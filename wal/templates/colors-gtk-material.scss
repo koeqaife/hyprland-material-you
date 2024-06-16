@@ -1,0 +1,57 @@
+$primary: #{color12.lighten(60)};
+$onPrimary: #{color4.darken(40)};
+$primaryContainer: #{color0.lighten(3)};
+$onPrimaryContainer: #{color0.lighten(80)};
+$secondary: #{color12.lighten(60)};
+$onSecondary: #{color4.darken(40)};
+$secondaryContainer: #{color0.lighten(2)};
+$onSecondaryContainer: #{color0.lighten(80)};
+$tertiary: adjust-hue(#{color0.lighten(3)}, 30deg);
+$onTertiary: adjust-hue(#{color0.lighten(80)}, 30deg);
+$tertiaryContainer: #{color4.darken(20)};
+$onTertiaryContainer: #{color12.lighten(20)};
+$error: #ffb4a9;
+$onError: #680003;
+$errorContainer: #930006;
+$onErrorContainer: #ffb4a9;
+$colorbarbg: #{color0.lighten(6)};
+$background: {color0};
+$onBackground: #{color0.lighten(80)};
+$surface: {color0};
+$onSurface: #{color0.lighten(80)};
+$surfaceVariant: #{color0.lighten(6)};
+$onSurfaceVariant: #{color0.lighten(80)};
+$outline: $foreground;
+$shadow: #{color0.darken(90)};
+$inverseSurface: invert($surface);
+$inverseOnSurface: invert($onSurface);
+$inversePrimary: invert($primary);
+
+.primary {{ color: $primary; }}
+.onPrimary {{ color: $onPrimary; }}
+.primaryContainer {{ color: $primaryContainer; }}
+.onPrimaryContainer {{ color: $onPrimaryContainer; }}
+.secondary {{ color: $secondary; }}
+.onSecondary {{ color: $onSecondary; }}
+.secondaryContainer {{ color: $secondaryContainer; }}
+.onSecondaryContainer {{ color: $onSecondaryContainer; }}
+.tertiary {{ color: $tertiary; }}
+.onTertiary {{ color: $onTertiary; }}
+.tertiaryContainer {{ color: $tertiaryContainer; }}
+.onTertiaryContainer {{ color: $onTertiaryContainer; }}
+.error {{ color: $error; }}
+.onError {{ color: $onError; }}
+.errorContainer {{ color: $errorContainer; }}
+.onErrorContainer {{ color: $onErrorContainer; }}
+.colorbarbg {{ color: $colorbarbg; }}
+.background {{ color: $background; }}
+.onBackground {{ color: $onBackground; }}
+.surface {{ color: $surface; }}
+.onSurface {{ color: $onSurface; }}
+.surfaceVariant {{ color: $surfaceVariant; }}
+.onSurfaceVariant {{ color: $onSurfaceVariant; }}
+.outline {{ color: $outline; }}
+.shadow {{ color: $shadow; }}
+.inverseSurface {{ color: $inverseSurface; }}
+.inverseOnSurface {{ color: $inverseOnSurface; }}
+.inversePrimary {{ color: $inversePrimary; }}

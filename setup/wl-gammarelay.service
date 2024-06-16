@@ -1,0 +1,13 @@
+
+[Unit]
+Description=wl-gammarelay service
+After=graphical-session.target
+ConditionEnvironment=WAYLAND_DISPLAY
+
+[Service]
+ExecStart=/usr/bin/wl-gammarelay
+Restart=always
+Environment="XDG_RUNTIME_DIR=/run/user/%U"
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,430 @@
+@import "/home/mrdan/.cache/material/colors.css";
+/* */
+@define-color theme_fg_color #AEE5FA;
+@define-color theme_text_color #AEE5FA;
+@define-color theme_bg_color #1a1b26;
+@define-color theme_base_color #1a1b26;
+@define-color theme_selected_bg_color #AEE5FA;
+@define-color theme_selected_fg_color rgba(0, 0, 0, 0.87);
+@define-color insensitive_bg_color #1a1b26;
+@define-color insensitive_fg_color rgba(192, 202, 245, 0.5);
+@define-color insensitive_base_color #24283b;
+@define-color theme_unfocused_fg_color #AEE5FA;
+@define-color theme_unfocused_text_color #c0caf5;
+@define-color theme_unfocused_bg_color #1a1b26;
+@define-color theme_unfocused_base_color #1a1b26;
+@define-color theme_unfocused_selected_bg_color #a9b1d6;
+@define-color theme_unfocused_selected_fg_color rgba(0, 0, 0, 0.87);
+@define-color unfocused_insensitive_color rgba(192, 202, 245, 0.5);
+@define-color borders rgba(192, 202, 245, 0.12);
+@define-color unfocused_borders rgba(192, 202, 245, 0.12);
+@define-color warning_color #FDD633;
+@define-color error_color #BA1B1B;
+@define-color success_color #81C995;
+@define-color wm_title #AEE5FA;
+@define-color wm_unfocused_title rgba(192, 202, 245, 0.7);
+@define-color wm_highlight rgba(192, 202, 245, 0.1);
+@define-color wm_bg #1a1b26;
+@define-color wm_unfocused_bg #1a1b26;
+@define-color wm_button_close_icon #1a1b26;
+@define-color wm_button_close_hover_bg #a9b1d6;
+@define-color wm_button_close_active_bg #c7c7c7;
+@define-color content_view_bg #1a1b26;
+@define-color placeholder_text_color @onSurface;
+@define-color text_view_bg #1d1d1d;
+@define-color budgie_tasklist_indicator_color #90D1F6;
+@define-color budgie_tasklist_indicator_color_active #90D1F6;
+@define-color budgie_tasklist_indicator_color_active_window #999999;
+@define-color budgie_tasklist_indicator_color_attention #FDD633;
+@define-color STRAWBERRY_100 #FF9262;
+@define-color STRAWBERRY_300 #FF793E;
+@define-color STRAWBERRY_500 #F15D22;
+@define-color STRAWBERRY_700 #CF3B00;
+@define-color STRAWBERRY_900 #AC1800;
+@define-color ORANGE_100 #FFDB91;
+@define-color ORANGE_300 #FFCA40;
+@define-color ORANGE_500 #FAA41A;
+@define-color ORANGE_700 #DE8800;
+@define-color ORANGE_900 #C26C00;
+@define-color BANANA_100 #FFFFA8;
+@define-color BANANA_300 #FFFA7D;
+@define-color BANANA_500 #FFCE51;
+@define-color BANANA_700 #D1A023;
+@define-color BANANA_900 #A27100;
+@define-color LIME_100 #A2F3BE;
+@define-color LIME_300 #8ADBA6;
+@define-color LIME_500 #73C48F;
+@define-color LIME_700 #479863;
+@define-color LIME_900 #1C6D38;
+@define-color BLUEBERRY_100 #94A6FF;
+@define-color BLUEBERRY_300 #6A7CE0;
+@define-color BLUEBERRY_500 #3F51B5;
+@define-color BLUEBERRY_700 #213397;
+@define-color BLUEBERRY_900 #031579;
+@define-color GRAPE_100 #D25DE6;
+@define-color GRAPE_300 #B84ACB;
+@define-color GRAPE_500 #9C27B0;
+@define-color GRAPE_700 #830E97;
+@define-color GRAPE_900 #6A007E;
+@define-color COCOA_100 #9F9792;
+@define-color COCOA_300 #7B736E;
+@define-color COCOA_500 #574F4A;
+@define-color COCOA_700 #463E39;
+@define-color COCOA_900 #342C27;
+@define-color SILVER_100 #EEE;
+@define-color SILVER_300 #CCC;
+@define-color SILVER_500 #AAA;
+@define-color SILVER_700 #888;
+@define-color SILVER_900 #666;
+@define-color SLATE_100 #888;
+@define-color SLATE_300 #666;
+@define-color SLATE_500 #444;
+@define-color SLATE_700 #222;
+@define-color SLATE_900 #111;
+@define-color BLACK_100 #474341;
+@define-color BLACK_300 #403C3A;
+@define-color BLACK_500 #393634;
+@define-color BLACK_700 #33302F;
+@define-color BLACK_900 #2B2928;
+@define-color accent_bg_color @primary;
+@define-color accent_fg_color @onPrimary;
+@define-color accent_color @primary;
+@define-color destructive_bg_color @error;
+@define-color destructive_fg_color @onError;
+@define-color destructive_color @error;
+@define-color success_bg_color #C5E1A5;
+@define-color success_fg_color #33691E;
+@define-color warning_bg_color #FFE082;
+@define-color warning_fg_color #E65100;
+@define-color error_bg_color @error;
+@define-color error_fg_color @onError;
+@define-color window_bg_color @background;
+@define-color window_fg_color @foreground;
+@define-color view_bg_color @surface;
+@define-color view_fg_color @onSurface;
+@define-color headerbar_bg_color mix(@dialog_bg_color, @window_bg_color, 0.5);
+@define-color headerbar_fg_color @onSecondaryContainer;
+@define-color headerbar_border_color @secondaryContainer;
+@define-color headerbar_backdrop_color @headerbar_bg_color;
+@define-color headerbar_shade_color rgba(0, 0, 0, 0.09);
+@define-color card_bg_color @surfaceContainerLowest;
+@define-color card_fg_color @onSecondaryContainer;
+@define-color card_shade_color rgba(0, 0, 0, 0.09);
+@define-color dialog_bg_color @surfaceContainer;
+@define-color dialog_fg_color @onSecondaryContainer;
+@define-color popover_bg_color @surfaceContainer;
+@define-color popover_fg_color @onSecondaryContainer;
+@define-color thumbnail_bg_color #1a1b26;
+@define-color thumbnail_fg_color #AEE5FA;
+@define-color shade_color rgba(0, 0, 0, 0.36);
+@define-color scrollbar_outline_color rgba(0, 0, 0, 0.5);
+@define-color sidebar_bg_color @surface;
+@define-color sidebar_fg_color @onSurface;
+@define-color sidebar_border_color @sidebar_bg_color;
+@define-color sidebar_backdrop_color @sidebar_bg_color;
+
+.navigation-sidebar {
+    background-color: @sidebar_bg_color;
+}
+
+.navigation-sidebar row {
+    border-radius: 100px;
+}
+
+.navigation-sidebar label {
+    color: @outline;
+}
+
+.navigation-sidebar row:selected {
+    background-color: @secondaryContainer;
+}
+
+.navigation-sidebar row:selected label {
+    color: @onSecondaryContainer;
+    background-color: transparent;
+}
+
+.navigation-sidebar row:active {
+    background-color: mix(@secondaryContainer, @onSecondaryContainer, 0.1);
+}
+
+.navigation-sidebar row:active label {
+    color: @onSecondaryContainer;
+    background-color: transparent;
+}
+
+tooltip {
+    background-color: @surfaceContainer;
+    color: @foreground;
+    border-radius: 11px;
+    border: 0px solid;
+}
+
+menu * {
+    border-radius: 0px;
+}
+
+menu separator {
+    color: @outline;
+}
+
+menu {
+    padding: 8px 0px 8px 0px;
+    background: @surfaceContainer;
+}
+
+separator {
+    color: @outline;
+    margin-right: 0px;
+    margin-left: 0px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    padding: 0px;
+}
+
+button, combobox, entry {
+    border-radius: 100px;
+    margin-left: 2px;
+    margin-right: 2px;
+    border: none;
+}
+
+* {
+    box-shadow: none;
+    transition: all 0.2s ease-in-out;
+}
+
+button:not(.flat).image-button {
+    background-color: @secondaryContainer;
+    color: @onSecondaryContainer;
+    transition: all 0.1s ease-in-out;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+button:not(.flat).image-button label, button:not(.flat).image-button .icon, 
+button:not(.flat).image-button image {
+    color: @onSecondaryContainer;
+}
+
+button:not(.flat).image-button:hover {
+    background-color: mix(@secondaryContainer, @onSecondaryContainer, 0.05);
+    box-shadow: 00px 3px 3px -2px rgba(0, 0, 0, 0.2);
+}
+
+button:not(.flat).image-button:active {
+    background-color: mix(@secondaryContainer, @onSecondaryContainer, 0.1);
+    box-shadow: none;
+}
+
+button:not(.flat).image-button:checked {
+    background-color: mix(@secondaryContainer, @onSecondaryContainer, 0.1);
+    box-shadow: none;
+}
+
+scale slider {
+    background-color: @primary;
+}
+
+switch {
+	border: 2px solid;
+    border-radius: 100px;
+    border-color: @outline;
+    background-color: @surfaceContainerHighest;
+}
+
+switch slider {
+    border-radius: 100px;
+    background-color: @outline;
+}
+
+switch:disabled {
+	background-color: @surfaceContainerHighest;
+    border-color: @onSurface;
+}
+
+switch:disabled slider {
+    background-color: @onSurface;
+}
+
+switch:hover {
+    background-color: mix(@surfaceContainerHighest, @onSurface, 0.08);
+}
+
+switch:hover slider {
+    background-color: @onSurfaceVariant;
+}
+
+switch:active {
+    background-color: mix(@surfaceContainerHighest, @onSurface, 0.08);
+}
+
+switch:active slider {
+    background-color: @onSurfaceVariant;
+}
+
+switch:checked {
+	background-color: @primary;
+    border-color: @primary;
+}
+
+switch:checked slider {
+    background-color: @onPrimary;
+}
+
+switch:checked:disabled {
+	background-color: @onSurface;
+    border-color: @onSurface;
+}
+
+switch:checked:disabled slider {
+    background-color: @surface;
+}
+
+switch:checked:hover {
+	background-color: @primary;
+    border-color: @primary;
+}
+
+switch:checked:hover slider {
+    background-color: @primaryContainer;
+}
+
+switch:checked:active {
+	background-color: @primary;
+    border-color: @primary;
+}
+
+switch:checked:active slider {
+    background-color: @primaryContainer;
+    border-color: @primaryContainer;
+}
+
+radio {
+    color: @onSurfaceVariant;
+    background-color: transparent;
+    border: 2px solid;
+    border-color: @onSurfaceVariant;
+    opacity: 1;
+    padding: 1px;
+}
+
+radio:checked {
+    color: @primary;
+    border-color: @primary;
+}
+
+radio:indeterminate {
+    color: @primary;
+    border-color: @primary;
+}
+
+radio:disabled {
+    color: @onSurface;
+    border-color: @onSurface;
+    background-color: transparent;
+    opacity: 0.38;
+}
+
+radio:checked:disabled {
+    color: @surface;
+    border-color: @onSurface;
+    background-color: @onSurface;
+    opacity: 0.38;
+}
+
+radio:indeterminate:disabled {
+    color: @surface;
+    border-color: @onSurface;
+    background-color: @onSurface;
+    opacity: 0.38;
+}
+
+radio:hover {
+    background-color: mix(@onSurface, transparent, 0.92);
+}
+
+radio:checked:hover {
+    background-color: mix(@primary, transparent, 0.92);
+}
+
+radio:indeterminate:hover {
+    background-color: mix(@primary, transparent, 0.92);
+}
+
+radio:active {
+    background-color: mix(@onSurface, transparent, 0.9);
+}
+
+radio:checked:active {
+    background-color: mix(@primary, transparent, 0.9);
+}
+
+radio:indeterminate:active {
+    background-color: mix(@primary, transparent, 0.9);
+}
+
+check {
+    color: @onSurface;
+    background-color: transparent;
+    border: 2px solid;
+    border-color: @onSurfaceVariant;
+    opacity: 1;
+    padding: 1px;
+}
+
+check:checked {
+    background-color: @primary;
+    border-color: transparent;
+    color: @onPrimary;
+}
+
+check:indeterminate {
+    background-color: @primary;
+    border-color: transparent;
+    color: @onPrimary;
+}
+
+check:disabled {
+    color: @onSurface;
+    border-color: @onSurface;
+    opacity: 0.38;
+}
+
+check:checked:disabled {
+    background-color: @onSurface;
+    border-color: transparent;
+    color: @surface;
+    opacity: 0.38;
+}
+
+check:indeterminate:disabled {
+    background-color: @onSurface;
+    border-color: transparent;
+    color: @surface;
+    opacity: 0.38;
+}
+
+check:hover {
+    background-color: mix(@onSurface, transparent, 0.92);
+}
+
+check:checked:hover {
+    background-color: @primary;
+}
+
+check:indeterminate:hover {
+    background-color: @primary;
+}
+
+check:active {
+    background-color: mix(@onSurface, transparent, 0.92);
+}
+
+check:checked:active {
+    background-color: @primary;
+}
+
+check:indeterminate:active {
+    background-color: @primary;
+}

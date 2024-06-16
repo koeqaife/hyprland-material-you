@@ -1,0 +1,53 @@
+@import url(https://capnkitten.github.io/BetterDiscord/Themes/Material-Discord/css/source.css);
+@import "<output-folder>/colors.scss";
+
+$color-scheme: <color-scheme>;
+
+$hue: round(hue($primary));
+$saturation: round(saturation($primary));
+$lightness: round(lightness($primary));
+
+* {
+    transition: color 0.2s ease-in-out;
+    transition-property: background-color, color;
+}
+
+.theme-#{$color-scheme} {
+	--main-color: #{$background};
+	--main-alt: #{$surfaceContainerLow};
+
+	--message-color: #{$surfaceContainerLowest};
+	--message-color-hover: #{$surfaceContainer};
+	--message-color-alt: #{$surfaceContainer};
+	--attachment-color: #{$background};
+
+	--accent-hue: #{$hue};
+	--accent-saturation: #{$saturation};
+	--accent-lightness: #{$lightness};
+	--accent-text-color: #{$onPrimary};
+
+	--main-textarea-color: #{$surfaceContainerHigh};
+	--main-textarea-color-alt: #{$surfaceContainerHighest};
+	--status-picker-color: #{$surfaceContainerHigh};
+
+	--tooltip-color: #{$surfaceContainer};
+	--popout-color: #{$surfaceContainer};
+	--popout-color-alt: #{$surfaceContainerLowest};
+	--popout-header-border: #{$onSurface};
+	--separator-color: #{$outlineVariant};
+	--sidebar-panel-color: #{$surfaceContainerLowest};
+	--server-color: #{$surfaceContainerLow};
+}
+
+[class*="botTag_"] svg path {
+	fill: #{$onPrimary};
+}
+
+[class*="repliedTextContent_"] {
+	padding: 0px 5px 0px 5px !important;
+}
+
+[class*="userPopoutOuter_"] {
+	border-radius: 16px !important;
+}
+  
