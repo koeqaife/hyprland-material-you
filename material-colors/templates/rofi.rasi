@@ -1,0 +1,22 @@
+* {
+    background:             <background>;
+
+    background-alt:         <surfaceContainer>;
+    foreground:             <onBackground>;
+    selected:               <primary>;
+    on-selected:            <onPrimary>;
+    active:                 <secondary>;
+    on-active:              <onSecondary>;
+    urgent:                 <error>;
+    on-urgent:              <onError>;
+    border-color:           <outlineVariant>;
+    surface:                <surface>;
+    surface-container-high: <surfaceContainerHigh>;
+    on-surface-variant:     <onSurfaceVariant>;
+    on-surface:             <onSurface>;
+    outline-variant:        <outlineVariant>;
+    secondary:              <secondary>;
+    on-secondary:            <onSecondary>;
+    secondary-container:     <secondaryContainer>;
+    on-secondary-container:   <onSecondaryContainer>;
+}

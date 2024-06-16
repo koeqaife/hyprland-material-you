@@ -1,0 +1,67 @@
+$primary: <primary>;
+$onPrimary: <onPrimary>;
+$primaryContainer: <primaryContainer>;
+$onPrimaryContainer: <onPrimaryContainer>;
+$secondary: <secondary>;
+$onSecondary: <onSecondary>;
+$secondaryContainer: <secondaryContainer>;
+$onSecondaryContainer: <onSecondaryContainer>;
+$tertiary: <tertiary>;
+$onTertiary: <onTertiary>;
+$tertiaryContainer: <tertiaryContainer>;
+$onTertiaryContainer: <onTertiaryContainer>;
+$error: <error>;
+$onError: <onError>;
+$errorContainer: <errorContainer>;
+$onErrorContainer: <onErrorContainer>;
+$colorbarbg: <surfaceContainer>;
+$background: <background>;
+$onBackground: <onBackground>;
+$surface: <surface>;
+$surfaceContainer: <surfaceContainer>;
+$surfaceContainerHigh: <surfaceContainerHigh>;
+$surfaceContainerHighest: <surfaceContainerHighest>;
+$surfaceContainerLowest: <surfaceContainerLowest>;
+$surfaceContainerLow: <surfaceContainerLow>;
+$onSurface: <onSurface>;
+$surfaceVariant: <surfaceVariant>;
+$onSurfaceVariant: <onSurface>;
+$outline: <outline>;
+$shadow: <shadow>;
+$inverseSurface: <inverseSurface>;
+$inverseOnSurface: <inverseOnSurface>;
+$inversePrimary: <inversePrimary>;
+
+.primary { color: $primary; }
+.onPrimary { color: $onPrimary; }
+.primaryContainer { color: $primaryContainer; }
+.onPrimaryContainer { color: $onPrimaryContainer; }
+.secondary { color: $secondary; }
+.onSecondary { color: $onSecondary; }
+.secondaryContainer { color: $secondaryContainer; }
+.onSecondaryContainer { color: $onSecondaryContainer; }
+.tertiary { color: $tertiary; }
+.onTertiary { color: $onTertiary; }
+.tertiaryContainer { color: $tertiaryContainer; }
+.onTertiaryContainer { color: $onTertiaryContainer; }
+.error { color: $error; }
+.onError { color: $onError; }
+.errorContainer { color: $errorContainer; }
+.onErrorContainer { color: $onErrorContainer; }
+.colorbarbg { color: $colorbarbg; }
+.background { color: $background; }
+.onBackground { color: $onBackground; }
+.surface { color: $surface; }
+.surfaceContainer { color: $surfaceContainer; }
+.surfaceContainerHigh { color: $surfaceContainerHigh; }
+.surfaceContainerHighest { color: $surfaceContainerHighest; }
+.surfaceContainerLowest { color: $surfaceContainerLowest; }
+.surfaceContainerLow { color: $surfaceContainerLow; }
+.onSurface { color: $onSurface; }
+.surfaceVariant { color: $surfaceVariant; }
+.onSurfaceVariant { color: $onSurfaceVariant; }
+.outline { color: $outline; }
+.shadow { color: $shadow; }
+.inverseSurface { color: $inverseSurface; }
+.inverseOnSurface { color: $inverseOnSurface; }
+.inversePrimary { color: $inversePrimary; }

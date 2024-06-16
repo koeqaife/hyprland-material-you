@@ -1,0 +1,880 @@
+@import "/home/mrdan/.cache/material/colors.css";
+
+window.bar {
+    background-color: @surface;
+    padding: 6px;
+}
+
+.bar label {
+    font-weight: bold;
+}
+
+button {
+    background: transparent;
+}
+
+trough {
+}
+
+/* slider {
+    background-color: @primary;
+    background-image: -gtk-scaled(url("sun-alt-svgrepo-com.png"));
+    background-size: 100px 100px;
+    color: @primary;
+    min-height: 10px;
+    min-width: 10px;
+    border-radius: 100px;
+} */
+
+scale slider {                                                                                      
+    background-image: -gtk-scaled(url("/home/mrdan/.cache/material/brightness-onPrimary.svg"));
+    color: @onPrimary;
+    background-color: @primary;
+    background-size: 20px 20px;
+    min-width: 24px;
+    min-height: 24px;
+    border-radius: 100px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+highlight {
+    border-radius: 100px;
+}
+
+* {
+    border: none;
+    outline: none;
+    transition: background-color, color 0.25s ease-in-out;
+    font-family: "Product Sans", "Font Awesome 6 Free", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.corner {
+    background-color: @background;
+    border-radius: 38px;
+}
+
+tooltip {
+    background-color: @surfaceContainer;
+    color: @foreground;
+    border-radius: 11px;
+    border: 0px solid;
+}
+
+menu separator {
+    color: @outline;
+}
+
+separator {
+    color: @outline;
+    margin-right: 0px;
+    margin-left: 0px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    padding: 0px;
+}
+
+/* -----------------------------------------------------
+ * Modules
+ * ----------------------------------------------------- */
+
+.modules-left,
+.modules-center,
+.modules-right {
+    /* background-color: @surface; */
+    /* border-radius: 25px 25px 25px 25px; */
+    padding: 6px;
+    /* border: solid 2px; */
+    /* color: @outlineVariant; */
+}
+
+/* -----------------------------------------------------
+ * Workspaces 
+ * ----------------------------------------------------- */
+
+.workspaces {
+    border-radius: 16px;
+    font-weight: bold;
+    font-style: normal;
+    font-size: 16px;
+    color: @onSurface;
+    background: @surfaceContainer;
+}
+
+.workspaces button {
+    padding: 0px 5px;
+    margin: 4px 3px;
+    border-radius: 16px;
+    border: 0px;
+    color: @onSurface;
+    transition: all 0.35s ease-in-out;
+}
+
+.workspaces button.active {
+    color: @onSecondaryContainer;
+    background: @secondaryContainer;
+    border-radius: 16px;
+    min-width: 40px;
+}
+
+.workspaces button:hover {
+    color: @onSurface;
+    background: @surfaceContainerHighest;
+    border-radius: 16px;
+}
+
+.workspaces button.active:hover {
+    color: @onPrimaryContainer;
+    background: @primaryContainer;
+    border-radius: 16px;
+}
+
+/* -----------------------------------------------------
+ * Clock
+ * ----------------------------------------------------- */
+
+.clock {
+    background-color: @surfaceContainer;
+    border-radius: 16px;
+    padding: 2px 10px 0px 10px;
+}
+
+.time {
+    color: @onSurface;
+    font-size: 14px;
+}
+
+.date {
+    color: @onSurface;
+    font-size: 10px;
+}
+
+/* -----------------------------------------------------
+ * Tray
+ * ----------------------------------------------------- */
+
+
+.tray {
+    background-color: @surfaceContainer;
+    border-radius: 16px;
+    padding: 2px 10px 0px 10px;
+}
+
+.tray button {
+    margin: 0px;
+    padding: 0px;
+}
+
+/* -----------------------------------------------------
+ * Notifications
+ * ----------------------------------------------------- */
+
+window.notification-popups box.notifications {
+    padding: 15px;
+    min-width: 350px;
+}
+
+
+.notification-icon {
+    min-width: 68px;
+    min-height: 68px;
+    margin-right: 1em;
+}
+
+.notification-icon image {
+    font-size: 58px;
+    /* to center the icon */
+    margin: 5px;
+    color: @onSurface;
+}
+
+.notification-icon box {
+    min-width: 68px;
+    min-height: 68px;
+    border-radius: 7px;
+}
+
+.notification {
+    min-width: 350px;
+    border-radius: 24px;
+    padding: 1em;
+    margin: 1px;
+    background-color: @surfaceContainerLowest;
+}
+
+.notification.critical {
+    border: 2px solid @error;
+}
+
+.notification-title {
+    color: @foreground;
+    font-size: 1.4em;
+}
+
+.notification-body {
+    color: @foreground;
+}
+
+.notification-actions .notification-action-button {
+    margin: 0 .4em;
+    margin-top: .8em;
+}
+
+.notification-action-button {
+    background-color: @primary;
+    color: @onPrimary;
+}
+
+.notification-actions .notification-action-button:first-child {
+    margin-left: 0;
+}
+
+.notification-actions .notification-action-button:last-child {
+    margin-right: 0;
+}
+
+/* -----------------------------------------------------
+ * Applications
+ * ----------------------------------------------------- */
+
+.applauncher_box {
+    border-radius: 24px;
+    background-color: @background;
+    border: 2px solid;
+    border-color: @outlineVariant;
+}
+
+.applauncher_box {
+    padding: 11px;
+}
+
+.applauncher_entry {
+    background-color: @surfaceContainerHigh;
+    border: none;
+    outline: none;
+    border-radius: 100px;
+    transition: all 0.2s ease-in-out;
+    margin-bottom: 16px;
+    padding: 5px;
+    font-weight: normal;
+    padding-left: 25px;
+}
+
+.application_container label {
+    color: @onSurface;
+    font-weight: normal;
+}
+
+.application_container {
+    transition: all 0.2s ease-in-out;
+    border-radius: 100px;
+    border: none;
+    outline: none;
+}
+
+.application_container:hover {
+    background-color: @surfaceContainerHighest;
+}
+
+.application_container:focus label {
+    color: @onPrimary;
+}
+
+.application_container:focus {
+    background-color: @primary;
+    border: 0px solid;
+    border-radius: 34px;
+    border: none;
+    outline: none;
+}
+
+.application_divider {
+    color: @outline;
+    margin: 5px 0px 5px 0px;
+}
+
+.application_label {
+    transition: all 0.2s ease-in-out;
+    color: @onSurface
+}
+
+.application_icon {
+    margin-right: 16px;
+}
+
+/* -----------------------------------------------------
+ * Clipboard history
+ * ----------------------------------------------------- */
+
+ .cliphistory_box {
+    border-radius: 24px;
+    background-color: @background;
+    border: 2px solid;
+    border-color: @outlineVariant;
+}
+
+.cliphistory_box {
+    padding: 11px;
+}
+
+.cliphistory_entry {
+    background-color: @surfaceContainerHigh;
+    color: @onSurface;
+    border: none;
+    outline: none;
+    border-radius: 100px;
+    transition: all 0.2s ease-in-out;
+    margin-bottom: 16px;
+    padding: 5px;
+    padding-left: 25px;
+}
+
+.entry_container {
+    transition: all 0.2s ease-in-out;
+    border-radius: 100px;
+    border: none;
+    outline: none;
+    min-height: 30px;
+}
+
+.entry_container:hover {
+    background-color: @surfaceContainerHighest;
+}
+
+.entry_container:focus .entry_label {
+    color: @onPrimary;
+}
+
+.entry_container:focus {
+    background-color: @primary;
+    border: 0px solid;
+    border-radius: 34px;
+    border: none;
+    outline: none;
+}
+
+.entry_divider {
+    color: @outline;
+    margin: 5px 0px 5px 0px;
+}
+
+.entry_label {
+    transition: all 0.2s ease-in-out;
+    color: @onSurface;
+    font-weight: normal;
+}
+
+/* -----------------------------------------------------
+ * Media player
+ * ----------------------------------------------------- */
+
+.player {
+    background-color: @background;
+    padding: 15px;
+    min-width: 350px;
+    border: 2px solid @outlineVariant;
+    border-radius: 24px;
+}
+
+.player .img {
+    min-width: 100px;
+    min-height: 100px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 13px;
+    color: @foreground;
+}
+
+.player .title {
+    font-size: 1.2em;
+    margin-left: 10px;
+    color: @foreground;
+}
+
+.player .artist {
+    font-size: 1.1em;
+    margin-left: 10px;
+    color: @foreground;
+}
+
+.player .length {
+    color: @foreground;
+}
+
+.player .position {
+    color: @foreground;
+    margin-left: 10px;
+}
+
+.player .icon {
+    color: @foreground
+}
+
+.player scale.position {
+    padding: 0;
+    margin-bottom: .3em;
+    margin-left: 10px;
+}
+
+.player scale.position trough {
+    background-color: @secondaryContainer;
+    min-height: 8px;
+}
+
+.player scale.position highlight {
+    background-color: @primary;
+}
+
+.player scale.position slider {
+    all: unset;
+}
+
+.player button {
+    min-height: 1em;
+    min-width: 1em;
+    padding: .3em;
+    color: @onSecondary;
+}
+
+.player button image {
+    color: @onSecondary;
+}
+
+.player_buttons {
+    background-color: @secondary;
+    border-radius: 100px;
+    padding: 3px;
+    margin-top: 2px;
+}
+
+/* -----------------------------------------------------
+ * Misc
+ * ----------------------------------------------------- */
+
+.keyboard {
+    background-color: @surfaceContainer;
+    color: @onSurface;
+    padding: 0px 10px 0px 10px;
+    border-radius: 100px;
+}
+
+.volume_box image {
+    margin-right: 5px;
+}
+
+.awesome_icon {
+    font-family: "Font Awesome 6 Free";
+}
+
+.battery {
+    background-color: @surfaceContainer;
+    border-radius: 100px;
+    padding: 2px 10px 2px 10px;
+}
+
+.battery label {
+    color: @onSurface;
+}
+
+.battery image {
+    color: @onSurface;
+}
+
+.bar_wifi {
+    background-color: @surfaceContainer;
+    border-radius: 100px;
+    padding: 2px 10px 2px 10px;
+}
+
+.bar_wifi image {
+    color: @onSurface;
+}
+
+/* -----------------------------------------------------
+ * Sidebar
+ * ----------------------------------------------------- */
+
+.sidebar_main_box {
+    background: @surfaceContainerLowest;
+}
+
+.sidebar_main_box .empty {
+    color: @onSurface;
+}
+
+.management_box {
+    padding: 15px;
+    padding-bottom: 0px;
+    outline: none;
+    border: none;
+}
+
+.management_button {
+    min-width: 180px;
+    min-height: 50px;
+}
+
+.management_button {
+    transition: all 0.2s ease-in-out;
+    border-radius: 25px;
+    background: @surfaceContainer;
+    border: none;
+    outline: none;
+}
+
+.management_button label {
+    transition: all 0.2s ease-in-out;
+    color: @onSurface;
+    font-weight: normal;
+}
+
+.ssid {
+    font-size: 12px;
+}
+
+.management_button .icon {
+    color: @onSurface
+}
+
+.management_button:hover {
+    background-color: @surfaceContainerHigh;
+}
+
+.management_button.active label {
+    color: @onPrimary
+}
+
+.management_button.active .icon {
+    color: @onPrimary
+}
+
+.management_button.active {
+    background-color: @primary;
+    border: 0px solid;
+}
+
+.management_button.waiting label {
+    color: @onError
+}
+
+.management_button.waiting .icon {
+    color: @onError
+}
+
+.management_button.waiting {
+    background-color: @error;
+    border: 0px solid;
+}
+
+.management_button.disabled {
+    background: transparent;
+}
+
+.sidebar_bottom {
+    background-color: @surfaceContainerLow;
+    border-radius: 24px 24px 0px 0px;
+    transition: all 0.25s ease-in-out;
+}
+
+.notification_sidebar_icon {
+    min-width: 68px;
+    min-height: 68px;
+    margin-right: 1em;
+}
+
+.notification_sidebar_icon image {
+    font-size: 58px;
+    /* to center the icon */
+    margin: 5px;
+    color: @onSurface;
+}
+
+.notification_sidebar_icon box {
+    min-width: 68px;
+    min-height: 68px;
+    border-radius: 7px;
+}
+
+.notification_sidebar {
+    min-width: 350px;
+    margin-left: 10px;
+    margin-right: 9px;
+    border-radius: 14px;
+    margin-top: 2px;
+    padding: 15px;
+    background-color: @background;
+    transition: all 0.25s ease-in-out;
+}
+
+
+.notifications_list_sidebar {
+    margin-top: 10px;
+}
+
+.notifications_list_sidebar:last-child {
+    margin-bottom: 10px;
+}
+
+
+.notification_sidebar.critical {
+    border: 2px solid @error;
+}
+
+.notification_sidebar_title {
+    color: @foreground;
+    font-size: 1.4em;
+}
+
+.notification_sidebar_body {
+    color: @foreground;
+}
+
+.notification_sidebar_actions .notification_sidebar_button {
+    margin: 0 .4em;
+    margin-top: .8em;
+}
+
+.notification_sidebar_button {
+    background-color: @primary;
+}
+
+.notification_sidebar_button label {
+    color: @onPrimary;
+}
+
+.notification_sidebar_actions .notification_sidebar_button:first-child {
+    margin-left: 0;
+}
+
+.notification_sidebar_actions .notification_sidebar_button:last-child {
+    margin-right: 0;
+}
+
+.notifications_sidebar_scrollable {
+    padding-right: 1px;
+    color: @primary;
+}
+
+.sidebar_buttons {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+    outline: none;
+    border: none;
+}
+
+.dotbuttons_box {
+    margin-bottom: 15px;
+}
+
+.dotbutton {
+    font-size: 10px;
+    margin: 0px;
+    padding: 3px;
+    transition: none;
+}
+
+.dotbutton label {
+    color: @surfaceContainerHigh;
+    transition: color 0.2s ease-in-out;
+}
+
+.dotbutton:hover {
+}
+
+.dotbutton.active label {
+    color: @secondary;
+}
+
+/* 
+.notifications_menu {
+    padding: 0px;
+    min-width: 50px;
+}
+
+.notifications_menu_item {
+    padding-right: 35px;
+    margin: 0px;
+} */
+
+/* -----------------------------------------------------
+ * Wifi
+ * ----------------------------------------------------- */
+
+.wifi_main_box {
+    min-height: 500px;
+    min-width: 500px;
+    background: @background;
+    border-radius: 24px;
+    border: 2px solid;
+    border-color: @outlineVariant;
+}
+
+.wifi_current {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.wifi_ssid {
+    font-weight: normal;
+    font-size: 14px;
+}
+
+.wifi_actual_content_box {
+    margin: 10px 10px 10px 10px;
+    background-color: @secondary;
+    padding: 3px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 16px;
+}
+
+.wifi_actual_content_box label {
+    color: @onSecondary;
+}
+
+.network_name {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.wifi_button {
+    margin: 2px 10px 0px 10px;
+    padding: 5px 10px 5px 10px;
+    background-color: @background;
+    border-radius: 16px;
+    transition: all 0.2s ease-in-out;
+}
+
+.wifi_button:hover {
+    background-color: @surfaceContainerHigh;
+}
+
+.wifi_button label, .wifi_button .icon {
+    color: @onSurface;
+}
+
+.wifi_scrollable {
+    background-color: @surfaceContainer;
+    border-radius: 24px;
+    padding-bottom: 2px;
+}
+
+.wifi_scrollable_box {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.wifi_revealer_box entry {
+    background-color: @surfaceContainerHigh;
+    color: @onSurface;
+    border-radius: 100px;
+}
+
+/* -----------------------------------------------------
+ * Buttons
+ * ----------------------------------------------------- */
+
+/* outline */
+.outline_button {
+    background-color: transparent;
+    border: 1.2px solid;
+    border-color: @outline;
+    border-radius: 100px;
+    padding-left: 24px;
+    padding-right: 24px;
+    transition: all 0.1s ease-in-out;
+}
+
+.outline_button label, .outline_button .icon,
+.outline_button .awesome_icon, image {
+    color: @primary;
+}
+
+.outline_button:hover {
+    background-color: mix(@primaryFixed, transparent, 0.8);
+}
+
+.outline_button:focus {
+    background-color: mix(@primaryFixed, transparent, 0.8);
+    border-color: @primary;
+}
+
+/* filled tonal */
+.filled_tonal_button {
+    background-color: @secondaryContainer;
+    color: @onSecondaryContainer;
+    border-radius: 100px;
+    transition: all 0.1s ease-in-out;
+}
+
+.filled_tonal_button label, .filled_tonal_button .icon,
+.filled_tonal_button .awesome_icon, image {
+    color: @onSecondaryContainer;
+}
+
+.filled_tonal_button:hover {
+    background-color: mix(@secondaryContainer, @onSecondaryContainer, 0.05);
+    box-shadow: 00px 3px 3px -2px rgba(0, 0, 0, 0.2);
+}
+
+.filled_tonal_button:active {
+    background-color: mix(@secondaryContainer, @onSecondaryContainer, 0.1);
+    box-shadow: none;
+}
+
+/* -----------------------------------------------------
+ * Navigation bar
+ * ----------------------------------------------------- */
+
+
+ .navigation {
+    background-color: @surfaceContainer;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.navigation .label {
+    font-weight: normal;
+    font-size: 12px;
+    margin-top: 3px;
+    color: @onSurface;
+}
+
+.navigation_button .container {
+    border-radius: 16px;
+    transition: all 0.2s ease-in-out;
+    padding: 5px;
+    min-height: 15px;
+}
+
+.navigation_button .icon {
+    font-weight: normal;
+    color: @onSurface;
+}
+
+.navigation_button.active .icon {
+    font-weight: bold;
+    color: @onSecondaryContainer;
+}
+
+.navigation_button .container_outer {
+    min-width: 60px;
+}
+
+.navigation_button:hover .container {
+    background-color: mix(@outline, transparent, 0.5);
+    min-width: 40px;
+}
+
+.navigation_button:active .container {
+    background-color: mix(@outline, transparent, 0.3);
+    min-width: 40px;
+}
+
+.navigation_button.active .container {
+    background: @secondaryContainer;
+    min-width: 40px;
+}
+
+
