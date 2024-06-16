@@ -69,6 +69,7 @@ echo ":: Copying files"
 sh $HOME/dotfiles/setup/copy.sh
 
 echo ":: Creating links"
+ln -f ~/.cache/material/material-discord.css ~/.config/Vencord/settings/quickCss.css
 ln -s $HOME/dotfiles/ags $HOME/.config/ags
 ln -s $HOME/dotfiles/alacritty $HOME/.config/alacritty
 ln -s $HOME/dotfiles/hypr $HOME/.config/hypr
