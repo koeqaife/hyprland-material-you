@@ -1,5 +1,12 @@
 #!/bin/bash
 # I tried to make it smooth, but it didn't work
+wl_gammarelay() {
+    if ! busctl --user list | grep rs.wl.gammarelay; then
+        systemctl --user restart wl-gammarelay.service
+    fi
+}
+wl_gammarelay >/dev/null
+
 LOCKFILE=/tmp/brightness.lock
 
 get_brightness() {

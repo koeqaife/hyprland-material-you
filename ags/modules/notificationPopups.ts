@@ -1,8 +1,11 @@
+import { Gtk as GtkType }from "types/@girs/gtk-3.0/gtk-3.0";
+import { Notification as NotificationType } from "types/service/notifications";
+import Box from "types/widgets/box";
+
 const notifications = await Service.import("notifications")
 const { Gtk } = imports.gi;
 
-/** @param {import('resource:///com/github/Aylur/ags/service/notifications.js').Notification} n */
-function NotificationIcon({ app_entry, app_icon, image }) {
+function NotificationIcon({ app_entry, app_icon, image }: NotificationType): Box<GtkType.Widget, any> {
     if (image) {
         return Widget.Box({
             css: `background-image: url("${image}");`
@@ -25,8 +28,7 @@ function NotificationIcon({ app_entry, app_icon, image }) {
 }
 
 
-/** @param {import('resource:///com/github/Aylur/ags/service/notifications.js').Notification} n */
-function Notification(n) {
+function Notification(n: NotificationType) {
     const icon = Widget.Box({
         vpack: "start",
         class_name: "notification-icon",
@@ -98,7 +100,7 @@ export function NotificationPopups(monitor = 0) {
         children: notifications.popups.map(Notification),
     })
 
-    function onNotified(_, /** @type {number} */ id) {
+    function onNotified(_: any, id: number) {
         const n = notifications.getNotification(id)
         if (n) {
 
@@ -116,7 +118,7 @@ export function NotificationPopups(monitor = 0) {
         }
     }
 
-    function onDismissed(_, /** @type {number} */ id) {
+    function onDismissed(_: any, id: number) {
         list.children.find(n => n.attribute.id === id)?.destroy()
     }
 

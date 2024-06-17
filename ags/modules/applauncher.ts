@@ -6,7 +6,9 @@ const Gio = imports.gi.Gio;
 const { Gtk } = imports.gi;
 const GLib = imports.gi.GLib;
 const WINDOW_NAME = "applauncher"
-import popupwindow from './.widgethacks/popupwindow.js';
+import Box from 'types/widgets/box';
+import popupwindow from './misc/popupwindow.ts';
+import { Application } from 'types/service/applications';
 
 
 const LAUNCH_COUNT_FILE = Gio.File.new_for_path(
@@ -25,7 +27,7 @@ function readLaunchCounts() {
     }
 }
 
-function writeLaunchCounts(launchCounts) {
+function writeLaunchCounts(launchCounts: number) {
     const data = JSON.stringify(launchCounts, null, 2);
     LAUNCH_COUNT_FILE.replace_contents(
         encoder.encode(data),
@@ -36,22 +38,22 @@ function writeLaunchCounts(launchCounts) {
     );
 }
 
-function incrementLaunchCount(appName) {
+function incrementLaunchCount(appName: string) {
     const launchCounts = readLaunchCounts();
     launchCounts[appName] = (launchCounts[appName] || 0) + 1;
     writeLaunchCounts(launchCounts);
 }
 
-function sortApplicationsByLaunchCount(applications) {
+function sortApplicationsByLaunchCount(applications: Box<any, any>[]) {
     const launchCounts = readLaunchCounts()
-    return applications.sort((a, b) => {
+    return applications.sort((a: Box<any, any>, b: Box<any, any>) => {
         const countA = launchCounts[a.attribute.app.name] || 0
         const countB = launchCounts[b.attribute.app.name] || 0
         return countB - countA
     })
 }
 
-const AppItem = function(app) {
+function AppItem(app: Application): Box<any, any> {
     let clickCount = 0;
     const button = Widget.Button({
         class_name: "application_container",
@@ -59,6 +61,7 @@ const AppItem = function(app) {
             children: [
                 Widget.Icon({
                     class_name: "application_icon",
+                    // @ts-ignore
                     icon: Utils.lookUpIcon(app.icon_name) ? app.icon_name : "image-missing",
                     size: 42,
                 }),

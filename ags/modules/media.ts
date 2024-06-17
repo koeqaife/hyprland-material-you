@@ -1,4 +1,6 @@
-import popupwindow from './.widgethacks/popupwindow.js';
+import { MprisPlayer } from 'types/service/mpris.js';
+import popupwindow from './misc/popupwindow.ts';
+import Label from 'types/widgets/label.js';
 const mpris = await Service.import("mpris")
 const players = mpris.bind("players")
 
@@ -9,16 +11,14 @@ const PREV_ICON = "media-skip-backward-symbolic"
 const NEXT_ICON = "media-skip-forward-symbolic"
 const WINDOW_NAME = "media"
 
-/** @param {number} length */
-function lengthStr(length) {
+function lengthStr(length: number): string {
     const min = Math.floor(length / 60)
     const sec = Math.floor(length % 60)
     const sec0 = sec < 10 ? "0" : ""
     return `${min}:${sec0}${sec}`
 }
 
-/** @param {import('types/service/mpris').MprisPlayer} player */
-function Player(player) {
+function Player(player: MprisPlayer) {
     const img = Widget.Box({
         class_name: "img",
         vpack: "start",
@@ -61,8 +61,8 @@ function Player(player) {
         class_name: "position",
         hpack: "start",
         setup: self => {
-            const update = (_, time) => {
-                self.label = lengthStr(time || player.position)
+            const update = (self: Label<any>) => {
+                self.label = lengthStr(player.position)
                 self.visible = player.length > 0
             }
 

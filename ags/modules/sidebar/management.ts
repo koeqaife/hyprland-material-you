@@ -1,7 +1,7 @@
 
 const notifications = await Service.import("notifications")
 const network = await Service.import('network')
-import { WINDOW_NAME } from "./main.js"
+import { WINDOW_NAME } from "./main.ts"
 
 const { Gtk } = imports.gi;
 const GLib = imports.gi.GLib;
@@ -294,7 +294,7 @@ function Page2() {
     })
 }
 
-const createDotButton = (index) => Widget.Button({
+const createDotButton = (index: number) => Widget.Button({
     label: '●',
     onClicked: () => currentPage.setValue(index),
     class_name: currentPage.bind().as(v => v == index ? "dotbutton active" : "dotbutton"),

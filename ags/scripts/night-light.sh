@@ -1,4 +1,12 @@
 #!/bin/bash
+wl_gammarelay() {
+    if ! busctl --user list | grep rs.wl.gammarelay; then
+        systemctl --user restart wl-gammarelay.service
+    fi
+}
+wl_gammarelay >/dev/null
+
+
 get_current_temperature() {
     busctl --user get-property rs.wl-gammarelay / rs.wl.gammarelay Temperature | awk '{print $2}'
 }

@@ -18,22 +18,22 @@ export const RoundedCorner = (place, props) => Widget.DrawingArea({
             widget.set_size_request(r, r);
 
             switch (place) {
-                case 'topleft':
+                case 'top_left':
                     cr.arc(r, r, r, Math.PI, 3 * Math.PI / 2);
                     cr.lineTo(0, 0);
                     break;
 
-                case 'topright':
+                case 'top_right':
                     cr.arc(0, r, r, 3 * Math.PI / 2, 2 * Math.PI);
                     cr.lineTo(r, 0);
                     break;
 
-                case 'bottomleft':
+                case 'bottom_left':
                     cr.arc(r, 0, r, Math.PI / 2, Math.PI);
                     cr.lineTo(0, r);
                     break;
 
-                case 'bottomright':
+                case 'bottom_right':
                     cr.arc(0, 0, r, 0, Math.PI / 2);
                     cr.lineTo(r, r);
                     break;
