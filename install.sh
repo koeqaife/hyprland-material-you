@@ -33,7 +33,7 @@ yay -S --noconfirm --needed \
     cliphist wl-clipboard pywal-16-colors libadwaita swappy nwg-look alacritty \
     pavucontrol polkit-gnome brightnessctl man-pages gvfs xarchiver zip imagemagick \
     blueman fastfetch bibata-cursor-theme gum python-pywayland brave dbus \
-    libdrm mesa fwupd rofi-wayland
+    libdrm mesa fwupd rofi-wayland bun-bin
 
 sleep 2
 
