@@ -1,5 +1,5 @@
-import popupwindow from '../.widgethacks/popupwindow.js';
-import { SideBar } from './sidebar.js'
+import popupwindow from '../misc/popupwindow.js';
+import { SideBar } from './sidebar.ts'
 
 export const WINDOW_NAME = "sidebar" 
 

@@ -1,6 +1,6 @@
-import { Management } from "./management.js"
-import { Buttons } from "./buttons.js";
-import { Navigation } from "./navigation.js";
+import { Management } from "./management.ts"
+import { Buttons } from "./buttons.ts";
+import { Navigation } from "./navigation.ts";
 const { Gtk } = imports.gi;
 
 export function SideBar() {

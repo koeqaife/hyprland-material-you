@@ -154,6 +154,10 @@ separator {
     padding: 0px;
 }
 
+.tray image {
+    color: @onSurface;
+}
+
 /* -----------------------------------------------------
  * Notifications
  * ----------------------------------------------------- */
@@ -289,6 +293,7 @@ window.notification-popups box.notifications {
 
 .application_icon {
     margin-right: 16px;
+    color: @onSurface;
 }
 
 /* -----------------------------------------------------
@@ -653,11 +658,11 @@ window.notification-popups box.notifications {
 }
 
 .system_scale slider {       
-    /* background-image: -gtk-scaled(url("/home/mrdan/.cache/material/brightness-onPrimary.svg")); */
+    background-image: -gtk-scaled(url("/home/mrdan/.cache/material/brightness-onPrimary.svg"));
     color: @onPrimary;
     background-color: @primary;
-    /* background-size: 20px 20px; */
-    min-width: 6px;
+    background-size: 20px 20px;
+    min-width: 30px;
     min-height: 23px;
     border-radius: 100px;
     padding: 0px;
@@ -665,10 +670,10 @@ window.notification-popups box.notifications {
     background-position: center;
     margin-left: 0px;
     margin-right: 0px;
-    margin-top: -18px;
-    margin-bottom: -18px;
-    box-shadow: -5px 0 0 1.5px @surfaceContainerLow,
-                5px 0px 0 1.5px @surfaceContainerLow;
+    margin-top: -16px;
+    margin-bottom: -16px;
+    /* box-shadow: -5px 0 0 1.5px @surfaceContainerLow,
+                5px 0px 0 1.5px @surfaceContainerLow; */
 }
 
 .system_scale {
@@ -682,6 +687,10 @@ window.notification-popups box.notifications {
 }
 
 .system_scale highlight {
+    border-radius: 100px 0px 0px 100px;
+    
+    margin-top: -13px;
+    margin-bottom: -13px;
     background-color: @primary;
 }
 

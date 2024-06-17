@@ -6,9 +6,12 @@ const network = await Service.import("network")
 const { Gtk, GLib, Gio } = imports.gi;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
-import { SIGNAL } from "./wifi.js";
-import { enableClickthrough } from "./.widgetutils/clickthrough.js";
-import { RoundedCorner } from "./.commonwidgets/cairo_roundedcorner.js";
+import { enableClickThrough } from "./misc/clickthrough.js";
+import { RoundedCorner } from "./misc/cairo_roundedcorner.js";
+import { Client, Workspace } from "types/service/hyprland.js"
+import Button from "types/widgets/button.js"
+import Icon from "types/widgets/icon.js"
+import { FileEnumerator, FileInfo } from "types/@girs/gio-2.0/gio-2.0.cjs"
 
 
 function checkKeymap() {
@@ -33,24 +36,24 @@ const date = Variable("", {
 })
 
 
-function getIconNameFromClass(windowClass) {
+function getIconNameFromClass(windowClass: string) {
     let formattedClass = windowClass.replace(/\s+/g, '-').toLowerCase();
     let homeDir = GLib.get_home_dir();
     let systemDataDirs = GLib.get_system_data_dirs().map(dir => dir + '/applications');
     let dataDirs = systemDataDirs.concat([homeDir + '/.local/share/applications']);
-    let icon;
+    let icon: string | undefined;
 
     for (let dir of dataDirs) {
         let applicationsGFile = Gio.File.new_for_path(dir);
 
-        let enumerator;
+        let enumerator: FileEnumerator;
         try {
             enumerator = applicationsGFile.enumerate_children('standard::name,standard::type', Gio.FileQueryInfoFlags.NONE, null);
         } catch (e) {
             continue;
         }
 
-        let fileInfo;
+        let fileInfo: FileInfo | null;
         while ((fileInfo = enumerator.next_file(null)) !== null) {
             let desktopFile = fileInfo.get_name();
             if (desktopFile.endsWith('.desktop')) {
@@ -71,23 +74,23 @@ function getIconNameFromClass(windowClass) {
     return Utils.lookUpIcon(icon) ? icon : "image-missing";
 }
 
-const dispatch = ws => hyprland.messageAsync(`dispatch workspace ${ws}`);
+const dispatch = (ws: string) => hyprland.messageAsync(`dispatch workspace ${ws}`);
 
 
 function Workspaces() {
     const activeId = hyprland.active.workspace.bind("id");
     let workspaceButtons = new Map();
 
-    function createWorkspaceButton(id) {
+    function createWorkspaceButton(id: Number) {
         const button = Widget.Button({
-            on_clicked: () => hyprland.messageAsync(`dispatch workspace ${id}`),
+            on_clicked: () => dispatch(`${id}`),
             child: Widget.Label(`${id}`),
             class_name: activeId.as(i => `${i === id ? "active" : ""}`),
         });
         return button;
     }
 
-    function updateWorkspaceButtons(workspaces) {
+    function updateWorkspaceButtons(workspaces: Workspace[]): Array<Button<any, any>> {
         workspaces.sort((a, b) => a.id - b.id);
 
         const updatedButtons = new Map();
@@ -165,7 +168,7 @@ function SysTray() {
                     tooltip_markup: item.bind("tooltip_markup"),
                 })
             } else {
-                return null
+                return undefined
             }
         }))
 
@@ -256,9 +259,9 @@ function OpenSideBar() {
 }
 
 function TaskBar() {
-    let globalWidgets = [];
+    let globalWidgets: Button<Icon<any>, any>[] = [];
 
-    function Clients(clients) {
+    function Clients(clients: Client[]) {
         const currentClientIds = clients.map(client => client.pid);
         globalWidgets = globalWidgets.filter(widget => currentClientIds.includes(widget.attribute.pid));
 
@@ -282,7 +285,6 @@ function TaskBar() {
         return globalWidgets;
     }
 
-    // @ts-ignore
     return Widget.Box({
         class_name: "tray",
         spacing: 5,
@@ -308,8 +310,7 @@ function volumeIndicator() {
                             [34, 'medium'],
                             [1, 'low'],
                             [0, 'muted'],
-                            // @ts-ignore
-                        ].find(([threshold]) => threshold <= vol)?.[1];
+                        ].find(([threshold]) => Number(threshold) <= vol)?.[1];
                         if (audio.speaker.is_muted)
                             self.icon = `audio-volume-muted-symbolic`;
                         else
@@ -389,27 +390,27 @@ export const Bar = async (monitor = 0) => {
     })
 }
 
-export const BarCornerTopleft = (monitor = 0) => Widget.Window({
+export const BarCornerTopLeft = (monitor = 0) => Widget.Window({
     monitor,
-    name: `barcornertl${monitor}`,
+    name: `bar_corner_tl${monitor}`,
     class_name: "transparent",
     layer: 'top',
     anchor: ['top', 'left'],
     exclusivity: 'normal',
     visible: true,
-    child: RoundedCorner('topleft', { className: 'corner', }),
-    setup: enableClickthrough,
+    child: RoundedCorner('top_left', { className: 'corner', }),
+    setup: enableClickThrough,
 });
 
-export const BarCornerTopright = (monitor = 0) => Widget.Window({
+export const BarCornerTopRight = (monitor = 0) => Widget.Window({
     monitor,
-    name: `barcornertr${monitor}`,
+    name: `bar_corner_tr${monitor}`,
     class_name: "transparent",
     layer: 'top',
     anchor: ['top', 'right'],
     exclusivity: 'normal',
     visible: true,
-    child: RoundedCorner('topright', { className: 'corner', }),
-    setup: enableClickthrough,
+    child: RoundedCorner('top_right', { className: 'corner', }),
+    setup: enableClickThrough,
 });
 

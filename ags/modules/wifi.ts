@@ -1,5 +1,7 @@
 import Network from "resource:///com/github/Aylur/ags/service/network.js";
-import popupwindow from './.widgethacks/popupwindow.js';
+import popupwindow from './misc/popupwindow.ts';
+import Button from "types/widgets/button.js";
+import Box, { BoxProps } from "types/widgets/box.js";
 const WINDOW_NAME = "wifi";
 
 
@@ -11,16 +13,14 @@ export const SIGNAL = {
     'network-wireless-signal-none-symbolic': "󰤯",
 }
 
-// @ts-ignore
 let connectAttempt = '';
 
-const WifiNetwork = (accessPoint) => {
+const WifiNetwork = (accessPoint: any): Button<Box<any, any>, any> => {
     const networkStrength = Widget.Label({
         label: SIGNAL[accessPoint.iconName],
         class_name: "awesome_icon icon",
         css: "margin-right: 0.60em;"
     })
-    // @ts-ignore
     const networkName = Widget.Box({
         vertical: true,
         class_name: "network_name",
@@ -42,7 +42,6 @@ const WifiNetwork = (accessPoint) => {
             // })
             .catch(print),
         className: 'wifi_button',
-        // @ts-ignore
         child: Widget.Box({
             className: 'wifi_Box',
             children: [
@@ -52,7 +51,9 @@ const WifiNetwork = (accessPoint) => {
                 accessPoint.active ? Widget.Label({
                     label: "",
                     class_name: "awesome_icon icon"
-                }) : null,
+                }) : Widget.Box({
+                    visible: false
+                }),
             ],
         })
     })
@@ -77,8 +78,7 @@ const CurrentNetwork = () => {
                 label: Network.wifi?.ssid,
                 setup: (self) => self.hook(Network, (self) => {
                     if (authLock) return;
-                    // @ts-ignore
-                    self.label = Network.wifi?.ssid;
+                    self.label = Network.wifi?.ssid || "Unknown";
                 }),
             }),
         ]
@@ -108,7 +108,7 @@ const CurrentNetwork = () => {
                     visibility: false, // Password dots
                     onAccept: (self) => {
                         authLock = false;
-                        networkAuth.revealChild = false;
+                        networkAuth.reveal_child = false;
                         Utils.execAsync(`nmcli device wifi connect '${connectAttempt}' password '${self.text}'`)
                             .catch(print);
                     }
@@ -118,13 +118,12 @@ const CurrentNetwork = () => {
         setup: (self) => self.hook(Network, (self) => {
             if (Network.wifi.state == 'failed' || Network.wifi.state == 'need_auth') {
                 authLock = true;
-                // @ts-ignore
-                connectAttempt = Network.wifi.ssid;
-                self.revealChild = true;
+                connectAttempt = Network.wifi?.ssid || "Unknown";
+                self.reveal_child = true;
             }
             if (Network.wifi.state == "activated") {
                 authLock = false;
-                self.revealChild = false;
+                self.reveal_child = false;
             }
         }),
     });
@@ -160,7 +159,7 @@ const CurrentNetwork = () => {
     })
 }
 
-export function WifiWidget(props) {
+export function WifiWidget(...props: BoxProps[]) {
     const networkList = Widget.Box({
         vertical: true,
         className: 'spacing-v-10',

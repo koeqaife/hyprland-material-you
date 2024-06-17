@@ -1,10 +1,18 @@
 const { GLib } = imports.gi;
 const WINDOW_NAME = "cliphist"
-import popupwindow from './.widgethacks/popupwindow.js';
+import popupwindow from './misc/popupwindow.ts';
+import Box from 'types/widgets/box.js';
 const { Gtk } = imports.gi;
 
 
-function ClipHistItem(entry) {
+type EntryObject = {
+    id: string;
+    content: string;
+    entry: string;
+};
+
+
+function ClipHistItem(entry: string) {
     let [id, ...content] = entry.split('\t');
     let clickCount = 0;
     let button = Widget.Button({
@@ -46,10 +54,10 @@ function ClipHistItem(entry) {
 
 
 function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
-    let output;
-    let entries;
-    let clipHistItems;
-    let widgets;
+    let output: string;
+    let entries: string[];
+    let clipHistItems: EntryObject[];
+    let widgets: Box<any, any>[];
 
     const list = Widget.Box({
         vertical: true,

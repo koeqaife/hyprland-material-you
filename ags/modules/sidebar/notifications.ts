@@ -1,9 +1,9 @@
+import { Notification as NotificationType } from "types/service/notifications";
 
 const notifications = await Service.import("notifications")
 const { Gtk, Gdk } = imports.gi;
 
-/** @param {import('resource:///com/github/Aylur/ags/service/notifications.js').Notification} n */
-function NotificationIcon({ app_entry, app_icon, image }) {
+function NotificationIcon({ app_entry, app_icon, image }: NotificationType) {
     if (image) {
         return Widget.Box({
             css: `background-image: url("${image}");`
@@ -26,8 +26,7 @@ function NotificationIcon({ app_entry, app_icon, image }) {
 }
 
 
-/** @param {import('resource:///com/github/Aylur/ags/service/notifications.js').Notification} n */
-function Notification(n) {
+function Notification(n: NotificationType) {
     const icon = Widget.Box({
         vpack: "start",
         class_name: "notification_sidebar_icon",
@@ -94,7 +93,12 @@ function Notification(n) {
     return Box
 }
 
-export function NotificationsBox({ exclude = [], include = [] }) {
+type NotificationsBoxType = {
+    exclude?: string[],
+    include?: string[]
+}
+
+export function NotificationsBox({ exclude = [""], include = [""] }: NotificationsBoxType) {
     let isEmpty = Variable(false)
     const list = Widget.Box({
         vertical: true,
@@ -119,7 +123,7 @@ export function NotificationsBox({ exclude = [], include = [] }) {
         else isEmpty.setValue(true)
     }
 
-    function onNotified(_, /** @type {number} */ id) {
+    function onNotified(_: any, id: number) {
         const n = notifications.getNotification(id)
         if (n) {
             if (exclude.includes(n.app_name.trim()))
@@ -132,7 +136,7 @@ export function NotificationsBox({ exclude = [], include = [] }) {
         }
     }
 
-    function onClosed(_, /** @type {number} */ id) {
+    function onClosed(_: any, id: number) {
         list.children.find(n => n.attribute.id === id)?.destroy()
         setIsEmpty()
     }

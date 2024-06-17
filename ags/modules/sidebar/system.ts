@@ -22,7 +22,7 @@ const current_brightness = Variable(100, {
     poll: [500, checkBrightness]
 })
 
-const Label = (label) => Widget.Label({
+const Label = (label: string) => Widget.Label({
         label: label,
         hpack: "start",
         class_name: "bold_label"
