@@ -44,7 +44,7 @@ export function Navigation() {
         children: {
             "Messages": NotificationsBox({ include: messages_apps }),
             "Notifications": NotificationsBox({ exclude: messages_apps }),
-            "System": SystemBox()
+            // "System": SystemBox()
         },
         transition: "crossfade",
         transitionDuration: 200,
@@ -65,11 +65,11 @@ export function Navigation() {
                 label: "Notifs",
                 icon: ""
             }),
-            Button({
-                page: "System",
-                label: "System",
-                icon: ""
-            })
+            // Button({
+            //     page: "System",
+            //     label: "System",
+            //     icon: ""
+            // })
         ]
     })
     return Widget.Box({
