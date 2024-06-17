@@ -37,12 +37,19 @@ yay -S --noconfirm --needed \
 
 sleep 2
 
-CHECK_FOLDERS="ags alacritty hypr swappy wal rofi"
+CHECK_CONFIG_FOLDERS="ags alacritty hypr swappy wal rofi"
+CHECK_HOME_FOLDERS="wallpaper"
 EXIT="NO"
 
-for dir in $CHECK_FOLDERS; do
+for dir in $CHECK_CONFIG_FOLDERS; do
   if [ -d "$HOME/.config/$dir" ]; then
     echo ":: Error: directory $dir already exists in .config"
+    EXIT="YES"
+  fi
+done
+for dir in $CHECK_CONFIG_FOLDERS; do
+  if [ -d "$HOME/$dir" ]; then
+    echo ":: Error: directory $dir already exists in home"
     EXIT="YES"
   fi
 done
@@ -69,7 +76,8 @@ echo ":: Copying files"
 sh $HOME/dotfiles/setup/copy.sh
 
 echo ":: Creating links"
-ln -f ~/.cache/material/material-discord.css ~/.config/Vencord/settings/quickCss.css
+ln -s $HOME/dotfiles/wallpapers $HOME/wallpaper
+ln -f $HOME/.cache/material/material-discord.css $HOME/.config/Vencord/settings/quickCss.css
 ln -s $HOME/dotfiles/ags $HOME/.config/ags
 ln -s $HOME/dotfiles/rofi $HOME/.config/rofi
 ln -s $HOME/dotfiles/alacritty $HOME/.config/alacritty

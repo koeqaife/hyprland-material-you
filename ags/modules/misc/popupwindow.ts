@@ -1,14 +1,24 @@
 import App from 'resource:///com/github/Aylur/ags/app.js';
 import Widget from 'resource:///com/github/Aylur/ags/widget.js';
+import { WindowProps, Window } from 'types/widgets/window';
 const { Gtk, GLib } = imports.gi;
 
-export default ({
+type _WindowProps = WindowProps<any, unknown, Window<any, unknown>> | undefined[];
+
+type Type = {
+    name: string,
+    child: any,
+    showClassName?: string,
+    hideClassName?: string,
+}
+
+export default <T extends Type>({
     name,
     child,
     showClassName = "",
     hideClassName = "",
     ...props
-}) => {
+}: T & Omit<_WindowProps, keyof Type>) => {
     return Widget.Window({
         name,
         visible: false,
