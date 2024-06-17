@@ -33,11 +33,11 @@ yay -S --noconfirm --needed \
     cliphist wl-clipboard pywal-16-colors libadwaita swappy nwg-look alacritty \
     pavucontrol polkit-gnome brightnessctl man-pages gvfs xarchiver zip imagemagick \
     blueman fastfetch bibata-cursor-theme gum python-pywayland brave dbus \
-    libdrm mesa fwupd
+    libdrm mesa fwupd rofi-wayland
 
 sleep 2
 
-CHECK_FOLDERS="ags alacritty hypr swappy wal"
+CHECK_FOLDERS="ags alacritty hypr swappy wal rofi"
 EXIT="NO"
 
 for dir in $CHECK_FOLDERS; do
@@ -71,6 +71,7 @@ sh $HOME/dotfiles/setup/copy.sh
 echo ":: Creating links"
 ln -f ~/.cache/material/material-discord.css ~/.config/Vencord/settings/quickCss.css
 ln -s $HOME/dotfiles/ags $HOME/.config/ags
+ln -s $HOME/dotfiles/rofi $HOME/.config/rofi
 ln -s $HOME/dotfiles/alacritty $HOME/.config/alacritty
 ln -s $HOME/dotfiles/hypr $HOME/.config/hypr
 ln -s $HOME/dotfiles/swappy $HOME/.config/swappy

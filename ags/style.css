@@ -26,17 +26,6 @@ trough {
     border-radius: 100px;
 } */
 
-scale slider {                                                                                      
-    background-image: -gtk-scaled(url("/home/mrdan/.cache/material/brightness-onPrimary.svg"));
-    color: @onPrimary;
-    background-color: @primary;
-    background-size: 20px 20px;
-    min-width: 24px;
-    min-height: 24px;
-    border-radius: 100px;
-    background-repeat: no-repeat;
-    background-position: center;
-}
 
 highlight {
     border-radius: 100px;
@@ -451,6 +440,10 @@ window.notification-popups box.notifications {
  * Misc
  * ----------------------------------------------------- */
 
+.bold_label {
+    font-weight: bold;
+}
+
 .keyboard {
     background-color: @surfaceContainer;
     color: @onSurface;
@@ -653,6 +646,43 @@ window.notification-popups box.notifications {
 .notifications_sidebar_scrollable {
     padding-right: 1px;
     color: @primary;
+}
+
+.system_box {
+    padding: 20px;
+}
+
+.system_scale slider {       
+    /* background-image: -gtk-scaled(url("/home/mrdan/.cache/material/brightness-onPrimary.svg")); */
+    color: @onPrimary;
+    background-color: @primary;
+    /* background-size: 20px 20px; */
+    min-width: 6px;
+    min-height: 23px;
+    border-radius: 100px;
+    padding: 0px;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: -18px;
+    margin-bottom: -18px;
+    box-shadow: -5px 0 0 1.5px @surfaceContainerLow,
+                5px 0px 0 1.5px @surfaceContainerLow;
+}
+
+.system_scale {
+    padding: 0px;
+    margin: 0px;
+}
+
+.system_scale trough {
+    background-color: @secondaryContainer;
+    min-height: 6px;
+}
+
+.system_scale highlight {
+    background-color: @primary;
 }
 
 .sidebar_buttons {

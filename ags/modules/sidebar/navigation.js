@@ -1,6 +1,6 @@
 const { Gtk } = imports.gi;
 import { NotificationsBox } from "./notifications.js"
-import { System } from "./system.js"
+import { SystemBox } from "./system.js"
 let shown = Variable("Messages");
 
 
@@ -44,7 +44,7 @@ export function Navigation() {
         children: {
             "Messages": NotificationsBox({ include: messages_apps }),
             "Notifications": NotificationsBox({ exclude: messages_apps }),
-            "System": System()
+            "System": SystemBox()
         },
         transition: "crossfade",
         transitionDuration: 200,
