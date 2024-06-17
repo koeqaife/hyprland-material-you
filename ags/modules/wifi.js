@@ -27,7 +27,7 @@ const WifiNetwork = (accessPoint) => {
         children: [
             Widget.Label({
                 hpack: 'start',
-                label: accessPoint.ssid
+                label: accessPoint.ssid,
             })
         ]
     });
