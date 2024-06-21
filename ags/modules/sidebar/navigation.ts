@@ -4,11 +4,19 @@ import { SystemBox } from "./system.ts"
 let shown = Variable("Messages");
 
 
-function Button({ page, label, icon }) {
+type ButtonType = {
+    page: string,
+    label: string,
+    icon: string
+}
+
+
+function Button({ page, label, icon }: ButtonType) {
     return Widget.Box({
         hexpand: true,
         child: Widget.Button({
             class_name: shown.bind().as(_page => _page == page ? "navigation_button active" : "navigation_button"),
+            hexpand: true,
             child: Widget.Box({
                 orientation: Gtk.Orientation.VERTICAL,
                 class_name: "container_outer",
@@ -18,7 +26,7 @@ function Button({ page, label, icon }) {
                         halign: Gtk.Align.CENTER,
                         class_name: "container",
                         child: Widget.Label({
-                            hexpand: true,
+                            hpack: "center",
                             label: icon,
                             class_name: "awesome_icon icon"
                         }),
@@ -26,7 +34,6 @@ function Button({ page, label, icon }) {
                     Widget.Label({
                         label: label,
                         class_name: "label",
-                        hexpand: true,
                     })
                 ]
             }),
@@ -44,7 +51,7 @@ export function Navigation() {
         children: {
             "Messages": NotificationsBox({ include: messages_apps }),
             "Notifications": NotificationsBox({ exclude: messages_apps }),
-            // "System": SystemBox()
+            "System": SystemBox()
         },
         transition: "crossfade",
         transitionDuration: 200,
@@ -65,11 +72,11 @@ export function Navigation() {
                 label: "Notifs",
                 icon: ""
             }),
-            // Button({
-            //     page: "System",
-            //     label: "System",
-            //     icon: ""
-            // })
+            Button({
+                page: "System",
+                label: "System",
+                icon: ""
+            })
         ]
     })
     return Widget.Box({

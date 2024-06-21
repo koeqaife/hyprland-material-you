@@ -41,7 +41,6 @@ for (let i = 0; i < (Gdk.Display.get_default()?.get_n_monitors() || 1); i++) {
 }
 
 App.config({
-    style: `${App.configDir}/style.css`,
     windows: Windows().flat(1),
     // @ts-ignore
     closeWindowDelay: closeWindowDelays,
@@ -51,6 +50,7 @@ App.config({
 
 function ReloadCSS() {
     App.resetCss()
+    // Utils.execAsync(`cp -f -r ${GLib.get_home_dir()}/dotfiles/material-colors/generated/svg/ ${App.configDir}/`).catch(print)
     App.applyCss(`${App.configDir}/style.css`)
 }
 
@@ -74,3 +74,4 @@ Utils.monitorFile(
     ReloadGtkCSS
 )
 forMonitorsAsync(Bar)
+ReloadGtkCSS()

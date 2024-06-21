@@ -33,9 +33,12 @@ yay -S --noconfirm --needed \
     cliphist wl-clipboard pywal-16-colors libadwaita swappy nwg-look alacritty \
     pavucontrol polkit-gnome brightnessctl man-pages gvfs xarchiver zip imagemagick \
     blueman fastfetch bibata-cursor-theme gum python-pywayland brave dbus \
-    libdrm mesa fwupd rofi-wayland bun-bin
+    libdrm mesa fwupd rofi-wayland bun-bin pipewire wireplumber udiskie \
+    lm_sensors
 
 sleep 2
+
+sudo sensors-detect --auto > /dev/null
 
 CHECK_CONFIG_FOLDERS="ags alacritty hypr swappy wal rofi"
 CHECK_HOME_FOLDERS="wallpaper"
@@ -76,6 +79,7 @@ echo ":: Copying files"
 sh $HOME/dotfiles/setup/copy.sh
 
 echo ":: Creating links"
+ln -f /home/mrdan/dotfiles/electron-flags.conf ~/.config/electron-flags.conf
 ln -s $HOME/dotfiles/wallpapers $HOME/wallpaper
 ln -f $HOME/.cache/material/material-discord.css $HOME/.config/Vencord/settings/quickCss.css
 ln -s $HOME/dotfiles/ags $HOME/.config/ags
@@ -112,6 +116,9 @@ echo ":: User dirs"
 xdg-user-dirs-update
 echo ":: Done"
 
+echo ":: Git configuration..."
+git update-index --no-assume-unchanged $HOME/dotfiles/.settings/* && echo ":: ~/dotfiles/.settings"
+git update-index --no-assume-unchanged $HOME/dotfiles/hypr/conf/custom.conf && echo ":: ~/dotfiles/hypr/conf/custom.conf"
 
 echo ":: Misc"
 hyprctl reload

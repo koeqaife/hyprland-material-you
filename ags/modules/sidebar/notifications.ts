@@ -35,25 +35,20 @@ function Notification(n: NotificationType) {
 
     const title = Widget.Label({
         class_name: "notification_sidebar_title",
-        xalign: 0,
-        justification: "left",
-        hexpand: true,
-        max_width_chars: 24,
-        truncate: "end",
         wrap: true,
         label: n.summary,
         use_markup: true,
+        hpack: "start",
+        xalign: 0
     })
 
     const body = Widget.Label({
         class_name: "notification_sidebar_body",
-        hexpand: true,
-        use_markup: true,
-        xalign: 0,
-        justification: "left",
         label: n.body,
         wrap: true,
-        truncate: "end",
+        use_markup: true,
+        hpack: "start",
+        xalign: 0
     })
 
     const actions = Widget.Box({
@@ -72,7 +67,7 @@ function Notification(n: NotificationType) {
     let Box = Widget.EventBox(
         {
             attribute: { id: n.id },
-            on_primary_click: () => n.close(),
+            on_secondary_click: () => n.close(),
         },
         Widget.Box(
             {
@@ -82,7 +77,10 @@ function Notification(n: NotificationType) {
             Widget.Box([
                 icon,
                 Widget.Box(
-                    { vertical: true },
+                    {
+                        vertical: true,
+                        hexpand: true,
+                    },
                     title,
                     body,
                 ),
@@ -98,7 +96,7 @@ type NotificationsBoxType = {
     include?: string[]
 }
 
-export function NotificationsBox({ exclude = [""], include = [""] }: NotificationsBoxType) {
+export function NotificationsBox({ exclude = [], include = [] }: NotificationsBoxType) {
     let isEmpty = Variable(false)
     const list = Widget.Box({
         vertical: true,

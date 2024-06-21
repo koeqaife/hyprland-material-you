@@ -139,9 +139,11 @@ function Page1() {
         children: [
             Widget.Box({
                 orientation: Gtk.Orientation.HORIZONTAL,
-                spacing: 5,
+                hexpand: true,
+                spacing: 2.5,
                 children: [
                     Widget.Button({
+                        hexpand: true,
                         class_name: network.wifi.bind("enabled")
                             .as(enabled => enabled ? "management_button active" : "management_button"),
                         child: NetworkIndicator(),
@@ -154,6 +156,7 @@ function Page1() {
                         }
                     }),
                     Widget.Button({
+                        hexpand: true,
                         class_name: bluetooth_enabled.bind()
                             .as(state => state.trim() == "yes" ? "management_button active" : "management_button"
                             ),
@@ -175,9 +178,11 @@ function Page1() {
             }),
             Widget.Box({
                 orientation: Gtk.Orientation.HORIZONTAL,
-                spacing: 5,
+                spacing: 2.5,
+                hexpand: true,
                 children: [
                     Widget.Button({
+                        hexpand: true,
                         class_name: theme.bind().as((str) => {
                             return str.trim() == "dark" ? "management_button active" : "management_button"
                         }),
@@ -191,6 +196,7 @@ function Page1() {
                         })
                     }),
                     Widget.Button({
+                        hexpand: true,
                         class_name: notifications.bind("dnd").as((bool) => {
                             return bool ? "management_button active" : "management_button";
                         }),
@@ -206,9 +212,11 @@ function Page1() {
             }),
             Widget.Box({
                 orientation: Gtk.Orientation.HORIZONTAL,
-                spacing: 5,
+                spacing: 2.5,
+                hexpand: true,
                 children: [
                     Widget.Button({
+                        hexpand: true,
                         class_name: idle_inhibitor.bind()
                             .as(bool => bool ? "management_button active" : "management_button"),
                         child: IconAndName({
@@ -225,6 +233,7 @@ function Page1() {
                         },
                     }),
                     Widget.Button({
+                        hexpand: true,
                         class_name: night_light.bind()
                             .as(mode => mode ? "management_button active" : "management_button"),
                         child: IconAndName({
@@ -267,9 +276,10 @@ function Page2() {
         children: [
             Widget.Box({
                 orientation: Gtk.Orientation.HORIZONTAL,
-                spacing: 5,
+                spacing: 2.5,
                 children: [
                     Widget.Button({
+                        hexpand: true,
                         class_name: "management_button",
                         child: IconAndName({
                             label: "Color picker",
@@ -286,6 +296,7 @@ function Page2() {
                         }
                     }),
                     Widget.Button({
+                        hexpand: true,
                         class_name: "management_button disabled",
                     }),
                 ]

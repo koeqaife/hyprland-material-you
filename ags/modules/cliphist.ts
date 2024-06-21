@@ -64,8 +64,13 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
         spacing,
     });
 
-    function repopulate() {
-        output = Utils.exec(`${App.configDir}/scripts/cliphist.sh --get`);
+    async function repopulate() {
+        output = await Utils.execAsync(`${App.configDir}/scripts/cliphist.sh --get`)
+            .then(str => str)
+            .catch(err => {
+                print(err)
+                return ""
+            });
         entries = output.split('\n').filter(line => line.trim() !== '');
         clipHistItems = entries.map(entry => {
             let [id, ...content] = entry.split('\t');
@@ -88,10 +93,9 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
 
     return Widget.Box({
         vertical: true,
-        css: `margin: ${spacing * 2}px;`,
         class_name: "cliphistory_box",
-        margin_top: 15,
-        margin_left: 15,
+        margin_top: 14,
+        margin_right: 14,
         children: [
             entry,
             Widget.Scrollable({

@@ -120,8 +120,8 @@ function Player(player: MprisPlayer) {
     return Widget.Box(
         {
             class_name: "player",
-            margin_left: 15,
-            margin_top: 15,
+            margin_left: 14,
+            margin_top: 14,
         },
         img,
         Widget.Box(
