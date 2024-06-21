@@ -14,14 +14,14 @@ get_brightness() {
 }
 
 set_brightness() {
-    if [ -e "$LOCKFILE" ] && kill -0 "$(cat $LOCKFILE)"; then
-        exit 0
-    fi
-    trap "rm -f $LOCKFILE; exit" INT TERM EXIT
-    echo $$ > "$LOCKFILE"
+    # if [ -e "$LOCKFILE" ] && kill -0 "$(cat $LOCKFILE)"; then
+    #     exit 0
+    # fi
+    # trap "rm -f $LOCKFILE; exit" INT TERM EXIT
+    # echo $$ > "$LOCKFILE"
     busctl --user -- set-property rs.wl-gammarelay / rs.wl.gammarelay Brightness d $1
-    rm -f "$LOCKFILE"
-    trap - INT TERM EXIT
+    # rm -f "$LOCKFILE"
+    # trap - INT TERM EXIT
 }
 
 set() {

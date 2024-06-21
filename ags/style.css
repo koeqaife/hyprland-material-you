@@ -34,7 +34,8 @@ highlight {
 * {
     border: none;
     outline: none;
-    transition: background-color, color 0.25s ease-in-out;
+    transition: 0.2s ease-in-out;
+    transition-property: border-color, background-color, color;
     font-family: "Product Sans", "Font Awesome 6 Free", Roboto, Helvetica, Arial, sans-serif;
 }
 
@@ -90,13 +91,17 @@ separator {
     background: @surfaceContainer;
 }
 
+.workspaces * {
+    transition: all 0.35s ease-in-out;
+    transition-property: background-color, color, min-width;
+}
+
 .workspaces button {
     padding: 0px 5px;
     margin: 4px 3px;
     border-radius: 16px;
     border: 0px;
     color: @onSurface;
-    transition: all 0.35s ease-in-out;
 }
 
 .workspaces button.active {
@@ -163,8 +168,7 @@ separator {
  * ----------------------------------------------------- */
 
 window.notification-popups box.notifications {
-    padding: 15px;
-    min-width: 350px;
+    padding: 14px;
 }
 
 
@@ -246,7 +250,6 @@ window.notification-popups box.notifications {
     border: none;
     outline: none;
     border-radius: 100px;
-    transition: all 0.2s ease-in-out;
     margin-bottom: 16px;
     padding: 5px;
     font-weight: normal;
@@ -259,7 +262,6 @@ window.notification-popups box.notifications {
 }
 
 .application_container {
-    transition: all 0.2s ease-in-out;
     border-radius: 100px;
     border: none;
     outline: none;
@@ -287,7 +289,6 @@ window.notification-popups box.notifications {
 }
 
 .application_label {
-    transition: all 0.2s ease-in-out;
     color: @onSurface
 }
 
@@ -317,14 +318,12 @@ window.notification-popups box.notifications {
     border: none;
     outline: none;
     border-radius: 100px;
-    transition: all 0.2s ease-in-out;
     margin-bottom: 16px;
     padding: 5px;
     padding-left: 25px;
 }
 
 .entry_container {
-    transition: all 0.2s ease-in-out;
     border-radius: 100px;
     border: none;
     outline: none;
@@ -353,7 +352,6 @@ window.notification-popups box.notifications {
 }
 
 .entry_label {
-    transition: all 0.2s ease-in-out;
     color: @onSurface;
     font-weight: normal;
 }
@@ -508,12 +506,11 @@ window.notification-popups box.notifications {
 }
 
 .management_button {
-    min-width: 180px;
+    min-width: 170px;
     min-height: 50px;
 }
 
 .management_button {
-    transition: all 0.2s ease-in-out;
     border-radius: 25px;
     background: @surfaceContainer;
     border: none;
@@ -521,7 +518,6 @@ window.notification-popups box.notifications {
 }
 
 .management_button label {
-    transition: all 0.2s ease-in-out;
     color: @onSurface;
     font-weight: normal;
 }
@@ -654,11 +650,10 @@ window.notification-popups box.notifications {
 }
 
 .system_box {
-    padding: 20px;
+    padding: 10px;
 }
 
 .system_scale slider {       
-    background-image: -gtk-scaled(url("/home/mrdan/.cache/material/brightness-onPrimary.svg"));
     color: @onPrimary;
     background-color: @primary;
     background-size: 20px 20px;
@@ -672,8 +667,19 @@ window.notification-popups box.notifications {
     margin-right: 0px;
     margin-top: -16px;
     margin-bottom: -16px;
-    /* box-shadow: -5px 0 0 1.5px @surfaceContainerLow,
-                5px 0px 0 1.5px @surfaceContainerLow; */
+
+}
+
+.system_scale.backlight slider {
+    background-image: -gtk-scaled(url("svg/brightness-onPrimary.svg"));
+}
+
+.system_scale.backlight {
+    margin-bottom: 25px;
+}
+
+.system_scale.brightness slider {
+    background-image: -gtk-scaled(url("svg/dark-onPrimary.svg"));
 }
 
 .system_scale {
@@ -684,6 +690,8 @@ window.notification-popups box.notifications {
 .system_scale trough {
     background-color: @secondaryContainer;
     min-height: 6px;
+    margin-right: 4px;
+    margin-left: 4px;
 }
 
 .system_scale highlight {
@@ -691,7 +699,46 @@ window.notification-popups box.notifications {
     
     margin-top: -13px;
     margin-bottom: -13px;
+    margin-left: -16px;
     background-color: @primary;
+}
+
+.system_box .slider_box, .system_box .usage_box, .system_box .info_box {
+    background-color: @surfaceContainerLowest;
+    padding: 26px;
+    border-radius: 14px;
+}
+
+.system_box .usage_box {
+    padding: 10px;
+}
+
+.system_box .info_box {
+    padding: 20px;
+}
+
+.usage_bar trough {
+    background-color: @secondaryContainer;
+    min-height: 6px;
+}
+
+.usage_bar progress {
+    min-width: 6px;
+    min-height: 6px;
+    background-color: @primary;
+    box-shadow: 5px 0px 0px 1px @surfaceContainerLowest;
+    border-radius: 100px;
+}
+
+.usage_box label {
+    color: @onSurface
+}
+
+.usage_bar_point {
+    background-color: @primary;
+    min-width: 6px;
+    min-height: 6px;
+    border-radius: 100%;
 }
 
 .sidebar_buttons {
@@ -715,7 +762,6 @@ window.notification-popups box.notifications {
 
 .dotbutton label {
     color: @surfaceContainerHigh;
-    transition: color 0.2s ease-in-out;
 }
 
 .dotbutton:hover {
@@ -782,7 +828,6 @@ window.notification-popups box.notifications {
     padding: 5px 10px 5px 10px;
     background-color: @background;
     border-radius: 16px;
-    transition: all 0.2s ease-in-out;
 }
 
 .wifi_button:hover {
@@ -822,7 +867,6 @@ window.notification-popups box.notifications {
     border-radius: 100px;
     padding-left: 24px;
     padding-right: 24px;
-    transition: all 0.1s ease-in-out;
 }
 
 .outline_button label, .outline_button .icon,
@@ -844,7 +888,6 @@ window.notification-popups box.notifications {
     background-color: @secondaryContainer;
     color: @onSecondaryContainer;
     border-radius: 100px;
-    transition: all 0.1s ease-in-out;
 }
 
 .filled_tonal_button label, .filled_tonal_button .icon,
@@ -882,9 +925,10 @@ window.notification-popups box.notifications {
 
 .navigation_button .container {
     border-radius: 16px;
-    transition: all 0.2s ease-in-out;
     padding: 5px;
     min-height: 15px;
+    min-width: 0px;
+    transition-property: min-width, color, background-color, border-color;
 }
 
 .navigation_button .icon {

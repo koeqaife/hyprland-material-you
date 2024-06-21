@@ -104,13 +104,10 @@ function AppItem(app: Application): Box<any, any> {
 };
 
 const Applauncher = ({ width = 500, height = 500, spacing = 12 }) => {
-    let applications = query("").map(AppItem)
-
-    applications = sortApplicationsByLaunchCount(applications)
+    let applications: Box<any, any>[];
 
     const list = Widget.Box({
         vertical: true,
-        children: applications,
         spacing,
     })
 
@@ -119,6 +116,7 @@ const Applauncher = ({ width = 500, height = 500, spacing = 12 }) => {
         applications = sortApplicationsByLaunchCount(applications)
         list.children = applications
     }
+    repopulate()
 
     const entry = Widget.Entry({
         hexpand: true,
@@ -142,8 +140,8 @@ const Applauncher = ({ width = 500, height = 500, spacing = 12 }) => {
         vertical: true,
         css: `margin: ${spacing * 2}px;`,
         class_name: "applauncher_box",
-        margin_top: 15,
-        margin_left: 15,
+        margin_top: 14,
+        margin_left: 14,
         children: [
             entry,
 

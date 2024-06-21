@@ -182,6 +182,7 @@ def main(color_scheme: str, image_path: str, use_color: int | None = None):
     updated_pywal_colors = update_pywal_colors_with_material_you(scheme, image_path)
 
     generate_templates(f"{script_dir}/templates", cache_path, scheme, color_scheme)
+    generate_templates(f"{script_dir}/templates/svg", join(cache_path, "svg/"), scheme, color_scheme)
     save_updated_colors(updated_pywal_colors)
 
     subprocess.run(['wal', '-s', '-q', '-e', '-n', '-R'])

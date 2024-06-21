@@ -11,5 +11,6 @@ export const sidebar = popupwindow({
     visible: false,
     keymode: "exclusive",
     child: SideBar(),
-    anchor: ["top", "right", "bottom"]
+    anchor: ["top", "right", "bottom"],
+    css: "min-width: 443px;"
 })

@@ -10,6 +10,7 @@ export const RoundedCorner = (place, props) => Widget.DrawingArea({
         const c = widget.get_style_context().get_property('background-color', Gtk.StateFlags.NORMAL);
         const r = widget.get_style_context().get_property('border-radius', Gtk.StateFlags.NORMAL);
         widget.set_size_request(r, r);
+        // @ts-ignore
         widget.connect('draw', Lang.bind(widget, (widget, cr) => {
             const c = widget.get_style_context().get_property('background-color', Gtk.StateFlags.NORMAL);
             const r = widget.get_style_context().get_property('border-radius', Gtk.StateFlags.NORMAL);

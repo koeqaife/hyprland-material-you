@@ -1,6 +1,7 @@
-import { Gtk as GtkType }from "types/@girs/gtk-3.0/gtk-3.0";
+import { Gtk as GtkType } from "types/@girs/gtk-3.0/gtk-3.0";
 import { Notification as NotificationType } from "types/service/notifications";
 import Box from "types/widgets/box";
+import Window from "types/widgets/window";
 
 const notifications = await Service.import("notifications")
 const { Gtk } = imports.gi;
@@ -74,7 +75,7 @@ function Notification(n: NotificationType) {
     return Widget.EventBox(
         {
             attribute: { id: n.id },
-            on_primary_click: n.dismiss,
+            on_secondary_click: n.dismiss,
         },
         Widget.Box(
             {
@@ -95,10 +96,24 @@ function Notification(n: NotificationType) {
 }
 
 export function NotificationPopups(monitor = 0) {
+    let window: Window<any, any>;
     const list = Widget.Box({
         vertical: true,
         children: notifications.popups.map(Notification),
     })
+
+    const updateWindowSize = () => {
+        const [minHeight, naturalHeight] = list.get_preferred_height();
+        const [minWidth, naturalWidth] = list.get_preferred_width();
+
+        if (naturalHeight > 0 && naturalWidth > 0) {
+            window.set_default_size(minWidth, minHeight);
+            window.resize(naturalWidth, naturalHeight);
+            window.set_visible(true);
+        } else {
+            window.set_visible(false);
+        }
+    };
 
     function onNotified(_: any, id: number) {
         const n = notifications.getNotification(id)
@@ -108,9 +123,8 @@ export function NotificationPopups(monitor = 0) {
                 n.dismiss()
             }
             else {
-                const notificationWidget = Notification(n)
-                list.children = [notificationWidget, ...list.children]
-
+                list.children = [Notification(n), ...list.children]
+                updateWindowSize()
                 setTimeout(() => {
                     n.dismiss()
                 }, 15000)
@@ -120,27 +134,26 @@ export function NotificationPopups(monitor = 0) {
 
     function onDismissed(_: any, id: number) {
         list.children.find(n => n.attribute.id === id)?.destroy()
+        updateWindowSize()
     }
 
     list.hook(notifications, onNotified, "notified")
         .hook(notifications, onDismissed, "dismissed")
 
-    return Widget.Window({
+    window =  Widget.Window({
         monitor,
         name: `notifications${monitor}`,
         class_name: "notification-popups",
         anchor: ["top", "right"],
+        type: Gtk.WindowType.POPUP,
         child: Widget.Box({
+            css: "min-width: 2px; min-height: 2px;",
             class_name: "notifications",
-            vertical: true,
-            child: list,
-
-            /** this is a simple one liner that could be used instead of
-                hooking into the 'notified' and 'dismissed' signals.
-                but its not very optimized becuase it will recreate
-                the whole list everytime a notification is added or dismissed */
-            // children: notifications.bind('popups')
-            //     .as(popups => popups.map(Notification))
+            children: [
+                list
+            ],
         }),
+        visible: false,
     })
+    return window
 }
