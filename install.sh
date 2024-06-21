@@ -7,7 +7,7 @@ install_yay() {
     makepkg -si --noconfirm --needed
 }
 
-
+cd $HOME/dotfiles
 
 if command -v yay &> /dev/null
 then
@@ -115,10 +115,6 @@ fi
 echo ":: User dirs"
 xdg-user-dirs-update
 echo ":: Done"
-
-echo ":: Git configuration..."
-git update-index --no-assume-unchanged $HOME/dotfiles/.settings/* && echo ":: ~/dotfiles/.settings"
-git update-index --no-assume-unchanged $HOME/dotfiles/hypr/conf/custom.conf && echo ":: ~/dotfiles/hypr/conf/custom.conf"
 
 echo ":: Misc"
 hyprctl reload
