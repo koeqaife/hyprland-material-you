@@ -14,6 +14,8 @@ cd dotfiles
 ./install.sh
 ```
 
+**Recommended icons:** "Tela nord"
+
 ### Screenshots
 
 -------
@@ -38,4 +40,3 @@ cd dotfiles
   
 [![Screenshot](screenshots/gtk-theme.png "Dark gtk theme")](screenshots/gtk-theme.png)
 [![Screenshot](screenshots/light-theme.png "Light gtk theme")](screenshots/light-theme.png)
-
