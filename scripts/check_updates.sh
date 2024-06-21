@@ -7,7 +7,7 @@ LOCAL=$(git rev-parse @)
 REMOTE=$(git rev-parse "$UPSTREAM")
 BASE=$(git merge-base @ "$UPSTREAM")
 
-if git diff-index --quiet HEAD --; then
+if git diff --ignore-submodules=untracked --exit-code --quiet; then
     echo "The files have not been modified. You can update"
 else
     echo "The files have been modified. You can't update"
