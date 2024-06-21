@@ -1,13 +1,18 @@
 #!/bin/bash
 
 cd $HOME/dotfiles
+
+git update-index --skip-worktree $HOME/dotfiles/.settings/*
+git update-index --skip-worktree $HOME/dotfiles/hypr/conf/custom.conf
+git update-index --skip-worktree $HOME/dotfiles/alacritty/alacritty.toml
+
 git fetch
 UPSTREAM=${1:-'@{u}'}
 LOCAL=$(git rev-parse @)
 REMOTE=$(git rev-parse "$UPSTREAM")
 BASE=$(git merge-base @ "$UPSTREAM")
 
-if git diff --ignore-submodules=untracked --exit-code --quiet; then
+if git diff-index --quiet HEAD --; then
     echo "The files have not been modified. You can update"
 else
     echo "The files have been modified. You can't update"
