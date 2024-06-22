@@ -239,10 +239,6 @@ window.notification-popups box.notifications {
     margin-right: 0;
 }
 
-.notification-close label {
-    color: @onSurface
-}
-
 .notification-time {
     color: @primary;
 }
@@ -832,7 +828,7 @@ window.notification-popups box.notifications {
 }
 
 .outline_button label, .outline_button .icon,
-.outline_button .awesome_icon, image {
+.outline_button .awesome_icon, .outline_button image {
     color: @primary;
 }
 
@@ -853,7 +849,7 @@ window.notification-popups box.notifications {
 }
 
 .filled_tonal_button label, .filled_tonal_button .icon,
-.filled_tonal_button .awesome_icon, image {
+.filled_tonal_button .awesome_icon, .filled_tonal_button image {
     color: @onSecondaryContainer;
 }
 
@@ -866,6 +862,28 @@ window.notification-popups box.notifications {
     background-color: mix(@secondaryContainer, @onSecondaryContainer, 0.1);
     box-shadow: none;
 }
+/* standard icon button */
+.standard_icon_button {
+    border-radius: 100px;
+    background-color: transparent;
+    color: @onSurfaceVariant;
+}
+
+.standard_icon_button label, .standard_icon_button .icon,
+.standard_icon_button .awesome_icon, .standard_icon_button image {
+    color: @onSurfaceVariant;
+    margin: 0px;
+    padding: 0px;
+}
+
+.standard_icon_button:hover {
+    background-color: mix(@onSurfaceVariant, transparent, 0.8);
+}
+
+.standard_icon_button:active {
+    background-color: mix(@onSurfaceVariant, transparent, 0.7);
+}
+
 
 /* -----------------------------------------------------
  * Navigation bar
