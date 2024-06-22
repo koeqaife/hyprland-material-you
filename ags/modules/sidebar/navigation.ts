@@ -12,35 +12,32 @@ type ButtonType = {
 
 
 function Button({ page, label, icon }: ButtonType) {
-    return Widget.Box({
+    return Widget.Button({
+        class_name: shown.bind().as(_page => _page == page ? "navigation_button active" : "navigation_button"),
         hexpand: true,
-        child: Widget.Button({
-            class_name: shown.bind().as(_page => _page == page ? "navigation_button active" : "navigation_button"),
-            hexpand: true,
-            child: Widget.Box({
-                orientation: Gtk.Orientation.VERTICAL,
-                class_name: "container_outer",
-                children: [
-                    Widget.Box({
-                        orientation: Gtk.Orientation.VERTICAL,
-                        halign: Gtk.Align.CENTER,
-                        class_name: "container",
-                        child: Widget.Label({
-                            hpack: "center",
-                            label: icon,
-                            class_name: "awesome_icon icon"
-                        }),
+        child: Widget.Box({
+            orientation: Gtk.Orientation.VERTICAL,
+            class_name: "container_outer",
+            children: [
+                Widget.Box({
+                    orientation: Gtk.Orientation.VERTICAL,
+                    halign: Gtk.Align.CENTER,
+                    class_name: "container",
+                    child: Widget.Label({
+                        hpack: "center",
+                        label: icon,
+                        class_name: "awesome_icon icon"
                     }),
-                    Widget.Label({
-                        label: label,
-                        class_name: "label",
-                    })
-                ]
-            }),
-            on_clicked: () => {
-                shown.setValue(page)
-            }
-        })
+                }),
+                Widget.Label({
+                    label: label,
+                    class_name: "label",
+                })
+            ]
+        }),
+        on_clicked: () => {
+            shown.setValue(page)
+        }
     })
 }
 
