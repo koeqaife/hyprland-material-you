@@ -38,7 +38,7 @@ smooth() {
                 fi
                 
                 brightnessctl s $current_brightness > /dev/null 2>&1
-                sleep 0.005
+                sleep 0.001
                 
                 local new_target_brightness=$(cat $BRIGHTNESS)
                 new_target_brightness=$(echo "$max_brightness * $new_target_brightness / 100" | bc)
