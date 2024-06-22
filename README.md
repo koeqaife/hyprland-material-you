@@ -25,7 +25,7 @@ cd dotfiles
 
 > I'm not sure if it will work, if you have any problems installing it, post in Issues
 
-### Screenshots
+## Screenshots
 
 -------
 
