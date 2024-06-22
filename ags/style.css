@@ -239,6 +239,14 @@ window.notification-popups box.notifications {
     margin-right: 0;
 }
 
+.notification-close label {
+    color: @onSurface
+}
+
+.notification-time {
+    color: @primary;
+}
+
 /* -----------------------------------------------------
  * Applications
  * ----------------------------------------------------- */
@@ -580,77 +588,18 @@ window.notification-popups box.notifications {
     /* border-radius: 0px 0px 24px 24px; */
 }
 
-.notification_sidebar_icon {
-    min-width: 68px;
-    min-height: 68px;
-    margin-right: 1em;
-}
-
-.notification_sidebar_icon image {
-    font-size: 58px;
-    /* to center the icon */
-    margin: 5px;
-    color: @onSurface;
-}
-
-.notification_sidebar_icon box {
-    min-width: 68px;
-    min-height: 68px;
-    border-radius: 7px;
-}
-
-.notification_sidebar {
+.notifications_sidebar_scrollable .notification {
     margin-left: 10px;
     margin-right: 9px;
     border-radius: 14px;
-    margin-top: 2px;
+    margin-top: 10px;
     padding: 15px;
     background-color: @background;
     transition: all 0.25s ease-in-out;
 }
 
-
-.notifications_list_sidebar {
-    margin-top: 10px;
-}
-
-.notifications_list_sidebar:last-child {
-    margin-bottom: 10px;
-}
-
-
-.notification_sidebar.critical {
-    border: 2px solid @error;
-}
-
-.notification_sidebar_title {
-    color: @foreground;
-    font-size: 1.4em;
-}
-
-.notification_sidebar_body {
-    color: @foreground;
-}
-
-.notification_sidebar_actions .notification_sidebar_button {
-    margin: 0 .4em;
-    margin-top: .8em;
-}
-
-.notification_sidebar_button {
-    background-color: @primary;
-}
-
-.notification_sidebar_button label {
-    color: @onPrimary;
-}
-
-.notification_sidebar_actions .notification_sidebar_button:first-child {
-    margin-left: 0;
-}
-
-.notification_sidebar_actions .notification_sidebar_button:last-child {
-    margin-right: 0;
+.notifications_sidebar_scrollable .notification-time {
+    color: @primary;
 }
 
 .notifications_sidebar_scrollable {
