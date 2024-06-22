@@ -3,7 +3,7 @@
 import Gdk from 'gi://Gdk';
 // widgets
 import { Bar, BarCornerTopLeft, BarCornerTopRight } from './modules/bar.ts';
-import { NotificationPopups } from "./modules/notificationPopups.ts"
+import { Notifications } from "./modules/notificationPopups.ts"
 import { applauncher } from "./modules/applauncher.js"
 import { media } from "./modules/media.ts"
 import { cliphist } from "./modules/cliphist.ts"
@@ -24,7 +24,7 @@ function forMonitorsAsync(widget: (index: number) => Promise<Window<any, any>>) 
 }
 
 const Windows = () => [
-    forMonitors(NotificationPopups),
+    forMonitors(Notifications),
     forMonitors(BarCornerTopLeft),
     forMonitors(BarCornerTopRight),
     media,
