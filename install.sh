@@ -45,18 +45,11 @@ if [[ $1 == "packages" ]]; then
 fi
 
 CHECK_CONFIG_FOLDERS="ags alacritty hypr swappy wal rofi"
-CHECK_HOME_FOLDERS="wallpaper"
 EXIT="NO"
 
 for dir in $CHECK_CONFIG_FOLDERS; do
   if [ -d "$HOME/.config/$dir" ]; then
     echo ":: Error: directory $dir already exists in .config"
-    EXIT="YES"
-  fi
-done
-for dir in $CHECK_CONFIG_FOLDERS; do
-  if [ -d "$HOME/$dir" ]; then
-    echo ":: Error: directory $dir already exists in home"
     EXIT="YES"
   fi
 done
@@ -84,7 +77,11 @@ sh $HOME/dotfiles/setup/copy.sh
 
 echo ":: Creating links"
 ln -f /home/mrdan/dotfiles/electron-flags.conf ~/.config/electron-flags.conf
-ln -s $HOME/dotfiles/wallpapers $HOME/wallpaper
+if [ -d "$HOME/wallpaper" ]; then
+    echo ":: Error: directory wallpaper already exists in home"
+else
+    cp -r $HOME/dotfiles/wallpapers $HOME/wallpaper
+fi
 ln -s $HOME/dotfiles/ags $HOME/.config/ags
 ln -s $HOME/dotfiles/rofi $HOME/.config/rofi
 ln -s $HOME/dotfiles/alacritty $HOME/.config/alacritty
