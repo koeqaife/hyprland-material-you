@@ -14,7 +14,7 @@ cd dotfiles
 ./install.sh
 ```
 
-**Recommended icons:** "Tela nord"
+**Recommended icons:** [Tela nord](https://www.gnome-look.org/p/1279924/) or [Tela circle nord](https://www.gnome-look.org/p/1359276/)
 
 ### Screenshots
 
