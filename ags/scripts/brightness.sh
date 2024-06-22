@@ -19,7 +19,12 @@ set_brightness() {
     # fi
     # trap "rm -f $LOCKFILE; exit" INT TERM EXIT
     # echo $$ > "$LOCKFILE"
-    busctl --user -- set-property rs.wl-gammarelay / rs.wl.gammarelay Brightness d $1
+    if (( $(echo "$1 < 0.05" | bc -l) )); then
+        BRIGHTNESS=0.05
+    else
+        BRIGHTNESS=$1
+    fi
+    busctl --user -- set-property rs.wl-gammarelay / rs.wl.gammarelay Brightness d $BRIGHTNESS
     # rm -f "$LOCKFILE"
     # trap - INT TERM EXIT
 }
