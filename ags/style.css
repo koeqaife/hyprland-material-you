@@ -46,9 +46,18 @@ highlight {
 
 tooltip {
     background-color: @surfaceContainer;
-    color: @foreground;
     border-radius: 11px;
-    border: 0px solid;
+    outline: none;
+    border: none;
+    box-shadow: none;
+}
+
+tooltip label {
+    color: @onSurface;
+    outline: none;
+    border: none;
+    box-shadow: none;
+    font-weight: normal;
 }
 
 menu separator {
@@ -568,6 +577,7 @@ window.notification-popups box.notifications {
     background-color: @surfaceContainerLow;
     border-radius: 24px 24px 0px 0px;
     transition: all 0.25s ease-in-out;
+    /* border-radius: 0px 0px 24px 24px; */
 }
 
 .notification_sidebar_icon {
@@ -590,7 +600,6 @@ window.notification-popups box.notifications {
 }
 
 .notification_sidebar {
-    min-width: 350px;
     margin-left: 10px;
     margin-right: 9px;
     border-radius: 14px;
@@ -731,6 +740,10 @@ window.notification-popups box.notifications {
 }
 
 .usage_box label {
+    color: @onSurface
+}
+
+.info_box label {
     color: @onSurface
 }
 
@@ -946,12 +959,12 @@ window.notification-popups box.notifications {
 }
 
 .navigation_button:hover .container {
-    background-color: mix(@outline, transparent, 0.5);
+    background-color: mix(@onSurface, @surfaceContainer, 0.92);
     min-width: 40px;
 }
 
 .navigation_button:active .container {
-    background-color: mix(@outline, transparent, 0.3);
+    background-color: mix(@onSurface, @surfaceContainer, 0.9);
     min-width: 40px;
 }
 
