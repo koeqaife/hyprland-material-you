@@ -5,6 +5,7 @@ cd $HOME/dotfiles
 git update-index --skip-worktree $HOME/dotfiles/.settings/*
 git update-index --skip-worktree $HOME/dotfiles/hypr/conf/custom.conf
 git update-index --skip-worktree $HOME/dotfiles/alacritty/alacritty.toml
+git update-index --skip-worktree $HOME/dotfiles/wallpapers/*
 
 git fetch
 UPSTREAM=${1:-'@{u}'}
