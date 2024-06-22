@@ -34,11 +34,15 @@ yay -S --noconfirm --needed \
     pavucontrol polkit-gnome brightnessctl man-pages gvfs xarchiver zip imagemagick \
     blueman fastfetch bibata-cursor-theme gum python-pywayland brave dbus \
     libdrm mesa fwupd rofi-wayland bun-bin pipewire wireplumber udiskie \
-    lm_sensors
+    lm_sensors gnome-system-monitor
 
 sleep 2
 
 sudo sensors-detect --auto > /dev/null
+
+if [[ $1 == "packages" ]]; then
+    exit 0
+fi
 
 CHECK_CONFIG_FOLDERS="ags alacritty hypr swappy wal rofi"
 CHECK_HOME_FOLDERS="wallpaper"
@@ -81,7 +85,6 @@ sh $HOME/dotfiles/setup/copy.sh
 echo ":: Creating links"
 ln -f /home/mrdan/dotfiles/electron-flags.conf ~/.config/electron-flags.conf
 ln -s $HOME/dotfiles/wallpapers $HOME/wallpaper
-ln -f $HOME/.cache/material/material-discord.css $HOME/.config/Vencord/settings/quickCss.css
 ln -s $HOME/dotfiles/ags $HOME/.config/ags
 ln -s $HOME/dotfiles/rofi $HOME/.config/rofi
 ln -s $HOME/dotfiles/alacritty $HOME/.config/alacritty
@@ -93,6 +96,7 @@ sh $HOME/dotfiles/plugins.sh
 
 echo ":: Vencord"
 sh -c "$(curl -sS https://raw.githubusercontent.com/Vendicated/VencordInstaller/main/install.sh)"
+ln -f $HOME/.cache/material/material-discord.css $HOME/.config/Vencord/settings/quickCss.css
 
 echo ":: Services"
 
