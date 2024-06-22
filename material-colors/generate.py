@@ -110,7 +110,7 @@ def get_file_list(folder_path):
     return file_list
 
 
-def generate_templates(folder: str, output_folder: str, scheme: Scheme, color_scheme: str):
+def generate_templates(folder: str, output_folder: str, scheme: Scheme, color_scheme: str, wallpaper: str = ''):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
     if not os.path.exists(folder):
@@ -128,6 +128,7 @@ def generate_templates(folder: str, output_folder: str, scheme: Scheme, color_sc
             template
             .replace("<color-scheme>", color_scheme)
             .replace("<output-folder>", output_folder)
+            .replace("<wallpaper>", wallpaper)
         )
         new_path = join(output_folder, os.path.basename(file_path))
         with open(new_path, 'w') as f:
@@ -181,8 +182,8 @@ def main(color_scheme: str, image_path: str, use_color: int | None = None):
 
     updated_pywal_colors = update_pywal_colors_with_material_you(scheme, image_path)
 
-    generate_templates(f"{script_dir}/templates", cache_path, scheme, color_scheme)
-    generate_templates(f"{script_dir}/templates/svg", join(cache_path, "svg/"), scheme, color_scheme)
+    generate_templates(f"{script_dir}/templates", cache_path, scheme, color_scheme, image_path)
+    generate_templates(f"{script_dir}/templates/svg", join(cache_path, "svg/"), scheme, color_scheme, image_path)
     save_updated_colors(updated_pywal_colors)
 
     subprocess.run(['wal', '-s', '-q', '-e', '-n', '-R'])
