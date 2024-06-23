@@ -187,11 +187,67 @@ button, combobox, entry {
     margin-left: 2px;
     margin-right: 2px;
     margin-bottom: 0px;
-    border-left: none;
-    border-right: none;
+    border: none;
 }
 
 * {
     box-shadow: none;
     transition: all 0.2s ease-in-out;
+}
+
+
+switch {
+	border: 2px solid;
+    border-radius: 100px;
+    border-color: @outline;
+    background-color: @surfaceContainerHighest;
+}
+
+switch slider {
+    border-radius: 100px;
+    background-color: @outline;
+}
+
+switch:disabled {
+	background-color: mix(@surfaceContainerHighest, transparent, 0.3);
+    border-color: mix(@onSurface, transparent, 0.3);
+}
+
+switch:disabled slider {
+    background-color: mix(@onSurface, transparent, 0.3);
+}
+
+switch:hover {
+    background-color: mix(@surfaceContainerHighest, @onSurface, 0.08);
+}
+
+switch:hover slider {
+    background-color: @onSurfaceVariant;
+}
+
+switch:checked {
+	background-color: @primary;
+    border-color: transparent;
+}
+
+switch:checked slider {
+    background-color: @onPrimary;
+    border-color: transparent;
+}
+
+switch:checked:disabled {
+	background-color: mix(@onSurface, transparent, 0.3);
+    border-color: transparent;
+}
+
+switch:checked:disabled slider {
+    background-color: mix(@surface, transparent, 0.3);
+}
+
+switch:checked:hover {
+	background-color: @primary;
+}
+
+switch:checked:hover slider {
+    background-color: @primaryContainer;
 }
