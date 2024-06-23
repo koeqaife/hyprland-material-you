@@ -95,6 +95,9 @@ echo ":: Vencord"
 sh -c "$(curl -sS https://raw.githubusercontent.com/Vendicated/VencordInstaller/main/install.sh)"
 ln -f $HOME/.cache/material/material-discord.css $HOME/.config/Vencord/settings/quickCss.css
 
+echo ":: Remove window close and minimize buttons in GTK"
+gsettings set org.gnome.desktop.wm.preferences button-layout ':'
+
 echo ":: Services"
 
 if [[ $(systemctl list-units --all -t service --full --no-legend "bluetooth.service" | sed 's/^\s*//g' | cut -f1 -d' ') == "bluetooth.service" ]];then
