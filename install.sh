@@ -34,7 +34,7 @@ yay -S --noconfirm --needed \
     pavucontrol polkit-gnome brightnessctl man-pages gvfs xarchiver zip imagemagick \
     blueman fastfetch bibata-cursor-theme gum python-pywayland brave dbus \
     libdrm mesa fwupd rofi-wayland bun-bin pipewire wireplumber udiskie \
-    lm_sensors gnome-system-monitor
+    lm_sensors gnome-system-monitor playerctl
 
 sleep 2
 
