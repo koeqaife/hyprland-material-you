@@ -12,6 +12,7 @@ import { Client, Workspace } from "types/service/hyprland.js"
 import Button from "types/widgets/button.js"
 import Icon from "types/widgets/icon.js"
 import { FileEnumerator, FileInfo } from "types/@girs/gio-2.0/gio-2.0.cjs"
+const mpris = await Service.import("mpris")
 
 
 function checkKeymap() {
@@ -223,13 +224,18 @@ function Wifi() {
 function MediaPlayer() {
     const button = Widget.Button({
         class_name: "filled_tonal_button awesome_icon",
-        on_clicked: () => {
+        on_primary_click: () => {
             App.toggleWindow("media")
             // Utils.execAsync(["ags", "-t", "media"])
         },
+        on_secondary_click: () => {
+            Utils.execAsync(["playerctl", "play-pause"]).catch(print)
+        },
         child: Widget.Label(
             ""
-        )
+        ),
+        tooltip_markup: mpris.bind("players")
+            .as(players => `${players[0].track_artists.join(" & ")} - ${players[0].track_title}`)
     })
 
     return button
