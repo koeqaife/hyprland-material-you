@@ -234,8 +234,8 @@ function MediaPlayer() {
         child: Widget.Label(
             ""
         ),
-        tooltip_markup: mpris.bind("players")
-            .as(players => `${players[0].track_artists.join(" & ")} - ${players[0].track_title}`)
+        tooltip_text: mpris.players[0].bind("metadata")
+            .as(metadata => `${metadata["xesam:artist"]} - ${metadata["xesam:title"]}`)
     })
 
     return button
