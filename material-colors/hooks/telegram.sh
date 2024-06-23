@@ -1,3 +1,4 @@
+#!/bin/bash
 wal_folder="$HOME"/.cache/wal
 telegram_theme_cache="$HOME"/.cache/telegram-theme
 
