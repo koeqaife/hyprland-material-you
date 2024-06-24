@@ -1,4 +1,4 @@
-# Hyprland dotfiles
+[# Hyprland dotfiles
 
 [![Screenshot](screenshots/screenshot1.png "Screenshot")](screenshots/screenshot1.png)
 
@@ -20,6 +20,8 @@ mv hyprland-material-you dotfiles
 cd dotfiles
 ./install.sh
 ```
+
+! Install font "Product Sans" !
 
 **Recommended icons:** [Tela nord](https://www.gnome-look.org/p/1279924/) or [Tela circle nord](https://www.gnome-look.org/p/1359276/)
 
@@ -49,3 +51,4 @@ cd dotfiles
 [![Screenshot](screenshots/light-theme.png "Light gtk theme")](screenshots/light-theme.png)
 
 > I got some code for AGS from [end-4](https://github.com/end-4/dots-hyprland/) and [kotontrion](https://github.com/kotontrion/dotfiles) configs, thanks to them.
+](https://befonts.com/product-sans-font.html)
