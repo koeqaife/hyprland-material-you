@@ -222,6 +222,7 @@ function Wifi() {
 
 
 function MediaPlayer() {
+    const metadata = mpris.players[0]?.metadata;
     const button = Widget.Button({
         class_name: "filled_tonal_button awesome_icon",
         on_primary_click: () => {
@@ -234,13 +235,21 @@ function MediaPlayer() {
         child: Widget.Label(
             ""
         ),
-        tooltip_text: mpris.players[0].bind("metadata")
-            .as(metadata => `${metadata["xesam:artist"]} - ${metadata["xesam:title"]}`)
+        visible: false,
+        tooltip_text: "Unknown"
+    }).hook(mpris, self => {
+        if (mpris.players.length > 0) {
+            self.visible = true;
+            if (metadata)
+                self.tooltip_text = `${metadata["xesam:artist"]} - ${metadata["xesam:title"]}`;
+        } else {
+            self.visible = false;
+            self.tooltip_text = "Unknown"
+        }
     })
 
     return button
 }
-
 
 function KeyboardLayout() {
     const widget = Widget.Label({
