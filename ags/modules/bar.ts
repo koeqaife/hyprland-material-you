@@ -222,7 +222,7 @@ function Wifi() {
 
 
 function MediaPlayer() {
-    const metadata = mpris.players[0]?.metadata;
+    let metadata = mpris.players[0]?.metadata;
     const button = Widget.Button({
         class_name: "filled_tonal_button awesome_icon",
         on_primary_click: () => {
@@ -240,6 +240,7 @@ function MediaPlayer() {
     }).hook(mpris, self => {
         if (mpris.players.length > 0) {
             self.visible = true;
+            metadata = mpris.players[0]?.metadata;
             if (metadata)
                 self.tooltip_text = `${metadata["xesam:artist"]} - ${metadata["xesam:title"]}`;
         } else {
@@ -250,6 +251,7 @@ function MediaPlayer() {
 
     return button
 }
+
 
 function KeyboardLayout() {
     const widget = Widget.Label({
