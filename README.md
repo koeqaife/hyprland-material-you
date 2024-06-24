@@ -21,6 +21,8 @@ cd dotfiles
 ./install.sh
 ```
 
+! Install font "Product Sans" !
+
 **Recommended icons:** [Tela nord](https://www.gnome-look.org/p/1279924/) or [Tela circle nord](https://www.gnome-look.org/p/1359276/)
 
 > I'm not sure if it will work, if you have any problems installing it, post in Issues
