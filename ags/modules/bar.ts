@@ -6,6 +6,7 @@ const network = await Service.import("network")
 const { Gtk, GLib, Gio } = imports.gi;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
+import { OpenSettings } from "apps/settings/main.ts";
 import { enableClickThrough } from "./misc/clickthrough.js";
 import { RoundedCorner } from "./misc/cairo_roundedcorner.js";
 import { Client, Workspace } from "types/service/hyprland.js"
@@ -201,7 +202,7 @@ function Wifi() {
     const button = Widget.Button({
         class_name: "bar_wifi awesome_icon",
         on_primary_click: () => {
-            App.toggleWindow("wifi")
+            OpenSettings("network")
         },
         on_secondary_click: (_, event) => {
             const nm_applet = systemtray.items.find(item => item.id == "nm-applet")
@@ -212,9 +213,17 @@ function Wifi() {
             }
         },
         child: Widget.Icon({
-            icon: network.wifi.bind("icon_name")
+            icon: "network-wireless-offline-symbolic"
         }),
-        tooltip_text: network.wifi.bind('ssid').as(ssid => ssid || 'Unknown')
+        tooltip_text: 'Disabled'
+    }).hook(network, self => {
+        if (network.wifi.enabled) {
+            self.tooltip_text = network.wifi.ssid || 'Unknown';
+            self.child.icon = network.wifi.icon_name;
+        } else {
+            self.tooltip_text = 'Disabled'
+            self.child.icon = "network-wireless-offline-symbolic";
+        }
     })
 
     return button
@@ -222,11 +231,11 @@ function Wifi() {
 
 
 function MediaPlayer() {
+    let metadata = mpris.players[0]?.metadata;
     const button = Widget.Button({
         class_name: "filled_tonal_button awesome_icon",
         on_primary_click: () => {
             App.toggleWindow("media")
-            // Utils.execAsync(["ags", "-t", "media"])
         },
         on_secondary_click: () => {
             Utils.execAsync(["playerctl", "play-pause"]).catch(print)
@@ -234,8 +243,19 @@ function MediaPlayer() {
         child: Widget.Label(
             ""
         ),
-        tooltip_text: mpris.players[0].bind("metadata")
-            .as(metadata => `${metadata["xesam:artist"]} - ${metadata["xesam:title"]}`)
+        visible: false,
+        tooltip_text: "Unknown"
+    }).hook(mpris, self => {
+        if (mpris.players.length > 0) {
+            self.visible = true;
+            metadata = mpris.players[0]?.metadata;
+            if (metadata)
+                self.tooltip_text = `${metadata["xesam:artist"]} - ${metadata["xesam:title"]}`;
+        } else {
+            self.visible = false;
+            self.tooltip_text = "Unknown"
+            App.closeWindow("media")
+        }
     })
 
     return button
@@ -279,15 +299,22 @@ function TaskBar() {
             if (widget) {
                 widget.tooltip_markup = item.title;
             } else {
+                let icon: string | undefined;
+                if (item.class == "com.github.Aylur.ags") {
+                    if (item.initialTitle == "Settings") {
+                        icon = "emblem-system-symbolic"
+                    }
+                }
+                else
+                    icon = getIconNameFromClass(item.class)
                 widget = Widget.Button({
                     attribute: { pid: item.pid },
-                    child: Widget.Icon({ icon: getIconNameFromClass(item.class) || "image-missing" }),
+                    child: Widget.Icon({ icon: icon }),
                     tooltip_markup: item.title,
                 });
                 globalWidgets.push(widget);
             }
         });
-    
         return globalWidgets;
     }
 

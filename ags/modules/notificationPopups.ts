@@ -98,7 +98,6 @@ export const Notification = (notification: NotificationType, dismiss = true) => 
                                 wrap_mode: Pango.WrapMode.WORD_CHAR,
                                 xalign: 0,
                                 wrap: true,
-                                // HACK: remove linebreaks, so lines property works properly
                                 label: notification.body.replace(/(\r\n|\n|\r)/gm, " "),
                             }),
                             notification.hints.value ?
