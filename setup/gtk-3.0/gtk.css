@@ -187,7 +187,6 @@ button, combobox, entry {
     margin-left: 2px;
     margin-right: 2px;
     margin-bottom: 0px;
-    border: none;
 }
 
 * {
@@ -209,12 +208,12 @@ switch slider {
 }
 
 switch:disabled {
-	background-color: mix(@surfaceContainerHighest, transparent, 0.3);
-    border-color: mix(@onSurface, transparent, 0.3);
+	background-color: mix(@surfaceContainerHighest, transparent, 0.38);
+    border-color: mix(@onSurface, transparent, 0.38);
 }
 
 switch:disabled slider {
-    background-color: mix(@onSurface, transparent, 0.3);
+    background-color: mix(@onSurface, transparent, 0.38);
 }
 
 switch:hover {
@@ -236,12 +235,12 @@ switch:checked slider {
 }
 
 switch:checked:disabled {
-	background-color: mix(@onSurface, transparent, 0.3);
+	background-color: mix(@onSurface, transparent, 0.38);
     border-color: transparent;
 }
 
 switch:checked:disabled slider {
-    background-color: mix(@surface, transparent, 0.3);
+    background-color: mix(@surface, transparent, 0.38);
 }
 
 switch:checked:hover {
