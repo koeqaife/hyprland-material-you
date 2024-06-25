@@ -1,16 +1,35 @@
 #!/bin/bash
 # Cache file for holding the current wallpaper
+LOCKFILE="/tmp/set-wallpaper.lock"
 cache_file="$HOME/.cache/current_wallpaper"
 blurred="$HOME/.cache/blurred_wallpaper.png"
 square="$HOME/.cache/square_wallpaper.png"
 rasi_file="$HOME/.cache/current_wallpaper.rasi"
 blur_file="$HOME/dotfiles/.settings/blur.sh"
 color_scheme_file="$HOME/dotfiles/.settings/color-scheme"
+custom_color_file="$HOME/dotfiles/.settings/custom-color"
+
+if [ -e "$LOCKFILE" ] && kill -0 "$(cat $LOCKFILE)"; then
+    notify-send "Warning" "You cannot change the wallpaper while the wallpaper change procedure is in progress"
+    exit 1
+fi
+
+trap "rm -f $LOCKFILE; exit" INT TERM EXIT
+echo $$ > "$LOCKFILE"
 
 blur="50x30"
 blur=$(cat $blur_file)
 color_scheme=$(cat $color_scheme_file)
+custom_color=$(cat $custom_color_file)
 generator="$HOME/dotfiles/material-colors/generate.py"
+
+generate_colors() {
+    if [[ $custom_color != "none" ]]; then
+        python -O $generator --color "$custom_color" --color-scheme $color_scheme 
+    else
+        python -O $generator --image $1 --color-scheme $color_scheme
+    fi
+}
 
 # Create cache file if not exists
 if [ ! -f $cache_file ] ;then
@@ -32,9 +51,9 @@ case $1 in
     "init")
         sleep 1
         if [ -f $cache_file ]; then
-            python -O $generator --image $current_wallpaper --color-scheme $color_scheme 
+            generate_colors $current_wallpaper
         else
-            python -O $generator --image ~/wallpaper/ --color-scheme $color_scheme 
+            generate_colors ~/wallpaper/
         fi
     ;;
 
@@ -49,12 +68,12 @@ case $1 in
             echo "No wallpaper selected"
             exit
         fi
-        python -O $generator --image ~/wallpaper/$selected --color-scheme $color_scheme 
+        generate_colors ~/wallpaper/$selected
     ;;
 
     # Randomly select wallpaper 
     *)
-        python -O $generator --image ~/wallpaper/ --color-scheme $color_scheme 
+        generate_colors ~/wallpaper/
     ;;
 
 esac
@@ -164,3 +183,6 @@ fi
 echo ":: SDDM theme changed"
 
 echo "DONE!"
+
+rm -f "$LOCKFILE"
+trap - INT TERM EXIT
