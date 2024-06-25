@@ -1,4 +1,4 @@
-[# Hyprland dotfiles
+# Hyprland dotfiles
 
 [![Screenshot](screenshots/screenshot1.png "Screenshot")](screenshots/screenshot1.png)
 
