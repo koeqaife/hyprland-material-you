@@ -1,6 +1,7 @@
 
 const notifications = await Service.import("notifications")
 const network = await Service.import('network')
+import { OpenSettings } from "apps/settings/main.ts";
 import { WINDOW_NAME } from "./main.ts"
 
 const { Gtk } = imports.gi;
@@ -11,7 +12,7 @@ const idle_inhibitor = Variable(false);
 const night_light = Variable(false);
 const theme = Variable("dark");
 const currentPage = Variable(0);
-const bluetooth_enabled = Variable('off', {
+export const bluetooth_enabled = Variable('off', {
     poll: [1000, `${App.configDir}/scripts/bluetooth.sh --get`]
 })
 
@@ -151,8 +152,8 @@ function Page1() {
                             network.toggleWifi();
                         },
                         on_secondary_click: () => {
-                            App.closeWindow(WINDOW_NAME);
-                            App.openWindow("wifi");
+                            App.closeWindow(WINDOW_NAME)
+                            OpenSettings("network")
                         }
                     }),
                     Widget.Button({

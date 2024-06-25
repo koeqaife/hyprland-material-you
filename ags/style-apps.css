@@ -1,0 +1,157 @@
+@import "/home/mrdan/.cache/material/colors.css";
+
+/* -----------------------------------------------------
+ * Settings
+ * ----------------------------------------------------- */
+
+.settings .settings_title {
+    color: @onSurface;
+    background-color: @surfaceContainerLow;
+    font-weight: normal;
+    font-size: 22px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.settings .full_sidebar {
+    border-right: 1px solid;
+    border-color: @outlineVariant;
+}
+
+.settings .page_title {
+    background-color: @surface;
+    font-weight: normal;
+    padding-left: 16px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    font-size: 20px;
+    border-bottom: 1px solid;
+    border-color: @outlineVariant;
+    /* margin-bottom: 3px; */
+}
+
+.settings .page_title {
+    color: @onSurfaceVariant;
+}
+
+.settings .sidebar {
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    min-width: 250px;
+    background-color: @surfaceContainerLow;
+}
+
+.settings .sidebar .row {
+    border-radius: 100px;
+    padding: 0px;
+    padding-right: 24px;
+    padding-left: 16px;
+    min-height: 56px;
+    background-color: @surfaceContainerLow;
+}
+
+.settings .sidebar .row:hover {
+    background-color: mix(@onSurface, @surface, 0.92);
+}
+
+.settings .sidebar .row.active {
+    background-color: @secondaryContainer;
+}
+
+.settings .sidebar .row label {
+    color: @onSurfaceVariant;
+    font-weight: normal;
+    font-size: 16px;
+}
+
+.settings .sidebar .row.active label {
+    color: @onSecondaryContainer;
+}
+
+.settings .sidebar .row image {
+    margin-right: 12px;
+    color: @onSurfaceVariant;
+}
+
+.settings .sidebar .row.active image {
+    margin-right: 12px;
+    color: @onSecondaryContainer;
+}
+
+.settings .sidebar separator {
+    margin-right: 16px;
+    margin-left: 16px;
+    color: @outline;
+}
+
+.settings .error_container {
+    padding-left: 16px;
+    padding-right: 16px;
+    background-color: @errorContainer;   
+}
+
+.settings .error_container label {
+    color: @onErrorContainer;   
+}
+
+/* Wifi */
+
+.settings .wifi_toggle {
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 12px;
+    padding-bottom: 8px;
+}
+
+.settings .wifi_toggle .title {
+    font-weight: normal;
+    font-size: 17px;
+    color: @onSurface
+}
+
+.settings .wifi_toggle .description {
+    font-weight: normal;
+    font-size: 14px;
+    color: @onSurfaceVariant
+}
+
+.settings .wifi_list .wifi_network {
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border-radius: 0px;
+}
+
+.settings .wifi_list .wifi_network:hover {
+    background-color: mix(@onSurface, @surface, 0.92)
+}
+
+.settings .wifi_list .wifi_network .title {
+    font-weight: normal;
+    font-size: 16px;
+    color: @onSurface
+}
+
+.settings .wifi_list .wifi_network .description {
+    font-weight: normal;
+    font-size: 14px;
+    color: @onSurfaceVariant
+}
+
+.settings .wifi_list .wifi_network image {
+    color: @onSurfaceVariant;
+    margin-right: 16px;
+}
+
+.settings .wifi_list .wifi_network.active image {
+    color: @primary;
+}
+
+.settings box {
+    margin: 0px;
+    padding: 0px;
+}
+

@@ -36,7 +36,7 @@ highlight {
     outline: none;
     transition: 0.2s ease-in-out;
     transition-property: border-color, background-color, color;
-    font-family: "Product Sans", "Font Awesome 6 Free", Roboto, Helvetica, Arial, sans-serif;
+    font-family: "Product Sans", Roboto, "Font Awesome 6 Free", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .corner {
@@ -741,79 +741,6 @@ window.notification-popups box.notifications {
 } */
 
 /* -----------------------------------------------------
- * Wifi
- * ----------------------------------------------------- */
-
-.wifi_main_box {
-    min-height: 500px;
-    min-width: 500px;
-    background: @background;
-    border-radius: 24px;
-    border: 2px solid;
-    border-color: @outlineVariant;
-}
-
-.wifi_current {
-    font-weight: bold;
-    font-size: 16px;
-}
-
-.wifi_ssid {
-    font-weight: normal;
-    font-size: 14px;
-}
-
-.wifi_actual_content_box {
-    margin: 10px 10px 10px 10px;
-    background-color: @secondary;
-    padding: 3px;
-    padding-left: 15px;
-    padding-right: 15px;
-    border-radius: 16px;
-}
-
-.wifi_actual_content_box label {
-    color: @onSecondary;
-}
-
-.network_name {
-    font-weight: bold;
-    font-size: 16px;
-}
-
-.wifi_button {
-    margin: 2px 10px 0px 10px;
-    padding: 5px 10px 5px 10px;
-    background-color: @background;
-    border-radius: 16px;
-}
-
-.wifi_button:hover {
-    background-color: @surfaceContainerHigh;
-}
-
-.wifi_button label, .wifi_button .icon {
-    color: @onSurface;
-}
-
-.wifi_scrollable {
-    background-color: @surfaceContainer;
-    border-radius: 24px;
-    padding-bottom: 2px;
-}
-
-.wifi_scrollable_box {
-    margin-top: 8px;
-    margin-bottom: 8px;
-}
-
-.wifi_revealer_box entry {
-    background-color: @surfaceContainerHigh;
-    color: @onSurface;
-    border-radius: 100px;
-}
-
-/* -----------------------------------------------------
  * Buttons
  * ----------------------------------------------------- */
 
@@ -940,4 +867,76 @@ window.notification-popups box.notifications {
     min-width: 40px;
 }
 
+
+/* -----------------------------------------------------
+ * Switch
+ * ----------------------------------------------------- */
+
+
+switch {
+	border: 2px solid;
+    border-radius: 100px;
+    border-color: @outline;
+    background-color: @surfaceContainerHighest;
+    min-height: 20px;
+    padding: 1px;
+}
+
+switch slider {
+    border-radius: 100%;
+    background-color: @outline;
+    min-height: 10px;
+    margin: 2px;
+    min-height: 8px;
+    min-width: 16px;
+    transition: all 0.2s ease-in-out;
+    transition-property: min-height, min-width, color, background-color, border-color, margin;
+}
+
+switch:disabled {
+	background-color: mix(@surfaceContainerHighest, transparent, 0.3);
+    border-color: mix(@onSurface, transparent, 0.3);
+}
+
+switch:disabled slider {
+    background-color: mix(@onSurface, transparent, 0.3);
+}
+
+switch:hover, switch:active {
+    background-color: mix(@surfaceContainerHighest, @onSurface, 0.08);
+}
+
+switch:hover slider, switch:active slider {
+    background-color: @onSurfaceVariant;
+}
+
+switch:checked {
+	background-color: @primary;
+    border-color: transparent;
+}
+
+switch:checked slider {
+    background-color: @onPrimary;
+    border-color: transparent;
+    margin: 0px;
+    min-height: 10px;
+    min-width: 20px;
+}
+
+switch:checked:disabled {
+	background-color: mix(@onSurface, transparent, 0.3);
+    border-color: transparent;
+}
+
+switch:checked:disabled slider {
+    background-color: mix(@surface, transparent, 0.3);
+}
+
+switch:checked:hover, switch:checked:active {
+	background-color: @primary;
+}
+
+switch:checked:hover slider, switch:checked:active slider {
+    background-color: @primaryContainer;
+}
 
