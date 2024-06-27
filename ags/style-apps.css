@@ -96,6 +96,11 @@
     color: @onErrorContainer;   
 }
 
+.settings box {
+    margin: 0px;
+    padding: 0px;
+}
+
 /* Wifi */
 
 .settings .wifi_toggle {
@@ -150,8 +155,63 @@
     color: @primary;
 }
 
-.settings box {
-    margin: 0px;
-    padding: 0px;
+/* Bluetooth */
+
+.settings .bluetooth_toggle {
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 12px;
+    padding-bottom: 8px;
+}
+
+.settings .bluetooth_toggle .title {
+    font-weight: normal;
+    font-size: 17px;
+    color: @onSurface
+}
+
+.settings .bluetooth_toggle .description {
+    font-weight: normal;
+    font-size: 14px;
+    color: @onSurfaceVariant
+}
+
+
+.settings .device_list .device {
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border-radius: 0px;
+}
+
+.settings .device_list .device:hover {
+    background-color: mix(@onSurface, @surface, 0.92)
+}
+
+.settings .device_list .device .title {
+    font-weight: normal;
+    font-size: 16px;
+    color: @onSurface
+}
+
+.settings .device_list .device .description {
+    font-weight: normal;
+    font-size: 14px;
+    color: @onSurfaceVariant
+}
+
+.settings .device_list .device image {
+    color: @onTertiary;
+    background-color: @tertiary;
+    margin-right: 16px;
+    min-height: 32px;
+    min-width: 32px;
+    border-radius: 5px;
+}
+
+.settings .device_list .device.active image {
+    color: @onPrimary;
+    background-color: @primary;
 }
 

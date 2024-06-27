@@ -1,12 +1,173 @@
-import { PageTitle } from "./main";
+import { type BluetoothDevice } from "types/service/bluetooth";
 import Gtk from "gi://Gtk?version=3.0"
+import { timeout } from "resource:///com/github/Aylur/ags/utils.js";
 
 const bluetooth = await Service.import("bluetooth")
 
-export const Bluetooth = () => Widget.Box({
-    hexpand: true,
-    vexpand: true,
-    child: Widget.Label({
-        label: "Not implemented yet",
+const HpackStartLabel = (label: string) => Widget.Label({
+    label: label,
+    hpack: "start"
+})
+
+const BluetoothToggle = () => Widget.EventBox({
+    child: Widget.Box({
+        class_name: "bluetooth_toggle",
+        children: [
+            Widget.Box({
+                vertical: true,
+                hexpand: true,
+                children: [
+                    Widget.Label({
+                        hpack: "start",
+                        class_name: "title",
+                        label: "Enabled"
+                    }),
+                    // Widget.Label({
+                    //     hpack: "start",
+                    //     class_name: "description",
+                    //     label: "Idk"
+                    // })
+                ]
+            }),
+            Widget.Switch({
+                vexpand: false,
+                valign: Gtk.Align.CENTER,
+                hpack: "end",
+                on_activate: self => {
+                    if (self.state != bluetooth.enabled)
+                        bluetooth.enabled = self.state;
+                },
+                state: bluetooth.bind("enabled"),
+            })
+        ]
+    }),
+    on_secondary_click: (self, event) => {
+        Widget.Menu({
+            children: [Widget.MenuItem({
+                child: HpackStartLabel("Open blueman-manager"),
+                on_activate: () => {
+                    Utils.execAsync("blueman-manager").catch(print);
+                }
+            })]
+        }).popup_at_pointer(event);
+    }
+})
+
+const DeviceMenu = (device: BluetoothDevice) => {
+    if (device.connecting) {
+        return undefined
+    }
+    return Widget.Menu({
+        children: [
+            !device.connected
+                ? Widget.MenuItem({
+                    child: HpackStartLabel("Connect"),
+                    on_activate: () => {
+                        device.setConnection(true);
+                    }
+                })
+                : Widget.MenuItem({
+                    child: HpackStartLabel("Disconnect"),
+                    on_activate: () => {
+                        device.setConnection(false);
+                    },
+                }),
+            Widget.MenuItem({
+                child: HpackStartLabel("Copy Address"),
+                on_activate: () => {
+                    Utils.execAsync(["wl-copy", device.address])
+                },
+            })
+        ]
     })
-}) 
+}
+
+
+const DeviceItem = (device: BluetoothDevice) => Widget.Button({
+    class_name: "device",
+    // on_primary_click: () => {
+    //     if (!connected)
+    //         Utils.execAsync(`nmcli device wifi connect '${access_point.ssid}'`)
+    //             .catch(print);
+    //     else if (is_saved)
+    //         Utils.execAsync(`${App.configDir}/scripts/network.sh --edit ${access_point.ssid}`)
+    //             .catch(print);
+    // },
+    on_secondary_click: (self, event) => {
+        DeviceMenu(device)?.popup_at_pointer(event);
+    },
+    child: Widget.Box({
+        class_name: "device_box",
+        children: [
+            Widget.Icon({
+                icon: `${device.icon_name}-symbolic`,
+                hpack: "center",
+                vpack: "center",
+                size: 20
+            }),
+            // @ts-ignore
+            Widget.Box({
+                vertical: true,
+                vpack: "center",
+                children: [
+                    Widget.Label({
+                        class_name: "title",
+                        label: device.name.trim(),
+                        hpack: "start",
+                    }),
+                    (device.connecting)
+                        ? Widget.Label({
+                            class_name: "description",
+                            label: device.connected ? "Disconnecting..." : "Connecting...",
+                            hpack: "start"
+                        })
+                        : (device.connected)
+                            ? Widget.Label({
+                                class_name: "description",
+                                label: "Active",
+                                hpack: "start"
+                            })
+                            : undefined
+                ]
+            })
+        ]
+    }),
+
+    setup: self => {
+        self.toggleClassName("active", device.connected);
+    }
+})
+
+function DeviceList() {
+    return Widget.Box({
+        vertical: true,
+        attribute: {
+            'updateDeviceList': (self) => {
+                const devices = bluetooth.devices || [];
+                self.children = Object.values(devices)
+                    .sort((a: BluetoothDevice, b: BluetoothDevice) => {
+                        if (a.connected) return -1;
+                        if (b.connected) return 1;
+                        return 0;
+                    })
+                    .filter((n: BluetoothDevice) => n.device.name !== null)
+                    .map((n: BluetoothDevice) => DeviceItem(n));
+            },
+        },
+        className: 'device_list',
+        setup: (self) => self.hook(bluetooth, self.attribute.updateDeviceList),
+    })
+}
+
+export const Bluetooth = () => Widget.Scrollable({
+    hscroll: "never",
+    child: Widget.Box({
+        hexpand: true,
+        vexpand: true,
+        vertical: true,
+        children: [
+            BluetoothToggle(),
+            DeviceList()
+        ]
+    })
+})
