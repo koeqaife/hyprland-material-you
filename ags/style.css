@@ -890,7 +890,7 @@ switch slider {
     min-height: 8px;
     min-width: 16px;
     transition: all 0.2s ease-in-out;
-    transition-property: min-height, min-width, color, background-color, border-color, margin;
+    transition-property: color, background-color, border-color;
 }
 
 switch:disabled {
