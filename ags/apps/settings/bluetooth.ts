@@ -10,11 +10,13 @@ const HpackStartLabel = (label: string) => Widget.Label({
 })
 
 const BluetoothToggle = () => Widget.EventBox({
+    class_name: "row",
     child: Widget.Box({
-        class_name: "bluetooth_toggle",
+        class_name: "row",
         children: [
             Widget.Box({
                 vertical: true,
+                vpack: "center",
                 hexpand: true,
                 children: [
                     Widget.Label({
@@ -41,6 +43,9 @@ const BluetoothToggle = () => Widget.EventBox({
             })
         ]
     }),
+    on_primary_click: (self) => {
+        self.child.children[1]!.activate();
+    },
     on_secondary_click: (self, event) => {
         Widget.Menu({
             children: [Widget.MenuItem({
@@ -84,15 +89,10 @@ const DeviceMenu = (device: BluetoothDevice) => {
 
 
 const DeviceItem = (device: BluetoothDevice) => Widget.Button({
-    class_name: "device",
-    // on_primary_click: () => {
-    //     if (!connected)
-    //         Utils.execAsync(`nmcli device wifi connect '${access_point.ssid}'`)
-    //             .catch(print);
-    //     else if (is_saved)
-    //         Utils.execAsync(`${App.configDir}/scripts/network.sh --edit ${access_point.ssid}`)
-    //             .catch(print);
-    // },
+    class_name: "row",
+    on_primary_click: () => {
+        device.setConnection(!device.connected);
+    },
     on_secondary_click: (self, event) => {
         DeviceMenu(device)?.popup_at_pointer(event);
     },
