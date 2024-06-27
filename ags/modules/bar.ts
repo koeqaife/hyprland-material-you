@@ -14,6 +14,7 @@ import Button from "types/widgets/button.js"
 import Icon from "types/widgets/icon.js"
 import { FileEnumerator, FileInfo } from "types/@girs/gio-2.0/gio-2.0.cjs"
 const mpris = await Service.import("mpris")
+const bluetooth = await Service.import("bluetooth")
 
 
 function checkKeymap() {
@@ -162,7 +163,7 @@ function BatteryLabel() {
 function SysTray() {
     const items = systemtray.bind("items")
         .as(items => items.map(item => {
-            if (item.id.trim() != "nm-applet") {
+            if (item.id.trim() != "nm-applet" && item.id.trim() != "blueman") {
                 return Widget.Button({
                     child: Widget.Icon({ icon: item.bind("icon") }),
                     on_primary_click: (_, event) => item.activate(event),
@@ -199,8 +200,8 @@ function AppLauncher() {
 
 
 function Wifi() {
-    const button = Widget.Button({
-        class_name: "bar_wifi awesome_icon",
+    return Widget.Button({
+        class_name: "bar_wifi icon",
         on_primary_click: () => {
             OpenSettings("network")
         },
@@ -225,9 +226,44 @@ function Wifi() {
             self.child.icon = "network-wireless-offline-symbolic";
         }
     })
-
-    return button
 }
+
+
+function Bluetooth() {
+    return Widget.Button({
+        class_name: "bar_bluetooth icon",
+        on_primary_click: () => {
+            OpenSettings("bluetooth")
+        },
+        on_secondary_click: (_, event) => {
+            const blueman = systemtray.items.find(item => item.id == "blueman")
+            if (blueman) {
+                blueman.openMenu(event)
+            } else {
+                Utils.execAsync("blueman-manager").catch(print)
+            }
+        },
+        child: Widget.Icon({
+            icon: "bluetooth-disabled-symbolic"
+        }),
+    }).hook(bluetooth, self => {
+        if (bluetooth.enabled) {
+            self.child.icon = "bluetooth-active-symbolic";
+        } else {
+            self.child.icon = "bluetooth-disabled-symbolic";
+        }
+    })
+}
+
+
+const Applets = () => Widget.Box({
+    class_name: "bar_applets",
+    spacing: 5,
+    children: [
+        Bluetooth(),
+        Wifi()
+    ]
+})
 
 
 function MediaPlayer() {
@@ -399,7 +435,7 @@ function Right() {
             KeyboardLayout(),
             BatteryLabel(),
             SysTray(),
-            Wifi(),
+            Applets(),
             Clock(),
             OpenSideBar()
         ],
