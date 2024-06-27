@@ -818,6 +818,72 @@ window.notification-popups box.notifications {
     background-color: mix(@onSurfaceVariant, transparent, 0.7);
 }
 
+/* standard button */
+.standard_button {
+    border-radius: 100px;
+    background-color: transparent;
+    color: @onSurfaceVariant;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.standard_button label, .standard_button .icon,
+.standard_button .awesome_icon, .standard_button image {
+    color: @onSurfaceVariant;
+    margin: 0px;
+    padding: 0px;
+}
+
+.standard_button:hover {
+    background-color: mix(@onSurfaceVariant, @surface, 0.8);
+}
+
+.standard_button:active {
+    background-color: mix(@onSurfaceVariant, @surface, 0.7);
+}
+
+.standard_button.disabled {
+    background-color: transparent;
+}
+
+.standard_button.disabled label, .standard_button.disabled .icon,
+.standard_button.disabled .awesome_icon, .standard_button.disabled image {
+    color: mix(@onSurface, transparent, 0.38);
+}
+
+/* filled button */
+.filled_button {
+    border-radius: 100px;
+    background-color: @primary;
+    color: @onPrimary;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.filled_button label, .filled_button .icon,
+.filled_button .awesome_icon, .filled_button image {
+    color: @onPrimary;
+    margin: 0px;
+    padding: 0px;
+}
+
+.filled_button:hover {
+    background-color: mix(@onPrimary, @primary, 0.92);
+}
+
+.filled_button:active {
+    background-color: mix(@onPrimary, @primary, 0.8);
+}
+
+.filled_button.disabled {
+    background-color: mix(@onSurface, @surface, 0.12);
+    color: mix(@onSurface, @surface, 0.38);
+}
+
+.filled_button.disabled label, .filled_button.disabled .icon,
+filled_button.disabled .awesome_icon, .filled_button.disabled image {
+    color: mix(@onSurface, @surface, 0.38);
+}
 
 /* -----------------------------------------------------
  * Navigation bar
