@@ -46,7 +46,10 @@ export function NotificationsBox({ exclude = [], include = [] }: NotificationsBo
         class_name: "notifications_menu",
         children: [
             Widget.MenuItem({
-                child: Widget.Label('Close all'),
+                child: Widget.Label({
+                    label: "Close all",
+                    hpack: "start"
+                }),
                 class_name: "notifications_menu_item",
                 on_activate: () => {
                     for (let n of notifications.notifications) {
