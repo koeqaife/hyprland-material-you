@@ -165,7 +165,7 @@ function Page1() {
                             return str.trim() == "dark" ? "management_button active" : "management_button"
                         }),
                         on_clicked: () => {
-                            Utils.execAsync(["sh", `${App.configDir}/scripts/toggle-theme.sh`]);
+                            Utils.execAsync(`${App.configDir}/scripts/dark-theme.sh --toggle`).catch(print);
                             theme.setValue(theme.value.trim() == "dark" ? "light" : "dark");
                         },
                         child: IconAndName({
