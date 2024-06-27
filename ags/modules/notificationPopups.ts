@@ -69,6 +69,7 @@ export const Notification = (notification: NotificationType, dismiss = true) => 
                                         lines: 1,
                                         xalign: 0,
                                         hexpand: true,
+                                        tooltip_text: notification.summary
                                     }),
                                     Widget.Label({
                                         class_name: "notification-time",
@@ -226,8 +227,8 @@ export function NotificationPopups(
         if (!original)
             return
         original.attribute.count--;
-        if (original.attribute.count <= 0) {
-            original.attribute.destroyWithAnims()
+        if (original?.attribute.count <= 0) {
+            original?.attribute.destroyWithAnims()
         }
     }
 
