@@ -310,9 +310,11 @@ function KeyboardLayout() {
 function OpenSideBar() {
     const button = Widget.Button({
         class_name: "filled_tonal_button awesome_icon",
-        on_clicked: () => {
+        on_primary_click: () => {
             App.toggleWindow("sidebar")
-            // Utils.execAsync(["ags", "-t", "sidebar"])
+        },
+        on_secondary_click: () => {
+            OpenSettings()
         },
         label: ""
     })
