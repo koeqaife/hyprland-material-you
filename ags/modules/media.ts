@@ -32,12 +32,14 @@ function Player(player: MprisPlayer) {
         wrap: true,
         hpack: "start",
         label: player.bind("track_title"),
+        use_markup: false
     })
 
     const artist = Widget.Label({
         class_name: "artist",
         wrap: true,
         hpack: "start",
+        use_markup: false,
         label: player.bind("track_artists").transform(a => a.join(", ")),
     })
 
