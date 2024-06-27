@@ -109,16 +109,17 @@ const Wallpaper = (image: string, name: string) => Widget.Button({
 const WallpaperList = () => {
     Utils.execAsync(`mkdir -p ${GLib.get_home_dir()}/.cache/thumbnails/wallpaper`)
         .then()
-    const directoryPath = `${App.configDir}/wallpaper`;
+    const link_directory = `${App.configDir}/wallpaper`;
+    const original_directory = `${GLib.get_home_dir()}/wallpaper`;
     const extensions = [".jpg", ".jpeg", ".png"];
-    let fileList = listFilesByExtensions(directoryPath, extensions);
+    let fileList = listFilesByExtensions(link_directory, extensions);
     let [l_fileList, r_fileList] = splitListInHalf(fileList);
     const box = Widget.Box({
         vertical: false,
         attribute: {
             update: self => {
-                self.children[0].children! = l_fileList.map(value => Wallpaper(`${directoryPath}/${value}`, value));
-                self.children[1].children! = r_fileList.map(value => Wallpaper(`${directoryPath}/${value}`, value));
+                self.children[0].children! = l_fileList.map(value => Wallpaper(`${original_directory}/${value}`, value));
+                self.children[1].children! = r_fileList.map(value => Wallpaper(`${original_directory}/${value}`, value));
             }
         },
         children: [

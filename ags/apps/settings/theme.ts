@@ -101,13 +101,15 @@ const ThemeColor = () => Widget.EventBox({
             Widget.Entry({
                 max_length: 7,
                 hpack: "end",
-                css: "border: 2px solid;",
+                css: "border: 2px solid; border-color: transparent;",
                 on_accept: self => {
                     ReloadTheme(self.text!);
                 },
                 on_change: self => {
                     if (self.text!.length > 6)
                         self.css = `border: 2px solid; border-color: ${self.text!}`
+                    else
+                        self.css = `border: 2px solid; border-color: transparent;`
                 }
             })
         ]
