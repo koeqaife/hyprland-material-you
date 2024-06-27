@@ -205,21 +205,24 @@ export function NotificationPopups(
             return
         const original = list.children.find(n => n.attribute.id === id);
         const replace = original?.attribute.id;
+        let notification;
         if (!replace) {
-            const notification = revealer(n, false, dismiss);
+            notification = revealer(n, false, dismiss);
             notification.attribute.count = 1;
             list.pack_end(notification, false, false, 0)
         }
         else if (original) {
-            const notification = revealer(n, true, dismiss);
+            notification = revealer(n, true, dismiss);
             notification.attribute.count++;
             original.destroy()
             list.pack_end(notification, false, false, 0)
         }
         if (timeout)
-            setTimeout(() => {
-                onDismissed(_, id)
-            }, 5000)
+            Utils.timeout(7500, () => {
+                if (notification !== null && !notification.disposed) {
+                    onDismissed(_, id)
+                }
+            })
     }
 
     function onDismissed(_: any, id: number) {
