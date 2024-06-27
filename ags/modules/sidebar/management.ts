@@ -3,34 +3,11 @@ const notifications = await Service.import("notifications")
 const network = await Service.import('network')
 import { OpenSettings } from "apps/settings/main.ts";
 import { WINDOW_NAME } from "./main.ts"
+import { bluetooth_enabled, idle_inhibitor, night_light, theme } from "variables.ts";
 
 const { Gtk } = imports.gi;
-const GLib = imports.gi.GLib;
-const Gio = imports.gi.Gio;
 
-const idle_inhibitor = Variable(false);
-const night_light = Variable(false);
-const theme = Variable("dark");
 const currentPage = Variable(0);
-export const bluetooth_enabled = Variable('off', {
-    poll: [1000, `${App.configDir}/scripts/bluetooth.sh --get`]
-})
-
-
-const color_scheme_file = `${GLib.get_home_dir()}/dotfiles/.settings/color-scheme`
-Utils.readFileAsync(color_scheme_file)
-    .then(out => { theme.setValue(out); })
-    .catch(err => { });
-
-
-Utils.monitorFile(
-    color_scheme_file,
-    () => {
-        Utils.readFileAsync(color_scheme_file)
-            .then(out => { theme.setValue(out); })
-            .catch(err => { });
-    }
-)
 
 function WifiIndicator() {
     return Widget.Box({
