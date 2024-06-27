@@ -63,7 +63,7 @@ const WifiNetwork = (access_point: AccessPoint) => {
                     .catch(print);
         },
         on_secondary_click: () => {
-            if(!connected && is_saved)
+            if (!connected && is_saved)
                 Utils.execAsync(`${App.configDir}/scripts/network.sh --edit ${access_point.ssid}`)
                     .catch(print);
         },
@@ -108,44 +108,41 @@ const WifiNetwork = (access_point: AccessPoint) => {
 }
 
 
-const WifiToggle = () => {
-    const box = Widget.Box({
-        class_name: "wifi_toggle",
-        children: [
-            Widget.Box({
-                vertical: true,
-                hexpand: true,
-                children: [
-                    Widget.Label({
-                        hpack: "start",
-                        class_name: "title",
-                        label: "Wi-Fi"
-                    }),
-                    Widget.Label({
-                        hpack: "start",
-                        class_name: "description",
-                        label: "Find and connect to Wi-Fi networks"
-                    })
-                ]
-            }),
-            Widget.Switch({
-                vexpand: false,
-                valign: Gtk.Align.CENTER,
-                hpack: "end",
-                on_activate(self) {
-                    timeout(5, () => {
-                        if (network.wifi.enabled != self.active)
-                            network.wifi.enabled = self.active
-                    })
-                },
-                active: Variable(false, {
-                    poll: [500, () => network.wifi.enabled]
-                }).bind()
-            })
-        ]
-    })
-    return box
-}
+const WifiToggle = () => Widget.Box({
+    class_name: "wifi_toggle",
+    children: [
+        Widget.Box({
+            vertical: true,
+            hexpand: true,
+            children: [
+                Widget.Label({
+                    hpack: "start",
+                    class_name: "title",
+                    label: "Wi-Fi"
+                }),
+                Widget.Label({
+                    hpack: "start",
+                    class_name: "description",
+                    label: "Find and connect to Wi-Fi networks"
+                })
+            ]
+        }),
+        Widget.Switch({
+            vexpand: false,
+            valign: Gtk.Align.CENTER,
+            hpack: "end",
+            on_activate(self) {
+                timeout(5, () => {
+                    if (network.wifi.enabled != self.active)
+                        network.wifi.enabled = self.active
+                })
+            },
+            active: Variable(false, {
+                poll: [500, () => network.wifi.enabled]
+            }).bind()
+        })
+    ]
+})
 
 function WifiList() {
     return Widget.Box({
@@ -197,7 +194,6 @@ const nm_applet_required = () => Widget.Box({
 })
 
 export function Network() {
-    WifiScan()
     const box = Widget.Box({
         vertical: true,
         children: [
