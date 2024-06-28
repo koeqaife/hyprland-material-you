@@ -1,15 +1,18 @@
 #!/bin/bash
 GENERATOR="$HOME/dotfiles/material-colors/generate.py"
 FILE="$HOME/dotfiles/.settings/color-scheme"
+SCHEME_FILE="$HOME/dotfiles/.settings/generation-scheme"
+GENERATION_SCHEME="tonalSpot"
+GENERATION_SCHEME=$(cat $SCHEME_FILE)
 toggle() {
     VALUE=$(cat $FILE)
 
     if [ "$VALUE" == "dark" ]; then
-        python -O $GENERATOR -R --color-scheme light
+        python -O $GENERATOR -R --color-scheme light --scheme $GENERATION_SCHEME
         echo "light" > $FILE
         
     elif [ "$VALUE" == "light" ]; then
-        python -O $GENERATOR -R --color-scheme dark
+        python -O $GENERATOR -R --color-scheme dark --scheme $GENERATION_SCHEME
         echo "dark" > $FILE
     else
         echo "Unknown value: $VALUE"
@@ -17,7 +20,7 @@ toggle() {
 }
 
 set() {
-    python -O $GENERATOR -R --color-scheme $1
+    python -O $GENERATOR -R --color-scheme $1 --scheme $GENERATION_SCHEME
     echo $1 > $FILE
 }
 
