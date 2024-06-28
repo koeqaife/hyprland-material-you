@@ -6,6 +6,7 @@ import fcntl
 import subprocess
 import asyncio
 import random as _random
+import colorsys
 
 
 lock_file_path = '/tmp/wallpaper.lock'
@@ -27,6 +28,18 @@ def release_lock():
     fcntl.flock(lock_file, fcntl.LOCK_UN)
     lock_file.close()
     os.remove(lock_file_path)
+
+
+def hue_to_numeric_hex(hue):
+    hue = hue / 360.0
+
+    rgb = colorsys.hls_to_rgb(hue, 0.5, 1.0)
+
+    hex_color_str = '#{:02x}{:02x}{:02x}'.format(int(rgb[0] * 255), int(rgb[1] * 255), int(rgb[2] * 255))
+
+    numeric_hex_color = int(hex_color_str.lstrip('#'), 16)
+
+    return numeric_hex_color
 
 
 parser = argparse.ArgumentParser()
@@ -61,6 +74,8 @@ cache_file = f"{HOME}/.cache/current_wallpaper"
 square = f"{HOME}/.cache/square_wallpaper.png"
 color_scheme_file = f"{HOME}/dotfiles/.settings/color-scheme"
 custom_color_file = f"{HOME}/dotfiles/.settings/custom-color"
+generation_scheme_file = f"{HOME}/dotfiles/.settings/generation-scheme"
+swww_animation_file = f"{HOME}/dotfiles/.settings/swww-anim"
 
 
 def current_state(str: str):
@@ -94,6 +109,12 @@ async def main():
     with open(custom_color_file) as f:
         custom_color = f.read().strip()
 
+    with open(generation_scheme_file) as f:
+        generation_scheme = f.read().strip()
+
+    with open(swww_animation_file) as f:
+        swww_animation = f.read().strip()
+
     new_wallpaper = f"{HOME}/dotfiles/wallpapers/lake.png"
 
     if random:
@@ -120,7 +141,7 @@ async def main():
     # Set the new wallpaper
     # -----------------------------------------------------
 
-    transition_type = "wipe"
+    transition_type = swww_animation
     # transition_type = "outer"
     # transition_type = "random"
 
@@ -133,7 +154,7 @@ async def main():
     if wallpaper_engine == "swww":
         print(":: Using swww")
 
-        cursor_pos = subprocess.getoutput('hyprctl cursorpos')
+        cursor_pos = subprocess.getoutput('hyprctl cursorpos').replace(", ", ",")
 
         subprocess.run([
             'swww', 'img', new_wallpaper,
@@ -169,9 +190,17 @@ async def main():
     # -----------------------------------------------------
     state("colors", "Generating colors...", with_image)
     print(":: Generate colors")
+    _starts_with = (lambda x: str(x).startswith("-"))
+
     GENERATOR.main(
         color_scheme, new_wallpaper,
-        int(custom_color.lstrip('#'), 16) if custom_color != "none" else None
+        (hue_to_numeric_hex(int(custom_color.lstrip("-")))
+         if _starts_with(custom_color) else (
+             int(custom_color.lstrip('#'), 16)
+             if custom_color != "none"
+             else None
+         )),
+        scheme=GENERATOR.schemes[generation_scheme]
     )
 
     # -----------------------------------------------------
