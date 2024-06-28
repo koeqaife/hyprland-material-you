@@ -138,6 +138,18 @@
     border-color: @outlineVariant;
 }
 
+.settings entry, .settings combobox {
+    min-width: 30px;
+    min-height: 32px;
+    border-radius: 4px;
+    background-color: @surfaceContainerHighest;
+}
+
+.settings entry label, .settings combobox label {
+    color: @onSurface;
+    font-weight: normal;
+}
+
 /* Wifi */
 
 .settings .wifi_list .row image {
