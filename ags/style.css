@@ -113,23 +113,15 @@ separator {
     color: @onSurface;
 }
 
-.workspaces button.active {
-    color: @onSecondaryContainer;
-    background: @secondaryContainer;
-    border-radius: 16px;
-    min-width: 40px;
-}
-
 .workspaces button:hover {
     color: @onSurface;
     background: @surfaceContainerHighest;
-    border-radius: 16px;
 }
 
-.workspaces button.active:hover {
-    color: @onPrimaryContainer;
-    background: @primaryContainer;
-    border-radius: 16px;
+.workspaces button.active {
+    color: @onSecondaryContainer;
+    background: @secondaryContainer;
+    min-width: 40px;
 }
 
 /* -----------------------------------------------------
