@@ -8,7 +8,29 @@ from materialyoucolor.quantize import QuantizeCelebi  # type: ignore
 from materialyoucolor.score.score import Score  # type: ignore
 from materialyoucolor.hct import Hct  # type: ignore
 from materialyoucolor.dynamiccolor.material_dynamic_colors import MaterialDynamicColors  # type: ignore
-from materialyoucolor.scheme.scheme_tonal_spot import SchemeTonalSpot as Scheme  # type: ignore
+from materialyoucolor.scheme.dynamic_scheme import DynamicScheme  # type: ignore
+from materialyoucolor.scheme.scheme_tonal_spot import SchemeTonalSpot  # type: ignore
+from materialyoucolor.scheme.scheme_expressive import SchemeExpressive  # type: ignore
+from materialyoucolor.scheme.scheme_fruit_salad import SchemeFruitSalad  # type: ignore
+from materialyoucolor.scheme.scheme_monochrome import SchemeMonochrome  # type: ignore
+from materialyoucolor.scheme.scheme_rainbow import SchemeRainbow  # type: ignore
+from materialyoucolor.scheme.scheme_vibrant import SchemeVibrant  # type: ignore
+from materialyoucolor.scheme.scheme_neutral import SchemeNeutral  # type: ignore
+from materialyoucolor.scheme.scheme_fidelity import SchemeFidelity  # type: ignore
+from materialyoucolor.scheme.scheme_content import SchemeContent  # type: ignore
+
+
+schemes = {
+    "tonalSpot": SchemeTonalSpot,
+    "expressive": SchemeExpressive,
+    "fruitSalad": SchemeFruitSalad,
+    "monochrome": SchemeMonochrome,
+    "rainbow": SchemeRainbow,
+    "vibrant": SchemeVibrant,
+    "neutral": SchemeNeutral,
+    "fidelity": SchemeFidelity,
+    "content": SchemeContent
+}
 
 
 def join(*args):
@@ -37,7 +59,7 @@ class Color():
             return "#000000"
 
 
-def update_pywal_colors_with_material_you(scheme: Scheme, wallpaper: str) -> dict:
+def update_pywal_colors_with_material_you(scheme: DynamicScheme, wallpaper: str) -> dict:
     color = Color(scheme)
     dict = {
         "wallpaper": wallpaper,
@@ -71,11 +93,11 @@ def update_pywal_colors_with_material_you(scheme: Scheme, wallpaper: str) -> dic
 
 
 class ColorsCache:
-    def __init__(self, colors: Scheme | dict, wallpaper: str, original_color: int) -> None:
+    def __init__(self, colors: DynamicScheme | dict, wallpaper: str, original_color: int) -> None:
         self.colors: dict[str, str] = {}
         self.wallpaper = wallpaper
         self.original_color = original_color
-        if isinstance(colors, Scheme):
+        if isinstance(colors, DynamicScheme):
             for color in vars(MaterialDynamicColors).keys():
                 color_name = getattr(MaterialDynamicColors, color)
                 if hasattr(color_name, "get_hct"):
@@ -110,7 +132,7 @@ def get_file_list(folder_path):
     return file_list
 
 
-def generate_templates(folder: str, output_folder: str, scheme: Scheme, color_scheme: str, wallpaper: str = ''):
+def generate_templates(folder: str, output_folder: str, scheme: DynamicScheme, color_scheme: str, wallpaper: str = ''):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
     if not os.path.exists(folder):
@@ -153,7 +175,7 @@ def save_updated_colors(updated_colors):
         json.dump(updated_colors, f, indent=4)
 
 
-def main(color_scheme: str, image_path: str, use_color: int | None = None):
+def main(color_scheme: str, image_path: str, use_color: int | None = None, scheme: DynamicScheme = schemes["tonalSpot"]):
     is_dark = True if color_scheme == "dark" else False
     if use_color is None:
         image = Image.open(image_path)
@@ -166,7 +188,7 @@ def main(color_scheme: str, image_path: str, use_color: int | None = None):
     else:
         color = use_color
 
-    scheme = Scheme(
+    scheme = scheme(
         Hct.from_int(color),
         is_dark,
         0.0,
@@ -197,7 +219,7 @@ def main(color_scheme: str, image_path: str, use_color: int | None = None):
     print("Updated pywal colors and regenerated template files.")
 
 
-def _argparse() -> tuple[bool, bool, str, str, str]:
+def _argparse() -> tuple[bool, bool, str, str, str, str]:
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-R", help="Restore previous colorscheme.", action='store_true')
@@ -206,6 +228,8 @@ def _argparse() -> tuple[bool, bool, str, str, str]:
     group.add_argument("--color", type=str, help="Main color for color scheme generation")
     parser.add_argument('--color-scheme', type=str, default='dark', choices=['dark', 'light'],
                         help="Color scheme variant")
+    parser.add_argument('--scheme', type=str, default="tonalSpot", choices=list(schemes.keys()),
+                        help="Scheme for color generation")
 
     args = parser.parse_args()
 
@@ -214,33 +238,35 @@ def _argparse() -> tuple[bool, bool, str, str, str]:
     image = args.image
     color_scheme = args.color_scheme
     use_color = args.color
-    return restore_palette, use_last_used_wallpaper, image, color_scheme, use_color
+    scheme = args.scheme
+    return restore_palette, use_last_used_wallpaper, image, color_scheme, use_color, scheme
 
 
 def _main():
-    restore_palette, use_last_used_wallpaper, image, color_scheme, use_color = _argparse()
+    restore_palette, use_last_used_wallpaper, image, color_scheme, use_color, _scheme = _argparse()
+    scheme = schemes[_scheme]
     if use_color is not None:
         try:
             with open(join(cache_path, "colors.json")) as f:
                 content = get_cache_object(f.read())
-            main(color_scheme, image_path=content.wallpaper, use_color=int(use_color.lstrip('#'), 16))
+            main(color_scheme, image_path=content.wallpaper, use_color=int(use_color.lstrip('#'), 16), scheme=scheme)
         except:
-            main(color_scheme, image_path="/dev/null", use_color=int(use_color.lstrip('#'), 16))
+            main(color_scheme, image_path="/dev/null", use_color=int(use_color.lstrip('#'), 16), scheme=scheme)
 
     elif restore_palette:
         with open(join(cache_path, "colors.json")) as f:
             content = get_cache_object(f.read())
-        main(color_scheme, image_path=content.wallpaper, use_color=content.original_color)
+        main(color_scheme, image_path=content.wallpaper, use_color=content.original_color, scheme=scheme)
     elif use_last_used_wallpaper:
         with open(join(cache_path, "colors.json")) as f:
             content = get_cache_object(f.read()).wallpaper
-        main(color_scheme, image_path=content)
+        main(color_scheme, image_path=content, scheme=scheme)
     else:
         if os.path.isdir(image):
             files = [f for f in os.listdir(image) if f.endswith(('.png', '.jpg', '.jpeg'))]
             if files:
                 image = join(image, random.choice(files))
-        main(color_scheme, image_path=image)
+        main(color_scheme, image_path=image, scheme=scheme)
 
 
 if __name__ == "__main__":
