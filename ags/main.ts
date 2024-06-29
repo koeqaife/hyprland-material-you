@@ -8,7 +8,7 @@ import { applauncher } from "./modules/applauncher.js"
 import { media } from "./modules/media.ts"
 import { cliphist } from "./modules/cliphist.ts"
 import { sidebar } from "./modules/sidebar/main.ts"
-import { wifi } from './modules/wifi.ts';
+import {} from 'apps/settings/main.ts';
 import Window from 'types/widgets/window';
 const GLib = imports.gi.GLib;
 
@@ -31,7 +31,6 @@ const Windows = () => [
     applauncher,
     cliphist,
     sidebar,
-    wifi
 ];
 
 const CLOSE_ANIM_TIME = 210;
@@ -52,6 +51,7 @@ function ReloadCSS() {
     App.resetCss()
     // Utils.execAsync(`cp -f -r ${GLib.get_home_dir()}/dotfiles/material-colors/generated/svg/ ${App.configDir}/`).catch(print)
     App.applyCss(`${App.configDir}/style.css`)
+    App.applyCss(`${App.configDir}/style-apps.css`)
 }
 
 function ReloadGtkCSS() {
@@ -61,6 +61,11 @@ function ReloadGtkCSS() {
 
 Utils.monitorFile(
     `${App.configDir}/style.css`,
+    ReloadCSS
+)
+
+Utils.monitorFile(
+    `${App.configDir}/style-apps.css`,
     ReloadCSS
 )
 

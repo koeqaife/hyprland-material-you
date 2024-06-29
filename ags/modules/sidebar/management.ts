@@ -1,35 +1,13 @@
 
 const notifications = await Service.import("notifications")
 const network = await Service.import('network')
+import { OpenSettings } from "apps/settings/main.ts";
 import { WINDOW_NAME } from "./main.ts"
+import { bluetooth_enabled, idle_inhibitor, night_light, theme } from "variables.ts";
 
 const { Gtk } = imports.gi;
-const GLib = imports.gi.GLib;
-const Gio = imports.gi.Gio;
 
-const idle_inhibitor = Variable(false);
-const night_light = Variable(false);
-const theme = Variable("dark");
 const currentPage = Variable(0);
-const bluetooth_enabled = Variable('off', {
-    poll: [1000, `${App.configDir}/scripts/bluetooth.sh --get`]
-})
-
-
-const color_scheme_file = `${GLib.get_home_dir()}/dotfiles/.settings/color-scheme`
-Utils.readFileAsync(color_scheme_file)
-    .then(out => { theme.setValue(out); })
-    .catch(err => { });
-
-
-Utils.monitorFile(
-    color_scheme_file,
-    () => {
-        Utils.readFileAsync(color_scheme_file)
-            .then(out => { theme.setValue(out); })
-            .catch(err => { });
-    }
-)
 
 function WifiIndicator() {
     return Widget.Box({
@@ -64,7 +42,7 @@ function WifiIndicator() {
                 label: "Internet",
             }),
             Widget.Box({
-                halign: Gtk.Align.END,
+                hpack: "end",
                 hexpand: true,
                 child: Widget.Label({
                     label: "",
@@ -115,7 +93,7 @@ function IconAndName({ label, icon, padding = "0.3em", arrow = false }) {
     })
     if (arrow) {
         const arrow = Widget.Box({
-            halign: Gtk.Align.END,
+            hpack: "end",
             hexpand: true,
             child: Widget.Label({
                 label: "",
@@ -151,8 +129,8 @@ function Page1() {
                             network.toggleWifi();
                         },
                         on_secondary_click: () => {
-                            App.closeWindow(WINDOW_NAME);
-                            App.openWindow("wifi");
+                            App.closeWindow(WINDOW_NAME)
+                            OpenSettings("network")
                         }
                     }),
                     Widget.Button({
@@ -170,7 +148,7 @@ function Page1() {
                                 .then(out => { bluetooth_enabled.setValue(out) })
                         },
                         on_secondary_click: () => {
-                            Utils.execAsync("blueman-manager")
+                            OpenSettings("bluetooth")
                             App.closeWindow(WINDOW_NAME)
                         }
                     })
@@ -187,7 +165,7 @@ function Page1() {
                             return str.trim() == "dark" ? "management_button active" : "management_button"
                         }),
                         on_clicked: () => {
-                            Utils.execAsync(["sh", `${App.configDir}/scripts/toggle-theme.sh`]);
+                            Utils.execAsync(`${App.configDir}/scripts/dark-theme.sh --toggle`).catch(print);
                             theme.setValue(theme.value.trim() == "dark" ? "light" : "dark");
                         },
                         child: IconAndName({
@@ -297,7 +275,16 @@ function Page2() {
                     }),
                     Widget.Button({
                         hexpand: true,
-                        class_name: "management_button disabled",
+                        class_name: "management_button",
+                        child: IconAndName({
+                            label: "Settings",
+                            icon: "",
+                            arrow: true,
+                        }),
+                        on_primary_click: () => {
+                            OpenSettings()
+                            App.closeWindow(WINDOW_NAME);
+                        }
                     }),
                 ]
             })
@@ -345,7 +332,7 @@ export function Management() {
                 Widget.Box({
                     children: dotButtons,
                     class_name: "dotbuttons_box",
-                    halign: Gtk.Align.CENTER,
+                    hpack: "center"
                 })
             ]
         })
