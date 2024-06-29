@@ -42,7 +42,7 @@ function WifiIndicator() {
                 label: "Internet",
             }),
             Widget.Box({
-                halign: Gtk.Align.END,
+                hpack: "end",
                 hexpand: true,
                 child: Widget.Label({
                     label: "",
@@ -93,7 +93,7 @@ function IconAndName({ label, icon, padding = "0.3em", arrow = false }) {
     })
     if (arrow) {
         const arrow = Widget.Box({
-            halign: Gtk.Align.END,
+            hpack: "end",
             hexpand: true,
             child: Widget.Label({
                 label: "",
@@ -323,7 +323,7 @@ export function Management() {
                 Widget.Box({
                     children: dotButtons,
                     class_name: "dotbuttons_box",
-                    halign: Gtk.Align.CENTER,
+                    hpack: "center"
                 })
             ]
         })

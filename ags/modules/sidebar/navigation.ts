@@ -21,7 +21,7 @@ function Button({ page, label, icon }: ButtonType) {
             children: [
                 Widget.Box({
                     orientation: Gtk.Orientation.VERTICAL,
-                    halign: Gtk.Align.CENTER,
+                    hpack: "center",
                     class_name: "container",
                     child: Widget.Label({
                         hpack: "center",
