@@ -232,7 +232,6 @@ const ColorScheme = () => Widget.EventBox({
                     let selected: string | null;
                     self.connect("changed", () => {
                         selected = self.get_active_text();
-                        print(selected, color_schemes[selected!])
                         theme_settings.scheme.setValue(color_schemes[selected!])
                         Utils.writeFile(color_schemes[selected!], generation_scheme_file).catch(print)
                         ReloadTheme()
