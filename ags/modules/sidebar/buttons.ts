@@ -1,4 +1,4 @@
-const { Gtk, GLib } = imports.gi;
+const { GLib } = imports.gi;
 
 const scripts_dir = `${GLib.get_home_dir()}/dotfiles/hypr/scripts`
 const lock_command = `${scripts_dir}/lock.sh`;
