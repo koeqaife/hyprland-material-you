@@ -1,4 +1,3 @@
-const { GLib } = imports.gi;
 const WINDOW_NAME = "cliphist"
 import popupwindow from './misc/popupwindow.ts';
 import Box from 'types/widgets/box.js';

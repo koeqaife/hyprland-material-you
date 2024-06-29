@@ -13,10 +13,8 @@ fi
 
 current_wallpaper=$(cat "$cache_file")
 extension="${current_wallpaper##*.}"
-current_blured_wallpaper="$HOME/.cache/blurred_wallpaper.png"
 
 cp $current_wallpaper /usr/share/sddm/themes/corners/backgrounds/current_wallpaper.$extension
-cp $current_blured_wallpaper /usr/share/sddm/themes/corners/backgrounds/blurred_wallpaper.png
 
 if [ "$1" != "init" ] ;then
     echo "Current wallpaper copied into /usr/share/sddm/themes/corners/backgrounds/"
@@ -24,7 +22,6 @@ fi
 
 new_wall=$(echo $current_wallpaper | sed "s|$HOME/wallpaper/||g")
 cp $HOME/.cache/wal/colors-sddm-style.conf /usr/share/sddm/themes/corners/
-sed -i 's/CURRENTWALLPAPERBLURED/'"blurred_wallpaper.png"'/' /usr/share/sddm/themes/corners/theme.conf
 sed -i 's/CURRENTWALLPAPER/'"current_wallpaper.$extension"'/' /usr/share/sddm/themes/corners/theme.conf
 
 if [ "$1" != "init" ] ;then

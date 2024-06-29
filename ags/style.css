@@ -36,7 +36,7 @@ highlight {
     outline: none;
     transition: 0.2s ease-in-out;
     transition-property: border-color, background-color, color;
-    font-family: "Product Sans", "Font Awesome 6 Free", Roboto, Helvetica, Arial, sans-serif;
+    font-family: "Product Sans", Roboto, "Font Awesome 6 Free", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .corner {
@@ -113,23 +113,15 @@ separator {
     color: @onSurface;
 }
 
-.workspaces button.active {
-    color: @onSecondaryContainer;
-    background: @secondaryContainer;
-    border-radius: 16px;
-    min-width: 40px;
-}
-
 .workspaces button:hover {
     color: @onSurface;
     background: @surfaceContainerHighest;
-    border-radius: 16px;
 }
 
-.workspaces button.active:hover {
-    color: @onPrimaryContainer;
-    background: @primaryContainer;
-    border-radius: 16px;
+.workspaces button.active {
+    color: @onSecondaryContainer;
+    background: @secondaryContainer;
+    min-width: 40px;
 }
 
 /* -----------------------------------------------------
@@ -489,14 +481,21 @@ window.notification-popups box.notifications {
     color: @onSurface;
 }
 
-.bar_wifi {
+.bar_applets {
     background-color: @surfaceContainer;
     border-radius: 100px;
     padding: 2px 10px 2px 10px;
+    margin: 0px;
 }
 
-.bar_wifi image {
+.bar_applets image {
     color: @onSurface;
+}
+
+.bar_applets button {
+    color: @onSurface;
+    margin: 0px;
+    padding: 0px;
 }
 
 /* -----------------------------------------------------
@@ -741,79 +740,6 @@ window.notification-popups box.notifications {
 } */
 
 /* -----------------------------------------------------
- * Wifi
- * ----------------------------------------------------- */
-
-.wifi_main_box {
-    min-height: 500px;
-    min-width: 500px;
-    background: @background;
-    border-radius: 24px;
-    border: 2px solid;
-    border-color: @outlineVariant;
-}
-
-.wifi_current {
-    font-weight: bold;
-    font-size: 16px;
-}
-
-.wifi_ssid {
-    font-weight: normal;
-    font-size: 14px;
-}
-
-.wifi_actual_content_box {
-    margin: 10px 10px 10px 10px;
-    background-color: @secondary;
-    padding: 3px;
-    padding-left: 15px;
-    padding-right: 15px;
-    border-radius: 16px;
-}
-
-.wifi_actual_content_box label {
-    color: @onSecondary;
-}
-
-.network_name {
-    font-weight: bold;
-    font-size: 16px;
-}
-
-.wifi_button {
-    margin: 2px 10px 0px 10px;
-    padding: 5px 10px 5px 10px;
-    background-color: @background;
-    border-radius: 16px;
-}
-
-.wifi_button:hover {
-    background-color: @surfaceContainerHigh;
-}
-
-.wifi_button label, .wifi_button .icon {
-    color: @onSurface;
-}
-
-.wifi_scrollable {
-    background-color: @surfaceContainer;
-    border-radius: 24px;
-    padding-bottom: 2px;
-}
-
-.wifi_scrollable_box {
-    margin-top: 8px;
-    margin-bottom: 8px;
-}
-
-.wifi_revealer_box entry {
-    background-color: @surfaceContainerHigh;
-    color: @onSurface;
-    border-radius: 100px;
-}
-
-/* -----------------------------------------------------
  * Buttons
  * ----------------------------------------------------- */
 
@@ -884,6 +810,72 @@ window.notification-popups box.notifications {
     background-color: mix(@onSurfaceVariant, transparent, 0.7);
 }
 
+/* standard button */
+.standard_button {
+    border-radius: 100px;
+    background-color: transparent;
+    color: @onSurfaceVariant;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.standard_button label, .standard_button .icon,
+.standard_button .awesome_icon, .standard_button image {
+    color: @onSurfaceVariant;
+    margin: 0px;
+    padding: 0px;
+}
+
+.standard_button:hover {
+    background-color: mix(@onSurfaceVariant, @surface, 0.8);
+}
+
+.standard_button:active {
+    background-color: mix(@onSurfaceVariant, @surface, 0.7);
+}
+
+.standard_button.disabled {
+    background-color: transparent;
+}
+
+.standard_button.disabled label, .standard_button.disabled .icon,
+.standard_button.disabled .awesome_icon, .standard_button.disabled image {
+    color: mix(@onSurface, transparent, 0.38);
+}
+
+/* filled button */
+.filled_button {
+    border-radius: 100px;
+    background-color: @primary;
+    color: @onPrimary;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.filled_button label, .filled_button .icon,
+.filled_button .awesome_icon, .filled_button image {
+    color: @onPrimary;
+    margin: 0px;
+    padding: 0px;
+}
+
+.filled_button:hover {
+    background-color: mix(@onPrimary, @primary, 0.92);
+}
+
+.filled_button:active {
+    background-color: mix(@onPrimary, @primary, 0.8);
+}
+
+.filled_button.disabled {
+    background-color: mix(@onSurface, @surface, 0.12);
+    color: mix(@onSurface, @surface, 0.38);
+}
+
+.filled_button.disabled label, .filled_button.disabled .icon,
+filled_button.disabled .awesome_icon, .filled_button.disabled image {
+    color: mix(@onSurface, @surface, 0.38);
+}
 
 /* -----------------------------------------------------
  * Navigation bar
@@ -940,4 +932,76 @@ window.notification-popups box.notifications {
     min-width: 40px;
 }
 
+
+/* -----------------------------------------------------
+ * Switch
+ * ----------------------------------------------------- */
+
+
+switch {
+	border: 2px solid;
+    border-radius: 100px;
+    border-color: @outline;
+    background-color: @surfaceContainerHighest;
+    min-height: 20px;
+    padding: 1px;
+}
+
+switch slider {
+    border-radius: 100%;
+    background-color: @outline;
+    min-height: 10px;
+    margin: 2px;
+    min-height: 8px;
+    min-width: 16px;
+    transition: all 0.2s ease-in-out;
+    transition-property: color, background-color, border-color;
+}
+
+switch:disabled {
+	background-color: mix(@surfaceContainerHighest, transparent, 0.3);
+    border-color: mix(@onSurface, transparent, 0.3);
+}
+
+switch:disabled slider {
+    background-color: mix(@onSurface, transparent, 0.3);
+}
+
+switch:hover, switch:active {
+    background-color: mix(@surfaceContainerHighest, @onSurface, 0.08);
+}
+
+switch:hover slider, switch:active slider {
+    background-color: @onSurfaceVariant;
+}
+
+switch:checked {
+	background-color: @primary;
+    border-color: transparent;
+}
+
+switch:checked slider {
+    background-color: @onPrimary;
+    border-color: transparent;
+    margin: 0px;
+    min-height: 10px;
+    min-width: 20px;
+}
+
+switch:checked:disabled {
+	background-color: mix(@onSurface, transparent, 0.3);
+    border-color: transparent;
+}
+
+switch:checked:disabled slider {
+    background-color: mix(@surface, transparent, 0.3);
+}
+
+switch:checked:hover, switch:checked:active {
+	background-color: @primary;
+}
+
+switch:checked:hover slider, switch:checked:active slider {
+    background-color: @primaryContainer;
+}
 

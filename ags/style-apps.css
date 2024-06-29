@@ -1,0 +1,201 @@
+@import "/home/mrdan/.cache/material/colors.css";
+
+/* -----------------------------------------------------
+ * Settings
+ * ----------------------------------------------------- */
+
+.settings .settings_title {
+    color: @onSurface;
+    background-color: @surfaceContainerLow;
+    font-weight: normal;
+    font-size: 22px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.settings .full_sidebar {
+    border-right: 1px solid;
+    border-color: @outlineVariant;
+}
+
+.settings .page_title {
+    background-color: @surface;
+    font-weight: normal;
+    padding-left: 16px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    font-size: 20px;
+    border-bottom: 1px solid;
+    border-color: @outlineVariant;
+    color: @onSurfaceVariant;
+    /* margin-bottom: 3px; */
+}
+
+.settings .sidebar {
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    min-width: 250px;
+    background-color: @surfaceContainerLow;
+}
+
+.settings .sidebar .row {
+    border-radius: 100px;
+    padding: 0px;
+    padding-right: 24px;
+    padding-left: 16px;
+    min-height: 56px;
+    background-color: @surfaceContainerLow;
+}
+
+.settings .sidebar .row:hover {
+    background-color: mix(@onSurface, @surface, 0.92);
+}
+
+.settings .sidebar .row.active {
+    background-color: @secondaryContainer;
+}
+
+.settings .sidebar .row label {
+    color: @onSurfaceVariant;
+    font-weight: normal;
+    font-size: 16px;
+}
+
+.settings .sidebar .row.active label {
+    color: @onSecondaryContainer;
+}
+
+.settings .sidebar .row image {
+    margin-right: 12px;
+    color: @onSurfaceVariant;
+}
+
+.settings .sidebar .row.active image {
+    margin-right: 12px;
+    color: @onSecondaryContainer;
+}
+
+.settings .sidebar separator {
+    margin-right: 16px;
+    margin-left: 16px;
+    color: @outline;
+}
+
+.settings .error_container {
+    padding-left: 16px;
+    padding-right: 16px;
+    background-color: @errorContainer;   
+}
+
+.settings .error_container label {
+    color: @onErrorContainer;   
+}
+
+.settings box {
+    margin: 0px;
+    padding: 0px;
+}
+
+.settings .row {
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    margin: 0px;
+    border-radius: 0px;
+}
+
+.settings .row:hover {
+    background-color: mix(@onSurface, @surface, 0.92)
+}
+
+.settings .row.focused {
+    background-color: mix(@onSurface, @surface, 0.8)
+}
+
+.settings .row .title {
+    font-weight: normal;
+    font-size: 17px;
+    color: @onSurface
+}
+
+.settings .row .description {
+    font-weight: normal;
+    font-size: 14px;
+    color: @onSurfaceVariant
+}
+
+.settings .bottom_bar {
+    background-color: @surface;
+    font-weight: normal;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    border-top: 1px solid;
+    border-color: @outlineVariant;
+}
+
+.settings entry, .settings combobox {
+    min-width: 30px;
+    min-height: 32px;
+    border-radius: 4px;
+    background-color: @surfaceContainerHighest;
+}
+
+.settings entry label, .settings combobox label {
+    color: @onSurface;
+    font-weight: normal;
+}
+
+/* Wifi */
+
+.settings .wifi_list .row image {
+    color: @onSurfaceVariant;
+    margin-right: 16px;
+}
+
+.settings .wifi_list .row.active image {
+    color: @primary;
+}
+
+/* Bluetooth */
+
+.settings .device_list .row .title {
+    font-weight: normal;
+    font-size: 16px;
+    color: @onSurface
+}
+
+.settings .device_list .row .description {
+    font-weight: normal;
+    font-size: 14px;
+    color: @onSurfaceVariant
+}
+
+.settings .device_list .row image {
+    color: @onTertiary;
+    background-color: @tertiary;
+    margin-right: 16px;
+    min-height: 32px;
+    min-width: 32px;
+    border-radius: 5px;
+}
+
+.settings .device_list .row.active image {
+    color: @onPrimary;
+    background-color: @primary;
+}
+
+/* Theme */
+.settings .wallpaper .image {
+    border-radius: 7px;
+    margin-right: 16px;
+    min-height: 32px;
+    min-width: 32px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}

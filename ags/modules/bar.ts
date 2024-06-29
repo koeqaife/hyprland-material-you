@@ -6,6 +6,7 @@ const network = await Service.import("network")
 const { Gtk, GLib, Gio } = imports.gi;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
+import { OpenSettings } from "apps/settings/main.ts";
 import { enableClickThrough } from "./misc/clickthrough.js";
 import { RoundedCorner } from "./misc/cairo_roundedcorner.js";
 import { Client, Workspace } from "types/service/hyprland.js"
@@ -13,6 +14,7 @@ import Button from "types/widgets/button.js"
 import Icon from "types/widgets/icon.js"
 import { FileEnumerator, FileInfo } from "types/@girs/gio-2.0/gio-2.0.cjs"
 const mpris = await Service.import("mpris")
+const bluetooth = await Service.import("bluetooth")
 
 
 function checkKeymap() {
@@ -161,7 +163,7 @@ function BatteryLabel() {
 function SysTray() {
     const items = systemtray.bind("items")
         .as(items => items.map(item => {
-            if (item.id.trim() != "nm-applet") {
+            if (item.id.trim() != "nm-applet" && item.id.trim() != "blueman") {
                 return Widget.Button({
                     child: Widget.Icon({ icon: item.bind("icon") }),
                     on_primary_click: (_, event) => item.activate(event),
@@ -198,10 +200,10 @@ function AppLauncher() {
 
 
 function Wifi() {
-    const button = Widget.Button({
-        class_name: "bar_wifi awesome_icon",
+    return Widget.Button({
+        class_name: "bar_wifi icon",
         on_primary_click: () => {
-            App.toggleWindow("wifi")
+            OpenSettings("network")
         },
         on_secondary_click: (_, event) => {
             const nm_applet = systemtray.items.find(item => item.id == "nm-applet")
@@ -212,13 +214,56 @@ function Wifi() {
             }
         },
         child: Widget.Icon({
-            icon: network.wifi.bind("icon_name")
+            icon: "network-wireless-offline-symbolic"
         }),
-        tooltip_text: network.wifi.bind('ssid').as(ssid => ssid || 'Unknown')
+        tooltip_text: 'Disabled'
+    }).hook(network, self => {
+        if (network.wifi.enabled) {
+            self.tooltip_text = network.wifi.ssid || 'Unknown';
+            self.child.icon = network.wifi.icon_name;
+        } else {
+            self.tooltip_text = 'Disabled'
+            self.child.icon = "network-wireless-offline-symbolic";
+        }
     })
-
-    return button
 }
+
+
+function Bluetooth() {
+    return Widget.Button({
+        class_name: "bar_bluetooth icon",
+        on_primary_click: () => {
+            OpenSettings("bluetooth")
+        },
+        on_secondary_click: (_, event) => {
+            const blueman = systemtray.items.find(item => item.id == "blueman")
+            if (blueman) {
+                blueman.openMenu(event)
+            } else {
+                Utils.execAsync("blueman-manager").catch(print)
+            }
+        },
+        child: Widget.Icon({
+            icon: "bluetooth-disabled-symbolic"
+        }),
+    }).hook(bluetooth, self => {
+        if (bluetooth.enabled) {
+            self.child.icon = "bluetooth-active-symbolic";
+        } else {
+            self.child.icon = "bluetooth-disabled-symbolic";
+        }
+    })
+}
+
+
+const Applets = () => Widget.Box({
+    class_name: "bar_applets",
+    spacing: 5,
+    children: [
+        Bluetooth(),
+        Wifi()
+    ]
+})
 
 
 function MediaPlayer() {
@@ -227,7 +272,6 @@ function MediaPlayer() {
         class_name: "filled_tonal_button awesome_icon",
         on_primary_click: () => {
             App.toggleWindow("media")
-            // Utils.execAsync(["ags", "-t", "media"])
         },
         on_secondary_click: () => {
             Utils.execAsync(["playerctl", "play-pause"]).catch(print)
@@ -246,6 +290,7 @@ function MediaPlayer() {
         } else {
             self.visible = false;
             self.tooltip_text = "Unknown"
+            App.closeWindow("media")
         }
     })
 
@@ -265,9 +310,11 @@ function KeyboardLayout() {
 function OpenSideBar() {
     const button = Widget.Button({
         class_name: "filled_tonal_button awesome_icon",
-        on_clicked: () => {
+        on_primary_click: () => {
             App.toggleWindow("sidebar")
-            // Utils.execAsync(["ags", "-t", "sidebar"])
+        },
+        on_secondary_click: () => {
+            OpenSettings()
         },
         label: ""
     })
@@ -290,15 +337,22 @@ function TaskBar() {
             if (widget) {
                 widget.tooltip_markup = item.title;
             } else {
+                let icon: string | undefined;
+                if (item.class == "com.github.Aylur.ags") {
+                    if (item.initialTitle == "Settings") {
+                        icon = "emblem-system-symbolic"
+                    }
+                }
+                else
+                    icon = getIconNameFromClass(item.class)
                 widget = Widget.Button({
                     attribute: { pid: item.pid },
-                    child: Widget.Icon({ icon: getIconNameFromClass(item.class) || "image-missing" }),
+                    child: Widget.Icon({ icon: icon }),
                     tooltip_markup: item.title,
                 });
                 globalWidgets.push(widget);
             }
         });
-    
         return globalWidgets;
     }
 
@@ -383,7 +437,7 @@ function Right() {
             KeyboardLayout(),
             BatteryLabel(),
             SysTray(),
-            Wifi(),
+            Applets(),
             Clock(),
             OpenSideBar()
         ],

@@ -21,10 +21,6 @@ cd dotfiles
 ./install.sh
 ```
 
-! Install font "Product Sans" !
-
-**Recommended icons:** [Tela nord](https://www.gnome-look.org/p/1279924/) or [Tela circle nord](https://www.gnome-look.org/p/1359276/)
-
 > I'm not sure if it will work, if you have any problems installing it, post in Issues
 
 ## Screenshots
@@ -33,9 +29,9 @@ cd dotfiles
   
 [![Screenshot](screenshots/sidebar.png "Sidebar")](screenshots/sidebar.png) [![Screenshot](screenshots/sidebar-system.png "Sidebar system info")](screenshots/sidebar-system.png)
 
-- Wifi
+- Settings
   
-[![Screenshot](screenshots/wifi.png "Wifi")](screenshots/wifi.png)
+[![Screenshot](screenshots/settings.png "Settings")](screenshots/settings.png)
 
 - Player
   
@@ -51,4 +47,3 @@ cd dotfiles
 [![Screenshot](screenshots/light-theme.png "Light gtk theme")](screenshots/light-theme.png)
 
 > I got some code for AGS from [end-4](https://github.com/end-4/dots-hyprland/) and [kotontrion](https://github.com/kotontrion/dotfiles) configs, thanks to them.
-](https://befonts.com/product-sans-font.html)

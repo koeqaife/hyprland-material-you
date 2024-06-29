@@ -69,6 +69,7 @@ export const Notification = (notification: NotificationType, dismiss = true) => 
                                         lines: 1,
                                         xalign: 0,
                                         hexpand: true,
+                                        tooltip_text: notification.summary
                                     }),
                                     Widget.Label({
                                         class_name: "notification-time",
@@ -98,7 +99,6 @@ export const Notification = (notification: NotificationType, dismiss = true) => 
                                 wrap_mode: Pango.WrapMode.WORD_CHAR,
                                 xalign: 0,
                                 wrap: true,
-                                // HACK: remove linebreaks, so lines property works properly
                                 label: notification.body.replace(/(\r\n|\n|\r)/gm, " "),
                             }),
                             notification.hints.value ?
@@ -112,7 +112,7 @@ export const Notification = (notification: NotificationType, dismiss = true) => 
             })
         }),
         Widget.Box({
-            halign: Gtk.Align.END,
+            hpack: "end",
             class_name: "notification-actions",
             children: notification.actions.map(action => Widget.Button({
                 child: Widget.Label(action.label),
@@ -205,21 +205,24 @@ export function NotificationPopups(
             return
         const original = list.children.find(n => n.attribute.id === id);
         const replace = original?.attribute.id;
+        let notification;
         if (!replace) {
-            const notification = revealer(n, false, dismiss);
+            notification = revealer(n, false, dismiss);
             notification.attribute.count = 1;
             list.pack_end(notification, false, false, 0)
         }
         else if (original) {
-            const notification = revealer(n, true, dismiss);
+            notification = revealer(n, true, dismiss);
             notification.attribute.count++;
             original.destroy()
             list.pack_end(notification, false, false, 0)
         }
         if (timeout)
-            setTimeout(() => {
-                onDismissed(_, id)
-            }, 5000)
+            Utils.timeout(7500, () => {
+                if (notification !== null && !notification.disposed) {
+                    onDismissed(_, id)
+                }
+            })
     }
 
     function onDismissed(_: any, id: number) {
@@ -227,8 +230,8 @@ export function NotificationPopups(
         if (!original)
             return
         original.attribute.count--;
-        if (original.attribute.count <= 0) {
-            original.attribute.destroyWithAnims()
+        if (original?.attribute.count <= 0) {
+            original?.attribute.destroyWithAnims()
         }
     }
 

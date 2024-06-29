@@ -52,7 +52,7 @@ function Notification(n: NotificationType) {
     })
 
     const actions = Widget.Box({
-        halign: Gtk.Align.END,
+        hpack: "end",
         class_name: "notification_sidebar_actions",
         children: n.actions.map(({ id, label }) => Widget.Button({
             class_name: "notification_sidebar_button",
