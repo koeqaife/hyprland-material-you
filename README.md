@@ -29,9 +29,9 @@ cd dotfiles
   
 [![Screenshot](screenshots/sidebar.png "Sidebar")](screenshots/sidebar.png) [![Screenshot](screenshots/sidebar-system.png "Sidebar system info")](screenshots/sidebar-system.png)
 
-- Wifi
+- Settings
   
-[![Screenshot](screenshots/wifi.png "Wifi")](screenshots/wifi.png)
+[![Screenshot](screenshots/settings.png "Settings")](screenshots/settings.png)
 
 - Player
   
