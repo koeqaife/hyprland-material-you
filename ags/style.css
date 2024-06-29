@@ -13,20 +13,6 @@ button {
     background: transparent;
 }
 
-trough {
-}
-
-/* slider {
-    background-color: @primary;
-    background-image: -gtk-scaled(url("sun-alt-svgrepo-com.png"));
-    background-size: 100px 100px;
-    color: @primary;
-    min-height: 10px;
-    min-width: 10px;
-    border-radius: 100px;
-} */
-
-
 highlight {
     border-radius: 100px;
 }
@@ -36,7 +22,7 @@ highlight {
     outline: none;
     transition: 0.2s ease-in-out;
     transition-property: border-color, background-color, color;
-    font-family: "Product Sans", Roboto, "Font Awesome 6 Free", Roboto, Helvetica, Arial, sans-serif;
+    font-family: "Product Sans", Roboto, "Font Awesome 6 Free", Helvetica, Arial, sans-serif;
 }
 
 .corner {
@@ -80,11 +66,7 @@ separator {
 .modules-left,
 .modules-center,
 .modules-right {
-    /* background-color: @surface; */
-    /* border-radius: 25px 25px 25px 25px; */
     padding: 6px;
-    /* border: solid 2px; */
-    /* color: @outlineVariant; */
 }
 
 /* -----------------------------------------------------
@@ -110,7 +92,11 @@ separator {
     margin: 4px 3px;
     border-radius: 16px;
     border: 0px;
+}
+
+.workspaces button label {
     color: @onSurface;
+    font-weight: bold;
 }
 
 .workspaces button:hover {
@@ -580,7 +566,6 @@ window.notification-popups box.notifications {
     background-color: @surfaceContainerLow;
     border-radius: 24px 24px 0px 0px;
     transition: all 0.25s ease-in-out;
-    /* border-radius: 0px 0px 24px 24px; */
 }
 
 .notifications_sidebar_scrollable .notification {
@@ -620,7 +605,6 @@ window.notification-popups box.notifications {
     margin-right: 0px;
     margin-top: -16px;
     margin-bottom: -16px;
-
 }
 
 .system_scale.backlight slider {
@@ -727,17 +711,6 @@ window.notification-popups box.notifications {
 .dotbutton.active label {
     color: @secondary;
 }
-
-/* 
-.notifications_menu {
-    padding: 0px;
-    min-width: 50px;
-}
-
-.notifications_menu_item {
-    padding-right: 35px;
-    margin: 0px;
-} */
 
 /* -----------------------------------------------------
  * Buttons
