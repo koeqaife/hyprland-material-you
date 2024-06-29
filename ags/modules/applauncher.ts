@@ -3,12 +3,12 @@ const { query } = await Service.import("applications")
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 const Gio = imports.gi.Gio;
-const { Gtk } = imports.gi;
 const GLib = imports.gi.GLib;
 const WINDOW_NAME = "applauncher"
 import Box from 'types/widgets/box';
 import popupwindow from './misc/popupwindow.ts';
 import { Application } from 'types/service/applications';
+import Gtk from "gi://Gtk?version=3.0"
 
 
 const LAUNCH_COUNT_FILE = Gio.File.new_for_path(
