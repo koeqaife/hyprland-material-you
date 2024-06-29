@@ -14,6 +14,13 @@ export const theme_settings = {
     "scheme": Variable("tonalSpot")
 }
 
+export const cpu_name = await Utils.execAsync(`${App.configDir}/scripts/system.sh --cpu-name`);
+export const gpu_name = await Utils.execAsync(`${App.configDir}/scripts/system.sh --gpu-name`);
+export const cpu_cores = await Utils.execAsync(`${App.configDir}/scripts/system.sh --cpu-cores`);
+export const amount_of_ram = await Utils.execAsync(`${App.configDir}/scripts/system.sh --ram`);
+export const kernel_name = await Utils.execAsync(`${App.configDir}/scripts/system.sh --kernel`);
+export const hostname = await Utils.execAsync(`${App.configDir}/scripts/system.sh --hostname`);
+
 export const custom_color_file = `${GLib.get_home_dir()}/dotfiles/.settings/custom-color`
 export const generation_scheme_file = `${GLib.get_home_dir()}/dotfiles/.settings/generation-scheme`
 export const color_scheme_file = `${GLib.get_home_dir()}/dotfiles/.settings/color-scheme`
