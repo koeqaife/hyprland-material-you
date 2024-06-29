@@ -148,7 +148,7 @@ function Page1() {
                                 .then(out => { bluetooth_enabled.setValue(out) })
                         },
                         on_secondary_click: () => {
-                            Utils.execAsync("blueman-manager")
+                            OpenSettings("bluetooth")
                             App.closeWindow(WINDOW_NAME)
                         }
                     })
@@ -275,7 +275,16 @@ function Page2() {
                     }),
                     Widget.Button({
                         hexpand: true,
-                        class_name: "management_button disabled",
+                        class_name: "management_button",
+                        child: IconAndName({
+                            label: "Settings",
+                            icon: "",
+                            arrow: true,
+                        }),
+                        on_primary_click: () => {
+                            OpenSettings()
+                            App.closeWindow(WINDOW_NAME);
+                        }
                     }),
                 ]
             })
