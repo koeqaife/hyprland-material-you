@@ -3,7 +3,7 @@ const battery = await Service.import("battery")
 const systemtray = await Service.import("systemtray")
 const audio = await Service.import("audio")
 const network = await Service.import("network")
-const { Gtk, GLib, Gio } = imports.gi;
+const { GLib, Gio } = imports.gi;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 import { OpenSettings } from "apps/settings/main.ts";
@@ -15,6 +15,7 @@ import Icon from "types/widgets/icon.js"
 import { FileEnumerator, FileInfo } from "types/@girs/gio-2.0/gio-2.0.cjs"
 const mpris = await Service.import("mpris")
 const bluetooth = await Service.import("bluetooth")
+import Gtk from "gi://Gtk?version=3.0"
 
 
 function checkKeymap() {

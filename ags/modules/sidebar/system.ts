@@ -1,5 +1,5 @@
-const { Gtk } = imports.gi;
 import { cpu_cores, cpu_name, kernel_name, amount_of_ram, gpu_name } from "variables";
+import Gtk from "gi://Gtk?version=3.0"
 
 type InfoType = {
     cpu: string,
