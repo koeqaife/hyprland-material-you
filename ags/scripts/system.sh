@@ -29,6 +29,14 @@ get_kernel() {
     uname -r
 }
 
+get_gpu() {
+    lshw -C display | grep "product" | awk -F ': ' '{print $2}'
+}
+
+get_hostname() {
+    cat /etc/hostname
+}
+
 if [[ "$1" == "--cpu-usage" ]]; then
     get_cpu_usage
     elif [[ "$1" == "--ram-usage" ]]; then
@@ -45,4 +53,8 @@ if [[ "$1" == "--cpu-usage" ]]; then
     get_ram
     elif [[ "$1" == "--kernel" ]]; then
     get_kernel
+    elif [[ "$1" == "--gpu-name" ]]; then
+    get_gpu
+    elif [[ "$1" == "--hostname" ]]; then
+    get_hostname
 fi
