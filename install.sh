@@ -58,7 +58,16 @@ if [[ $EXIT == "YES" ]]; then
     exit 1
 fi
 
+echo ":: Installing python-materialyoucolor"
 pip install --break-system-packages https://github.com/T-Dynamos/materialyoucolor-python/archive/master.zip
+
+echo ":: Installing Tela Nord icons..."
+mkdir -p /tmp/install
+cd /tmp/install
+git clone https://github.com/vinceliuice/Tela-icon-theme
+cd Tela-icon-theme
+./install.sh nord
+cd $HOME/dotfiles
 
 echo ":: Setting SDDM and colors"
 ln -s -f $HOME/dotfiles/wal $HOME/.config/wal
