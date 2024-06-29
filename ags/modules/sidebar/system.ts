@@ -1,5 +1,3 @@
-import { Variable as VariableType } from "types/variable";
-
 const { Gtk } = imports.gi;
 
 const cpu_name = await Utils.execAsync(`${App.configDir}/scripts/system.sh --cpu-name`);
@@ -93,8 +91,8 @@ const Usage = (
     const usage_overlay = Widget.Overlay({
         child: usage_progress_bar,
         overlay: Widget.Box({
-            halign: Gtk.Align.END,
-            valign: Gtk.Align.CENTER,
+            hpack: "end",
+            vpack: "center",
             class_name: "usage_bar_point"
         })
     })

@@ -112,7 +112,7 @@ export const Notification = (notification: NotificationType, dismiss = true) => 
             })
         }),
         Widget.Box({
-            halign: Gtk.Align.END,
+            hpack: "end",
             class_name: "notification-actions",
             children: notification.actions.map(action => Widget.Button({
                 child: Widget.Label(action.label),

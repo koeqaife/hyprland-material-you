@@ -33,7 +33,7 @@ const BluetoothToggle = () => Widget.EventBox({
             }),
             Widget.Switch({
                 vexpand: false,
-                valign: Gtk.Align.CENTER,
+                vpack: "center",
                 hpack: "end",
                 on_activate: self => {
                     if (self.state != bluetooth.enabled)

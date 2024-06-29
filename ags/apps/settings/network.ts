@@ -132,7 +132,7 @@ const WifiToggle = () => Widget.EventBox({
             }),
             Widget.Switch({
                 vexpand: false,
-                valign: Gtk.Align.CENTER,
+                vpack: "center",
                 hpack: "end",
                 on_activate(self) {
                     timeout(5, () => {
