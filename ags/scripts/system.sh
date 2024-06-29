@@ -22,7 +22,7 @@ get_cpu_name() {
 }
 
 get_ram() {
-    free -h | grep Mem | awk '{print $2}'
+    echo "$(free -m | grep Mem | awk '{print $2}') MiB"
 }
 
 get_kernel() {
