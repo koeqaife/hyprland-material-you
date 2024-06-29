@@ -1,9 +1,5 @@
 const { Gtk } = imports.gi;
-
-const cpu_name = await Utils.execAsync(`${App.configDir}/scripts/system.sh --cpu-name`);
-const cpu_cores = await Utils.execAsync(`${App.configDir}/scripts/system.sh --cpu-cores`);
-const amount_of_ram = await Utils.execAsync(`${App.configDir}/scripts/system.sh --ram`);
-const kernel_name = await Utils.execAsync(`${App.configDir}/scripts/system.sh --kernel`);
+import { cpu_cores, cpu_name, kernel_name, amount_of_ram, gpu_name } from "variables";
 
 type InfoType = {
     cpu: string,
@@ -188,7 +184,8 @@ export function SystemBox() {
             InfoLabelString("CPU name", cpu_name, ""),
             InfoLabelString("CPU cores", cpu_cores, ""),
             InfoLabelString("RAM amount", amount_of_ram, ""),
-            InfoLabelString("Kernel", kernel_name, "")
+            InfoLabelString("Kernel", kernel_name, ""),
+            InfoLabelString("GPU", gpu_name, ""),
         ],
         vexpand: true
     })
