@@ -46,6 +46,18 @@ tooltip label {
     font-weight: normal;
 }
 
+menu {
+    background: @surfaceContainer;
+}
+
+menuitem {
+    color: @onSurface
+}
+
+menuitem:disabled {
+    color: mix(@onSurface, transparent, 0.38)
+}
+
 menu separator {
     color: @outline;
 }
