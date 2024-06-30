@@ -18,6 +18,9 @@ from materialyoucolor.scheme.scheme_vibrant import SchemeVibrant  # type: ignore
 from materialyoucolor.scheme.scheme_neutral import SchemeNeutral  # type: ignore
 from materialyoucolor.scheme.scheme_fidelity import SchemeFidelity  # type: ignore
 from materialyoucolor.scheme.scheme_content import SchemeContent  # type: ignore
+import hashlib
+import pickle
+import numpy as np
 
 
 schemes = {
@@ -41,6 +44,7 @@ home = os.path.expanduser('~')
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 cache_path = f"{home}/.cache/material/"
+os.makedirs(cache_path, exist_ok=True)
 
 
 def rgb_to_hex(rgb):
@@ -182,16 +186,50 @@ def save_updated_colors(updated_colors):
         json.dump(updated_colors, f, indent=4)
 
 
+def process_image(image_path, quality=2, num_colors=128):
+    def get_cache_path(image_path):
+        global cache_path
+        _cache_path = join(cache_path, "cached_colors")
+        hash_object = hashlib.md5(image_path.encode())
+        cache_filename = hash_object.hexdigest() + '.pkl'
+        os.makedirs(_cache_path, exist_ok=True)
+        return join(_cache_path, cache_filename)
+
+    def load_from_cache(cache_path):
+        if os.path.exists(cache_path):
+            with open(cache_path, 'rb') as f:
+                return pickle.load(f)
+        return None
+
+    def save_to_cache(cache_path, data):
+        with open(cache_path, 'wb') as f:
+            pickle.dump(data, f)
+
+    cache_path = get_cache_path(image_path)
+    
+    cached_result = load_from_cache(cache_path)
+    if cached_result is not None:
+        return cached_result
+    
+    image = Image.open(image_path).convert('RGB')
+    
+    image_data = np.array(image)
+    pixel_array = image_data[::quality, ::quality].reshape(-1, 3)
+    
+    result = QuantizeCelebi(pixel_array, num_colors)
+    
+    color = Score.score(result)[0]
+    
+    save_to_cache(cache_path, color)
+    
+    return color
+
+
 def main(color_scheme: str, image_path: str, use_color: int | None = None, scheme: DynamicScheme = schemes["tonalSpot"]):
     is_dark = True if color_scheme == "dark" else False
     if use_color is None:
-        image = Image.open(image_path)
-        pixel_len = image.width * image.height
-        image_data = image.getdata()
-        quality = 2
-        pixel_array = [image_data[_] for _ in range(0, pixel_len, quality)]
-        result = QuantizeCelebi(pixel_array, 128)
-        color = Score.score(result)[0]
+        color = process_image(image_path, 4, 1024)
+
     else:
         color = use_color
 
