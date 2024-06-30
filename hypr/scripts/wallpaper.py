@@ -72,6 +72,7 @@ spec.loader.exec_module(GENERATOR)   # type: ignore
 
 cache_file = f"{HOME}/.cache/current_wallpaper"
 square = f"{HOME}/.cache/square_wallpaper.png"
+png = f"{HOME}/.cache/current_wallpaper.png"
 color_scheme_file = f"{HOME}/dotfiles/.settings/color-scheme"
 custom_color_file = f"{HOME}/dotfiles/.settings/custom-color"
 generation_scheme_file = f"{HOME}/dotfiles/.settings/generation-scheme"
@@ -208,9 +209,36 @@ async def main():
     # -----------------------------------------------------
     square_task = asyncio.create_task(square_image(new_wallpaper))
 
+    # -----------------------------------------------------
+    # Png image
+    # -----------------------------------------------------
+    png_task = asyncio.create_task(png_image(new_wallpaper))
+
     state("tasks", None, None)
-    await asyncio.gather(square_task)
+    await asyncio.gather(square_task, png_task)
     state("finish", "Wallpaper procedure complete!", with_image)
+
+
+async def png_image(wallpaper: str):
+    _from = (".jpg", "jpeg")
+    if not wallpaper.endswith(_from):
+        cmd = f"cp -f {wallpaper} {png}"
+    else:
+        with_image = f"with image {wallpaper}"
+        state(None, "Converting jpg to png...", with_image)
+        print(":: Converting jpg to png...")
+        cmd = f"magick {wallpaper} {png}"
+    process = await asyncio.create_subprocess_shell(
+        cmd,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
+    )
+    stdout, stderr = await process.communicate()
+
+    if process.returncode != 0:
+        print(f":: Error while processing image: {stderr.decode()}")
+    else:
+        print(":: JPG successfully converted to PNG!")
 
 
 async def square_image(wallpaper):
