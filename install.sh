@@ -22,6 +22,7 @@ fi
 echo :: Installing packages
 sleep 2
 
+yay -Syu --noconfirm --needed
 yay -S --noconfirm --needed \
     hyprland hyprshot hyprcursor hypridle hyprlang hyprpaper hyprpicker \
     hyprutils hyprwayland-scanner xdg-dbus-proxy xdg-desktop-portal \
