@@ -4,6 +4,7 @@ const network = await Service.import('network')
 import { OpenSettings } from "apps/settings/main.ts";
 import { WINDOW_NAME } from "./main.ts"
 import { bluetooth_enabled, idle_inhibitor, night_light, theme } from "variables.ts";
+import { MaterialIcon } from "icons.ts";
 
 import Gtk from "gi://Gtk?version=3.0"
 
@@ -13,11 +14,7 @@ function WifiIndicator() {
     return Widget.Box({
         css: "padding-left: 15px; padding-right: 15px; padding-top: 5px; padding-bottom: 5px;",
         children: [
-            Widget.Label({
-                label: "\udb82\udd28",
-                class_name: "awesome_icon",
-                css: `font-weight: bold; font-size: 20px; margin-right: 0.60em;`,
-            }),
+            MaterialIcon("signal_wifi_4_bar", "20px"),
             Widget.Box({
                 visible: network.wifi.bind('enabled'),
                 orientation: Gtk.Orientation.VERTICAL,
@@ -44,11 +41,7 @@ function WifiIndicator() {
             Widget.Box({
                 hpack: "end",
                 hexpand: true,
-                child: Widget.Label({
-                    label: "",
-                    class_name: "awesome_icon",
-                    css: `font-weight: normal; font-size: 15px;`,
-                })
+                child: MaterialIcon("chevron_right", "20px")
             })
         ],
     })
@@ -57,9 +50,7 @@ function WifiIndicator() {
 const WiredIndicator = () => Widget.Box({
     css: "padding-left: 15px; padding-right: 15px; padding-top: 5px; padding-bottom: 5px;",
     children: [
-        Widget.Icon({
-            icon: network.wired.bind('icon_name'),
-        }),
+        MaterialIcon("settings_ethernet", "20px"),
         Widget.Label({
             label: "Internet",
         }),
@@ -76,15 +67,11 @@ const NetworkIndicator = () => Widget.Stack({
 })
 
 
-function IconAndName({ label, icon, padding = "0.3em", arrow = false }) {
+function IconAndName({ label, icon, arrow = false }) {
     let box = Widget.Box({
         css: "padding-left: 15px; padding-right: 15px; padding-top: 5px; padding-bottom: 5px;",
         children: [
-            Widget.Label({
-                label: icon,
-                class_name: "awesome_icon",
-                css: `font-weight: bold; font-size: 20px; margin-right: ${padding};`,
-            }),
+            MaterialIcon(icon, "20px"),
             Widget.Label({
                 label: label,
                 justification: "center",
@@ -95,11 +82,7 @@ function IconAndName({ label, icon, padding = "0.3em", arrow = false }) {
         const arrow = Widget.Box({
             hpack: "end",
             hexpand: true,
-            child: Widget.Label({
-                label: "",
-                class_name: "awesome_icon",
-                css: `font-weight: normal; font-size: 15px;`,
-            })
+            child: MaterialIcon("chevron_right", "20px")
         })
         // @ts-ignore
         box.children = [...box.children, arrow]
@@ -140,7 +123,7 @@ function Page1() {
                             ),
                         child: IconAndName({
                             label: "Bluetooth",
-                            icon: "󰂯",
+                            icon: "bluetooth",
                             arrow: true,
                         }),
                         on_primary_click: () => {
@@ -170,7 +153,7 @@ function Page1() {
                         },
                         child: IconAndName({
                             label: "Dark theme",
-                            icon: ""
+                            icon: "contrast"
                         })
                     }),
                     Widget.Button({
@@ -183,7 +166,8 @@ function Page1() {
                         },
                         child: IconAndName({
                             label: "Do Not Disturb",
-                            icon: ""
+                            icon: notifications.bind("dnd")
+                                .as((bool) => bool ? "do_not_disturb_on" : "do_not_disturb_off")
                         })
                     })
                 ]
@@ -199,7 +183,7 @@ function Page1() {
                             .as(bool => bool ? "management_button active" : "management_button"),
                         child: IconAndName({
                             label: "Idle inhibitor",
-                            icon: ""
+                            icon: "schedule"
                         }),
                         onClicked: () => {
                             idle_inhibitor.setValue(!idle_inhibitor.value)
@@ -216,7 +200,7 @@ function Page1() {
                             .as(mode => mode ? "management_button active" : "management_button"),
                         child: IconAndName({
                             label: "Night Light",
-                            icon: ""
+                            icon: "nightlight"
                         }),
                         onClicked: () => {
                             night_light.setValue(!night_light.value)
@@ -261,7 +245,7 @@ function Page2() {
                         class_name: "management_button",
                         child: IconAndName({
                             label: "Color picker",
-                            icon: "",
+                            icon: "colorize",
                             arrow: true,
                         }),
                         on_primary_click: () => {
@@ -278,7 +262,7 @@ function Page2() {
                         class_name: "management_button",
                         child: IconAndName({
                             label: "Settings",
-                            icon: "",
+                            icon: "settings",
                             arrow: true,
                         }),
                         on_primary_click: () => {
