@@ -990,3 +990,69 @@ switch:checked:hover slider, switch:checked:active slider {
     background-color: @primaryContainer;
 }
 
+
+/* -----------------------------------------------------
+ * Cheatsheet
+ * ----------------------------------------------------- */
+
+.cheatsheet flowbox {
+    margin-top: 14px;
+    margin-bottom: 14px;
+    background-color: @background;
+    border-radius: 24px;
+    border: 2px solid @outlineVariant;
+    padding: 5px;
+}
+
+.cheatsheet .category {
+    background-color: @surfaceContainerLow;
+    border-radius: 17px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+.cheatsheet .category separator {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.cheatsheet .category .row {
+    margin-bottom: 2px;
+    margin-left: 7px;
+    margin-right: 7px;
+}
+
+.cheatsheet .category .key {
+    background-color: @surfaceContainerLowest;
+    padding-left: 4px;
+    padding-right: 4px;
+    color: @onSurface;
+    border-radius: 4px;
+}
+
+.cheatsheet .category .plus {
+    margin-left: 4px;
+    margin-right: 4px;
+    color: @outline;
+}
+
+.cheatsheet .category .separator {
+    color: @outline;
+}
+
+.cheatsheet .category .description {
+    color: @onSurfaceVariant;
+    font-size: 16px;
+}
+
+.cheatsheet .category .title {
+    font-weight: bold;
+    color: @onSurface;
+    margin-left: 7px;
+    margin-right: 7px;
+    font-size: 17px;
+}
+
+.cheatsheet .category .awesome_icon.key {
+    padding: 4px;
+}
