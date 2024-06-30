@@ -45,6 +45,7 @@ home = os.path.expanduser('~')
 script_dir = os.path.dirname(os.path.abspath(__file__))
 cache_path = f"{home}/.cache/material/"
 os.makedirs(cache_path, exist_ok=True)
+os.makedirs(f"{home}/.cache/wal/", exist_ok=True)
 
 
 def rgb_to_hex(rgb):
