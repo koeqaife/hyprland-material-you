@@ -47,6 +47,10 @@ def rgb_to_hex(rgb):
     return '#{:02x}{:02x}{:02x}'.format(*rgb[:3])
 
 
+def rgba_to_rgb(rgba):
+    return f'{rgba[0]}, {rgba[1]}, {rgba[2]}'
+
+
 class Color():
     def __init__(self, scheme) -> None:
         self.scheme = scheme
@@ -144,8 +148,11 @@ def generate_templates(folder: str, output_folder: str, scheme: DynamicScheme, c
         for color in vars(MaterialDynamicColors).keys():
             color_name = getattr(MaterialDynamicColors, color)
             if hasattr(color_name, "get_hct"):
-                hex_color = rgb_to_hex(color_name.get_hct(scheme).to_rgba())
+                rgba = color_name.get_hct(scheme).to_rgba()
+                hex_color = rgb_to_hex(rgba)
+                rgb_color = rgba_to_rgb(rgba)
                 template = template.replace(f"<{color}>", hex_color)
+                template = template.replace(f"<{color}.rgb>", rgb_color)
         template = (
             template
             .replace("<color-scheme>", color_scheme)
