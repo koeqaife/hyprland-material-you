@@ -41,7 +41,9 @@ function WifiIndicator() {
             Widget.Box({
                 hpack: "end",
                 hexpand: true,
-                child: MaterialIcon("chevron_right", "20px")
+                child: MaterialIcon("chevron_right", "20px", {
+                    class_name: "material_icon icon arrow"
+                })
             })
         ],
     })
@@ -82,7 +84,9 @@ function IconAndName({ label, icon, arrow = false }) {
         const arrow = Widget.Box({
             hpack: "end",
             hexpand: true,
-            child: MaterialIcon("chevron_right", "20px")
+            child: MaterialIcon("chevron_right", "20px", {
+                class_name: "material_icon icon arrow"
+            })
         })
         // @ts-ignore
         box.children = [...box.children, arrow]

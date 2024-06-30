@@ -501,7 +501,7 @@ window.notification-popups box.notifications {
     margin: 0px;
 }
 
-.bar_applets image {
+.bar_applets .icon {
     color: @onSurface;
 }
 
@@ -556,6 +556,10 @@ window.notification-popups box.notifications {
     margin-right: 5px;
 }
 
+.management_button .arrow {
+    margin-right: 0px;
+}
+
 .management_button:hover {
     background-color: @surfaceContainerHigh;
 }
@@ -564,7 +568,7 @@ window.notification-popups box.notifications {
     color: @onPrimary
 }
 
-.management_button.active .icon {
+.management_button.active .icon{
     color: @onPrimary;
     font-weight: normal;
 }
