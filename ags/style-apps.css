@@ -151,7 +151,7 @@
     min-width: 30px;
     min-height: 32px;
     border-radius: 4px;
-    background-color: @surfaceContainerHighest;
+    background-color: @surfaceContainerHigh;
 }
 
 .settings entry label, .settings combobox label {
