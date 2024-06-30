@@ -20,6 +20,7 @@ export const cpu_cores = await Utils.execAsync(`${App.configDir}/scripts/system.
 export const amount_of_ram = await Utils.execAsync(`${App.configDir}/scripts/system.sh --ram`);
 export const kernel_name = await Utils.execAsync(`${App.configDir}/scripts/system.sh --kernel`);
 export const hostname = await Utils.execAsync(`${App.configDir}/scripts/system.sh --hostname`);
+export const current_os = await Utils.execAsync(`${App.configDir}/scripts/system.sh --os`);
 
 export const custom_color_file = `${GLib.get_home_dir()}/dotfiles/.settings/custom-color`
 export const generation_scheme_file = `${GLib.get_home_dir()}/dotfiles/.settings/generation-scheme`

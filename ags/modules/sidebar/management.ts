@@ -5,7 +5,7 @@ import { OpenSettings } from "apps/settings/main.ts";
 import { WINDOW_NAME } from "./main.ts"
 import { bluetooth_enabled, idle_inhibitor, night_light, theme } from "variables.ts";
 
-const { Gtk } = imports.gi;
+import Gtk from "gi://Gtk?version=3.0"
 
 const currentPage = Variable(0);
 

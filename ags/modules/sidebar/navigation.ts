@@ -1,7 +1,7 @@
-const { Gtk } = imports.gi;
 import { NotificationsBox } from "./notifications.ts"
 import { SystemBox } from "./system.ts"
 let shown = Variable("Messages");
+import Gtk from "gi://Gtk?version=3.0"
 
 
 type ButtonType = {
