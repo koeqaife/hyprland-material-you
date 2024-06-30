@@ -207,7 +207,7 @@ def main(color_scheme: str, image_path: str, use_color: int | None = None, schem
 
     with open(join(cache_path, "colors.json"), 'w') as f:
         object = ColorsCache(scheme, image_path, color)
-        json.dump(colors_dict(object), f)
+        json.dump(colors_dict(object), f, indent=2)
 
     updated_pywal_colors = update_pywal_colors_with_material_you(scheme, image_path)
 
