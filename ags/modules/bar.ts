@@ -367,7 +367,7 @@ function volumeIndicator() {
             on_secondary_click: () => audio.speaker.is_muted = !audio.speaker.is_muted,
             child: Widget.Box({
                 children: [
-                    MaterialIcon("volume_off").hook(audio.speaker, self => {
+                    MaterialIcon("volume_off", "20px").hook(audio.speaker, self => {
                         const vol = audio.speaker.volume * 100;
                         const icon = [
                             [101, 'sound_detection_loud_sound'],
