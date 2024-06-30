@@ -49,4 +49,7 @@ cd dotfiles
 [![Screenshot](screenshots/gtk-theme.png "Dark gtk theme")](screenshots/gtk-theme.png)
 [![Screenshot](screenshots/light-theme.png "Light gtk theme")](screenshots/light-theme.png)
 
+- List of keybindings
+[![Screenshot](screenshots/cheatsheet.png "CheatSheet")](screenshots/cheatsheet.png)
+
 > I got some code for AGS from [end-4](https://github.com/end-4/dots-hyprland/) and [kotontrion](https://github.com/kotontrion/dotfiles) configs, thanks to them.
