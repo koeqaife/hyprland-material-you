@@ -111,6 +111,10 @@
     background-color: mix(@onSurface, @surface, 0.92)
 }
 
+.settings .row:active {
+    background-color: mix(@onSurface, @surface, 0.8)
+}
+
 .settings .row.focused {
     background-color: mix(@onSurface, @surface, 0.8)
 }
