@@ -465,6 +465,11 @@ window.notification-popups box.notifications {
     font-family: "Font Awesome 6 Free";
 }
 
+.material_icon {
+    font-family: "Material Symbols Rounded", "MaterialSymbolsRounded",
+    "Material Symbols Outlined", "Material Symbols Sharp";
+}
+
 .battery {
     background-color: @surfaceContainer;
     border-radius: 100px;
@@ -1012,8 +1017,9 @@ switch:checked:hover slider, switch:checked:active slider {
 }
 
 .cheatsheet .category separator {
-    margin-top: 2px;
-    margin-bottom: 2px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    color: @outline;
 }
 
 .cheatsheet .category .row {
