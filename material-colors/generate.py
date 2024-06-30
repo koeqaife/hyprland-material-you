@@ -261,8 +261,6 @@ def main(color_scheme: str, image_path: str, use_color: int | None = None, schem
 
     run_hooks(join(script_dir, "hooks"))
 
-    print("Updated pywal colors and regenerated template files.")
-
 
 def _argparse() -> tuple[bool, bool, str, str, str, str]:
     parser = argparse.ArgumentParser()
