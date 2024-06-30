@@ -1,7 +1,16 @@
 import Gtk from "gi://Gtk?version=3.0"
 import { timeout } from "resource:///com/github/Aylur/ags/utils.js";
 import { Variable as VariableType } from "types/variable";
+import { MaterialIcon } from "icons";
 const systemtray = await Service.import("systemtray")
+
+const MATERIAL_SYMBOL_SIGNAL_STRENGTH = {
+    'network-wireless-signal-excellent-symbolic': "signal_wifi_4_bar",
+    'network-wireless-signal-good-symbolic': "network_wifi_3_bar",
+    'network-wireless-signal-ok-symbolic': "network_wifi_2_bar",
+    'network-wireless-signal-weak-symbolic': "network_wifi_1_bar",
+    'network-wireless-signal-none-symbolic': "signal_wifi_0_bar",
+}
 
 type AccessPoint = {
     bssid: string | null;
@@ -70,10 +79,10 @@ const WifiNetwork = (access_point: AccessPoint) => {
         child: Widget.Box({
             class_name: "wifi_network_box",
             children: [
-                Widget.Icon({
-                    icon: access_point.iconName,
-                    size: 20
-                }),
+                MaterialIcon(
+                    MATERIAL_SYMBOL_SIGNAL_STRENGTH[access_point.iconName!],
+                    "20px"
+                ),
                 // @ts-ignore
                 Widget.Box({
                     vertical: true,

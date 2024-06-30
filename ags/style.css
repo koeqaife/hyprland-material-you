@@ -233,6 +233,10 @@ window.notification-popups box.notifications {
     color: @primary;
 }
 
+.notification-close .icon {
+    font-weight: 300;
+}
+
 /* -----------------------------------------------------
  * Applications
  * ----------------------------------------------------- */
@@ -428,10 +432,12 @@ window.notification-popups box.notifications {
     min-height: 1em;
     min-width: 1em;
     padding: .3em;
+    padding-top: 0px;
+    padding-bottom: 0px;
     color: @onSecondary;
 }
 
-.player button image {
+.player button .icon {
     color: @onSecondary;
 }
 
@@ -457,12 +463,21 @@ window.notification-popups box.notifications {
     border-radius: 100px;
 }
 
-.volume_box image {
+.volume_box button {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.volume_box .icon {
     margin-right: 5px;
 }
 
 .awesome_icon {
     font-family: "Font Awesome 6 Free";
+}
+
+.material_icon {
+    font-family: "Material Symbols Outlined", "Material Symbols Sharp";
 }
 
 .battery {
@@ -486,7 +501,7 @@ window.notification-popups box.notifications {
     margin: 0px;
 }
 
-.bar_applets image {
+.bar_applets .icon {
     color: @onSurface;
 }
 
@@ -537,7 +552,12 @@ window.notification-popups box.notifications {
 }
 
 .management_button .icon {
-    color: @onSurface
+    color: @onSurface;
+    margin-right: 5px;
+}
+
+.management_button .arrow {
+    margin-right: 0px;
 }
 
 .management_button:hover {
@@ -548,8 +568,9 @@ window.notification-popups box.notifications {
     color: @onPrimary
 }
 
-.management_button.active .icon {
-    color: @onPrimary
+.management_button.active .icon{
+    color: @onPrimary;
+    font-weight: normal;
 }
 
 .management_button.active {
@@ -741,6 +762,7 @@ window.notification-popups box.notifications {
 .outline_button label, .outline_button .icon,
 .outline_button .awesome_icon, .outline_button image {
     color: @primary;
+    font-weight: 300;
 }
 
 .outline_button:hover {
@@ -757,11 +779,16 @@ window.notification-popups box.notifications {
     background-color: @secondaryContainer;
     color: @onSecondaryContainer;
     border-radius: 100px;
+    padding: 0px;
+    padding-left: 6px;
+    padding-right: 6px;
 }
 
 .filled_tonal_button label, .filled_tonal_button .icon,
 .filled_tonal_button .awesome_icon, .filled_tonal_button image {
     color: @onSecondaryContainer;
+    font-weight: 400;
+    margin: 0px;
 }
 
 .filled_tonal_button:hover {
@@ -882,19 +909,19 @@ filled_button.disabled .awesome_icon, .filled_button.disabled image {
 
 .navigation_button .container {
     border-radius: 16px;
-    padding: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
     min-height: 15px;
     min-width: 0px;
     transition-property: min-width, color, background-color, border-color;
 }
 
 .navigation_button .icon {
-    font-weight: normal;
+    font-weight: 400;
     color: @onSurface;
 }
 
 .navigation_button.active .icon {
-    font-weight: bold;
     color: @onSecondaryContainer;
 }
 
@@ -1012,8 +1039,9 @@ switch:checked:hover slider, switch:checked:active slider {
 }
 
 .cheatsheet .category separator {
-    margin-top: 2px;
-    margin-bottom: 2px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    color: @outline;
 }
 
 .cheatsheet .category .row {
