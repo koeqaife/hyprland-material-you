@@ -41,6 +41,9 @@ cd dotfiles
   
 [![Screenshot](screenshots/apps-menu.png "Apps")](screenshots/apps-menu.png)
 
+- Lock Screen (hyprlock)
+[![Screenshot](screenshots/hyprlock.png "Hyprlock")](screenshots/hyprlock.png)
+
 - Gtk theme:
   
 [![Screenshot](screenshots/gtk-theme.png "Dark gtk theme")](screenshots/gtk-theme.png)
