@@ -36,7 +36,8 @@ yay -S --noconfirm --needed \
     blueman fastfetch bibata-cursor-theme gum python-pywayland brave dbus \
     libdrm mesa fwupd rofi-wayland bun-bin pipewire wireplumber udiskie \
     lm_sensors gnome-system-monitor playerctl ttf-meslo-nerd ttf-google-sans \
-    ttf-font-awesome ttf-opensans ttf-roboto lshw
+    ttf-font-awesome ttf-opensans ttf-roboto lshw ttf-material-symbols-variable-git \
+    fontconfig
 
 sleep 2
 
