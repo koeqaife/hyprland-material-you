@@ -4,6 +4,8 @@ import { Bluetooth } from "./bluetooth";
 import { Theme } from "./theme";
 import { Wallpapers } from "./wallpapers";
 import { Info } from "./info";
+import { Apps } from "./apps";
+import { MaterialIcon } from "icons";
 const hyprland = await Service.import("hyprland")
 import Gtk from "gi://Gtk?version=3.0"
 
@@ -43,14 +45,15 @@ function Settings(cur_tab: string) {
             "bluetooth": Page(Bluetooth(), "Bluetooth"),
             "theme": Page(Theme(), "Theme"),
             "wallpaper": Page(Wallpapers(), "Wallpapers"),
-            "info": Page(Info(), "Info")
+            "info": Page(Info(), "Info"),
+            "apps": Page(Apps(), "Apps")
         }
     })
     const Row = (name: string, label: string, icon: string = "image-missing") => Widget.Button({
         on_clicked: () => { current_tab.setValue(name) },
         child: Widget.Box({
             children: [
-                Widget.Icon(icon),
+                MaterialIcon(icon),
                 Widget.Label(label)
             ]
         }),
@@ -62,13 +65,15 @@ function Settings(cur_tab: string) {
         class_name: "sidebar",
         spacing: 2,
         children: [
-            Row("network", "Network", "network-wireless-signal-excellent-symbolic"),
-            Row("bluetooth", "Bluetooth", "bluetooth-active-symbolic"),
+            Row("network", "Network", "signal_wifi_4_bar"),
+            Row("bluetooth", "Bluetooth", "bluetooth"),
             Widget.Separator(),
-            Row("theme", "Theme", "applications-graphics-symbolic"),
-            Row("wallpaper", "Wallpapers", "folder-pictures-symbolic"),
+            Row("theme", "Theme", "palette"),
+            Row("wallpaper", "Wallpapers", "image"),
             Widget.Separator(),
-            Row("info", "Info", "dialog-information-symbolic")
+            Row("apps", "Apps", "grid_view"),
+            Widget.Separator(),
+            Row("info", "Info", "info")
         ]
     })
     return Widget.Box({

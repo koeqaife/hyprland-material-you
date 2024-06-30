@@ -16,11 +16,20 @@ import { FileEnumerator, FileInfo } from "types/@girs/gio-2.0/gio-2.0.cjs"
 const mpris = await Service.import("mpris")
 const bluetooth = await Service.import("bluetooth")
 import Gtk from "gi://Gtk?version=3.0"
+import { MaterialIcon } from "icons.js"
 
 const keyboard_layout = Variable("none")
 hyprland.connect("keyboard-layout", (hyprland, keyboardname, layoutname) => {
     keyboard_layout.setValue(layoutname.trim().toLowerCase().substr(0, 2))
 })
+
+const MATERIAL_SYMBOL_SIGNAL_STRENGTH = {
+    'network-wireless-signal-excellent-symbolic': "signal_wifi_4_bar",
+    'network-wireless-signal-good-symbolic': "network_wifi_3_bar",
+    'network-wireless-signal-ok-symbolic': "network_wifi_2_bar",
+    'network-wireless-signal-weak-symbolic': "network_wifi_1_bar",
+    'network-wireless-signal-none-symbolic': "signal_wifi_0_bar",
+}
 
 const time = Variable("", {
     poll: [1000, 'date "+%H:%M"'],
@@ -178,13 +187,11 @@ function SysTray() {
 
 function AppLauncher() {
     const button = Widget.Button({
-        class_name: "filled_tonal_button awesome_icon",
+        class_name: "filled_tonal_button",
         on_clicked: () => {
             App.toggleWindow("applauncher")
         },
-        child: Widget.Label(
-            "\uf002"
-        )
+        child: MaterialIcon("search")
     })
 
     return button
@@ -193,7 +200,7 @@ function AppLauncher() {
 
 function Wifi() {
     return Widget.Button({
-        class_name: "bar_wifi icon",
+        class_name: "bar_wifi",
         on_primary_click: () => {
             OpenSettings("network")
         },
@@ -205,17 +212,15 @@ function Wifi() {
                 Utils.execAsync("nm-connection-editor").catch(print)
             }
         },
-        child: Widget.Icon({
-            icon: "network-wireless-offline-symbolic"
-        }),
+        child: MaterialIcon("signal_wifi_off", "16px"),
         tooltip_text: 'Disabled'
     }).hook(network, self => {
         if (network.wifi.enabled) {
             self.tooltip_text = network.wifi.ssid || 'Unknown';
-            self.child.icon = network.wifi.icon_name;
+            self.child.label = MATERIAL_SYMBOL_SIGNAL_STRENGTH[network.wifi.icon_name] || "signal_wifi_off";
         } else {
             self.tooltip_text = 'Disabled'
-            self.child.icon = "network-wireless-offline-symbolic";
+            self.child.label = "signal_wifi_off";
         }
     })
 }
@@ -223,7 +228,7 @@ function Wifi() {
 
 function Bluetooth() {
     return Widget.Button({
-        class_name: "bar_bluetooth icon",
+        class_name: "bar_bluetooth",
         on_primary_click: () => {
             OpenSettings("bluetooth")
         },
@@ -235,14 +240,12 @@ function Bluetooth() {
                 Utils.execAsync("blueman-manager").catch(print)
             }
         },
-        child: Widget.Icon({
-            icon: "bluetooth-disabled-symbolic"
-        }),
+        child: MaterialIcon("bluetooth_disabled", "18px"),
     }).hook(bluetooth, self => {
         if (bluetooth.enabled) {
-            self.child.icon = "bluetooth-active-symbolic";
+            self.child.label = "bluetooth";
         } else {
-            self.child.icon = "bluetooth-disabled-symbolic";
+            self.child.label = "bluetooth_disabled";
         }
     })
 }
@@ -261,16 +264,14 @@ const Applets = () => Widget.Box({
 function MediaPlayer() {
     let metadata = mpris.players[0]?.metadata;
     const button = Widget.Button({
-        class_name: "filled_tonal_button awesome_icon",
+        class_name: "filled_tonal_button",
         on_primary_click: () => {
             App.toggleWindow("media")
         },
         on_secondary_click: () => {
             Utils.execAsync(["playerctl", "play-pause"]).catch(print)
         },
-        child: Widget.Label(
-            ""
-        ),
+        child: MaterialIcon("play_circle"),
         visible: false,
         tooltip_text: "Unknown"
     }).hook(mpris, self => {
@@ -302,14 +303,14 @@ function KeyboardLayout() {
 
 function OpenSideBar() {
     const button = Widget.Button({
-        class_name: "filled_tonal_button awesome_icon",
+        class_name: "filled_tonal_button",
         on_primary_click: () => {
             App.toggleWindow("sidebar")
         },
         on_secondary_click: () => {
             OpenSettings()
         },
-        label: ""
+        child: MaterialIcon("dock_to_left")
     })
 
     return button
@@ -366,19 +367,19 @@ function volumeIndicator() {
             on_secondary_click: () => audio.speaker.is_muted = !audio.speaker.is_muted,
             child: Widget.Box({
                 children: [
-                    Widget.Icon().hook(audio.speaker, self => {
+                    MaterialIcon("volume_off", "20px").hook(audio.speaker, self => {
                         const vol = audio.speaker.volume * 100;
                         const icon = [
-                            [101, 'overamplified'],
-                            [67, 'high'],
-                            [34, 'medium'],
-                            [1, 'low'],
-                            [0, 'muted'],
+                            [101, 'sound_detection_loud_sound'],
+                            [67, 'volume_up'],
+                            [34, 'volume_down'],
+                            [1, 'volume_mute'],
+                            [0, 'volume_off'],
                         ].find(([threshold]) => Number(threshold) <= vol)?.[1];
                         if (audio.speaker.is_muted)
-                            self.icon = `audio-volume-muted-symbolic`;
+                            self.label = "volume_off";
                         else
-                            self.icon = `audio-volume-${icon}-symbolic`;
+                            self.label = String(icon!);
                         self.tooltip_text = `Volume ${Math.floor(vol)}%`;
                     }),
                     Widget.Label({
