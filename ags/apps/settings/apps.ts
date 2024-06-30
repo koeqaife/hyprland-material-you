@@ -1,6 +1,7 @@
 const apps_script = `python -OOO ${App.configDir}/scripts/apps.py`;
+import { MaterialIcon } from "icons";
 
-const Row = (app: string, title: string) => Widget.EventBox({
+const Row = (app: string, title: string, icon: string) => Widget.EventBox({
     class_name: "row",
     on_primary_click: self => {
         self.child.children[1]!.activate()
@@ -9,6 +10,7 @@ const Row = (app: string, title: string) => Widget.EventBox({
         class_name: "row",
         vpack: "start",
         children: [
+            MaterialIcon(icon),
             Widget.Box({
                 vertical: true,
                 hexpand: true,
@@ -62,10 +64,10 @@ export function Apps() {
     const box = Widget.Box({
         vertical: true,
         children: [
-            Row("browser", "Browser"),
-            Row("editor", "Editor"),
-            Row("filemanager", "File manager"),
-            Row("terminal", "Terminal")
+            Row("browser", "Browser", "web"),
+            Row("editor", "Editor", "edit"),
+            Row("filemanager", "File manager", "folder"),
+            Row("terminal", "Terminal", "terminal")
         ],
     })
     return Widget.Scrollable({

@@ -1,14 +1,15 @@
 import { MprisPlayer } from 'types/service/mpris.js';
 import popupwindow from './misc/popupwindow.ts';
 import Label from 'types/widgets/label.js';
+import { MaterialIcon } from 'icons.ts';
 const mpris = await Service.import("mpris")
 const players = mpris.bind("players")
 
 const FALLBACK_ICON = "audio-x-generic-symbolic"
-const PLAY_ICON = "media-playback-start-symbolic"
-const PAUSE_ICON = "media-playback-pause-symbolic"
-const PREV_ICON = "media-skip-backward-symbolic"
-const NEXT_ICON = "media-skip-forward-symbolic"
+const PLAY_ICON = "play_arrow"
+const PAUSE_ICON = "pause"
+const PREV_ICON = "skip_previous"
+const NEXT_ICON = "skip_next"
 const WINDOW_NAME = "media"
 
 function lengthStr(length: number): string {
@@ -96,27 +97,28 @@ function Player(player: MprisPlayer) {
         class_name: "play-pause",
         on_clicked: () => player.playPause(),
         visible: player.bind("can_play"),
-        child: Widget.Icon({
-            icon: player.bind("play_back_status").transform(s => {
+        child: MaterialIcon(
+            // @ts-ignore
+            player.bind("play_back_status").transform(s => {
                 switch (s) {
                     case "Playing": return PAUSE_ICON
                     case "Paused":
                     case "Stopped": return PLAY_ICON
                 }
-            }),
-        }),
+            }
+            ), "18px"),
     })
 
     const prev = Widget.Button({
         on_clicked: () => player.previous(),
         visible: player.bind("can_go_prev"),
-        child: Widget.Icon(PREV_ICON),
+        child: MaterialIcon(PREV_ICON, "18px"),
     })
 
     const next = Widget.Button({
         on_clicked: () => player.next(),
         visible: player.bind("can_go_next"),
-        child: Widget.Icon(NEXT_ICON),
+        child: MaterialIcon(NEXT_ICON, "18px"),
     })
 
     return Widget.Box(

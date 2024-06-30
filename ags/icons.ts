@@ -6,5 +6,7 @@ export const MaterialIcon = (icon: string, size: string = "24px", props?: LabelP
     label: icon,
     class_name: "icon material_icon",
     css: `font-size: ${size};`,
+    hpack: "center",
+    vpack: "center",
     ...props
 })

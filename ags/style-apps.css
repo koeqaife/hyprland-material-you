@@ -67,7 +67,7 @@
     color: @onSecondaryContainer;
 }
 
-.settings .sidebar .row image {
+.settings .sidebar .row .icon {
     margin-right: 12px;
     color: @onSurfaceVariant;
 }
@@ -131,6 +131,11 @@
     color: @onSurfaceVariant
 }
 
+.settings .row .icon {
+    color: @onSurfaceVariant;
+    margin-right: 16px;
+}
+
 .settings .bottom_bar {
     background-color: @surface;
     font-weight: normal;
@@ -156,12 +161,12 @@
 
 /* Wifi */
 
-.settings .wifi_list .row image {
+.settings .wifi_list .row .icon {
     color: @onSurfaceVariant;
     margin-right: 16px;
 }
 
-.settings .wifi_list .row.active image {
+.settings .wifi_list .row.active .icon {
     color: @primary;
 }
 
