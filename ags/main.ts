@@ -9,9 +9,9 @@ import { media } from "./modules/media.ts"
 import { cliphist } from "./modules/cliphist.ts"
 import { sidebar } from "./modules/sidebar/main.ts"
 import {} from 'apps/settings/main.ts';
+import { cheatsheet } from 'modules/cheatsheet.ts';
 import Window from 'types/widgets/window';
 const GLib = imports.gi.GLib;
-
 
 const range = (length: number, start = 1) => Array.from({ length }, (_, i) => i + start);
 function forMonitors(widget: (index: number) => Window<any, any>): Window<any, any>[] {
@@ -31,6 +31,7 @@ const Windows = () => [
     applauncher,
     cliphist,
     sidebar,
+    cheatsheet
 ];
 
 const CLOSE_ANIM_TIME = 210;
