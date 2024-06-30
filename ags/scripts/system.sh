@@ -37,6 +37,10 @@ get_hostname() {
     cat /etc/hostname
 }
 
+get_os() {
+    hostnamectl | grep "Operating System" | awk '{for (i=3; i<=NF; i++) printf $i " "; print ""}'
+}
+
 if [[ "$1" == "--cpu-usage" ]]; then
     get_cpu_usage
     elif [[ "$1" == "--ram-usage" ]]; then
@@ -57,4 +61,6 @@ if [[ "$1" == "--cpu-usage" ]]; then
     get_gpu
     elif [[ "$1" == "--hostname" ]]; then
     get_hostname
+    elif [[ "$1" == "--os" ]]; then
+    get_os
 fi

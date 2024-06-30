@@ -1,7 +1,7 @@
 import { Management } from "./management.ts"
 import { Buttons } from "./buttons.ts";
 import { Navigation } from "./navigation.ts";
-const { Gtk } = imports.gi;
+import Gtk from "gi://Gtk?version=3.0"
 
 export function SideBar() {
     return Widget.Box({

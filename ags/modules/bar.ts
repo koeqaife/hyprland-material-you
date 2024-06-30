@@ -3,7 +3,7 @@ const battery = await Service.import("battery")
 const systemtray = await Service.import("systemtray")
 const audio = await Service.import("audio")
 const network = await Service.import("network")
-const { Gtk, GLib, Gio } = imports.gi;
+const { GLib, Gio } = imports.gi;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 import { OpenSettings } from "apps/settings/main.ts";
@@ -15,17 +15,9 @@ import Icon from "types/widgets/icon.js"
 import { FileEnumerator, FileInfo } from "types/@girs/gio-2.0/gio-2.0.cjs"
 const mpris = await Service.import("mpris")
 const bluetooth = await Service.import("bluetooth")
+import Gtk from "gi://Gtk?version=3.0"
 
-
-function checkKeymap() {
-    const layout = Utils.execAsync(`${App.configDir}/scripts/keyboard-layout.sh`)
-        .then(out => { return out })
-        .catch(err => { print(err); return "en" });
-    return layout;
-}
-
-const keyboard_layout = Variable("en")
-keyboard_layout.setValue(await checkKeymap())
+const keyboard_layout = Variable("none")
 hyprland.connect("keyboard-layout", (hyprland, keyboardname, layoutname) => {
     keyboard_layout.setValue(layoutname.trim().toLowerCase().substr(0, 2))
 })
@@ -301,6 +293,7 @@ function MediaPlayer() {
 function KeyboardLayout() {
     const widget = Widget.Label({
         class_name: "keyboard",
+        visible: keyboard_layout.bind().as(c => c != "none"),
         label: keyboard_layout.bind()
     })
     return widget

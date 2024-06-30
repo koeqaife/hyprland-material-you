@@ -7,7 +7,7 @@ import Pango from "gi://Pango";
 import Label from "types/widgets/label";
 
 const notifications = await Service.import("notifications")
-const { Gtk } = imports.gi;
+import Gtk from "gi://Gtk?version=3.0"
 
 function NotificationIcon({ app_entry, app_icon, image }: NotificationType): Box<GtkType.Widget, any> {
     if (image) {
