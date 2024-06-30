@@ -4,6 +4,7 @@ import { Bluetooth } from "./bluetooth";
 import { Theme } from "./theme";
 import { Wallpapers } from "./wallpapers";
 import { Info } from "./info";
+import { Apps } from "./apps";
 const hyprland = await Service.import("hyprland")
 import Gtk from "gi://Gtk?version=3.0"
 
@@ -43,7 +44,8 @@ function Settings(cur_tab: string) {
             "bluetooth": Page(Bluetooth(), "Bluetooth"),
             "theme": Page(Theme(), "Theme"),
             "wallpaper": Page(Wallpapers(), "Wallpapers"),
-            "info": Page(Info(), "Info")
+            "info": Page(Info(), "Info"),
+            "apps": Page(Apps(), "Apps")
         }
     })
     const Row = (name: string, label: string, icon: string = "image-missing") => Widget.Button({
@@ -67,6 +69,8 @@ function Settings(cur_tab: string) {
             Widget.Separator(),
             Row("theme", "Theme", "applications-graphics-symbolic"),
             Row("wallpaper", "Wallpapers", "folder-pictures-symbolic"),
+            Widget.Separator(),
+            Row("apps", "Apps", "applications-other-symbolic"),
             Widget.Separator(),
             Row("info", "Info", "dialog-information-symbolic")
         ]
