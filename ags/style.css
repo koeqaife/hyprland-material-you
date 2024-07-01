@@ -476,10 +476,6 @@ window.notification-popups box.notifications {
     font-family: "Font Awesome 6 Free";
 }
 
-.material_icon {
-    font-family: "Material Symbols Outlined", "Material Symbols Sharp";
-}
-
 .battery {
     background-color: @surfaceContainer;
     border-radius: 100px;
@@ -779,9 +775,8 @@ window.notification-popups box.notifications {
     background-color: @secondaryContainer;
     color: @onSecondaryContainer;
     border-radius: 100px;
+    min-width: 35px;
     padding: 0px;
-    padding-left: 6px;
-    padding-right: 6px;
 }
 
 .filled_tonal_button label, .filled_tonal_button .icon,
@@ -1083,4 +1078,13 @@ switch:checked:hover slider, switch:checked:active slider {
 
 .cheatsheet .category .awesome_icon.key {
     padding: 4px;
+}
+
+/* -----------------------------------------------------
+ * Material
+ * ----------------------------------------------------- */
+
+.material_icon {
+    all: unset;
+    font-family: "Material Symbols Outlined", "Material Symbols Sharp";
 }
