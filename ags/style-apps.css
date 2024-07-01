@@ -249,15 +249,23 @@
 }
 
 .emojis .emoji {
-    font-weight: 300;
     min-height: 35px;
     min-width: 35px;
     padding: 0px;
 }
 
+.emojis .emoji:active {
+    background-color: @secondaryContainer;
+}
+
+.emojis .emoji label {
+    font-size: 20px;
+}
+
 .emojis .title {
     padding-left: 16px;
     color: @onSurfaceVariant;
+    margin-top: 3px;
 }
 
 .emojis button:focus {
