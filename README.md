@@ -27,7 +27,7 @@ cd dotfiles
 
 - Sidebar
   
-[![Screenshot](screenshots/sidebar.png "Sidebar")](screenshots/sidebar.png) [![Screenshot](screenshots/sidebar-system.png "Sidebar system info")](screenshots/sidebar-system.png)
+[![Screenshot](screenshots/sidebar.png "Sidebar")](screenshots/sidebar.png)[![Screenshot](screenshots/sidebar-system.png "Sidebar system info")](screenshots/sidebar-system.png)
 
 - Settings
   
@@ -42,6 +42,7 @@ cd dotfiles
 [![Screenshot](screenshots/apps-menu.png "Apps")](screenshots/apps-menu.png)
 
 - Lock Screen (hyprlock)
+
 [![Screenshot](screenshots/hyprlock.png "Hyprlock")](screenshots/hyprlock.png)
 
 - Gtk theme:
@@ -50,6 +51,11 @@ cd dotfiles
 [![Screenshot](screenshots/light-theme.png "Light gtk theme")](screenshots/light-theme.png)
 
 - List of keybindings
+
 [![Screenshot](screenshots/cheatsheet.png "CheatSheet")](screenshots/cheatsheet.png)
+
+- Emoji picker
+
+[![Screenshot](screenshots/emoji.png "emoji picker")](screenshots/emoji.png)
 
 > I got some code for AGS from [end-4](https://github.com/end-4/dots-hyprland/) and [kotontrion](https://github.com/kotontrion/dotfiles) configs, thanks to them.
