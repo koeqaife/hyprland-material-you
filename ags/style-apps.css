@@ -208,3 +208,58 @@
     background-position: center;
     background-repeat: no-repeat;
 }
+
+/* -----------------------------------------------------
+ * Emojis
+ * ----------------------------------------------------- */
+
+.emojis {
+    background-color: @background;
+}
+
+.emojis .emoji_category {
+    font-weight: 300;
+    min-height: 35px;
+    min-width: 35px;
+    padding: 0px;
+}
+
+.emojis .emoji_category.active {
+    background-color: @secondaryContainer;
+    color: @onSecondaryContainer;
+}
+
+.emojis .emoji_category.active .icon {
+    color: @onSecondaryContainer;
+}
+
+.emojis .top_bar {
+    background: @surfaceContainer;
+    padding-left: 10px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.emojis scrollbar {
+    opacity: 0;
+}
+
+.emojis scrollbar:hover {
+    opacity: 0.1;
+}
+
+.emojis .emoji {
+    font-weight: 300;
+    min-height: 35px;
+    min-width: 35px;
+    padding: 0px;
+}
+
+.emojis .title {
+    padding-left: 16px;
+    color: @onSurfaceVariant;
+}
+
+.emojis button:focus {
+    background-color: transparent;
+}
