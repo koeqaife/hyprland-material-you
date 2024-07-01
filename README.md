@@ -27,7 +27,7 @@ cd dotfiles
 
 - Sidebar
   
-[![Screenshot](screenshots/sidebar.png "Sidebar")](screenshots/sidebar.png) [![Screenshot](screenshots/sidebar-system.png "Sidebar system info")](screenshots/sidebar-system.png)
+[![Screenshot](screenshots/sidebar.png "Sidebar")](screenshots/sidebar.png)[![Screenshot](screenshots/sidebar-system.png "Sidebar system info")](screenshots/sidebar-system.png)
 
 - Settings
   
