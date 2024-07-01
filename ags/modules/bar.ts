@@ -335,6 +335,9 @@ function TaskBar() {
                 if (item.class == "com.github.Aylur.ags") {
                     if (item.initialTitle == "Settings") {
                         icon = "emblem-system-symbolic"
+                    } 
+                    else if (item.initialTitle == "Emoji Picker") {
+                        icon = "face-smile-symbolic"
                     }
                 }
                 else

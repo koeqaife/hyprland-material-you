@@ -9,6 +9,7 @@ import { media } from "./modules/media.ts"
 import { cliphist } from "./modules/cliphist.ts"
 import { sidebar } from "./modules/sidebar/main.ts"
 import {} from 'apps/settings/main.ts';
+import {} from 'apps/emoji/main.ts';
 import { cheatsheet } from 'modules/cheatsheet.ts';
 import Window from 'types/widgets/window';
 const GLib = imports.gi.GLib;
