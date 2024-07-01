@@ -248,7 +248,8 @@ window.notification-popups box.notifications {
     border-color: @outlineVariant;
 }
 
-.applauncher_box {
+.applauncher_box separator {
+    margin: 0px;
 }
 
 .applauncher_entry {
@@ -310,11 +311,15 @@ window.notification-popups box.notifications {
  * Clipboard history
  * ----------------------------------------------------- */
 
- .cliphistory_box {
+.cliphistory_box {
     border-radius: 24px;
     background-color: @background;
     border: 2px solid;
     border-color: @outlineVariant;
+}
+
+.cliphistory_box separator {
+    margin: 0px;
 }
 
 .cliphistory_entry {
