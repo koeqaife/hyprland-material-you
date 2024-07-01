@@ -249,10 +249,11 @@ window.notification-popups box.notifications {
 }
 
 .applauncher_box {
-    padding: 11px;
 }
 
 .applauncher_entry {
+    margin: 11px;
+
     background-color: @surfaceContainerHigh;
     border: none;
     outline: none;
@@ -269,30 +270,31 @@ window.notification-popups box.notifications {
 }
 
 .application_container {
-    border-radius: 100px;
+    border-radius: 0px;
     border: none;
     outline: none;
+    margin: 0px;
+    min-height: 47px;
+}
+
+.application_container image {
+    margin-left: 11px;
 }
 
 .application_container:hover {
-    background-color: @surfaceContainerHighest;
-}
-
-.application_container:focus label {
-    color: @onPrimary;
+    background-color: mix(@onSurface, @surface, 0.92)
 }
 
 .application_container:focus {
-    background-color: @primary;
+    background-color: mix(@onSurface, @surface, 0.8);
     border: 0px solid;
-    border-radius: 34px;
     border: none;
     outline: none;
 }
 
 .application_divider {
     color: @outline;
-    margin: 5px 0px 5px 0px;
+    margin: 0px 0px 0px 0px;
 }
 
 .application_label {
@@ -315,10 +317,6 @@ window.notification-popups box.notifications {
     border-color: @outlineVariant;
 }
 
-.cliphistory_box {
-    padding: 11px;
-}
-
 .cliphistory_entry {
     background-color: @surfaceContainerHigh;
     color: @onSurface;
@@ -328,34 +326,35 @@ window.notification-popups box.notifications {
     margin-bottom: 16px;
     padding: 5px;
     padding-left: 25px;
+    margin: 11px;
 }
 
 .entry_container {
-    border-radius: 100px;
     border: none;
     outline: none;
-    min-height: 30px;
+    border-radius: 0px;
+    min-height: 40px;
+}
+
+.entry_container label {
+    margin-left: 11px;
+    margin-right: 11px;
 }
 
 .entry_container:hover {
-    background-color: @surfaceContainerHighest;
-}
-
-.entry_container:focus .entry_label {
-    color: @onPrimary;
+    background-color: mix(@onSurface, @surface, 0.92)
 }
 
 .entry_container:focus {
-    background-color: @primary;
+    background-color: mix(@onSurface, @surface, 0.8);
     border: 0px solid;
-    border-radius: 34px;
     border: none;
     outline: none;
 }
 
 .entry_divider {
     color: @outline;
-    margin: 5px 0px 5px 0px;
+    margin: 0px;
 }
 
 .entry_label {
