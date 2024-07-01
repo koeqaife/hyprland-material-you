@@ -86,11 +86,11 @@
 .settings .error_container {
     padding-left: 16px;
     padding-right: 16px;
-    background-color: @errorContainer;   
+    background-color: @errorContainer;
 }
 
 .settings .error_container label {
-    color: @onErrorContainer;   
+    color: @onErrorContainer;
 }
 
 .settings box {
@@ -147,14 +147,16 @@
     border-color: @outlineVariant;
 }
 
-.settings entry, .settings combobox {
+.settings entry,
+.settings combobox {
     min-width: 30px;
     min-height: 32px;
     border-radius: 4px;
     background-color: @surfaceContainerHigh;
 }
 
-.settings entry label, .settings combobox label {
+.settings entry label,
+.settings combobox label {
     color: @onSurface;
     font-weight: normal;
 }
