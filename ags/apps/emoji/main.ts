@@ -130,11 +130,13 @@ function RecentPage() {
     });
     box.hook(recent, (self) => {
         Utils.idle(() => {
-            const flow = Widget.FlowBox();
+            const flow = Widget.FlowBox({
+                homogeneous: true
+            });
+            flow.set_min_children_per_line(5);
+            flow.set_max_children_per_line(25);
             for (const emojiKey in recent.value) {
                 let emoji = emojiList[emojiKey];
-                flow.set_min_children_per_line(5);
-                flow.set_max_children_per_line(25);
                 flow.add(Widget.Button({
                     class_name: "standard_icon_button emoji",
                     label: emoji,
@@ -170,11 +172,13 @@ function SearchPage(search: VType<string>) {
         Utils.idle(() => {
             if (search.value.length == 0)
                 return
-            const flow = Widget.FlowBox();
+            const flow = Widget.FlowBox({
+                homogeneous: true
+            });
+            flow.set_min_children_per_line(5);
+            flow.set_max_children_per_line(25);
             for (const emojiKey in emojiList) {
                 let emoji = emojiList[emojiKey];
-                flow.set_min_children_per_line(5);
-                flow.set_max_children_per_line(25);
                 if (searchString(emojiKey, search.value))
                     flow.add(Widget.Button({
                         class_name: "standard_icon_button emoji",
@@ -215,12 +219,14 @@ function Page(category) {
                 hpack: "start",
             }), false, false, 0
         )
-        const flow = Widget.FlowBox();
+        const flow = Widget.FlowBox({
+            homogeneous: true
+        });
+        flow.set_min_children_per_line(5);
+        flow.set_max_children_per_line(25);
         let emojis = category[subcategoryKey];
         for (let emojiKey in emojis) {
             let emoji = emojis[emojiKey];
-            flow.set_min_children_per_line(5);
-            flow.set_max_children_per_line(25);
             flow.add(Widget.Button({
                 class_name: "standard_icon_button emoji",
                 label: emoji,
