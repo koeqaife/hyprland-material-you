@@ -143,7 +143,6 @@ function Page(category) {
                 },
                 tooltipText: emojiKey.replace(/^e\d+-\d+/, '').replaceAll("-", " ").trim()
             }))
-            // print(`    ${emojiKey}: ${emoji}`);
         }
         box.pack_start(flow, false, false, 0)
     }
@@ -205,14 +204,9 @@ function EmojiList() {
         placeholder_text: "Search",
         class_name: "search",
         on_change: (self) => {
-            if (self.text!.length == 0)
-                search.setValue("");
+            search.setValue(entry.text!)
         }
     })
-    Utils.interval(250, () => {
-        if (entry.text && entry.text != search.value)
-            search.setValue(entry.text!)
-    }, entry)
 
     return Widget.Box({
         class_name: "emoji_list",
