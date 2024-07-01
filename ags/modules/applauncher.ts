@@ -144,7 +144,7 @@ const Applauncher = ({ width = 500, height = 500, spacing = 12 }) => {
         margin_left: 14,
         children: [
             entry,
-
+            Widget.Separator(),
             Widget.Scrollable({
                 hscroll: "never",
                 css: `min-width: ${width}px;`
