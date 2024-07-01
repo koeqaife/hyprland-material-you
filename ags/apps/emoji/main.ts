@@ -1,13 +1,51 @@
 import { RegularWindow } from "apps/window";
 import { MaterialIcon } from "icons";
 import Gtk from "gi://Gtk?version=3.0"
-import { Binding } from "types/service";
 import { Variable as VType } from "types/variable";
-import Window from '../../types/widgets/window';
+const Gio = imports.gi.Gio;
+const GLib = imports.gi.GLib;
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
 
 const jsonData = Utils.readFile(`${App.configDir}/assets/emoji.json`)
 const hyprland = await Service.import("hyprland")
 let current_window;
+const current_page = Variable("recent");
+
+const RECENT_EMOJI_FILE = Gio.File.new_for_path(
+    GLib.build_filenamev([GLib.get_home_dir(), '.cache', 'recent_emoji.json'])
+);
+const recent = Variable(readRecentEmoji());
+
+
+function readRecentEmoji() {
+    try {
+        if (!RECENT_EMOJI_FILE.query_exists(null)) {
+            return {};
+        }
+        const [, contents] = RECENT_EMOJI_FILE.load_contents(null);
+        return JSON.parse(decoder.decode(contents));
+    } catch (error) {
+        return {};
+    }
+}
+
+function writeRecentEmoji(recent: any) {
+    const data = JSON.stringify(recent, null, 2);
+    RECENT_EMOJI_FILE.replace_contents(
+        encoder.encode(data),
+        null,
+        false,
+        Gio.FileCreateFlags.REPLACE_DESTINATION,
+        null
+    );
+}
+
+function addRecentEmoji(name: string, emoji: string) {
+    recent.value[name] = emoji;
+    recent.setValue(moveItemsToFront(name, recent.value))
+    writeRecentEmoji(recent.value);
+}
 
 const emojiData = JSON.parse(jsonData);
 
@@ -27,6 +65,17 @@ function extractEmojis(data) {
     return emojis;
 }
 
+function moveItemsToFront(item: any, arr: any) {
+    let new_array = {};
+    new_array[item] = arr[item];
+    for (let _item in arr) {
+        if (_item != item)
+            new_array[_item] = arr[_item];
+    }
+
+    return new_array;
+}
+
 const CATEGORY_ICONS = {
     "smileys-emotion": "mood",
     "people-body": "emoji_people",
@@ -40,6 +89,7 @@ const CATEGORY_ICONS = {
 }
 
 export async function OpenEmojiPicker() {
+    current_page.setValue("recent")
     if (current_window) {
         const _current_workspace = hyprland.active.workspace.id;
         const _client = hyprland.clients.find(client => {
@@ -69,6 +119,44 @@ function searchString(str: string, keywords: string) {
 
     return true;
 }
+
+
+function RecentPage() {
+    const emojiList = extractEmojis(emojiData);
+    const box = Widget.Box({
+        vertical: true,
+        vexpand: true,
+        vpack: "start"
+    });
+    box.hook(recent, (self) => {
+        Utils.idle(() => {
+            const flow = Widget.FlowBox();
+            for (const emojiKey in recent.value) {
+                let emoji = emojiList[emojiKey];
+                flow.set_min_children_per_line(5);
+                flow.set_max_children_per_line(25);
+                flow.add(Widget.Button({
+                    class_name: "standard_icon_button emoji",
+                    label: emoji,
+                    attribute: { emoji: emoji },
+                    on_clicked: (self) => {
+                        Utils.execAsync(`wl-copy ${self.attribute.emoji}`).catch(print)
+                        current_window.hide()
+                    },
+                    tooltipText: emojiKey.replace(/^e\d+-\d+/, '').replaceAll("-", " ").trim()
+                }))
+            }
+            box.child = flow;
+        })
+    })
+
+    return Widget.Scrollable({
+        child: box,
+        hscroll: "never",
+        vexpand: true
+    });
+}
+
 
 
 function SearchPage(search: VType<string>) {
@@ -138,6 +226,7 @@ function Page(category) {
                 label: emoji,
                 attribute: { emoji: emoji },
                 on_clicked: (self) => {
+                    addRecentEmoji(emojiKey, emoji)
                     Utils.execAsync(`wl-copy ${self.attribute.emoji}`).catch(print)
                     current_window.hide()
                 },
@@ -156,7 +245,6 @@ function Page(category) {
 
 function EmojiList() {
     const search = Variable("");
-    const current_page = Variable("smileys-emotion");
     const Button = (icon: string, name: string) => Widget.Button({
         class_name: "emoji_category standard_icon_button",
         child: MaterialIcon(icon),
@@ -171,9 +259,12 @@ function EmojiList() {
     })
 
     let categories_pages = {
-        "search": SearchPage(search)
+        "search": SearchPage(search),
+        "recent": RecentPage()
     };
-    let categories_buttons: Gtk.Widget[] = [];
+    let categories_buttons = [
+        Button("schedule", "recent")
+    ];
     for (const name in emojiData) {
         categories_buttons = [...categories_buttons, Button(CATEGORY_ICONS[name]!, name)];
         categories_pages[name] = Page(emojiData[name]);
@@ -208,7 +299,7 @@ function EmojiList() {
         }
     })
 
-    return Widget.Box({
+    const box = Widget.Box({
         class_name: "emoji_list",
         vertical: true,
         children: [
@@ -226,6 +317,8 @@ function EmojiList() {
             stack
         ]
     })
+
+    return box
 }
 
 export const EmojisWindow = () => {
@@ -249,5 +342,6 @@ export const EmojisWindow = () => {
         window.hide()
         return true
     })
+
     return window
 }
