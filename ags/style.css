@@ -568,7 +568,7 @@ window.notification-popups box.notifications {
     color: @onPrimary
 }
 
-.management_button.active .icon{
+.management_button.active .icon {
     color: @onPrimary;
     font-weight: normal;
 }
@@ -624,7 +624,7 @@ window.notification-popups box.notifications {
     padding: 10px;
 }
 
-.system_scale slider {       
+.system_scale slider {
     color: @onPrimary;
     background-color: @primary;
     background-size: 20px 20px;
@@ -666,14 +666,16 @@ window.notification-popups box.notifications {
 
 .system_scale highlight {
     border-radius: 100px 0px 0px 100px;
-    
+
     margin-top: -13px;
     margin-bottom: -13px;
     margin-left: -16px;
     background-color: @primary;
 }
 
-.system_box .slider_box, .system_box .usage_box, .system_box .info_box {
+.system_box .slider_box,
+.system_box .usage_box,
+.system_box .info_box {
     background-color: @surfaceContainerLowest;
     padding: 26px;
     border-radius: 14px;
@@ -738,8 +740,7 @@ window.notification-popups box.notifications {
     color: @surfaceContainerHigh;
 }
 
-.dotbutton:hover {
-}
+.dotbutton:hover {}
 
 .dotbutton.active label {
     color: @secondary;
@@ -759,8 +760,10 @@ window.notification-popups box.notifications {
     padding-right: 24px;
 }
 
-.outline_button label, .outline_button .icon,
-.outline_button .awesome_icon, .outline_button image {
+.outline_button label,
+.outline_button .icon,
+.outline_button .awesome_icon,
+.outline_button image {
     color: @primary;
     font-weight: 300;
 }
@@ -783,8 +786,10 @@ window.notification-popups box.notifications {
     padding: 0px;
 }
 
-.filled_tonal_button label, .filled_tonal_button .icon,
-.filled_tonal_button .awesome_icon, .filled_tonal_button image {
+.filled_tonal_button label,
+.filled_tonal_button .icon,
+.filled_tonal_button .awesome_icon,
+.filled_tonal_button image {
     color: @onSecondaryContainer;
     font-weight: 400;
     margin: 0px;
@@ -799,6 +804,7 @@ window.notification-popups box.notifications {
     background-color: mix(@secondaryContainer, @onSecondaryContainer, 0.1);
     box-shadow: none;
 }
+
 /* standard icon button */
 .standard_icon_button {
     border-radius: 100px;
@@ -806,8 +812,10 @@ window.notification-popups box.notifications {
     color: @onSurfaceVariant;
 }
 
-.standard_icon_button label, .standard_icon_button .icon,
-.standard_icon_button .awesome_icon, .standard_icon_button image {
+.standard_icon_button label,
+.standard_icon_button .icon,
+.standard_icon_button .awesome_icon,
+.standard_icon_button image {
     color: @onSurfaceVariant;
     margin: 0px;
     padding: 0px;
@@ -830,8 +838,10 @@ window.notification-popups box.notifications {
     padding-right: 24px;
 }
 
-.standard_button label, .standard_button .icon,
-.standard_button .awesome_icon, .standard_button image {
+.standard_button label,
+.standard_button .icon,
+.standard_button .awesome_icon,
+.standard_button image {
     color: @onSurfaceVariant;
     margin: 0px;
     padding: 0px;
@@ -849,8 +859,10 @@ window.notification-popups box.notifications {
     background-color: transparent;
 }
 
-.standard_button.disabled label, .standard_button.disabled .icon,
-.standard_button.disabled .awesome_icon, .standard_button.disabled image {
+.standard_button.disabled label,
+.standard_button.disabled .icon,
+.standard_button.disabled .awesome_icon,
+.standard_button.disabled image {
     color: mix(@onSurface, transparent, 0.38);
 }
 
@@ -863,8 +875,10 @@ window.notification-popups box.notifications {
     padding-right: 24px;
 }
 
-.filled_button label, .filled_button .icon,
-.filled_button .awesome_icon, .filled_button image {
+.filled_button label,
+.filled_button .icon,
+.filled_button .awesome_icon,
+.filled_button image {
     color: @onPrimary;
     margin: 0px;
     padding: 0px;
@@ -883,8 +897,10 @@ window.notification-popups box.notifications {
     color: mix(@onSurface, @surface, 0.38);
 }
 
-.filled_button.disabled label, .filled_button.disabled .icon,
-filled_button.disabled .awesome_icon, .filled_button.disabled image {
+.filled_button.disabled label,
+.filled_button.disabled .icon,
+filled_button.disabled .awesome_icon,
+.filled_button.disabled image {
     color: mix(@onSurface, @surface, 0.38);
 }
 
@@ -893,7 +909,7 @@ filled_button.disabled .awesome_icon, .filled_button.disabled image {
  * ----------------------------------------------------- */
 
 
- .navigation {
+.navigation {
     background-color: @surfaceContainer;
     padding-top: 3px;
     padding-bottom: 3px;
@@ -950,7 +966,7 @@ filled_button.disabled .awesome_icon, .filled_button.disabled image {
 
 
 switch {
-	border: 2px solid;
+    border: 2px solid;
     border-radius: 100px;
     border-color: @outline;
     background-color: @surfaceContainerHighest;
@@ -970,7 +986,7 @@ switch slider {
 }
 
 switch:disabled {
-	background-color: mix(@surfaceContainerHighest, transparent, 0.3);
+    background-color: mix(@surfaceContainerHighest, transparent, 0.3);
     border-color: mix(@onSurface, transparent, 0.3);
 }
 
@@ -978,16 +994,18 @@ switch:disabled slider {
     background-color: mix(@onSurface, transparent, 0.3);
 }
 
-switch:hover, switch:active {
+switch:hover,
+switch:active {
     background-color: mix(@surfaceContainerHighest, @onSurface, 0.08);
 }
 
-switch:hover slider, switch:active slider {
+switch:hover slider,
+switch:active slider {
     background-color: @onSurfaceVariant;
 }
 
 switch:checked {
-	background-color: @primary;
+    background-color: @primary;
     border-color: transparent;
 }
 
@@ -1000,7 +1018,7 @@ switch:checked slider {
 }
 
 switch:checked:disabled {
-	background-color: mix(@onSurface, transparent, 0.3);
+    background-color: mix(@onSurface, transparent, 0.3);
     border-color: transparent;
 }
 
@@ -1008,11 +1026,13 @@ switch:checked:disabled slider {
     background-color: mix(@surface, transparent, 0.3);
 }
 
-switch:checked:hover, switch:checked:active {
-	background-color: @primary;
+switch:checked:hover,
+switch:checked:active {
+    background-color: @primary;
 }
 
-switch:checked:hover slider, switch:checked:active slider {
+switch:checked:hover slider,
+switch:checked:active slider {
     background-color: @primaryContainer;
 }
 
