@@ -52,4 +52,7 @@ cd dotfiles
 - List of keybindings
 [![Screenshot](screenshots/cheatsheet.png "CheatSheet")](screenshots/cheatsheet.png)
 
+- Emoji picker
+[![Screenshot](screenshots/emoji.png "emoji")](screenshots/emoji.png)
+
 > I got some code for AGS from [end-4](https://github.com/end-4/dots-hyprland/) and [kotontrion](https://github.com/kotontrion/dotfiles) configs, thanks to them.
