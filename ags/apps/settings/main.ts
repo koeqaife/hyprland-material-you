@@ -127,8 +127,11 @@ export const SettingsWindow = (cur_tab: string) => {
         default_width: 850,
         class_name: "settings",
         child: Settings(cur_tab),
-        setup(win) {
+        setup(win: any) {
             current_window = win;
+            win.keybind("Escape", () => {
+                win.close()
+            })
         },
         visible: true,
     });
