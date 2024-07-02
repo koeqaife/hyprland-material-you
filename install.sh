@@ -202,19 +202,19 @@ main() {
     fi
     ask_continue "Proceed with installing packages?" false && install_packages
     ask_continue "Proceed with setting up sensors?" false && setup_sensors
-    ask_continue "Proceed with checking config folders?" && check_config_folders
-    ask_continue "Proceed with installing python-materialyoucolor?" && install_python_materialyoucolor
+    ask_continue "Proceed with checking config folders?*" && check_config_folders
+    ask_continue "Proceed with installing python-materialyoucolor?*" && install_python_materialyoucolor
     ask_continue "Proceed with installing Tela Nord icons?" false && install_tela_nord_icons
-    ask_continue "Proceed with setting up colors?" && setup_colors
+    ask_continue "Proceed with setting up colors?*" && setup_colors
     ask_continue "Proceed with setting up SDDM?" false && setup_sddm
-    ask_continue "Proceed with copying files?" && copy_files
-    ask_continue "Proceed with creating links?" && create_links
-    ask_continue "Proceed with installing plugins?" && install_plugins
+    ask_continue "Proceed with copying files?*" && copy_files
+    ask_continue "Proceed with creating links?*" && create_links
+    ask_continue "Proceed with installing plugins?*" && install_plugins
     ask_continue "Proceed with installing Vencord?" false && install_vencord
     ask_continue "Proceed with removing GTK buttons?" false && remove_gtk_buttons
-    ask_continue "Proceed with setting up services?" && setup_services
-    ask_continue "Proceed with updating user directories?" && update_user_dirs
-    ask_continue "Proceed with miscellaneous tasks?" && misc_tasks
+    ask_continue "Proceed with setting up services?*" && setup_services
+    ask_continue "Proceed with updating user directories?*" && update_user_dirs
+    ask_continue "Proceed with miscellaneous tasks?*" && misc_tasks
     
     echo "Please restart your PC"
 }
