@@ -334,35 +334,35 @@ window.notification-popups box.notifications {
     margin: 11px;
 }
 
-.entry_container {
+.clip_container {
     border: none;
     outline: none;
     border-radius: 0px;
     min-height: 40px;
 }
 
-.entry_container label {
+.clip_container label {
     margin-left: 11px;
     margin-right: 11px;
 }
 
-.entry_container:hover {
+.clip_container:hover {
     background-color: mix(@onSurface, @surface, 0.92)
 }
 
-.entry_container:focus {
+.clip_container:focus {
     background-color: mix(@onSurface, @surface, 0.8);
     border: 0px solid;
     border: none;
     outline: none;
 }
 
-.entry_divider {
+.clip_divider {
     color: @outline;
     margin: 0px;
 }
 
-.entry_label {
+.clip_label {
     color: @onSurface;
     font-weight: normal;
 }
