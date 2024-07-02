@@ -9,8 +9,23 @@ window.bar {
     font-weight: bold;
 }
 
-button {
+button, box {
     background: transparent;
+    transition-property: all, border-image, background-size, background-image;
+    transition-duration: 0.3s, 0.3s, 0.3s, 0.3s;
+    transition-timing-function: ease-out;
+    outline: none;
+    background-image: radial-gradient(circle, transparent 10%, transparent 0%);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 1000% 1000%;
+    background-color: transparent;
+}
+
+button:active, box:active {
+    transition-duration: 0.3s, 0.3s, 0ms, 0ms;
+    animation: ripple 0.3s ease-out forwards;
+    background-size: 0% 0%;
 }
 
 highlight {
@@ -296,6 +311,10 @@ window.notification-popups box.notifications {
     outline: none;
 }
 
+.application_container:active {
+    background-image: radial-gradient(circle, mix(@onSurface, @surface, 0.78) 10%, transparent 0%);
+}
+
 .application_divider {
     color: @outline;
     margin: 0px 0px 0px 0px;
@@ -358,6 +377,10 @@ window.notification-popups box.notifications {
     border: 0px solid;
     border: none;
     outline: none;
+}
+
+.clip_container:active {
+    background-image: radial-gradient(circle, mix(@onSurface, @surface, 0.78) 10%, transparent 0%);
 }
 
 .clip_container .clip_id {
@@ -556,6 +579,15 @@ window.notification-popups box.notifications {
     background: @surfaceContainer;
     border: none;
     outline: none;
+
+    transition-property: all, border-image, background-size, background-image;
+    transition-duration: 0.3s, 0.3s, 0.3s, 0.3s;
+    transition-timing-function: ease-out;
+    outline: none;
+    background-image: radial-gradient(circle, transparent 10%, transparent 0%);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 1000% 1000%;
 }
 
 .management_button label {
@@ -577,7 +609,14 @@ window.notification-popups box.notifications {
 }
 
 .management_button:hover {
-    background-color: @surfaceContainerHigh;
+    background-color: mix(@onSurfaceVariant, @surface, 0.9);
+}
+
+.management_button:active {
+    transition-duration: 0.3s, 0.3s, 0ms, 0ms;
+    animation: ripple 0.3s ease-out forwards;
+    background-size: 0% 0%;
+    background-image: radial-gradient(circle, mix(@onSurface, @surface, 0.7) 10%, transparent 0%);
 }
 
 .management_button.active label {
@@ -592,6 +631,13 @@ window.notification-popups box.notifications {
 .management_button.active {
     background-color: @primary;
     border: 0px solid;
+}
+
+.management_button.active:active {
+    transition-duration: 0.3s, 0.3s, 0ms, 0ms;
+    animation: ripple 0.3s ease-out forwards;
+    background-size: 0% 0%;
+    background-image: radial-gradient(circle, mix(@onPrimary, @primary, 0.7) 10%, transparent 0%);
 }
 
 .management_button.waiting label {
@@ -793,6 +839,13 @@ window.notification-popups box.notifications {
     border-color: @primary;
 }
 
+.outline_button:active {
+    background-image: radial-gradient(circle, mix(@primaryFixed, transparent, 0.7) 10%, transparent 0%);
+
+    /* background-color: mix(@primaryFixed, transparent, 0.9); */
+    /* border-color: @primary; */
+}
+
 /* filled tonal */
 .filled_tonal_button {
     background-color: @secondaryContainer;
@@ -817,7 +870,8 @@ window.notification-popups box.notifications {
 }
 
 .filled_tonal_button:active {
-    background-color: mix(@secondaryContainer, @onSecondaryContainer, 0.1);
+    background-image: radial-gradient(circle, mix(@secondaryContainer, @onSecondaryContainer, 0.1) 10%, transparent 0%);
+    /* background-color: mix(@secondaryContainer, @onSecondaryContainer, 0.1); */
     box-shadow: none;
 }
 
@@ -842,7 +896,7 @@ window.notification-popups box.notifications {
 }
 
 .standard_icon_button:active {
-    background-color: mix(@onSurfaceVariant, transparent, 0.7);
+    background-image: radial-gradient(circle, mix(@onSurfaceVariant, transparent, 0.7) 10%, transparent 0%);
 }
 
 /* standard button */
@@ -868,7 +922,7 @@ window.notification-popups box.notifications {
 }
 
 .standard_button:active {
-    background-color: mix(@onSurfaceVariant, @surface, 0.7);
+    background-image: radial-gradient(circle, mix(@onSurfaceVariant, @surface, 0.7) 10%, transparent 0%);
 }
 
 .standard_button.disabled {
@@ -905,7 +959,7 @@ window.notification-popups box.notifications {
 }
 
 .filled_button:active {
-    background-color: mix(@onPrimary, @primary, 0.8);
+    background-image: radial-gradient(circle, mix(@onPrimary, @primary, 0.8) 10%, transparent 0%);
 }
 
 .filled_button.disabled {
@@ -1127,4 +1181,10 @@ switch:checked:active slider {
 .material_icon {
     all: unset;
     font-family: "Material Symbols Outlined", "Material Symbols Sharp";
+}
+
+@keyframes ripple {
+    to {
+        background-size: 1000% 1000%;
+    }
 }

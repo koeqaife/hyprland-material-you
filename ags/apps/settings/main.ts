@@ -57,7 +57,7 @@ function Settings(cur_tab: string) {
                 Widget.Label(label)
             ]
         }),
-        class_name: current_tab.bind().as(c => c == name ? "row active" : "row")
+        class_name: current_tab.bind().as(c => c == name ? "sidebar_row active" : "sidebar_row")
     })
     const sidebar = Widget.Box({
         vertical: true,
