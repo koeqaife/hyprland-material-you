@@ -127,7 +127,7 @@ copy_files() {
 
 create_links() {
     echo ":: Creating links"
-    ln -f /home/mrdan/dotfiles/electron-flags.conf ~/.config/electron-flags.conf
+    ln -f $HOME/dotfiles/electron-flags.conf $HOME/.config/electron-flags.conf
     if [ -d "$HOME/wallpaper" ]; then
         echo ":: Error: directory wallpaper already exists in home"
     else
