@@ -634,10 +634,7 @@ window.notification-popups box.notifications {
 }
 
 .management_button.active:active {
-    transition-duration: 0.3s, 0.3s, 0ms, 0ms;
-    animation: ripple 0.3s ease-out forwards;
-    background-size: 0% 0%;
-    background-image: radial-gradient(circle, mix(@onPrimary, @primary, 0.7) 10%, transparent 0%);
+    background-image: radial-gradient(circle, transparent 10%, transparent 0%);
 }
 
 .management_button.waiting label {
