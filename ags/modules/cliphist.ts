@@ -9,19 +9,35 @@ type EntryObject = {
     content: string;
     entry: string;
 };
-
+// ·
 
 function ClipHistItem(entry: string) {
     let [id, ...content] = entry.split('\t');
     let clickCount = 0;
     let button = Widget.Button({
         class_name: "clip_container",
-        child: Widget.Label({
-            label: entry,
-            class_name: "clip_label",
-            xalign: 0,
-            vpack: "center",
-            truncate: "end",
+        child: Widget.Box({
+            children: [
+                Widget.Label({
+                    label: id,
+                    class_name: "clip_id",
+                    xalign: 0,
+                    vpack: "center",
+                }),
+                Widget.Label({
+                    label: "・",
+                    class_name: "dot_divider",
+                    xalign: 0,
+                    vpack: "center",
+                }),
+                Widget.Label({
+                    label: content.join(' ').trim(),
+                    class_name: "clip_label",
+                    xalign: 0,
+                    vpack: "center",
+                    truncate: "end",
+                }),
+            ]
         })
     })
 

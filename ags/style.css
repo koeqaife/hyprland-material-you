@@ -357,6 +357,18 @@ window.notification-popups box.notifications {
     outline: none;
 }
 
+.clip_container .clip_id {
+    font-weight: 200;
+    font-feature-settings: "tnum";
+}
+
+.clip_container .dot_divider {
+    font-weight: 900;
+    font-size: 12px;
+    min-width: 0px;
+    margin: 0px;
+}
+
 .clip_divider {
     color: @outline;
     margin: 0px;
