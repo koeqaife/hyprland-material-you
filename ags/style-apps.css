@@ -130,7 +130,7 @@
     background-color: mix(@onSurface, @surface, 0.92)
 }
 
-.settings .row:active {
+.settings .row:active:not(.focused) {
     transition-duration: 0.3s, 0.3s, 0ms, 0ms;
     animation: ripple 0.3s ease-out forwards;
     background-size: 0% 0%;
