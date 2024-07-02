@@ -5,6 +5,7 @@ mv $HOME/.config/gtk-4.0 --backup $HOME/.config/gtk-4.0-bk
 cp -r -f $HOME/dotfiles/setup/gtk-3.0 $HOME/.config/
 cp -r -f $HOME/dotfiles/setup/gtk-4.0 $HOME/.config/
 echo ":: wl-gammarelay..."
+mkdir -p $HOME/.config/systemd/user/
 cp $HOME/dotfiles/setup/wl-gammarelay.service $HOME/.config/systemd/user/
 systemctl --user daemon-reload
 systemctl --user enable --now wl-gammarelay.service
