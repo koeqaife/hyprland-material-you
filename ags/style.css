@@ -12,9 +12,8 @@ window.bar {
 button, box {
     background: transparent;
     transition-property: all, border-image, background-size, background-image;
-    transition-duration: 0.3s, 0.3s, 0.3s, 0.3s;
+    transition-duration: 0.2s, 0.3s, 0.3s, 0.3s;
     transition-timing-function: ease-out;
-    outline: none;
     background-image: radial-gradient(circle, transparent 10%, transparent 0%);
     background-repeat: no-repeat;
     background-position: center;
@@ -918,7 +917,7 @@ window.notification-popups box.notifications {
     background-color: mix(@onSurfaceVariant, @surface, 0.8);
 }
 
-.standard_button:active {
+.standard_button:active:not(.disabled) {
     background-image: radial-gradient(circle, mix(@onSurfaceVariant, @surface, 0.7) 10%, transparent 0%);
 }
 
@@ -955,7 +954,7 @@ window.notification-popups box.notifications {
     background-color: mix(@onPrimary, @primary, 0.92);
 }
 
-.filled_button:active {
+.filled_button:active:not(.disabled)  {
     background-image: radial-gradient(circle, mix(@onPrimary, @primary, 0.8) 10%, transparent 0%);
 }
 
@@ -990,12 +989,19 @@ filled_button.disabled .awesome_icon,
 }
 
 .navigation_button .container {
+    transition-property: all, border-image, background-size, background-image;
+    transition-duration: 0.3s, 0.3s, 0.3s, 0.3s;
+    transition-timing-function: ease-out;
+    background-image: radial-gradient(circle, transparent 10%, transparent 0%);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 1000% 1000%;
+
     border-radius: 16px;
     padding-left: 5px;
     padding-right: 5px;
-    min-height: 15px;
+    min-height: 25px;
     min-width: 0px;
-    transition-property: min-width, color, background-color, border-color;
 }
 
 .navigation_button .icon {
@@ -1016,13 +1022,17 @@ filled_button.disabled .awesome_icon,
     min-width: 40px;
 }
 
-.navigation_button:active .container {
-    background-color: mix(@onSurface, @surfaceContainer, 0.9);
+.navigation_button.active .container {
+    background-color: @secondaryContainer;
     min-width: 40px;
 }
 
-.navigation_button.active .container {
-    background: @secondaryContainer;
+.navigation_button:active .container {
+    transition-duration: 0.3s, 0.3s, 0ms, 0ms;
+    animation: ripple 0.3s ease-out forwards;
+    background-size: 0% 0%;
+
+    background-image: radial-gradient(circle, mix(@onSurface, @surfaceContainer, 0.87) 10%, transparent 0%);
     min-width: 40px;
 }
 
