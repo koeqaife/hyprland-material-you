@@ -15,10 +15,10 @@ function ClipHistItem(entry: string) {
     let [id, ...content] = entry.split('\t');
     let clickCount = 0;
     let button = Widget.Button({
-        class_name: "entry_container",
+        class_name: "clip_container",
         child: Widget.Label({
             label: entry,
-            class_name: "entry_label",
+            class_name: "clip_label",
             xalign: 0,
             vpack: "center",
             truncate: "end",
@@ -44,7 +44,7 @@ function ClipHistItem(entry: string) {
         children: [
             button,
             Widget.Separator({
-                class_name: "entry_divider",
+                class_name: "clip_divider",
                 orientation: Gtk.Orientation.HORIZONTAL
             })
         ]
