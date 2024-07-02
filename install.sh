@@ -71,7 +71,7 @@ setup_sensors() {
 }
 
 check_config_folders() {
-    local CHECK_CONFIG_FOLDERS="ags alacritty hypr swappy wal rofi"
+    local CHECK_CONFIG_FOLDERS="ags alacritty hypr swappy wal"
     local EXIT="NO"
     
     for dir in $CHECK_CONFIG_FOLDERS; do
@@ -134,7 +134,6 @@ create_links() {
         cp -r $HOME/dotfiles/wallpapers $HOME/wallpaper
     fi
     ln -s $HOME/dotfiles/ags $HOME/.config/ags
-    ln -s $HOME/dotfiles/rofi $HOME/.config/rofi
     ln -s $HOME/dotfiles/alacritty $HOME/.config/alacritty
     ln -s $HOME/dotfiles/hypr $HOME/.config/hypr
     ln -s $HOME/dotfiles/swappy $HOME/.config/swappy
