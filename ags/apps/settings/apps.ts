@@ -3,7 +3,7 @@ import { MaterialIcon } from "icons";
 
 const Row = (app: string, title: string, icon: string) => Widget.EventBox({
     class_name: "row",
-    on_primary_click: self => {
+    on_primary_click_release: self => {
         self.child.children[1]!.activate()
     },
     child: Widget.Box({

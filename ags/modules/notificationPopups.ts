@@ -38,7 +38,7 @@ export const Notification = (notification: NotificationType, dismiss = true) => 
     vertical: true,
     children: [
         Widget.EventBox({
-            on_primary_click: (box) => {
+            on_primary_click_release: (box) => {
                 // @ts-ignore
                 const label: Label<any> = box.child.children[1].children[1];
                 if (label.lines < 0) {
