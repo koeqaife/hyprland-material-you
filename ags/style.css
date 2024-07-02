@@ -631,6 +631,7 @@ window.notification-popups box.notifications {
 .management_button.active {
     background-color: @primary;
     border: 0px solid;
+    background-image: radial-gradient(circle, @primary 10%, transparent 0%);
 }
 
 .management_button.active:active {
@@ -1023,11 +1024,6 @@ filled_button.disabled .awesome_icon,
     min-width: 40px;
 }
 
-.navigation_button.active .container {
-    background-color: @secondaryContainer;
-    min-width: 40px;
-}
-
 .navigation_button:active .container {
     transition-duration: 0.3s, 0.3s, 0ms, 0ms;
     animation: ripple 0.3s ease-out forwards;
@@ -1037,6 +1033,11 @@ filled_button.disabled .awesome_icon,
     min-width: 40px;
 }
 
+.navigation_button.active .container {
+    background-color: @secondaryContainer;
+    background-image: radial-gradient(circle, @secondaryContainer 10%, transparent 0%);
+    min-width: 40px;
+}
 
 /* -----------------------------------------------------
  * Switch

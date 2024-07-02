@@ -57,12 +57,9 @@
     background-image: radial-gradient(circle, mix(@onSurface, @surface, 0.9) 10%, transparent 0%);
 }
 
-.settings .sidebar_row.active:active {
-    background-image: radial-gradient(circle, transparent 10%, transparent 0%);
-}
-
 .settings .sidebar_row.active {
     background-color: @secondaryContainer;
+    background-image: radial-gradient(circle, @secondaryContainer 10%, transparent 0%);
 }
 
 .settings .sidebar_row label {
@@ -138,7 +135,7 @@
 }
 
 .settings .row.focused {
-    background-color: mix(@onSurface, @surface, 0.8)
+    background-color: mix(@onSurface, @surface, 0.8);
 }
 
 .settings .row .title {
