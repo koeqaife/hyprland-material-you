@@ -370,6 +370,7 @@ window.notification-popups box.notifications {
     font-size: 12px;
     min-width: 0px;
     margin: 0px;
+    color: @outlineVariant;
 }
 
 .clip_divider {
