@@ -18,6 +18,7 @@ highlight {
 }
 
 * {
+    margin: 0px;
     border: none;
     outline: none;
     transition: 0.2s ease-in-out;
@@ -135,11 +136,13 @@ separator {
 .time {
     color: @onSurface;
     font-size: 14px;
+    font-feature-settings: "tnum";
 }
 
 .date {
     color: @onSurface;
     font-size: 10px;
+    font-feature-settings: "tnum";
 }
 
 /* -----------------------------------------------------

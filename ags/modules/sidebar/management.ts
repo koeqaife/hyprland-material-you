@@ -105,7 +105,7 @@ function Page1() {
             Widget.Box({
                 orientation: Gtk.Orientation.HORIZONTAL,
                 hexpand: true,
-                spacing: 2.5,
+                spacing: 5,
                 children: [
                     Widget.Button({
                         hexpand: true,
@@ -143,7 +143,7 @@ function Page1() {
             }),
             Widget.Box({
                 orientation: Gtk.Orientation.HORIZONTAL,
-                spacing: 2.5,
+                spacing: 5,
                 hexpand: true,
                 children: [
                     Widget.Button({
@@ -178,7 +178,7 @@ function Page1() {
             }),
             Widget.Box({
                 orientation: Gtk.Orientation.HORIZONTAL,
-                spacing: 2.5,
+                spacing: 5,
                 hexpand: true,
                 children: [
                     Widget.Button({
@@ -242,7 +242,7 @@ function Page2() {
         children: [
             Widget.Box({
                 orientation: Gtk.Orientation.HORIZONTAL,
-                spacing: 2.5,
+                spacing: 5,
                 children: [
                     Widget.Button({
                         hexpand: true,
