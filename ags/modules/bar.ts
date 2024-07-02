@@ -162,25 +162,31 @@ function BatteryLabel() {
 
 
 function SysTray() {
-    const items = systemtray.bind("items")
-        .as(items => items.map(item => {
-            if (item.id.trim() != "nm-applet" && item.id.trim() != "blueman") {
-                return Widget.Button({
-                    child: Widget.Icon({ icon: item.bind("icon") }),
-                    on_primary_click: (_, event) => item.activate(event),
-                    on_secondary_click: (_, event) => item.openMenu(event),
-                    tooltip_markup: item.bind("tooltip_markup"),
-                })
-            } else {
-                return undefined
-            }
-        }))
-
-    // @ts-ignore
     return Widget.Box({
         class_name: "tray",
         spacing: 5,
-        children: items,
+        setup: (self) => {
+            self.hook(systemtray, () => {
+                const items = systemtray.items;
+                // @ts-expect-error
+                self.children = items.map(item => {
+                    if (item.id.trim() != "nm-applet" && item.id.trim() != "blueman") {
+                        return Widget.Button({
+                            child: Widget.Icon({ icon: item.bind("icon") }),
+                            on_primary_click: (_, event) => item.activate(event),
+                            on_secondary_click: (_, event) => item.openMenu(event),
+                            tooltip_markup: item.bind("tooltip_markup"),
+                        })
+                    } else {
+                        return undefined
+                    }
+                });
+                if (self.children.length > 0)
+                    self.visible = true;
+                else
+                    self.visible = false;
+            })
+        }
     })
 }
 
@@ -335,7 +341,7 @@ function TaskBar() {
                 if (item.class == "com.github.Aylur.ags") {
                     if (item.initialTitle == "Settings") {
                         icon = "emblem-system-symbolic"
-                    } 
+                    }
                     else if (item.initialTitle == "Emoji Picker") {
                         icon = "face-smile-symbolic"
                     }
