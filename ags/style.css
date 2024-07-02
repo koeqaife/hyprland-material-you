@@ -615,7 +615,8 @@ window.notification-popups box.notifications {
     transition-duration: 0.3s, 0.3s, 0ms, 0ms;
     animation: ripple 0.3s ease-out forwards;
     background-size: 0% 0%;
-    background-image: radial-gradient(circle, mix(@onSurface, @surface, 0.7) 10%, transparent 0%);
+
+    background-image: radial-gradient(circle, mix(@onSurface, @surface, 0.85) 10%, transparent 0%);
 }
 
 .management_button.active label {
