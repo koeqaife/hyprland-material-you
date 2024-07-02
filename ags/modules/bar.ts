@@ -173,8 +173,8 @@ function SysTray() {
                     if (item.id.trim() != "nm-applet" && item.id.trim() != "blueman") {
                         return Widget.Button({
                             child: Widget.Icon({ icon: item.bind("icon") }),
-                            on_primary_click: (_, event) => item.activate(event),
-                            on_secondary_click: (_, event) => item.openMenu(event),
+                            on_primary_click_release: (_, event) => item.activate(event),
+                            on_secondary_click_release: (_, event) => item.openMenu(event),
                             tooltip_markup: item.bind("tooltip_markup"),
                         })
                     } else {
@@ -207,10 +207,10 @@ function AppLauncher() {
 function Wifi() {
     return Widget.Button({
         class_name: "bar_wifi",
-        on_primary_click: () => {
+        on_primary_click_release: () => {
             OpenSettings("network")
         },
-        on_secondary_click: (_, event) => {
+        on_secondary_click_release: (_, event) => {
             const nm_applet = systemtray.items.find(item => item.id == "nm-applet")
             if (nm_applet) {
                 nm_applet.openMenu(event)
@@ -235,10 +235,10 @@ function Wifi() {
 function Bluetooth() {
     return Widget.Button({
         class_name: "bar_bluetooth",
-        on_primary_click: () => {
+        on_primary_click_release: () => {
             OpenSettings("bluetooth")
         },
-        on_secondary_click: (_, event) => {
+        on_secondary_click_release: (_, event) => {
             const blueman = systemtray.items.find(item => item.id == "blueman")
             if (blueman) {
                 blueman.openMenu(event)
@@ -271,10 +271,10 @@ function MediaPlayer() {
     let metadata = mpris.players[0]?.metadata;
     const button = Widget.Button({
         class_name: "filled_tonal_button",
-        on_primary_click: () => {
+        on_primary_click_release: () => {
             App.toggleWindow("media")
         },
-        on_secondary_click: () => {
+        on_secondary_click_release: () => {
             Utils.execAsync(["playerctl", "play-pause"]).catch(print)
         },
         child: MaterialIcon("play_circle"),
@@ -310,10 +310,10 @@ function KeyboardLayout() {
 function OpenSideBar() {
     const button = Widget.Button({
         class_name: "filled_tonal_button",
-        on_primary_click: () => {
+        on_primary_click_release: () => {
             App.toggleWindow("sidebar")
         },
-        on_secondary_click: () => {
+        on_secondary_click_release: () => {
             OpenSettings()
         },
         child: MaterialIcon("dock_to_left")
@@ -372,8 +372,8 @@ function volumeIndicator() {
         onScrollDown: () => audio.speaker.volume -= 0.01,
         class_name: "filled_tonal_button volume_box",
         child: Widget.Button({
-            on_primary_click: () => Utils.execAsync("pavucontrol").catch(print),
-            on_secondary_click: () => audio.speaker.is_muted = !audio.speaker.is_muted,
+            on_primary_click_release: () => Utils.execAsync("pavucontrol").catch(print),
+            on_secondary_click_release: () => audio.speaker.is_muted = !audio.speaker.is_muted,
             child: Widget.Box({
                 children: [
                     MaterialIcon("volume_off", "20px").hook(audio.speaker, self => {

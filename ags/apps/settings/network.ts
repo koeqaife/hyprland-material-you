@@ -63,7 +63,7 @@ const WifiNetwork = (access_point: AccessPoint) => {
     const connected = access_point.ssid == network.wifi.ssid;
     return Widget.Button({
         class_name: "row",
-        on_primary_click: () => {
+        on_primary_click_release: () => {
             if (!connected)
                 Utils.execAsync(`nmcli device wifi connect '${access_point.ssid}'`)
                     .catch(print);
@@ -71,7 +71,7 @@ const WifiNetwork = (access_point: AccessPoint) => {
                 Utils.execAsync(`${App.configDir}/scripts/network.sh --edit ${access_point.ssid}`)
                     .catch(print);
         },
-        on_secondary_click: () => {
+        on_secondary_click_release: () => {
             if (!connected && is_saved)
                 Utils.execAsync(`${App.configDir}/scripts/network.sh --edit ${access_point.ssid}`)
                     .catch(print);
@@ -155,7 +155,7 @@ const WifiToggle = () => Widget.EventBox({
             })
         ]
     }),
-    on_primary_click: self => {
+    on_primary_click_release: self => {
         self.child.children[1]!.activate();
     }
 })

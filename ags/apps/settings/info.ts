@@ -11,8 +11,8 @@ const Row = (
     on_primary_click: any = empty_func, on_secondary_click: any = empty_func
 ) => Widget.EventBox({
     class_name: "row",
-    on_primary_click: on_primary_click,
-    on_secondary_click: on_secondary_click,
+    on_primary_click_release: on_primary_click,
+    on_secondary_click_release: on_secondary_click,
     child: Widget.Box({
         class_name: "row",
         vpack: "start",
