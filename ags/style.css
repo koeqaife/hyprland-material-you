@@ -18,6 +18,7 @@ highlight {
 }
 
 * {
+    margin: 0px;
     border: none;
     outline: none;
     transition: 0.2s ease-in-out;
@@ -135,11 +136,13 @@ separator {
 .time {
     color: @onSurface;
     font-size: 14px;
+    font-feature-settings: "tnum";
 }
 
 .date {
     color: @onSurface;
     font-size: 10px;
+    font-feature-settings: "tnum";
 }
 
 /* -----------------------------------------------------
@@ -334,35 +337,48 @@ window.notification-popups box.notifications {
     margin: 11px;
 }
 
-.entry_container {
+.clip_container {
     border: none;
     outline: none;
     border-radius: 0px;
     min-height: 40px;
 }
 
-.entry_container label {
+.clip_container label {
     margin-left: 11px;
     margin-right: 11px;
 }
 
-.entry_container:hover {
+.clip_container:hover {
     background-color: mix(@onSurface, @surface, 0.92)
 }
 
-.entry_container:focus {
+.clip_container:focus {
     background-color: mix(@onSurface, @surface, 0.8);
     border: 0px solid;
     border: none;
     outline: none;
 }
 
-.entry_divider {
+.clip_container .clip_id {
+    font-weight: 200;
+    font-feature-settings: "tnum";
+}
+
+.clip_container .dot_divider {
+    font-weight: 900;
+    font-size: 12px;
+    min-width: 0px;
+    margin: 0px;
+    color: @outlineVariant;
+}
+
+.clip_divider {
     color: @outline;
     margin: 0px;
 }
 
-.entry_label {
+.clip_label {
     color: @onSurface;
     font-weight: normal;
 }
