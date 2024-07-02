@@ -240,7 +240,7 @@ function Bluetooth() {
                 Utils.execAsync("blueman-manager").catch(print)
             }
         },
-        child: MaterialIcon("bluetooth_disabled", "18px"),
+        child: MaterialIcon("bluetooth_disabled", "16px"),
     }).hook(bluetooth, self => {
         if (bluetooth.enabled) {
             self.child.label = "bluetooth";
