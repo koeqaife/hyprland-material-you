@@ -1,4 +1,4 @@
-@import "/home/mrdan/.cache/material/colors.css";
+@import "material/colors.css";
 
 window.bar {
     background-color: @surface;
