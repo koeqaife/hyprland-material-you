@@ -1,4 +1,4 @@
-@import "material/colors.css";
+@import "../../.cache/material/colors.css";
 
 window.bar {
     background-color: @surface;
@@ -708,7 +708,7 @@ window.notification-popups box.notifications {
 }
 
 .system_scale.backlight slider {
-    background-image: -gtk-scaled(url("svg/brightness-onPrimary.svg"));
+    background-image: -gtk-scaled(url("../../.cache/material/svg/brightness-onPrimary.svg"));
 }
 
 .system_scale.backlight {
@@ -716,7 +716,7 @@ window.notification-popups box.notifications {
 }
 
 .system_scale.brightness slider {
-    background-image: -gtk-scaled(url("svg/dark-onPrimary.svg"));
+    background-image: -gtk-scaled(url("../../.cache/material/svg/dark-onPrimary.svg"));
 }
 
 .system_scale {
