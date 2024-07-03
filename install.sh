@@ -115,8 +115,7 @@ setup_sddm() {
     sudo cp $HOME/dotfiles/sddm/sddm.conf /etc/
     sudo chmod 777 /etc/sddm.conf.d/sddm.conf
     sudo chmod 777 /etc/sddm.conf
-    sudo chmod -R 777 /usr/share/sddm/themes/corners/backgrounds/
-    sudo chmod 777 /usr/share/sddm/themes/corners/theme.conf
+    sudo chmod -R 777 /usr/share/sddm/themes/corners/
     sh $HOME/dotfiles/sddm/scripts/wallpaper.sh
 }
 
