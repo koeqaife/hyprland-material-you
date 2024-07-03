@@ -11,8 +11,6 @@ window.bar {
 
 button, box {
     background: transparent;
-    transition-property: all, border-image, background-size, background-image;
-    transition-duration: 0.2s, 0.3s, 0.3s, 0.3s;
     transition-timing-function: ease-out;
     background-image: radial-gradient(circle, transparent 10%, transparent 0%);
     background-repeat: no-repeat;
@@ -22,7 +20,7 @@ button, box {
 }
 
 button:active, box:active {
-    transition-duration: 0.3s, 0.3s, 0ms, 0ms;
+    transition-duration:  0.3s, 0ms, 0ms, 0.2s, 0.2s, 0.2s;
     animation: ripple 0.3s ease-out forwards;
     background-size: 0% 0%;
 }
@@ -35,8 +33,10 @@ highlight {
     margin: 0px;
     border: none;
     outline: none;
-    transition: 0.2s ease-in-out;
-    transition-property: border-color, background-color, color;
+
+    transition-property: border-image, background-size, background-image, color, background-color, border-color;
+    transition-duration: 0.3s, 0.3s, 0.3s, 0.2s, 0.2s, 0.2s;
+
     font-family: "Product Sans", Roboto, "Font Awesome 6 Free", Helvetica, Arial, sans-serif;
 }
 
@@ -579,8 +579,9 @@ window.notification-popups box.notifications {
     border: none;
     outline: none;
 
-    transition-property: all, border-image, background-size, background-image;
-    transition-duration: 0.3s, 0.3s, 0.3s, 0.3s;
+    transition-property: border-image, background-size, background-image, color, background-color, border-color;
+    transition-duration: 0.3s, 0.3s, 0.3s, 0.2s, 0.2s, 0.2s;
+
     transition-timing-function: ease-out;
     outline: none;
     background-image: radial-gradient(circle, transparent 10%, transparent 0%);
@@ -592,6 +593,7 @@ window.notification-popups box.notifications {
 .management_button label {
     color: @onSurface;
     font-weight: normal;
+    transition: color 0.2s;
 }
 
 .ssid {
@@ -601,10 +603,12 @@ window.notification-popups box.notifications {
 .management_button .icon {
     color: @onSurface;
     margin-right: 5px;
+    transition: color 0.2s;
 }
 
 .management_button .arrow {
     margin-right: 0px;
+    transition: color 0.2s;
 }
 
 .management_button:hover {
@@ -612,10 +616,6 @@ window.notification-popups box.notifications {
 }
 
 .management_button:active {
-    transition-duration: 0.3s, 0.3s, 0ms, 0ms;
-    animation: ripple 0.3s ease-out forwards;
-    background-size: 0% 0%;
-
     background-image: radial-gradient(circle, mix(@onSurface, @surface, 0.85) 10%, transparent 0%);
 }
 
@@ -630,8 +630,11 @@ window.notification-popups box.notifications {
 
 .management_button.active {
     background-color: @primary;
+    transition-duration: 0.3s, 0ms, 0.3s, 0.2s, 0.3s, 0.2s;
+    animation: ripple 0.3s ease-out forwards;
+    background-size: 0% 0%;
     border: 0px solid;
-    background-image: radial-gradient(circle, @primary 10%, transparent 0%);
+    background-image: radial-gradient(circle, @primary 10%, mix(@onSurface, @surface, 0.85) 0%);
 }
 
 .management_button.active:active {
