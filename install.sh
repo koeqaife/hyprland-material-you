@@ -52,7 +52,7 @@ install_packages() {
     libdrm mesa fwupd rofi-wayland bun-bin pipewire wireplumber udiskie \
     lm_sensors gnome-system-monitor playerctl ttf-meslo-nerd ttf-google-sans \
     ttf-font-awesome ttf-opensans ttf-roboto lshw ttf-material-symbols-variable-git \
-    fontconfig dart-sass
+    fontconfig dart-sass ttf-meslo-nerd-font-powerlevel10k cpio meson cmake
 }
 
 setup_yay() {
@@ -115,8 +115,7 @@ setup_sddm() {
     sudo cp $HOME/dotfiles/sddm/sddm.conf /etc/
     sudo chmod 777 /etc/sddm.conf.d/sddm.conf
     sudo chmod 777 /etc/sddm.conf
-    sudo chmod -R 777 /usr/share/sddm/themes/corners/backgrounds/
-    sudo chmod 777 /usr/share/sddm/themes/corners/theme.conf
+    sudo chmod -R 777 /usr/share/sddm/themes/corners/
     sh $HOME/dotfiles/sddm/scripts/wallpaper.sh
 }
 
