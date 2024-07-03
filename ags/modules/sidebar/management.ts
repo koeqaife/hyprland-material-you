@@ -298,7 +298,7 @@ export function Management() {
 
     const stack = Widget.Stack({
         children: pages,
-        // @ts-ignore
+        // @ts-expect-error
         shown: currentPage.bind().as(v => `page${v + 1}`),
         transition: "slide_left_right",
         transitionDuration: 200,
@@ -323,6 +323,14 @@ export function Management() {
                     hpack: "center"
                 })
             ]
-        })
+        }),
+        setup: (self) => {
+            for (let page in pageNames) {
+                // @ts-expect-error
+                self.keybind(`${Number(page.replace("page", ""))+1}`, () => {
+                    currentPage.setValue(Number(page.replace("page", "")));
+                })
+            }
+        }
     })
 }
