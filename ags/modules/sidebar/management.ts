@@ -112,10 +112,10 @@ function Page1() {
                         class_name: network.wifi.bind("enabled")
                             .as(enabled => enabled ? "management_button active" : "management_button"),
                         child: NetworkIndicator(),
-                        on_primary_click: () => {
+                        on_primary_click_release: () => {
                             network.toggleWifi();
                         },
-                        on_secondary_click: () => {
+                        on_secondary_click_release: () => {
                             App.closeWindow(WINDOW_NAME)
                             OpenSettings("network")
                         }
@@ -130,11 +130,11 @@ function Page1() {
                             icon: "bluetooth",
                             arrow: true,
                         }),
-                        on_primary_click: () => {
+                        on_primary_click_release: () => {
                             Utils.execAsync(`${App.configDir}/scripts/bluetooth.sh --toggle`)
                                 .then(out => { bluetooth_enabled.setValue(out) })
                         },
-                        on_secondary_click: () => {
+                        on_secondary_click_release: () => {
                             OpenSettings("bluetooth")
                             App.closeWindow(WINDOW_NAME)
                         }
@@ -252,7 +252,7 @@ function Page2() {
                             icon: "colorize",
                             arrow: true,
                         }),
-                        on_primary_click: () => {
+                        on_clicked: () => {
                             App.closeWindow(WINDOW_NAME);
                             Utils.execAsync("sleep 0.5")
                                 .then(() =>
@@ -269,7 +269,7 @@ function Page2() {
                             icon: "settings",
                             arrow: true,
                         }),
-                        on_primary_click: () => {
+                        on_clicked: () => {
                             OpenSettings()
                             App.closeWindow(WINDOW_NAME);
                         }

@@ -1,4 +1,4 @@
-@import "/home/mrdan/.cache/material/colors.css";
+@import "../../.cache/material/colors.css";
 
 /* -----------------------------------------------------
  * Settings
@@ -40,7 +40,7 @@
     background-color: @surfaceContainerLow;
 }
 
-.settings .sidebar .row {
+.settings .sidebar_row {
     border-radius: 100px;
     padding: 0px;
     padding-right: 24px;
@@ -49,30 +49,35 @@
     background-color: @surfaceContainerLow;
 }
 
-.settings .sidebar .row:hover {
+.settings .sidebar_row:hover {
     background-color: mix(@onSurface, @surface, 0.92);
 }
 
-.settings .sidebar .row.active {
-    background-color: @secondaryContainer;
+.settings .sidebar_row:active {
+    background-image: radial-gradient(circle, mix(@onSurface, @surface, 0.9) 10%, transparent 0%);
 }
 
-.settings .sidebar .row label {
+.settings .sidebar_row.active {
+    background-color: @secondaryContainer;
+    background-image: radial-gradient(circle, @secondaryContainer 10%, transparent 0%);
+}
+
+.settings .sidebar_row label {
     color: @onSurfaceVariant;
     font-weight: normal;
     font-size: 16px;
 }
 
-.settings .sidebar .row.active label {
+.settings .sidebar_row.active label {
     color: @onSecondaryContainer;
 }
 
-.settings .sidebar .row .icon {
+.settings .sidebar_row .icon {
     margin-right: 12px;
     color: @onSurfaceVariant;
 }
 
-.settings .sidebar .row.active image {
+.settings .sidebar_row.active image {
     margin-right: 12px;
     color: @onSecondaryContainer;
 }
@@ -99,6 +104,15 @@
 }
 
 .settings .row {
+    background: transparent;
+    transition-timing-function: ease-out;
+    outline: none;
+    background-image: radial-gradient(circle, transparent 10%, transparent 0%);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 1000% 1000%;
+    background-color: transparent;
+
     padding-left: 16px;
     padding-right: 16px;
     padding-top: 12px;
@@ -111,12 +125,15 @@
     background-color: mix(@onSurface, @surface, 0.92)
 }
 
-.settings .row:active {
-    background-color: mix(@onSurface, @surface, 0.8)
+.settings .row:active:not(.focused) {
+    transition-duration: 0.3s, 0ms, 0ms, 0.2s, 0.2s, 0.2s;
+    animation: ripple 0.3s ease-out forwards;
+    background-size: 0% 0%;
+    background-image: radial-gradient(circle, mix(@onSurface, @surface, 0.9) 10%, transparent 0%);
 }
 
 .settings .row.focused {
-    background-color: mix(@onSurface, @surface, 0.8)
+    background-color: mix(@onSurface, @surface, 0.8);
 }
 
 .settings .row .title {
