@@ -43,10 +43,10 @@ const BluetoothToggle = () => Widget.EventBox({
             })
         ]
     }),
-    on_primary_click: (self) => {
+    on_primary_click_release: (self) => {
         self.child.children[1]!.activate();
     },
-    on_secondary_click: (self, event) => {
+    on_secondary_click_release: (self, event) => {
         Widget.Menu({
             children: [Widget.MenuItem({
                 child: HpackStartLabel("Open blueman-manager"),
@@ -90,10 +90,10 @@ const DeviceMenu = (device: BluetoothDevice) => {
 
 const DeviceItem = (device: BluetoothDevice) => Widget.Button({
     class_name: "row",
-    on_primary_click: () => {
+    on_primary_click_release: () => {
         device.setConnection(!device.connected);
     },
-    on_secondary_click: (self, event) => {
+    on_secondary_click_release: (self, event) => {
         DeviceMenu(device)?.popup_at_pointer(event);
     },
     child: Widget.Box({

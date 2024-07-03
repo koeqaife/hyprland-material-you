@@ -162,25 +162,31 @@ function BatteryLabel() {
 
 
 function SysTray() {
-    const items = systemtray.bind("items")
-        .as(items => items.map(item => {
-            if (item.id.trim() != "nm-applet" && item.id.trim() != "blueman") {
-                return Widget.Button({
-                    child: Widget.Icon({ icon: item.bind("icon") }),
-                    on_primary_click: (_, event) => item.activate(event),
-                    on_secondary_click: (_, event) => item.openMenu(event),
-                    tooltip_markup: item.bind("tooltip_markup"),
-                })
-            } else {
-                return undefined
-            }
-        }))
-
-    // @ts-ignore
     return Widget.Box({
         class_name: "tray",
         spacing: 5,
-        children: items,
+        setup: (self) => {
+            self.hook(systemtray, () => {
+                const items = systemtray.items;
+                // @ts-expect-error
+                self.children = items.map(item => {
+                    if (item.id.trim() != "nm-applet" && item.id.trim() != "blueman") {
+                        return Widget.Button({
+                            child: Widget.Icon({ icon: item.bind("icon") }),
+                            on_primary_click_release: (_, event) => item.activate(event),
+                            on_secondary_click_release: (_, event) => item.openMenu(event),
+                            tooltip_markup: item.bind("tooltip_markup"),
+                        })
+                    } else {
+                        return undefined
+                    }
+                });
+                if (self.children.length > 0)
+                    self.visible = true;
+                else
+                    self.visible = false;
+            })
+        }
     })
 }
 
@@ -201,10 +207,10 @@ function AppLauncher() {
 function Wifi() {
     return Widget.Button({
         class_name: "bar_wifi",
-        on_primary_click: () => {
+        on_primary_click_release: () => {
             OpenSettings("network")
         },
-        on_secondary_click: (_, event) => {
+        on_secondary_click_release: (_, event) => {
             const nm_applet = systemtray.items.find(item => item.id == "nm-applet")
             if (nm_applet) {
                 nm_applet.openMenu(event)
@@ -229,10 +235,10 @@ function Wifi() {
 function Bluetooth() {
     return Widget.Button({
         class_name: "bar_bluetooth",
-        on_primary_click: () => {
+        on_primary_click_release: () => {
             OpenSettings("bluetooth")
         },
-        on_secondary_click: (_, event) => {
+        on_secondary_click_release: (_, event) => {
             const blueman = systemtray.items.find(item => item.id == "blueman")
             if (blueman) {
                 blueman.openMenu(event)
@@ -240,7 +246,7 @@ function Bluetooth() {
                 Utils.execAsync("blueman-manager").catch(print)
             }
         },
-        child: MaterialIcon("bluetooth_disabled", "18px"),
+        child: MaterialIcon("bluetooth_disabled", "16px"),
     }).hook(bluetooth, self => {
         if (bluetooth.enabled) {
             self.child.label = "bluetooth";
@@ -265,10 +271,10 @@ function MediaPlayer() {
     let metadata = mpris.players[0]?.metadata;
     const button = Widget.Button({
         class_name: "filled_tonal_button",
-        on_primary_click: () => {
+        on_primary_click_release: () => {
             App.toggleWindow("media")
         },
-        on_secondary_click: () => {
+        on_secondary_click_release: () => {
             Utils.execAsync(["playerctl", "play-pause"]).catch(print)
         },
         child: MaterialIcon("play_circle"),
@@ -304,10 +310,10 @@ function KeyboardLayout() {
 function OpenSideBar() {
     const button = Widget.Button({
         class_name: "filled_tonal_button",
-        on_primary_click: () => {
+        on_primary_click_release: () => {
             App.toggleWindow("sidebar")
         },
-        on_secondary_click: () => {
+        on_secondary_click_release: () => {
             OpenSettings()
         },
         child: MaterialIcon("dock_to_left")
@@ -335,7 +341,7 @@ function TaskBar() {
                 if (item.class == "com.github.Aylur.ags") {
                     if (item.initialTitle == "Settings") {
                         icon = "emblem-system-symbolic"
-                    } 
+                    }
                     else if (item.initialTitle == "Emoji Picker") {
                         icon = "face-smile-symbolic"
                     }
@@ -366,8 +372,8 @@ function volumeIndicator() {
         onScrollDown: () => audio.speaker.volume -= 0.01,
         class_name: "filled_tonal_button volume_box",
         child: Widget.Button({
-            on_primary_click: () => Utils.execAsync("pavucontrol").catch(print),
-            on_secondary_click: () => audio.speaker.is_muted = !audio.speaker.is_muted,
+            on_primary_click_release: () => Utils.execAsync("pavucontrol").catch(print),
+            on_secondary_click_release: () => audio.speaker.is_muted = !audio.speaker.is_muted,
             child: Widget.Box({
                 children: [
                     MaterialIcon("volume_off", "20px").hook(audio.speaker, self => {

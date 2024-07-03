@@ -105,7 +105,7 @@ const ReloadTheme = () => {
 
 const DarkTheme = () => Widget.EventBox({
     class_name: "row",
-    on_primary_click: self => {
+    on_primary_click_release: self => {
         self.child.children[1]!.activate()
     },
     child: Widget.Box({
@@ -147,7 +147,7 @@ const DarkTheme = () => Widget.EventBox({
 
 const ThemeColor = () => Widget.EventBox({
     class_name: "row",
-    on_primary_click: self => {
+    on_primary_click_release: self => {
         // self.child.children[1]!.activate()
     },
     child: Widget.Box({
@@ -199,7 +199,7 @@ const ThemeColor = () => Widget.EventBox({
 
 const ColorScheme = () => Widget.EventBox({
     class_name: "row",
-    on_primary_click: self => {
+    on_primary_click_release: self => {
         // self.child.children[1]!.activate()
     },
     child: Widget.Box({

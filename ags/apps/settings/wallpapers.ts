@@ -109,10 +109,9 @@ const Wallpaper = (image: string, name: string) => Widget.Button({
 function CacheThumbnails() {
     Utils.execAsync(`mkdir -p ${GLib.get_home_dir()}/.cache/thumbnails/wallpaper`)
         .catch(print)
-    const link_directory = `${App.configDir}/wallpaper`;
     const original_directory = `${GLib.get_home_dir()}/wallpaper`;
     const extensions = [".jpg", ".jpeg", ".png"];
-    const fileList = listFilesByExtensions(link_directory, extensions);
+    const fileList = listFilesByExtensions(original_directory, extensions);
     fileList.forEach((value, index) => {
         const path = `${original_directory}/${value}`
         const cache_file = `${GLib.get_home_dir()}/.cache/thumbnails/wallpaper/${value}`;
@@ -129,10 +128,9 @@ function CacheThumbnails() {
 CacheThumbnails()
 
 const WallpaperList = () => {
-    const link_directory = `${App.configDir}/wallpaper`;
     const original_directory = `${GLib.get_home_dir()}/wallpaper`;
     const extensions = [".jpg", ".jpeg", ".png"];
-    let fileList = listFilesByExtensions(link_directory, extensions);
+    let fileList = listFilesByExtensions(original_directory, extensions);
     let [l_fileList, r_fileList] = splitListInHalf(fileList);
     const box = Widget.Box({
         vertical: false,

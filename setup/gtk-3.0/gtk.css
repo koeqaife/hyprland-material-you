@@ -1,4 +1,4 @@
-@import "/home/mrdan/.cache/material/colors.css";
+@import "../../.cache/material/colors.css";
 /* */
 @define-color theme_fg_color #AEE5FA;
 @define-color theme_text_color #AEE5FA;

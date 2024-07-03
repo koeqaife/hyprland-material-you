@@ -52,7 +52,7 @@ install_packages() {
     libdrm mesa fwupd rofi-wayland bun-bin pipewire wireplumber udiskie \
     lm_sensors gnome-system-monitor playerctl ttf-meslo-nerd ttf-google-sans \
     ttf-font-awesome ttf-opensans ttf-roboto lshw ttf-material-symbols-variable-git \
-    fontconfig
+    fontconfig dart-sass
 }
 
 setup_yay() {
@@ -71,7 +71,7 @@ setup_sensors() {
 }
 
 check_config_folders() {
-    local CHECK_CONFIG_FOLDERS="ags alacritty hypr swappy wal rofi"
+    local CHECK_CONFIG_FOLDERS="ags alacritty hypr swappy wal"
     local EXIT="NO"
     
     for dir in $CHECK_CONFIG_FOLDERS; do
@@ -127,14 +127,13 @@ copy_files() {
 
 create_links() {
     echo ":: Creating links"
-    ln -f /home/mrdan/dotfiles/electron-flags.conf ~/.config/electron-flags.conf
+    ln -f $HOME/dotfiles/electron-flags.conf $HOME/.config/electron-flags.conf
     if [ -d "$HOME/wallpaper" ]; then
         echo ":: Error: directory wallpaper already exists in home"
     else
         cp -r $HOME/dotfiles/wallpapers $HOME/wallpaper
     fi
     ln -s $HOME/dotfiles/ags $HOME/.config/ags
-    ln -s $HOME/dotfiles/rofi $HOME/.config/rofi
     ln -s $HOME/dotfiles/alacritty $HOME/.config/alacritty
     ln -s $HOME/dotfiles/hypr $HOME/.config/hypr
     ln -s $HOME/dotfiles/swappy $HOME/.config/swappy
@@ -142,6 +141,7 @@ create_links() {
 
 install_plugins() {
     echo ":: Plugins"
+    hyprpm update
     sh $HOME/dotfiles/plugins.sh
 }
 
@@ -202,19 +202,19 @@ main() {
     fi
     ask_continue "Proceed with installing packages?" false && install_packages
     ask_continue "Proceed with setting up sensors?" false && setup_sensors
-    ask_continue "Proceed with checking config folders?" && check_config_folders
-    ask_continue "Proceed with installing python-materialyoucolor?" && install_python_materialyoucolor
+    ask_continue "Proceed with checking config folders?*" && check_config_folders
+    ask_continue "Proceed with installing python-materialyoucolor?*" && install_python_materialyoucolor
     ask_continue "Proceed with installing Tela Nord icons?" false && install_tela_nord_icons
-    ask_continue "Proceed with setting up colors?" && setup_colors
+    ask_continue "Proceed with setting up colors?*" && setup_colors
     ask_continue "Proceed with setting up SDDM?" false && setup_sddm
-    ask_continue "Proceed with copying files?" && copy_files
-    ask_continue "Proceed with creating links?" && create_links
-    ask_continue "Proceed with installing plugins?" && install_plugins
+    ask_continue "Proceed with copying files?*" && copy_files
+    ask_continue "Proceed with creating links?*" && create_links
+    ask_continue "Proceed with installing plugins?*" && install_plugins
     ask_continue "Proceed with installing Vencord?" false && install_vencord
     ask_continue "Proceed with removing GTK buttons?" false && remove_gtk_buttons
-    ask_continue "Proceed with setting up services?" && setup_services
-    ask_continue "Proceed with updating user directories?" && update_user_dirs
-    ask_continue "Proceed with miscellaneous tasks?" && misc_tasks
+    ask_continue "Proceed with setting up services?*" && setup_services
+    ask_continue "Proceed with updating user directories?*" && update_user_dirs
+    ask_continue "Proceed with miscellaneous tasks?*" && misc_tasks
     
     echo "Please restart your PC"
 }

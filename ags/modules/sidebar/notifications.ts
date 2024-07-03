@@ -65,7 +65,7 @@ export function NotificationsBox({ exclude = [], include = [] }: NotificationsBo
     return Widget.EventBox({
         vexpand: true,
         hexpand: true,
-        on_secondary_click: (_, event) => {
+        on_secondary_click_release: (_, event) => {
             menu.popup_at_pointer(event)
         },
         child: Widget.Scrollable({

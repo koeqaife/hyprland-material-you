@@ -3,6 +3,7 @@ import { SystemBox } from "./system.ts"
 let shown = Variable("Messages");
 import Gtk from "gi://Gtk?version=3.0"
 import { MaterialIcon } from "icons.ts";
+import { enableClickThrough } from "modules/misc/clickthrough.js";
 
 
 type ButtonType = {
@@ -20,11 +21,14 @@ function Button({ page, label, icon }: ButtonType) {
             orientation: Gtk.Orientation.VERTICAL,
             class_name: "container_outer",
             children: [
-                Widget.Box({
-                    orientation: Gtk.Orientation.VERTICAL,
-                    hpack: "center",
-                    class_name: "container",
-                    child: MaterialIcon(icon, "20px"),
+                Widget.Overlay({
+                    child: Widget.Box({
+                        orientation: Gtk.Orientation.VERTICAL,
+                        hpack: "center",
+                        class_name: "container",
+                    }),
+                    overlay: MaterialIcon(icon, "20px"),
+                    pass_through: true
                 }),
                 Widget.Label({
                     label: label,
