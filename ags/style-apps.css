@@ -105,8 +105,6 @@
 
 .settings .row {
     background: transparent;
-    transition-property: all, border-image, background-size, background-image;
-    transition-duration: 0.3s, 0.3s, 0.3s, 0.3s;
     transition-timing-function: ease-out;
     outline: none;
     background-image: radial-gradient(circle, transparent 10%, transparent 0%);
@@ -128,7 +126,7 @@
 }
 
 .settings .row:active:not(.focused) {
-    transition-duration: 0.3s, 0.3s, 0ms, 0ms;
+    transition-duration:  0.3s, 0ms, 0ms, 0.2s, 0.2s, 0.2s;
     animation: ripple 0.3s ease-out forwards;
     background-size: 0% 0%;
     background-image: radial-gradient(circle, mix(@onSurface, @surface, 0.9) 10%, transparent 0%);
