@@ -9,7 +9,8 @@ window.bar {
     font-weight: bold;
 }
 
-button, box {
+button,
+box {
     background: transparent;
     transition-timing-function: ease-out;
     background-image: radial-gradient(circle, transparent 10%, transparent 0%);
@@ -19,8 +20,9 @@ button, box {
     background-color: transparent;
 }
 
-button:active, box:active {
-    transition-duration:  0.3s, 0ms, 0ms, 0.2s, 0.2s, 0.2s;
+button:active,
+box:active {
+    transition-duration: 0.3s, 0ms, 0ms, 0.2s, 0.2s, 0.2s;
     animation: ripple 0.3s ease-out forwards;
     background-size: 0% 0%;
 }
@@ -541,6 +543,7 @@ window.notification-popups box.notifications {
 
 .bar_applets .icon {
     color: @onSurface;
+    font-weight: 600;
 }
 
 .bar_applets button {
@@ -959,7 +962,7 @@ window.notification-popups box.notifications {
     background-color: mix(@onPrimary, @primary, 0.92);
 }
 
-.filled_button:active:not(.disabled)  {
+.filled_button:active:not(.disabled) {
     background-image: radial-gradient(circle, mix(@onPrimary, @primary, 0.8) 10%, transparent 0%);
 }
 
