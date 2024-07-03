@@ -607,6 +607,7 @@ window.notification-popups box.notifications {
     color: @onSurface;
     margin-right: 5px;
     transition: color 0.2s;
+    font-weight: 400;
 }
 
 .management_button .arrow {
