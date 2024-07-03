@@ -9,4 +9,7 @@ mkdir -p $HOME/.config/systemd/user/
 cp $HOME/dotfiles/setup/wl-gammarelay.service $HOME/.config/systemd/user/
 systemctl --user daemon-reload
 systemctl --user enable --now wl-gammarelay.service
+echo ":: Product Sans font"
+sudo cp -r $HOME/dotfiles/setup/google-sans /usr/share/fonts
+sudo fc-cache -f -v
 echo ":: Done!"
