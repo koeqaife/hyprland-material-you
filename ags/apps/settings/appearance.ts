@@ -1,6 +1,9 @@
 import { theme, theme_settings, generation_scheme_file } from "variables.ts";
 const GLib = imports.gi.GLib;
 import Gtk from "gi://Gtk?version=3.0"
+import config from "services/configuration.ts";
+import { Binding } from "types/service";
+import { default_config } from '../../services/configuration';
 
 const ComboBoxText = Widget.subclass<typeof Gtk.ComboBoxText, Gtk.ComboBoxText.ConstructorProperties>(Gtk.ComboBoxText)
 
@@ -15,10 +18,10 @@ const color_schemes = {
     "Fidelity": "fidelity",
     "Content": "content",
     [Symbol.iterator]: function* () {
-      const keys = Object.keys(this);
-      for (const key of keys) {
-        yield { key, value: this[key] };
-      }
+        const keys = Object.keys(this);
+        for (const key of keys) {
+            yield { key, value: this[key] };
+        }
     }
 }
 
@@ -242,13 +245,82 @@ const ColorScheme = () => Widget.EventBox({
     })
 })
 
-export function Theme() {
+const SwitchRow = (
+    on_activate: (...args: any) => void,
+    state: boolean | Binding<any, any, boolean>,
+    title: string,
+    description?: string
+) => Widget.EventBox({
+    class_name: "row",
+    on_primary_click_release: self => {
+        self.child.children[1]!.activate()
+    },
+    child: Widget.Box({
+        class_name: "row",
+        vpack: "start",
+        children: [
+            // @ts-expect-error
+            Widget.Box({
+                vertical: true,
+                hexpand: true,
+                vpack: "center",
+                children: [
+                    Widget.Label({
+                        hpack: "start",
+                        class_name: "title",
+                        label: title
+                    }),
+                    (description)
+                        ? Widget.Label({
+                            hpack: "start",
+                            class_name: "description",
+                            label: description
+                        })
+                        : undefined
+                ]
+            }),
+            Widget.Switch({
+                vexpand: false,
+                vpack: "center",
+                hpack: "end",
+                on_activate: on_activate,
+                state: state,
+            })
+        ]
+    })
+})
+
+function ToggleConfigVar(name: keyof typeof default_config) {
+    config.config = {
+        ...config.config,
+        [name]: !config.config[name]
+    }
+}
+
+export function Appearance() {
     const box = Widget.Box({
         vertical: true,
         children: [
             DarkTheme(),
             ThemeColor(),
-            ColorScheme()
+            ColorScheme(),
+            Widget.Separator(),
+            SwitchRow(
+                () => ToggleConfigVar("always_show_battery"),
+                config.config.always_show_battery,
+                "Always show battery"
+            ),
+            SwitchRow(
+                () => ToggleConfigVar("show_battery_percent"),
+                config.config.show_battery_percent,
+                "Show battery percent"
+            ),
+            SwitchRow(
+                () => ToggleConfigVar("show_taskbar"),
+                config.config.show_taskbar,
+                "Show taskbar",
+                "Requires restart ags"
+            )
         ],
     })
     return Widget.Scrollable({

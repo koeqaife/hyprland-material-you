@@ -17,6 +17,7 @@ const mpris = await Service.import("mpris")
 const bluetooth = await Service.import("bluetooth")
 import Gtk from "gi://Gtk?version=3.0"
 import { MaterialIcon } from "icons.js"
+import config from "services/configuration.ts";
 
 const keyboard_layout = Variable("none")
 hyprland.connect("keyboard-layout", (hyprland, keyboardname, layoutname) => {
@@ -184,20 +185,28 @@ function getClosestBatteryLevel(level: number, charging: boolean = false) {
 
 
 function BatteryLabel() {
-    const isVisible = battery.bind("percent").as(p => p < 100);
-
     return Widget.Box({
         class_name: "battery",
-        visible: (isVisible && battery.available),
+        visible: false,
         children: [
             MaterialIcon(getClosestBatteryLevel(battery.percent, battery.charging), "16px"),
             Widget.Label({
                 label: battery.bind("percent").as(p => `${p > 0 ? p : 0}%`),
+                visible: config.bind("config").as(config => config.show_battery_percent)
             }),
         ],
+        tooltip_text: battery.bind("percent").as(p => `Battery: ${p > 0 ? p : 0}%`),
         setup: (self) => {
             self.hook(battery, () => {
                 self.children[0].label = getClosestBatteryLevel(battery.percent, battery.charging);
+                self.visible = (battery.percent < 100 && battery.available) || config.config.always_show_battery;
+            })
+            self.hook(config, () => {
+                if (config.config.always_show_battery) {
+                    self.visible = true;
+                } else {
+                    self.visible = battery.percent < 100 && battery.available;
+                }
             })
         }
     });
@@ -368,6 +377,9 @@ function OpenSideBar() {
 const focus = ({ address }) => Utils.execAsync(`hyprctl dispatch focuswindow address:${address}`).catch(print);
 
 function TaskBar() {
+    if (!config.config.show_taskbar) {
+        return undefined
+    }
     let globalWidgets: Button<Icon<any>, any>[] = [];
 
     function Clients(clients: Client[]) {
@@ -459,6 +471,7 @@ const Dot = () => Widget.Label({
 
 
 function Left() {
+    // @ts-expect-error
     return Widget.Box({
         // margin_left: 15,
         class_name: "modules-left",
