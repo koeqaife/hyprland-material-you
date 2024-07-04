@@ -1,7 +1,7 @@
 import { RegularWindow } from "apps/window";
 import { Network } from "./network";
 import { Bluetooth } from "./bluetooth";
-import { Theme } from "./theme";
+import { Appearance } from "./appearance";
 import { Wallpapers } from "./wallpapers";
 import { Info } from "./info";
 import { Apps } from "./apps";
@@ -43,7 +43,7 @@ function Settings(cur_tab: string) {
         children: {
             "network": Page(Network(), "Network"),
             "bluetooth": Page(Bluetooth(), "Bluetooth"),
-            "theme": Page(Theme(), "Theme"),
+            "appearance": Page(Appearance(), "Appearance"),
             "wallpaper": Page(Wallpapers(), "Wallpapers"),
             "info": Page(Info(), "Info"),
             "apps": Page(Apps(), "Apps")
@@ -68,7 +68,7 @@ function Settings(cur_tab: string) {
             Row("network", "Network", "signal_wifi_4_bar"),
             Row("bluetooth", "Bluetooth", "bluetooth"),
             Widget.Separator(),
-            Row("theme", "Theme", "palette"),
+            Row("appearance", "Appearance", "palette"),
             Row("wallpaper", "Wallpapers", "image"),
             Widget.Separator(),
             Row("apps", "Apps", "grid_view"),
