@@ -322,6 +322,8 @@ function OpenSideBar() {
     return button
 }
 
+const focus = ({ address }) => Utils.execAsync(`hyprctl dispatch focuswindow address:${address}`).catch(print);
+
 function TaskBar() {
     let globalWidgets: Button<Icon<any>, any>[] = [];
 
@@ -352,6 +354,9 @@ function TaskBar() {
                     attribute: { pid: item.pid },
                     child: Widget.Icon({ icon: icon }),
                     tooltip_markup: item.title,
+                    on_clicked: (self) => {
+                        focus(item)
+                    }
                 });
                 globalWidgets.push(widget);
             }
