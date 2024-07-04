@@ -53,7 +53,7 @@ export function Navigation() {
         },
         transition: "crossfade",
         transitionDuration: 200,
-        // @ts-ignore
+        // @ts-expect-error
         shown: shown.bind()
     })
     const buttons = Widget.Box({
@@ -84,6 +84,16 @@ export function Navigation() {
         children: [
             stack,
             buttons
-        ]
+        ],
+        setup: (self) => {
+            const keys = Object.keys(stack.children);
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
+                // @ts-expect-error
+                self.keybind(`${i + 1}`, () => {
+                    shown.setValue(key);
+                });
+            }
+        }
     })
 }
