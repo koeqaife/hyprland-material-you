@@ -305,14 +305,8 @@ export function Management() {
     })
     const dotButtons = pageNames.map((_, index) => createDotButton(index));
     return Widget.EventBox({
-        onScrollUp: () => currentPage.setValue((currentPage.value + 1) % numberOfPages),
-        onScrollDown: () => {
-            if (currentPage.value - 1) {
-                currentPage.setValue(numberOfPages - 1)
-                return
-            }
-            currentPage.setValue(currentPage.value - 1);
-        },
+        onScrollUp: () => currentPage.setValue(Math.min(currentPage.value + 1, numberOfPages - 1)),
+        onScrollDown: () => currentPage.setValue(Math.max(currentPage.value - 1, 0)),
         child: Widget.Box({
             orientation: Gtk.Orientation.VERTICAL,
             children: [
