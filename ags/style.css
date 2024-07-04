@@ -531,9 +531,10 @@ window.notification-popups box.notifications {
 
 .battery label {
     color: @onSurface;
+    font-size: 16px;
 }
 
-.battery image {
+.battery .icon {
     color: @onSurface;
 }
 

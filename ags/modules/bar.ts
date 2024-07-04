@@ -143,16 +143,55 @@ function Clock() {
 }
 
 
-function BatteryLabel() {
-    const icon = battery.bind("icon_name");
+const battery_icons = {
+    charging: {
+        100: "battery_charging_full",
+        90: "battery_charging_90",
+        80: "battery_charging_80",
+        70: "battery_charging_80",
+        60: "battery_charging_60",
+        50: "battery_charging_50",
+        40: "battery_charging_30",
+        30: "battery_charging_30",
+        20: "battery_charging_20",
+        10: "battery_charging_20",
+        0: "battery_charging_20",
+    },
+    100: "battery_full",
+    90: "battery_6_bar",
+    80: "battery_5_bar",
+    70: "battery_5_bar",
+    60: "battery_4_bar",
+    50: "battery_3_bar",
+    40: "battery_2_bar",
+    30: "battery_2_bar",
+    20: "battery_1_bar",
+    10: "battery_1_bar",
+    0: "battery_alert",
+}
 
-    const isVisible = battery.bind("percent").as(p => p < 100);
+
+function getClosestBatteryLevel(level: number, charging: boolean = false) {
+    const array = !charging ? battery_icons : battery_icons.charging;
+    const levels = Object.keys(array).map(Number).sort((a, b) => b - a);
+    for (let i = 0; i < levels.length; i++) {
+        if (level >= levels[i]) {
+            return array[levels[i]];
+        }
+    }
+    return array[levels[levels.length - 1]];
+}
+
+
+function BatteryLabel() {
+    const isVisible = battery.bind("percent").as(p => p < 101);
 
     return Widget.Box({
         class_name: "battery",
         visible: isVisible,
         children: [
-            Widget.Icon({ icon }),
+            // @ts-expect-error
+            MaterialIcon(battery.bind("percent").as(p => getClosestBatteryLevel(p, battery.charging)), "16px"),
             Widget.Label({
                 label: battery.bind("percent").as(p => `${p > 0 ? p : 0}%`),
             }),
@@ -405,6 +444,14 @@ function volumeIndicator() {
         })
     })
 }
+
+
+const Dot = () => Widget.Label({
+    class_name: "dot",
+    use_markup: true,
+    label: "·",
+    css: "font-weight: 900;"
+})
 
 
 function Left() {
