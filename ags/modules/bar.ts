@@ -184,11 +184,11 @@ function getClosestBatteryLevel(level: number, charging: boolean = false) {
 
 
 function BatteryLabel() {
-    const isVisible = battery.bind("percent").as(p => p < 101);
+    const isVisible = battery.bind("percent").as(p => p < 100);
 
     return Widget.Box({
         class_name: "battery",
-        visible: isVisible,
+        visible: (isVisible && battery.available),
         children: [
             // @ts-expect-error
             MaterialIcon(battery.bind("percent").as(p => getClosestBatteryLevel(p, battery.charging)), "16px"),
