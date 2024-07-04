@@ -5,6 +5,12 @@ export const main_color = Variable("#000000");
 export const current_wallpaper = Variable(`${GLib.get_home_dir()}/dotfiles/wallpapers/default.png`);
 
 export const idle_inhibitor = Variable(false);
+export const cur_uptime = Variable("error")
+Utils.interval(5000, () => {
+    Utils.execAsync(`${App.configDir}/scripts/system.sh --uptime`)
+        .then(out => cur_uptime.setValue(out))
+        .catch(print)
+})
 export const night_light = Variable(false);
 export const bluetooth_enabled = Variable('off', {
     poll: [1000, `${App.configDir}/scripts/bluetooth.sh --get`]

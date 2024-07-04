@@ -4,28 +4,28 @@ name: pywal;
 
 // Color presets //
 
-secondary: {color10};
-onSecondary: {color11};
-outline: foreground;
-shadow: {color14};
+secondary: <secondary>;
+onSecondary: <onSecondary>;
+outline: <outline>;
+shadow: <shadow>;
 
-BACKGROUND: {color0};
-BACKGROUND_LIT_LIGHT: {color4};
-BACKGROUND_LIGHT: #{color4.lighten(3)};
-BACKGROUND_EXTRA_LIGHT: #{color4.lighten(8)};
-ON_BACKGROUND: {color1};
-ON_BACKGROUND_DARKER:  {color4.darken(25)};
+BACKGROUND: <background>;
+BACKGROUND_LIT_LIGHT: <surfaceContainerLowest>;
+BACKGROUND_LIGHT: <surfaceContainer>;
+BACKGROUND_EXTRA_LIGHT: <surfaceContainerHigh>;
+ON_BACKGROUND: <onBackground>;
+ON_BACKGROUND_DARKER:  <onSurfaceVariant>;
 
-ACCENT: {color2};
-ON_ACCENT: {color3};
-ACCENT_LIGHT: #{color2.lighten(15)};
-ON_ACCENT_LIGHT: {color3};
-ACCENT_DARK: #{color2.darken(15)};
-ON_ACCENT_DARK: {color3};
+ACCENT: <primary>;
+ON_ACCENT: <onPrimary>;
+ACCENT_LIGHT: <tertiary>;
+ON_ACCENT_LIGHT: <onTertiary>;
+ACCENT_DARK: <secondary>;
+ON_ACCENT_DARK: <onSecondary>;
 
-ERROR: {color6};
+ERROR: <error>;
 ERROR_RIPPLE: #ff9180;
-ON_ERROR: {color7};
+ON_ERROR: <onError>;
 
 SUCCES: #66bb6a;
 SUCCES_LIGHT: #81c784;
@@ -194,7 +194,7 @@ introErrorFg: ERROR;                            // Login error text (like when p
 introCoverTopBg: BACKGROUND;                    // Gradient finish at the top of the login screen
 introCoverBottomBg: BACKGROUND;                 // Gradient start at the bottom of the login screen
 introCoverIconsFg: ACCENT_DARK;                 // Icons and clouds colors
-introCoverPlaneTrace: {color12}69;              // Plane trace
+introCoverPlaneTrace: <primary>69;              // Plane trace
 introCoverPlaneInner: ON_ACCENT;                // Plane color inside
 introCoverPlaneOuter: ACCENT;                   // Plane color outside
 introCoverPlaneTop: ON_BACKGROUND;              // Main plane color
@@ -347,8 +347,8 @@ msgInBg: BACKGROUND_LIGHT;                      // Incoming message background
 msgInBgSelected: ACCENT;                        // Selected incoming message background
 msgOutBg: BACKGROUND_EXTRA_LIGHT;               // Outgoing message background
 msgOutBgSelected: ACCENT;                       // Selected outgoing message background
-msgSelectOverlay: {color12}50;                  // Selected media (images...) overlay
-msgStickerOverlay: {color12}50;                 // Selected sticker overlay
+msgSelectOverlay: <primary>50;                  // Selected media (images...) overlay
+msgStickerOverlay: <primary>50;                 // Selected sticker overlay
 msgInServiceFg: ACCENT;                         // Incoming reply quoted name
 msgInServiceFgSelected: ON_ACCENT;              // Selected incoming reply quoted name
 msgOutServiceFg: ACCENT;                        // Outgoing reply quoted name
