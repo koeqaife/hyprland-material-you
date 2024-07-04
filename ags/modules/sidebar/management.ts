@@ -298,21 +298,15 @@ export function Management() {
 
     const stack = Widget.Stack({
         children: pages,
-        // @ts-ignore
+        // @ts-expect-error
         shown: currentPage.bind().as(v => `page${v + 1}`),
         transition: "slide_left_right",
         transitionDuration: 200,
     })
     const dotButtons = pageNames.map((_, index) => createDotButton(index));
     return Widget.EventBox({
-        onScrollUp: () => currentPage.setValue((currentPage.value + 1) % numberOfPages),
-        onScrollDown: () => {
-            if (currentPage.value - 1) {
-                currentPage.setValue(numberOfPages - 1)
-                return
-            }
-            currentPage.setValue(currentPage.value - 1);
-        },
+        onScrollUp: () => currentPage.setValue(Math.min(currentPage.value + 1, numberOfPages - 1)),
+        onScrollDown: () => currentPage.setValue(Math.max(currentPage.value - 1, 0)),
         child: Widget.Box({
             orientation: Gtk.Orientation.VERTICAL,
             children: [
@@ -322,7 +316,15 @@ export function Management() {
                     class_name: "dotbuttons_box",
                     hpack: "center"
                 })
-            ]
+            ],
+            setup: (self) => {
+                for (let page in pageNames) {
+                    // @ts-expect-error
+                    self.keybind(`${Number(page.replace("page", "")) + 1}`, () => {
+                        currentPage.setValue(Number(page.replace("page", "")));
+                    })
+                }
+            }
         })
     })
 }
