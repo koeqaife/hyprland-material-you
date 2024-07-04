@@ -319,7 +319,7 @@ export function Appearance() {
                 () => ToggleConfigVar("show_taskbar"),
                 config.config.show_taskbar,
                 "Show taskbar",
-                "Requires restart ags"
+                "Requires ags restart"
             )
         ],
     })
