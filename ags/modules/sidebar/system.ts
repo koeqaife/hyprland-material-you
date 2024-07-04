@@ -1,5 +1,6 @@
-import { cpu_cores, cpu_name, kernel_name, amount_of_ram, gpu_name } from "variables";
+import { cpu_cores, cpu_name, kernel_name, amount_of_ram, gpu_name, cur_uptime } from "variables";
 import Gtk from "gi://Gtk?version=3.0"
+import { Variable as VariableType } from 'types/variable';
 
 type InfoType = {
     cpu: string,
@@ -126,6 +127,15 @@ const InfoLabelString = (name: string, value: string, end: string) => {
     })
 }
 
+const InfoLabelVariableString = (name: string, value: VariableType<string>, end: string) => {
+    return Widget.Label({
+        class_name: "info_label",
+        truncate: "end",
+        hpack: "start",
+        label: value.bind().as(value => `${name}: ${value}${end}`)
+    })
+}
+
 export function SystemBox() {
     const backlight = Widget.Slider({
         min: 0,
@@ -186,6 +196,7 @@ export function SystemBox() {
             InfoLabelString("RAM amount", amount_of_ram, ""),
             InfoLabelString("Kernel", kernel_name, ""),
             InfoLabelString("GPU", gpu_name, ""),
+            InfoLabelVariableString("Uptime", cur_uptime, ""),
         ],
         vexpand: true
     })
