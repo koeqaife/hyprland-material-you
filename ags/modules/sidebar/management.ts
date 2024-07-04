@@ -322,15 +322,15 @@ export function Management() {
                     class_name: "dotbuttons_box",
                     hpack: "center"
                 })
-            ]
-        }),
-        setup: (self) => {
-            for (let page in pageNames) {
-                // @ts-expect-error
-                self.keybind(`${Number(page.replace("page", ""))+1}`, () => {
-                    currentPage.setValue(Number(page.replace("page", "")));
-                })
+            ],
+            setup: (self) => {
+                for (let page in pageNames) {
+                    // @ts-expect-error
+                    self.keybind(`${Number(page.replace("page", "")) + 1}`, () => {
+                        currentPage.setValue(Number(page.replace("page", "")));
+                    })
+                }
             }
-        }
+        })
     })
 }
