@@ -1,6 +1,6 @@
 import { Binding } from "types/service"
 const GLib = imports.gi.GLib;
-import { cpu_cores, cpu_name, kernel_name, amount_of_ram, gpu_name, hostname, current_os } from "variables";
+import { cpu_cores, cpu_name, kernel_name, amount_of_ram, gpu_name, hostname, current_os, cur_uptime } from "variables";
 
 type StringOrBinding = string | Binding<any, any, string> | null;
 
@@ -55,6 +55,7 @@ export function Info() {
             Row("DE", current_de!),
             Row("OS", current_os),
             Row("Kernel", kernel_name),
+            Row("Uptime", cur_uptime.bind()),
             Row("CPU", `${cpu_name} (${cpu_cores} Cores)`),
             Row("GPU", `${gpu_name}`),
             Row("Ram", amount_of_ram),

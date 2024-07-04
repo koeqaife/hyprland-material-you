@@ -1,5 +1,6 @@
 import Gtk from "gi://Gtk?version=3.0";
 import popupwindow from "modules/misc/popupwindow";
+import { MaterialIcon } from 'icons';
 const hyprland = await Service.import("hyprland");
 
 const WINDOW_NAME = "cheatsheet";
@@ -21,6 +22,14 @@ const icons = {
     "super": ""
 }
 
+const category_icons = {
+    "actions": "accessibility_new",
+    "applications": "apps",
+    "windows": "select_window",
+    "workspaces": "overview_key",
+    "misc": "construction",
+    "plugins": "extension"
+}
 
 const CheatSheet = () => Widget.FlowBox({
     attribute: {
@@ -31,10 +40,15 @@ const CheatSheet = () => Widget.FlowBox({
                     vertical: true,
                     vpack: "fill",
                     children: [
-                        Widget.Label({
-                            label: category,
-                            class_name: "title",
-                            hpack: "start"
+                        Widget.Box({
+                            children: [
+                                MaterialIcon(category_icons[category.toLowerCase()] || "category"),
+                                Widget.Label({
+                                    label: category,
+                                    class_name: "title",
+                                    hpack: "start"
+                                }),
+                            ]
                         }),
                         Widget.Separator()
                     ]

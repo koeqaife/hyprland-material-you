@@ -41,6 +41,10 @@ get_os() {
     hostnamectl | grep "Operating System" | awk '{for (i=3; i<=NF; i++) printf $i " "; print ""}'
 }
 
+get_uptime() {
+    uptime -p | sed -e 's/up //' -e 's/ hours\{0,1\}/h/g' -e 's/ minutes\{0,1\}/min/g' -e 's/ days\{0,1\}/d/g' -e 's/ seconds\{0,1\}/sec/g' -e 's/ //g' -e 's/,/, /' 
+}
+
 if [[ "$1" == "--cpu-usage" ]]; then
     get_cpu_usage
     elif [[ "$1" == "--ram-usage" ]]; then
@@ -63,4 +67,6 @@ if [[ "$1" == "--cpu-usage" ]]; then
     get_hostname
     elif [[ "$1" == "--os" ]]; then
     get_os
+    elif [[ "$1" == "--uptime" ]]; then
+    get_uptime
 fi
