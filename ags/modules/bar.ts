@@ -190,12 +190,16 @@ function BatteryLabel() {
         class_name: "battery",
         visible: (isVisible && battery.available),
         children: [
-            // @ts-expect-error
-            MaterialIcon(battery.bind("percent").as(p => getClosestBatteryLevel(p, battery.charging)), "16px"),
+            MaterialIcon(getClosestBatteryLevel(battery.percent, battery.charging), "16px"),
             Widget.Label({
                 label: battery.bind("percent").as(p => `${p > 0 ? p : 0}%`),
             }),
         ],
+        setup: (self) => {
+            self.hook(battery, () => {
+                self.children[0].label = getClosestBatteryLevel(battery.percent, battery.charging);
+            })
+        }
     });
 }
 
