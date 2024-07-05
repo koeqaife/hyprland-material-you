@@ -4,7 +4,7 @@ import { SideBar } from './sidebar.ts'
 export const WINDOW_NAME = "sidebar" 
 
 
-export const sidebar = popupwindow({
+export const sideright = popupwindow({
     name: WINDOW_NAME,
 
     class_name: "sidebar",

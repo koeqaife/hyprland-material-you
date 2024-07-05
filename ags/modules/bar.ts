@@ -17,6 +17,7 @@ const mpris = await Service.import("mpris")
 const bluetooth = await Service.import("bluetooth")
 import Gtk from "gi://Gtk?version=3.0"
 import { MaterialIcon } from "icons.js"
+import config from "services/configuration.ts";
 
 const keyboard_layout = Variable("none")
 hyprland.connect("keyboard-layout", (hyprland, keyboardname, layoutname) => {
@@ -143,20 +144,71 @@ function Clock() {
 }
 
 
+const battery_icons = {
+    charging: {
+        100: "battery_charging_full",
+        90: "battery_charging_90",
+        80: "battery_charging_80",
+        70: "battery_charging_80",
+        60: "battery_charging_60",
+        50: "battery_charging_50",
+        40: "battery_charging_30",
+        30: "battery_charging_30",
+        20: "battery_charging_20",
+        10: "battery_charging_20",
+        0: "battery_charging_20",
+    },
+    100: "battery_full",
+    90: "battery_6_bar",
+    80: "battery_5_bar",
+    70: "battery_5_bar",
+    60: "battery_4_bar",
+    50: "battery_3_bar",
+    40: "battery_2_bar",
+    30: "battery_2_bar",
+    20: "battery_1_bar",
+    10: "battery_1_bar",
+    0: "battery_alert",
+}
+
+
+function getClosestBatteryLevel(level: number, charging: boolean = false) {
+    const array = !charging ? battery_icons : battery_icons.charging;
+    const levels = Object.keys(array).map(Number).sort((a, b) => b - a);
+    for (let i = 0; i < levels.length; i++) {
+        if (level >= levels[i]) {
+            return array[levels[i]];
+        }
+    }
+    return array[levels[levels.length - 1]];
+}
+
+
 function BatteryLabel() {
-    const icon = battery.bind("icon_name");
-
-    const isVisible = battery.bind("percent").as(p => p < 100);
-
     return Widget.Box({
         class_name: "battery",
-        visible: isVisible,
+        visible: false,
         children: [
-            Widget.Icon({ icon }),
+            MaterialIcon(getClosestBatteryLevel(battery.percent, battery.charging), "16px"),
             Widget.Label({
                 label: battery.bind("percent").as(p => `${p > 0 ? p : 0}%`),
+                visible: config.bind("config").as(config => config.show_battery_percent)
             }),
         ],
+        tooltip_text: battery.bind("percent").as(p => `Battery: ${p > 0 ? p : 0}%`),
+        setup: (self) => {
+            self.hook(battery, () => {
+                self.children[0].label = getClosestBatteryLevel(battery.percent, battery.charging);
+                self.visible = (battery.percent < 100 && battery.available) || config.config.always_show_battery;
+            })
+            self.hook(config, () => {
+                if (config.config.always_show_battery) {
+                    self.visible = true;
+                } else {
+                    self.visible = battery.percent < 100 && battery.available;
+                }
+            })
+        }
     });
 }
 
@@ -325,6 +377,9 @@ function OpenSideBar() {
 const focus = ({ address }) => Utils.execAsync(`hyprctl dispatch focuswindow address:${address}`).catch(print);
 
 function TaskBar() {
+    if (!config.config.show_taskbar) {
+        return undefined
+    }
     let globalWidgets: Button<Icon<any>, any>[] = [];
 
     function Clients(clients: Client[]) {
@@ -407,7 +462,16 @@ function volumeIndicator() {
 }
 
 
+const Dot = () => Widget.Label({
+    class_name: "dot",
+    use_markup: true,
+    label: "·",
+    css: "font-weight: 900;"
+})
+
+
 function Left() {
+    // @ts-expect-error
     return Widget.Box({
         // margin_left: 15,
         class_name: "modules-left",

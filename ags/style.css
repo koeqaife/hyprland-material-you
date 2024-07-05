@@ -124,19 +124,22 @@ separator {
 }
 
 .workspaces button label {
-    color: @onSurface;
+    color: @onSurfaceVariant;
     font-weight: bold;
 }
 
 .workspaces button:hover {
     color: @onSurface;
-    background: @surfaceContainerHighest;
+    background-color: mix(@onSurface, @surface, 0.85);
 }
 
 .workspaces button.active {
-    color: @onSecondaryContainer;
     background: @secondaryContainer;
     min-width: 40px;
+}
+
+.workspaces button.active label {
+    color: @onSecondaryContainer;
 }
 
 /* -----------------------------------------------------
@@ -528,9 +531,11 @@ window.notification-popups box.notifications {
 
 .battery label {
     color: @onSurface;
+    font-size: 16px;
+    font-weight: 300;
 }
 
-.battery image {
+.battery .icon {
     color: @onSurface;
 }
 

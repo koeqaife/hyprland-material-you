@@ -7,7 +7,7 @@ import { Notifications } from "./modules/notificationPopups.ts"
 import { applauncher } from "./modules/applauncher.js"
 import { media } from "./modules/media.ts"
 import { cliphist } from "./modules/cliphist.ts"
-import { sidebar } from "./modules/sidebar/main.ts"
+import { sideright } from "./modules/sideright/main.ts"
 import {} from 'apps/settings/main.ts';
 import {} from 'apps/emoji/main.ts';
 import { cheatsheet } from 'modules/cheatsheet.ts';
@@ -31,7 +31,7 @@ const Windows = () => [
     media,
     applauncher,
     cliphist,
-    sidebar,
+    sideright,
     cheatsheet
 ];
 
