@@ -7,122 +7,123 @@ import Pango from "gi://Pango";
 import Label from "types/widgets/label";
 import { MaterialIcon } from "icons";
 
-const notifications = await Service.import("notifications")
-import Gtk from "gi://Gtk?version=3.0"
+const notifications = await Service.import("notifications");
+import Gtk from "gi://Gtk?version=3.0";
 
 function NotificationIcon({ app_entry, app_icon, image }: NotificationType): Box<GtkType.Widget, any> {
     if (image) {
         return Widget.Box({
-            css: `background-image: url("${image}");`
-                + "background-size: contain;"
-                + "background-repeat: no-repeat;"
-                + "background-position: center;",
-        })
+            css:
+                `background-image: url("${image}");` +
+                "background-size: contain;" +
+                "background-repeat: no-repeat;" +
+                "background-position: center;"
+        });
     }
 
-    let icon = "dialog-information-symbolic"
-    if (Utils.lookUpIcon(app_icon))
-        icon = app_icon
+    let icon = "dialog-information-symbolic";
+    if (Utils.lookUpIcon(app_icon)) icon = app_icon;
 
-    if (app_entry && Utils.lookUpIcon(app_entry))
-        icon = app_entry
+    if (app_entry && Utils.lookUpIcon(app_entry)) icon = app_entry;
 
     return Widget.Box({
-        child: Widget.Icon(icon),
-    })
+        child: Widget.Icon(icon)
+    });
 }
 
-
-export const Notification = (notification: NotificationType, dismiss = true) => Widget.Box({
-    class_name: `notification ${notification.urgency}`,
-    vertical: true,
-    children: [
-        Widget.EventBox({
-            on_primary_click_release: (box) => {
-                // @ts-ignore
-                const label: Label<any> = box.child.children[1].children[1];
-                if (label.lines < 0) {
-                    label.lines = 3;
-                    label.truncate = "end";
-                } else {
-                    label.lines = -1;
-                    label.truncate = "none";
-                }
-            },
-            child: Widget.Box({
-                children: [
-                    Widget.Box({
-                        class_name: "notification-icon",
-                        child: NotificationIcon(notification),
-                        vpack: "start"
-                    }),
-                    Widget.Box({
-                        vertical: true,
-                        children: [
-                            Widget.Box({
-                                children: [
-                                    Widget.Label({
-                                        class_name: "notification-title",
-                                        label: notification.summary,
-                                        justification: "left",
-                                        max_width_chars: 3,
-                                        truncate: "end",
-                                        lines: 1,
-                                        xalign: 0,
-                                        hexpand: true,
-                                        tooltip_text: notification.summary
-                                    }),
-                                    Widget.Label({
-                                        class_name: "notification-time",
-                                        label: GLib.DateTime.new_from_unix_local(notification.time).format("%H:%M"),
-                                    }),
-                                    Widget.Button({
-                                        class_name: "standard_icon_button notification-close",
-                                        child: MaterialIcon("close"),
-                                        on_clicked: () => {
-                                            if (dismiss) {
-                                                notification.dismiss();
-                                            }
-                                            else {
-                                                notification.close();
-                                            }
-                                        },
-                                        css: "margin-left: 5px;"
-                                    })
-                                ]
-                            }),
-                            Widget.Label({
-                                class_name: "notification-body",
-                                justification: "left",
-                                max_width_chars: 24,
-                                lines: 3,
-                                truncate: "end",
-                                wrap_mode: Pango.WrapMode.WORD_CHAR,
-                                xalign: 0,
-                                wrap: true,
-                                label: notification.body.replace(/(\r\n|\n|\r)/gm, " "),
-                            }),
-                            notification.hints.value ?
-                                Widget.ProgressBar({
-                                    class_name: "notification-progress",
-                                    value: Number(notification.hints.value.unpack()) / 100
-                                }) : Widget.Box()
-                        ]
+export const Notification = (notification: NotificationType, dismiss = true) =>
+    Widget.Box({
+        class_name: `notification ${notification.urgency}`,
+        vertical: true,
+        children: [
+            Widget.EventBox({
+                on_primary_click_release: (box) => {
+                    // @ts-ignore
+                    const label: Label<any> = box.child.children[1].children[1];
+                    if (label.lines < 0) {
+                        label.lines = 3;
+                        label.truncate = "end";
+                    } else {
+                        label.lines = -1;
+                        label.truncate = "none";
+                    }
+                },
+                child: Widget.Box({
+                    children: [
+                        Widget.Box({
+                            class_name: "notification-icon",
+                            child: NotificationIcon(notification),
+                            vpack: "start"
+                        }),
+                        Widget.Box({
+                            vertical: true,
+                            children: [
+                                Widget.Box({
+                                    children: [
+                                        Widget.Label({
+                                            class_name: "notification-title",
+                                            label: notification.summary,
+                                            justification: "left",
+                                            max_width_chars: 3,
+                                            truncate: "end",
+                                            lines: 1,
+                                            xalign: 0,
+                                            hexpand: true,
+                                            tooltip_text: notification.summary
+                                        }),
+                                        Widget.Label({
+                                            class_name: "notification-time",
+                                            label: GLib.DateTime.new_from_unix_local(notification.time).format("%H:%M")
+                                        }),
+                                        Widget.Button({
+                                            class_name: "standard_icon_button notification-close",
+                                            child: MaterialIcon("close"),
+                                            on_clicked: () => {
+                                                if (dismiss) {
+                                                    notification.dismiss();
+                                                } else {
+                                                    notification.close();
+                                                }
+                                            },
+                                            css: "margin-left: 5px;"
+                                        })
+                                    ]
+                                }),
+                                Widget.Label({
+                                    class_name: "notification-body",
+                                    justification: "left",
+                                    max_width_chars: 24,
+                                    lines: 3,
+                                    truncate: "end",
+                                    wrap_mode: Pango.WrapMode.WORD_CHAR,
+                                    xalign: 0,
+                                    wrap: true,
+                                    label: notification.body.replace(/(\r\n|\n|\r)/gm, " ")
+                                }),
+                                notification.hints.value
+                                    ? Widget.ProgressBar({
+                                          class_name: "notification-progress",
+                                          value: Number(notification.hints.value.unpack()) / 100
+                                      })
+                                    : Widget.Box()
+                            ]
+                        })
+                    ]
+                })
+            }),
+            Widget.Box({
+                hpack: "end",
+                class_name: "notification-actions",
+                children: notification.actions.map((action) =>
+                    Widget.Button({
+                        child: Widget.Label(action.label),
+                        on_clicked: () => notification.invoke(action.id),
+                        class_name: "notification-action-button"
                     })
-                ]
+                )
             })
-        }),
-        Widget.Box({
-            hpack: "end",
-            class_name: "notification-actions",
-            children: notification.actions.map(action => Widget.Button({
-                child: Widget.Label(action.label),
-                on_clicked: () => notification.invoke(action.id),
-                class_name: "notification-action-button",
-            }))
-        })
-    ]
-});
+        ]
+    });
 
 const NotificationReveal = (notification: NotificationType, visible = false, dismiss = true) => {
     const transition_duration = 200;
@@ -138,7 +139,7 @@ const NotificationReveal = (notification: NotificationType, visible = false, dis
             timeout(1, () => {
                 revealer.reveal_child = true;
             });
-        },
+        }
     });
 
     const firstRevealer = Widget.Revealer({
@@ -150,10 +151,10 @@ const NotificationReveal = (notification: NotificationType, visible = false, dis
     });
 
     type BoxAttrs = {
-        destroyWithAnims: any,
-        count: number,
-        id: number,
-    }
+        destroyWithAnims: any;
+        count: number;
+        id: number;
+    };
 
     let box: Box<any, BoxAttrs>;
 
@@ -170,19 +171,19 @@ const NotificationReveal = (notification: NotificationType, visible = false, dis
         hexpand: true,
         hpack: "end",
         attribute: {
-            "destroyWithAnims": destroyWithAnims,
+            destroyWithAnims: destroyWithAnims,
             count: 0,
-            id: notification.id,
+            id: notification.id
         },
-        children: [firstRevealer],
+        children: [firstRevealer]
     });
     return box;
 };
 
 type NotificationsBoxType = {
-    exclude: string[],
-    include: string[]
-}
+    exclude: string[];
+    include: string[];
+};
 
 export function NotificationPopups(
     dismiss = true,
@@ -193,52 +194,46 @@ export function NotificationPopups(
     const list = Widget.Box({
         vpack: "start",
         vertical: true,
-        children: notifications.popups.map(id => revealer(id, false, dismiss)),
-    })
+        children: notifications.popups.map((id) => revealer(id, false, dismiss))
+    });
 
     function onNotified(_: any, id: number) {
-        const n = notifications.getNotification(id)
-        if (notifications.dnd || !n)
-            return;
-        if (exclude.includes(n.app_name.trim()))
-            return
-        if (!include.includes(n.app_name.trim()) && include.length > 0)
-            return
-        const original = list.children.find(n => n.attribute.id === id);
+        const n = notifications.getNotification(id);
+        if (notifications.dnd || !n) return;
+        if (exclude.includes(n.app_name.trim())) return;
+        if (!include.includes(n.app_name.trim()) && include.length > 0) return;
+        const original = list.children.find((n) => n.attribute.id === id);
         const replace = original?.attribute.id;
         let notification;
         if (!replace) {
             notification = revealer(n, false, dismiss);
             notification.attribute.count = 1;
-            list.pack_end(notification, false, false, 0)
-        }
-        else if (original) {
+            list.pack_end(notification, false, false, 0);
+        } else if (original) {
             notification = revealer(n, true, dismiss);
             notification.attribute.count++;
-            original.destroy()
-            list.pack_end(notification, false, false, 0)
+            original.destroy();
+            list.pack_end(notification, false, false, 0);
         }
         if (timeout)
             Utils.timeout(7500, () => {
                 if (notification !== null && !notification.disposed) {
-                    onDismissed(_, id)
+                    onDismissed(_, id);
                 }
-            })
+            });
     }
 
     function onDismissed(_: any, id: number) {
-        const original = list.children.find(n => n.attribute.id === id);
-        if (!original)
-            return
+        const original = list.children.find((n) => n.attribute.id === id);
+        if (!original) return;
         original.attribute.count--;
         if (original?.attribute.count <= 0) {
-            original?.attribute.destroyWithAnims()
+            original?.attribute.destroyWithAnims();
         }
     }
 
-    list.hook(notifications, onNotified, "notified")
-        .hook(notifications, onDismissed, dismiss ? "dismissed" : "closed")
-    return list
+    list.hook(notifications, onNotified, "notified").hook(notifications, onDismissed, dismiss ? "dismissed" : "closed");
+    return list;
 }
 
 export function Notifications(monitor = 0) {
@@ -253,9 +248,9 @@ export function Notifications(monitor = 0) {
             class_name: "notifications",
             hexpand: true,
             vexpand: true,
-            child: NotificationPopups(),
+            child: NotificationPopups()
         }),
-        visible: true,
-    })
-    return window
+        visible: true
+    });
+    return window;
 }

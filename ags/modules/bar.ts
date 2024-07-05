@@ -1,51 +1,50 @@
-const hyprland = await Service.import("hyprland")
-const battery = await Service.import("battery")
-const systemtray = await Service.import("systemtray")
-const audio = await Service.import("audio")
-const network = await Service.import("network")
+const hyprland = await Service.import("hyprland");
+const battery = await Service.import("battery");
+const systemtray = await Service.import("systemtray");
+const audio = await Service.import("audio");
+const network = await Service.import("network");
 const { GLib, Gio } = imports.gi;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 import { OpenSettings } from "apps/settings/main.ts";
 import { enableClickThrough } from "./misc/clickthrough.js";
 import { RoundedCorner } from "./misc/cairo_roundedcorner.js";
-import { Client, Workspace } from "types/service/hyprland.js"
-import Button from "types/widgets/button.js"
-import Icon from "types/widgets/icon.js"
-import { FileEnumerator, FileInfo } from "types/@girs/gio-2.0/gio-2.0.cjs"
-const mpris = await Service.import("mpris")
-const bluetooth = await Service.import("bluetooth")
-import Gtk from "gi://Gtk?version=3.0"
-import { MaterialIcon } from "icons.js"
+import { Client, Workspace } from "types/service/hyprland.js";
+import Button from "types/widgets/button.js";
+import Icon from "types/widgets/icon.js";
+import { FileEnumerator, FileInfo } from "types/@girs/gio-2.0/gio-2.0.cjs";
+const mpris = await Service.import("mpris");
+const bluetooth = await Service.import("bluetooth");
+import Gtk from "gi://Gtk?version=3.0";
+import { MaterialIcon } from "icons.js";
 import config from "services/configuration.ts";
 
-const keyboard_layout = Variable("none")
+const keyboard_layout = Variable("none");
 hyprland.connect("keyboard-layout", (hyprland, keyboardname, layoutname) => {
-    keyboard_layout.setValue(layoutname.trim().toLowerCase().substr(0, 2))
-})
+    keyboard_layout.setValue(layoutname.trim().toLowerCase().substr(0, 2));
+});
 
 const MATERIAL_SYMBOL_SIGNAL_STRENGTH = {
-    'network-wireless-signal-excellent-symbolic': "signal_wifi_4_bar",
-    'network-wireless-signal-good-symbolic': "network_wifi_3_bar",
-    'network-wireless-signal-ok-symbolic': "network_wifi_2_bar",
-    'network-wireless-signal-weak-symbolic': "network_wifi_1_bar",
-    'network-wireless-signal-none-symbolic': "signal_wifi_0_bar",
-}
+    "network-wireless-signal-excellent-symbolic": "signal_wifi_4_bar",
+    "network-wireless-signal-good-symbolic": "network_wifi_3_bar",
+    "network-wireless-signal-ok-symbolic": "network_wifi_2_bar",
+    "network-wireless-signal-weak-symbolic": "network_wifi_1_bar",
+    "network-wireless-signal-none-symbolic": "signal_wifi_0_bar"
+};
 
 const time = Variable("", {
-    poll: [1000, 'date "+%H:%M"'],
-})
+    poll: [1000, 'date "+%H:%M"']
+});
 
 const date = Variable("", {
-    poll: [1000, 'date "+%Y-%m-%d"'],
-})
-
+    poll: [1000, 'date "+%Y-%m-%d"']
+});
 
 function getIconNameFromClass(windowClass: string) {
-    let formattedClass = windowClass.replace(/\s+/g, '-').toLowerCase();
+    let formattedClass = windowClass.replace(/\s+/g, "-").toLowerCase();
     let homeDir = GLib.get_home_dir();
-    let systemDataDirs = GLib.get_system_data_dirs().map(dir => dir + '/applications');
-    let dataDirs = systemDataDirs.concat([homeDir + '/.local/share/applications']);
+    let systemDataDirs = GLib.get_system_data_dirs().map((dir) => dir + "/applications");
+    let dataDirs = systemDataDirs.concat([homeDir + "/.local/share/applications"]);
     let icon: string | undefined;
 
     for (let dir of dataDirs) {
@@ -53,7 +52,11 @@ function getIconNameFromClass(windowClass: string) {
 
         let enumerator: FileEnumerator;
         try {
-            enumerator = applicationsGFile.enumerate_children('standard::name,standard::type', Gio.FileQueryInfoFlags.NONE, null);
+            enumerator = applicationsGFile.enumerate_children(
+                "standard::name,standard::type",
+                Gio.FileQueryInfoFlags.NONE,
+                null
+            );
         } catch (e) {
             continue;
         }
@@ -61,8 +64,8 @@ function getIconNameFromClass(windowClass: string) {
         let fileInfo: FileInfo | null;
         while ((fileInfo = enumerator.next_file(null)) !== null) {
             let desktopFile = fileInfo.get_name();
-            if (desktopFile.endsWith('.desktop')) {
-                let fileContents = GLib.file_get_contents(dir + '/' + desktopFile);
+            if (desktopFile.endsWith(".desktop")) {
+                let fileContents = GLib.file_get_contents(dir + "/" + desktopFile);
                 let matches = /Icon=(\S+)/.exec(decoder.decode(fileContents[1]));
                 if (matches && matches[1]) {
                     if (desktopFile.toLowerCase().includes(formattedClass)) {
@@ -81,7 +84,6 @@ function getIconNameFromClass(windowClass: string) {
 
 const dispatch = (ws: string) => hyprland.messageAsync(`dispatch workspace ${ws}`).catch(print);
 
-
 function Workspaces() {
     const activeId = hyprland.active.workspace.bind("id");
     let workspaceButtons = new Map();
@@ -90,7 +92,7 @@ function Workspaces() {
         const button = Widget.Button({
             on_clicked: () => dispatch(`${id}`),
             child: Widget.Label(`${id}`),
-            class_name: activeId.as(i => `${i === id ? "active" : ""}`),
+            class_name: activeId.as((i) => `${i === id ? "active" : ""}`)
         });
         return button;
     }
@@ -107,8 +109,7 @@ function Workspaces() {
                 updatedButtons.set(id, createWorkspaceButton(id));
             }
         });
-        if (workspaceButtons != updatedButtons)
-            workspaceButtons = updatedButtons;
+        if (workspaceButtons != updatedButtons) workspaceButtons = updatedButtons;
 
         return Array.from(workspaceButtons.values());
     }
@@ -116,15 +117,14 @@ function Workspaces() {
     const workspaceButtonsArray = hyprland.bind("workspaces").as(updateWorkspaceButtons);
 
     return Widget.EventBox({
-        onScrollUp: () => dispatch('+1'),
-        onScrollDown: () => dispatch('-1'),
+        onScrollUp: () => dispatch("+1"),
+        onScrollDown: () => dispatch("-1"),
         child: Widget.Box({
             children: workspaceButtonsArray,
-            class_name: "workspaces",
-        }),
+            class_name: "workspaces"
+        })
     });
 }
-
 
 function Clock() {
     return Widget.Box({
@@ -133,16 +133,15 @@ function Clock() {
         children: [
             Widget.Label({
                 class_name: "time",
-                label: time.bind(),
+                label: time.bind()
             }),
             Widget.Label({
                 class_name: "date",
-                label: date.bind(),
+                label: date.bind()
             })
-        ],
-    })
+        ]
+    });
 }
-
 
 const battery_icons = {
     charging: {
@@ -156,7 +155,7 @@ const battery_icons = {
         30: "battery_charging_30",
         20: "battery_charging_20",
         10: "battery_charging_20",
-        0: "battery_charging_20",
+        0: "battery_charging_20"
     },
     100: "battery_full",
     90: "battery_6_bar",
@@ -168,13 +167,14 @@ const battery_icons = {
     30: "battery_2_bar",
     20: "battery_1_bar",
     10: "battery_1_bar",
-    0: "battery_alert",
-}
-
+    0: "battery_alert"
+};
 
 function getClosestBatteryLevel(level: number, charging: boolean = false) {
     const array = !charging ? battery_icons : battery_icons.charging;
-    const levels = Object.keys(array).map(Number).sort((a, b) => b - a);
+    const levels = Object.keys(array)
+        .map(Number)
+        .sort((a, b) => b - a);
     for (let i = 0; i < levels.length; i++) {
         if (level >= levels[i]) {
             return array[levels[i]];
@@ -183,7 +183,6 @@ function getClosestBatteryLevel(level: number, charging: boolean = false) {
     return array[levels[levels.length - 1]];
 }
 
-
 function BatteryLabel() {
     return Widget.Box({
         class_name: "battery",
@@ -191,27 +190,26 @@ function BatteryLabel() {
         children: [
             MaterialIcon(getClosestBatteryLevel(battery.percent, battery.charging), "16px"),
             Widget.Label({
-                label: battery.bind("percent").as(p => `${p > 0 ? p : 0}%`),
-                visible: config.bind("config").as(config => config.show_battery_percent)
-            }),
+                label: battery.bind("percent").as((p) => `${p > 0 ? p : 0}%`),
+                visible: config.bind("config").as((config) => config.show_battery_percent)
+            })
         ],
-        tooltip_text: battery.bind("percent").as(p => `Battery: ${p > 0 ? p : 0}%`),
+        tooltip_text: battery.bind("percent").as((p) => `Battery: ${p > 0 ? p : 0}%`),
         setup: (self) => {
             self.hook(battery, () => {
                 self.children[0].label = getClosestBatteryLevel(battery.percent, battery.charging);
                 self.visible = (battery.percent < 100 && battery.available) || config.config.always_show_battery;
-            })
+            });
             self.hook(config, () => {
                 if (config.config.always_show_battery) {
                     self.visible = true;
                 } else {
                     self.visible = battery.percent < 100 && battery.available;
                 }
-            })
+            });
         }
     });
 }
-
 
 function SysTray() {
     return Widget.Box({
@@ -221,173 +219,161 @@ function SysTray() {
             self.hook(systemtray, () => {
                 const items = systemtray.items;
                 // @ts-expect-error
-                self.children = items.map(item => {
+                self.children = items.map((item) => {
                     if (item.id.trim() != "nm-applet" && item.id.trim() != "blueman") {
                         return Widget.Button({
                             child: Widget.Icon({ icon: item.bind("icon") }),
                             on_primary_click_release: (_, event) => item.activate(event),
                             on_secondary_click_release: (_, event) => item.openMenu(event),
-                            tooltip_markup: item.bind("tooltip_markup"),
-                        })
+                            tooltip_markup: item.bind("tooltip_markup")
+                        });
                     } else {
-                        return undefined
+                        return undefined;
                     }
                 });
-                if (self.children.length > 0)
-                    self.visible = true;
-                else
-                    self.visible = false;
-            })
+                if (self.children.length > 0) self.visible = true;
+                else self.visible = false;
+            });
         }
-    })
+    });
 }
-
 
 function AppLauncher() {
     const button = Widget.Button({
         class_name: "filled_tonal_button",
         on_clicked: () => {
-            App.toggleWindow("applauncher")
+            App.toggleWindow("applauncher");
         },
         child: MaterialIcon("search")
-    })
+    });
 
-    return button
+    return button;
 }
-
 
 function Wifi() {
     return Widget.Button({
         class_name: "bar_wifi",
         on_primary_click_release: () => {
-            OpenSettings("network")
+            OpenSettings("network");
         },
         on_secondary_click_release: (_, event) => {
-            const nm_applet = systemtray.items.find(item => item.id == "nm-applet")
+            const nm_applet = systemtray.items.find((item) => item.id == "nm-applet");
             if (nm_applet) {
-                nm_applet.openMenu(event)
+                nm_applet.openMenu(event);
             } else {
-                Utils.execAsync("nm-connection-editor").catch(print)
+                Utils.execAsync("nm-connection-editor").catch(print);
             }
         },
         child: MaterialIcon("signal_wifi_off", "16px"),
-        tooltip_text: 'Disabled'
-    }).hook(network, self => {
+        tooltip_text: "Disabled"
+    }).hook(network, (self) => {
         if (network.wifi.enabled) {
-            self.tooltip_text = network.wifi.ssid || 'Unknown';
+            self.tooltip_text = network.wifi.ssid || "Unknown";
             self.child.label = MATERIAL_SYMBOL_SIGNAL_STRENGTH[network.wifi.icon_name] || "signal_wifi_off";
         } else {
-            self.tooltip_text = 'Disabled'
+            self.tooltip_text = "Disabled";
             self.child.label = "signal_wifi_off";
         }
-    })
+    });
 }
-
 
 function Bluetooth() {
     return Widget.Button({
         class_name: "bar_bluetooth",
         on_primary_click_release: () => {
-            OpenSettings("bluetooth")
+            OpenSettings("bluetooth");
         },
         on_secondary_click_release: (_, event) => {
-            const blueman = systemtray.items.find(item => item.id == "blueman")
+            const blueman = systemtray.items.find((item) => item.id == "blueman");
             if (blueman) {
-                blueman.openMenu(event)
+                blueman.openMenu(event);
             } else {
-                Utils.execAsync("blueman-manager").catch(print)
+                Utils.execAsync("blueman-manager").catch(print);
             }
         },
-        child: MaterialIcon("bluetooth_disabled", "16px"),
-    }).hook(bluetooth, self => {
+        child: MaterialIcon("bluetooth_disabled", "16px")
+    }).hook(bluetooth, (self) => {
         if (bluetooth.enabled) {
             self.child.label = "bluetooth";
         } else {
             self.child.label = "bluetooth_disabled";
         }
-    })
+    });
 }
 
-
-const Applets = () => Widget.Box({
-    class_name: "bar_applets",
-    spacing: 5,
-    children: [
-        Bluetooth(),
-        Wifi()
-    ]
-})
-
+const Applets = () =>
+    Widget.Box({
+        class_name: "bar_applets",
+        spacing: 5,
+        children: [Bluetooth(), Wifi()]
+    });
 
 function MediaPlayer() {
     let metadata = mpris.players[0]?.metadata;
     const button = Widget.Button({
         class_name: "filled_tonal_button",
         on_primary_click_release: () => {
-            App.toggleWindow("media")
+            App.toggleWindow("media");
         },
         on_secondary_click_release: () => {
-            Utils.execAsync(["playerctl", "play-pause"]).catch(print)
+            Utils.execAsync(["playerctl", "play-pause"]).catch(print);
         },
         child: MaterialIcon("play_circle"),
         visible: false,
         tooltip_text: "Unknown"
-    }).hook(mpris, self => {
+    }).hook(mpris, (self) => {
         if (mpris.players.length > 0) {
             self.visible = true;
             metadata = mpris.players[0]?.metadata;
-            if (metadata)
-                self.tooltip_text = `${metadata["xesam:artist"]} - ${metadata["xesam:title"]}`;
+            if (metadata) self.tooltip_text = `${metadata["xesam:artist"]} - ${metadata["xesam:title"]}`;
         } else {
             self.visible = false;
-            self.tooltip_text = "Unknown"
-            App.closeWindow("media")
+            self.tooltip_text = "Unknown";
+            App.closeWindow("media");
         }
-    })
+    });
 
-    return button
+    return button;
 }
-
 
 function KeyboardLayout() {
     const widget = Widget.Label({
         class_name: "keyboard",
-        visible: keyboard_layout.bind().as(c => c != "none"),
+        visible: keyboard_layout.bind().as((c) => c != "none"),
         label: keyboard_layout.bind()
-    })
-    return widget
+    });
+    return widget;
 }
-
 
 function OpenSideBar() {
     const button = Widget.Button({
         class_name: "filled_tonal_button",
         on_primary_click_release: () => {
-            App.toggleWindow("sidebar")
+            App.toggleWindow("sidebar");
         },
         on_secondary_click_release: () => {
-            OpenSettings()
+            OpenSettings();
         },
         child: MaterialIcon("dock_to_left")
-    })
+    });
 
-    return button
+    return button;
 }
 
 const focus = ({ address }) => Utils.execAsync(`hyprctl dispatch focuswindow address:${address}`).catch(print);
 
 function TaskBar() {
     if (!config.config.show_taskbar) {
-        return undefined
+        return undefined;
     }
     let globalWidgets: Button<Icon<any>, any>[] = [];
 
     function Clients(clients: Client[]) {
-        const currentClientIds = clients.map(client => client.pid);
-        globalWidgets = globalWidgets.filter(widget => currentClientIds.includes(widget.attribute.pid));
+        const currentClientIds = clients.map((client) => client.pid);
+        globalWidgets = globalWidgets.filter((widget) => currentClientIds.includes(widget.attribute.pid));
 
-        clients.forEach(item => {
-            let widget = globalWidgets.find(w => w.attribute.pid === item.pid);
+        clients.forEach((item) => {
+            let widget = globalWidgets.find((w) => w.attribute.pid === item.pid);
             if (item.class == "Alacritty") {
                 return;
             }
@@ -397,20 +383,17 @@ function TaskBar() {
                 let icon: string | undefined;
                 if (item.class == "com.github.Aylur.ags") {
                     if (item.initialTitle == "Settings") {
-                        icon = "emblem-system-symbolic"
+                        icon = "emblem-system-symbolic";
+                    } else if (item.initialTitle == "Emoji Picker") {
+                        icon = "face-smile-symbolic";
                     }
-                    else if (item.initialTitle == "Emoji Picker") {
-                        icon = "face-smile-symbolic"
-                    }
-                }
-                else
-                    icon = getIconNameFromClass(item.class)
+                } else icon = getIconNameFromClass(item.class);
                 widget = Widget.Button({
                     attribute: { pid: item.pid },
                     child: Widget.Icon({ icon: icon }),
                     tooltip_markup: item.title,
                     on_clicked: (self) => {
-                        focus(item)
+                        focus(item);
                     }
                 });
                 globalWidgets.push(widget);
@@ -422,53 +405,49 @@ function TaskBar() {
     return Widget.Box({
         class_name: "tray",
         spacing: 5,
-        children: hyprland.bind("clients").as(Clients),
-    })
+        children: hyprland.bind("clients").as(Clients)
+    });
 }
 
 function volumeIndicator() {
     return Widget.EventBox({
-        onScrollUp: () => audio.speaker.volume += 0.01,
-        onScrollDown: () => audio.speaker.volume -= 0.01,
+        onScrollUp: () => (audio.speaker.volume += 0.01),
+        onScrollDown: () => (audio.speaker.volume -= 0.01),
         class_name: "filled_tonal_button volume_box",
         child: Widget.Button({
             on_primary_click_release: () => Utils.execAsync("pavucontrol").catch(print),
-            on_secondary_click_release: () => audio.speaker.is_muted = !audio.speaker.is_muted,
+            on_secondary_click_release: () => (audio.speaker.is_muted = !audio.speaker.is_muted),
             child: Widget.Box({
                 children: [
-                    MaterialIcon("volume_off", "20px").hook(audio.speaker, self => {
+                    MaterialIcon("volume_off", "20px").hook(audio.speaker, (self) => {
                         const vol = audio.speaker.volume * 100;
                         const icon = [
-                            [101, 'sound_detection_loud_sound'],
-                            [67, 'volume_up'],
-                            [34, 'volume_down'],
-                            [1, 'volume_mute'],
-                            [0, 'volume_off'],
+                            [101, "sound_detection_loud_sound"],
+                            [67, "volume_up"],
+                            [34, "volume_down"],
+                            [1, "volume_mute"],
+                            [0, "volume_off"]
                         ].find(([threshold]) => Number(threshold) <= vol)?.[1];
-                        if (audio.speaker.is_muted)
-                            self.label = "volume_off";
-                        else
-                            self.label = String(icon!);
+                        if (audio.speaker.is_muted) self.label = "volume_off";
+                        else self.label = String(icon!);
                         self.tooltip_text = `Volume ${Math.floor(vol)}%`;
                     }),
                     Widget.Label({
-                        label: audio.speaker.bind("volume").as(volume => `${Math.floor(volume * 100)}%`),
+                        label: audio.speaker.bind("volume").as((volume) => `${Math.floor(volume * 100)}%`)
                     })
                 ]
             })
-
         })
-    })
+    });
 }
 
-
-const Dot = () => Widget.Label({
-    class_name: "dot",
-    use_markup: true,
-    label: "·",
-    css: "font-weight: 900;"
-})
-
+const Dot = () =>
+    Widget.Label({
+        class_name: "dot",
+        use_markup: true,
+        label: "·",
+        css: "font-weight: 900;"
+    });
 
 function Left() {
     // @ts-expect-error
@@ -477,26 +456,18 @@ function Left() {
         class_name: "modules-left",
         hpack: "start",
         spacing: 8,
-        children: [
-            AppLauncher(),
-            MediaPlayer(),
-            TaskBar()
-        ],
-    })
+        children: [AppLauncher(), MediaPlayer(), TaskBar()]
+    });
 }
-
 
 function Center() {
     return Widget.Box({
         class_name: "modules-center",
         hpack: "center",
         spacing: 8,
-        children: [
-            Workspaces(),
-        ],
-    })
+        children: [Workspaces()]
+    });
 }
-
 
 function Right() {
     return Widget.Box({
@@ -504,18 +475,9 @@ function Right() {
         class_name: "modules-right",
         hpack: "end",
         spacing: 8,
-        children: [
-            volumeIndicator(),
-            KeyboardLayout(),
-            BatteryLabel(),
-            SysTray(),
-            Applets(),
-            Clock(),
-            OpenSideBar()
-        ],
-    })
+        children: [volumeIndicator(), KeyboardLayout(), BatteryLabel(), SysTray(), Applets(), Clock(), OpenSideBar()]
+    });
 }
-
 
 export const Bar = async (monitor = 0) => {
     return Widget.Window({
@@ -527,33 +489,33 @@ export const Bar = async (monitor = 0) => {
         child: Widget.CenterBox({
             start_widget: Left(),
             center_widget: Center(),
-            end_widget: Right(),
-        }),
+            end_widget: Right()
+        })
+    });
+};
 
-    })
-}
+export const BarCornerTopLeft = (monitor = 0) =>
+    Widget.Window({
+        monitor,
+        name: `bar_corner_tl${monitor}`,
+        class_name: "transparent",
+        layer: "top",
+        anchor: ["top", "left"],
+        exclusivity: "normal",
+        visible: true,
+        child: RoundedCorner("top_left", { className: "corner" }),
+        setup: enableClickThrough
+    });
 
-export const BarCornerTopLeft = (monitor = 0) => Widget.Window({
-    monitor,
-    name: `bar_corner_tl${monitor}`,
-    class_name: "transparent",
-    layer: 'top',
-    anchor: ['top', 'left'],
-    exclusivity: 'normal',
-    visible: true,
-    child: RoundedCorner('top_left', { className: 'corner', }),
-    setup: enableClickThrough,
-});
-
-export const BarCornerTopRight = (monitor = 0) => Widget.Window({
-    monitor,
-    name: `bar_corner_tr${monitor}`,
-    class_name: "transparent",
-    layer: 'top',
-    anchor: ['top', 'right'],
-    exclusivity: 'normal',
-    visible: true,
-    child: RoundedCorner('top_right', { className: 'corner', }),
-    setup: enableClickThrough,
-});
-
+export const BarCornerTopRight = (monitor = 0) =>
+    Widget.Window({
+        monitor,
+        name: `bar_corner_tr${monitor}`,
+        class_name: "transparent",
+        layer: "top",
+        anchor: ["top", "right"],
+        exclusivity: "normal",
+        visible: true,
+        child: RoundedCorner("top_right", { className: "corner" }),
+        setup: enableClickThrough
+    });

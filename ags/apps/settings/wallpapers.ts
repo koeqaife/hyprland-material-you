@@ -12,12 +12,14 @@ const changing_states = {
     colors: "Generating colors...",
     tasks: "Waiting for some tasks to finish...",
     finish: "Finished!"
-}
+};
 Utils.monitorFile("/tmp/wallpaper.status", () => {
     Utils.readFileAsync("/tmp/wallpaper.status")
-        .then(c => { changing_state.setValue(c) })
-        .catch(() => { })
-})
+        .then((c) => {
+            changing_state.setValue(c);
+        })
+        .catch(() => {});
+});
 // @ts-ignore
 const focused: VariableType<null | string> = Variable(null);
 
@@ -34,11 +36,7 @@ function listFilesByExtensions(directoryPath: string, extensions: string[]): str
 
     let directory = Gio.File.new_for_path(directoryPath);
 
-    let enumerator = directory.enumerate_children(
-        "standard::*",
-        Gio.FileQueryInfoFlags.NONE,
-        null
-    );
+    let enumerator = directory.enumerate_children("standard::*", Gio.FileQueryInfoFlags.NONE, null);
 
     let fileInfo;
     while ((fileInfo = enumerator.next_file(null)) !== null) {
@@ -55,77 +53,75 @@ function listFilesByExtensions(directoryPath: string, extensions: string[]): str
     return files;
 }
 
-const Wallpaper = (image: string, name: string) => Widget.Button({
-    on_clicked: () => {
-        focused.setValue(image)
-    },
-    class_name: "row wallpaper",
-    setup: self => {
-        self.hook(focused, () => {
-            self.toggleClassName("focused", focused.value === image)
-        })
-    },
-    hexpand: true,
-    child: Widget.Box({
-        children: [
-            Widget.Box({
-                hpack: "center",
-                vpack: "center",
-                class_name: "image",
-                setup(self) {
-                    const cache_file = `${GLib.get_home_dir()}/.cache/thumbnails/wallpaper/${name}`;
-                    Utils.readFileAsync(cache_file)
-                        .catch(() => {
-                            Utils.execAsync(`magick ${image} -resize x32 -gravity Center -extent 1:1 ${cache_file}`)
-                                .catch(print)
+const Wallpaper = (image: string, name: string) =>
+    Widget.Button({
+        on_clicked: () => {
+            focused.setValue(image);
+        },
+        class_name: "row wallpaper",
+        setup: (self) => {
+            self.hook(focused, () => {
+                self.toggleClassName("focused", focused.value === image);
+            });
+        },
+        hexpand: true,
+        child: Widget.Box({
+            children: [
+                Widget.Box({
+                    hpack: "center",
+                    vpack: "center",
+                    class_name: "image",
+                    setup(self) {
+                        const cache_file = `${GLib.get_home_dir()}/.cache/thumbnails/wallpaper/${name}`;
+                        Utils.readFileAsync(cache_file).catch(() => {
+                            Utils.execAsync(
+                                `magick ${image} -resize x32 -gravity Center -extent 1:1 ${cache_file}`
+                            ).catch(print);
+                        });
+                        Utils.idle(() => {
+                            self.css = `background-image: url("${cache_file}");`;
+                        });
+                    }
+                }),
+                Widget.Box({
+                    vertical: true,
+                    hexpand: true,
+                    vpack: "center",
+                    children: [
+                        Widget.Label({
+                            hpack: "start",
+                            class_name: "title",
+                            label: name,
+                            truncate: "end"
                         })
-                    Utils.idle(() => {
-                        self.css = `background-image: url("${cache_file}");`
-                    })
-                },
-            }),
-            Widget.Box({
-                vertical: true,
-                hexpand: true,
-                vpack: "center",
-                children: [
-                    Widget.Label({
-                        hpack: "start",
-                        class_name: "title",
-                        label: name,
-                        truncate: "end"
-                    }),
-                    // Widget.Label({
-                    //     hpack: "start",
-                    //     class_name: "description",
-                    //     label: "Idk"
-                    // })
-                ]
-            })
-        ]
-    })
-})
+                        // Widget.Label({
+                        //     hpack: "start",
+                        //     class_name: "description",
+                        //     label: "Idk"
+                        // })
+                    ]
+                })
+            ]
+        })
+    });
 
 function CacheThumbnails() {
-    Utils.execAsync(`mkdir -p ${GLib.get_home_dir()}/.cache/thumbnails/wallpaper`)
-        .catch(print)
+    Utils.execAsync(`mkdir -p ${GLib.get_home_dir()}/.cache/thumbnails/wallpaper`).catch(print);
     const original_directory = `${GLib.get_home_dir()}/wallpaper`;
     const extensions = [".jpg", ".jpeg", ".png"];
     const fileList = listFilesByExtensions(original_directory, extensions);
     fileList.forEach((value, index) => {
-        const path = `${original_directory}/${value}`
+        const path = `${original_directory}/${value}`;
         const cache_file = `${GLib.get_home_dir()}/.cache/thumbnails/wallpaper/${value}`;
         Utils.idle(() => {
-            Utils.readFileAsync(cache_file)
-                .catch(() => {
-                    Utils.execAsync(`magick ${path} -resize x32 -gravity Center -extent 1:1 ${cache_file}`)
-                        .catch(print)
-                })
-        })
-    })
+            Utils.readFileAsync(cache_file).catch(() => {
+                Utils.execAsync(`magick ${path} -resize x32 -gravity Center -extent 1:1 ${cache_file}`).catch(print);
+            });
+        });
+    });
 }
 
-CacheThumbnails()
+CacheThumbnails();
 
 const WallpaperList = () => {
     const original_directory = `${GLib.get_home_dir()}/wallpaper`;
@@ -135,9 +131,13 @@ const WallpaperList = () => {
     const box = Widget.Box({
         vertical: false,
         attribute: {
-            update: self => {
-                self.children[0].children! = l_fileList.map(value => Wallpaper(`${original_directory}/${value}`, value));
-                self.children[1].children! = r_fileList.map(value => Wallpaper(`${original_directory}/${value}`, value));
+            update: (self) => {
+                self.children[0].children! = l_fileList.map((value) =>
+                    Wallpaper(`${original_directory}/${value}`, value)
+                );
+                self.children[1].children! = r_fileList.map((value) =>
+                    Wallpaper(`${original_directory}/${value}`, value)
+                );
             }
         },
         children: [
@@ -148,23 +148,21 @@ const WallpaperList = () => {
             Widget.Box({
                 vertical: true,
                 children: []
-            }),
+            })
         ]
-    })
+    });
 
-    box.attribute.update(box)
+    box.attribute.update(box);
 
-    return box
-}
+    return box;
+};
 
 export function Wallpapers() {
     focused.setValue(current_wallpaper.value);
     const box = Widget.Box({
         vertical: true,
-        children: [
-            WallpaperList()
-        ],
-    })
+        children: [WallpaperList()]
+    });
     return Widget.Box({
         vertical: true,
         children: [
@@ -183,7 +181,7 @@ export function Wallpapers() {
                         children: [
                             Widget.Label({
                                 class_name: "description",
-                                label: changing_state.bind().as(state => changing_states[state])
+                                label: changing_state.bind().as((state) => changing_states[state])
                             })
                         ]
                     }),
@@ -198,15 +196,19 @@ export function Wallpapers() {
                                 on_clicked: () => {
                                     if (!changing.value) {
                                         changing.setValue(true);
-                                        Utils.execAsync(`python -O ${GLib.get_home_dir()}/dotfiles/hypr/scripts/wallpaper.py -R`)
+                                        Utils.execAsync(
+                                            `python -O ${GLib.get_home_dir()}/dotfiles/hypr/scripts/wallpaper.py -R`
+                                        )
                                             .catch(print)
-                                            .finally(() => { changing.setValue(false) })
+                                            .finally(() => {
+                                                changing.setValue(false);
+                                            });
                                     }
                                 },
-                                setup: self => {
+                                setup: (self) => {
                                     self.hook(changing, () => {
                                         self.toggleClassName("disabled", changing.value);
-                                    })
+                                    });
                                 }
                             }),
                             Widget.Button({
@@ -216,15 +218,21 @@ export function Wallpapers() {
                                 on_clicked: () => {
                                     if (!changing.value) {
                                         changing.setValue(true);
-                                        Utils.execAsync(`python -O ${GLib.get_home_dir()}/dotfiles/hypr/scripts/wallpaper.py -I ${focused.value}`)
+                                        Utils.execAsync(
+                                            `python -O ${GLib.get_home_dir()}/dotfiles/hypr/scripts/wallpaper.py -I ${
+                                                focused.value
+                                            }`
+                                        )
                                             .catch(print)
-                                            .finally(() => { changing.setValue(false) })
+                                            .finally(() => {
+                                                changing.setValue(false);
+                                            });
                                     }
                                 },
-                                setup: self => {
+                                setup: (self) => {
                                     self.hook(changing, () => {
                                         self.toggleClassName("disabled", changing.value);
-                                    })
+                                    });
                                 }
                             })
                         ]
@@ -232,5 +240,5 @@ export function Wallpapers() {
                 ]
             })
         ]
-    })
+    });
 }
