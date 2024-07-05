@@ -1,22 +1,21 @@
 import { RegularWindow } from "apps/window";
 import { MaterialIcon } from "icons";
-import Gtk from "gi://Gtk?version=3.0"
+import Gtk from "gi://Gtk?version=3.0";
 import { Variable as VType } from "types/variable";
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
-const jsonData = Utils.readFile(`${App.configDir}/assets/emoji.json`)
-const hyprland = await Service.import("hyprland")
+const jsonData = Utils.readFile(`${App.configDir}/assets/emoji.json`);
+const hyprland = await Service.import("hyprland");
 let current_window;
 const current_page = Variable("recent");
 
 const RECENT_EMOJI_FILE = Gio.File.new_for_path(
-    GLib.build_filenamev([GLib.get_home_dir(), '.cache', 'recent_emoji.json'])
+    GLib.build_filenamev([GLib.get_home_dir(), ".cache", "recent_emoji.json"])
 );
 const recent = Variable(readRecentEmoji());
-
 
 function readRecentEmoji() {
     try {
@@ -43,7 +42,7 @@ function writeRecentEmoji(recent: any) {
 
 function addRecentEmoji(name: string, emoji: string) {
     recent.value[name] = emoji;
-    recent.setValue(moveItemsToFront(name, recent.value))
+    recent.setValue(moveItemsToFront(name, recent.value));
     writeRecentEmoji(recent.value);
 }
 
@@ -52,9 +51,9 @@ const emojiData = JSON.parse(jsonData);
 function extractEmojis(data) {
     const emojis = {};
 
-    Object.values(data).forEach(subgroup => {
+    Object.values(data).forEach((subgroup) => {
         // @ts-ignore
-        Object.values(subgroup).forEach(emojiGroup => {
+        Object.values(subgroup).forEach((emojiGroup) => {
             // @ts-ignore
             Object.entries(emojiGroup).forEach(([key, value]) => {
                 emojis[key] = value;
@@ -69,8 +68,7 @@ function moveItemsToFront(item: any, arr: any) {
     let new_array = {};
     new_array[item] = arr[item];
     for (let _item in arr) {
-        if (_item != item)
-            new_array[_item] = arr[_item];
+        if (_item != item) new_array[_item] = arr[_item];
     }
 
     return new_array;
@@ -82,34 +80,30 @@ const CATEGORY_ICONS = {
     "animals-nature": "pets",
     "food-drink": "emoji_food_beverage",
     "travel-places": "emoji_transportation",
-    "activities": "sports_soccer",
-    "objects": "emoji_objects",
-    "symbols": "emoji_symbols",
-    "flags": "flag"
-}
+    activities: "sports_soccer",
+    objects: "emoji_objects",
+    symbols: "emoji_symbols",
+    flags: "flag"
+};
 
 export async function OpenEmojiPicker() {
-    current_page.setValue("recent")
+    current_page.setValue("recent");
     if (current_window) {
         const _current_workspace = hyprland.active.workspace.id;
-        const _client = hyprland.clients.find(client => {
-            return (client.class == "com.github.Aylur.ags" && client.title == "Emoji Picker")
-        })
+        const _client = hyprland.clients.find((client) => {
+            return client.class == "com.github.Aylur.ags" && client.title == "Emoji Picker";
+        });
         if (_client && _current_workspace != _client.workspace.id) {
-            current_window.hide()
-            current_window.show()
-        }
-        else
-            current_window.show()
-    }
-    else
-        EmojisWindow();
+            current_window.hide();
+            current_window.show();
+        } else current_window.show();
+    } else EmojisWindow();
 }
 
 globalThis.OpenEmojiPicker = OpenEmojiPicker;
 
 function searchString(str: string, keywords: string) {
-    const searchTerms = keywords.split(' ');
+    const searchTerms = keywords.split(" ");
 
     for (let term of searchTerms) {
         if (!str.toLowerCase().includes(term.toLowerCase())) {
@@ -119,7 +113,6 @@ function searchString(str: string, keywords: string) {
 
     return true;
 }
-
 
 function RecentPage() {
     const emojiList = extractEmojis(emojiData);
@@ -137,20 +130,25 @@ function RecentPage() {
             flow.set_max_children_per_line(25);
             for (const emojiKey in recent.value) {
                 let emoji = emojiList[emojiKey];
-                flow.add(Widget.Button({
-                    class_name: "standard_icon_button emoji",
-                    label: emoji,
-                    attribute: { emoji: emoji },
-                    on_clicked: (self) => {
-                        Utils.execAsync(`wl-copy ${self.attribute.emoji}`).catch(print)
-                        current_window.hide()
-                    },
-                    tooltipText: emojiKey.replace(/^e\d+-\d+/, '').replaceAll("-", " ").trim()
-                }))
+                flow.add(
+                    Widget.Button({
+                        class_name: "standard_icon_button emoji",
+                        label: emoji,
+                        attribute: { emoji: emoji },
+                        on_clicked: (self) => {
+                            Utils.execAsync(`wl-copy ${self.attribute.emoji}`).catch(print);
+                            current_window.hide();
+                        },
+                        tooltipText: emojiKey
+                            .replace(/^e\d+-\d+/, "")
+                            .replaceAll("-", " ")
+                            .trim()
+                    })
+                );
             }
             box.child = flow;
-        })
-    })
+        });
+    });
 
     return Widget.Scrollable({
         child: box,
@@ -158,8 +156,6 @@ function RecentPage() {
         vexpand: true
     });
 }
-
-
 
 function SearchPage(search: VType<string>) {
     const emojiList = extractEmojis(emojiData);
@@ -170,8 +166,7 @@ function SearchPage(search: VType<string>) {
     });
     box.hook(search, (self) => {
         Utils.idle(() => {
-            if (search.value.length == 0)
-                return
+            if (search.value.length == 0) return;
             const flow = Widget.FlowBox({
                 homogeneous: true
             });
@@ -180,20 +175,25 @@ function SearchPage(search: VType<string>) {
             for (const emojiKey in emojiList) {
                 let emoji = emojiList[emojiKey];
                 if (searchString(emojiKey, search.value))
-                    flow.add(Widget.Button({
-                        class_name: "standard_icon_button emoji",
-                        label: emoji,
-                        attribute: { emoji: emoji },
-                        on_clicked: (self) => {
-                            Utils.execAsync(`wl-copy ${self.attribute.emoji}`).catch(print)
-                            current_window.hide()
-                        },
-                        tooltipText: emojiKey.replace(/^e\d+-\d+/, '').replaceAll("-", " ").trim()
-                    }))
+                    flow.add(
+                        Widget.Button({
+                            class_name: "standard_icon_button emoji",
+                            label: emoji,
+                            attribute: { emoji: emoji },
+                            on_clicked: (self) => {
+                                Utils.execAsync(`wl-copy ${self.attribute.emoji}`).catch(print);
+                                current_window.hide();
+                            },
+                            tooltipText: emojiKey
+                                .replace(/^e\d+-\d+/, "")
+                                .replaceAll("-", " ")
+                                .trim()
+                        })
+                    );
             }
             box.child = flow;
-        })
-    })
+        });
+    });
 
     return Widget.Scrollable({
         child: box,
@@ -211,14 +211,15 @@ function Page(category) {
     for (let subcategoryKey in category) {
         box.pack_start(
             Widget.Label({
-                label:
-                    subcategoryKey.charAt(0).toUpperCase()
-                    + subcategoryKey.replaceAll("-", " ").slice(1) + ":",
+                label: subcategoryKey.charAt(0).toUpperCase() + subcategoryKey.replaceAll("-", " ").slice(1) + ":",
                 class_name: "title",
                 vpack: "start",
-                hpack: "start",
-            }), false, false, 0
-        )
+                hpack: "start"
+            }),
+            false,
+            false,
+            0
+        );
         const flow = Widget.FlowBox({
             homogeneous: true
         });
@@ -227,19 +228,24 @@ function Page(category) {
         let emojis = category[subcategoryKey];
         for (let emojiKey in emojis) {
             let emoji = emojis[emojiKey];
-            flow.add(Widget.Button({
-                class_name: "standard_icon_button emoji",
-                label: emoji,
-                attribute: { emoji: emoji },
-                on_clicked: (self) => {
-                    addRecentEmoji(emojiKey, emoji)
-                    Utils.execAsync(`wl-copy ${self.attribute.emoji}`).catch(print)
-                    current_window.hide()
-                },
-                tooltipText: emojiKey.replace(/^e\d+-\d+/, '').replaceAll("-", " ").trim()
-            }))
+            flow.add(
+                Widget.Button({
+                    class_name: "standard_icon_button emoji",
+                    label: emoji,
+                    attribute: { emoji: emoji },
+                    on_clicked: (self) => {
+                        addRecentEmoji(emojiKey, emoji);
+                        Utils.execAsync(`wl-copy ${self.attribute.emoji}`).catch(print);
+                        current_window.hide();
+                    },
+                    tooltipText: emojiKey
+                        .replace(/^e\d+-\d+/, "")
+                        .replaceAll("-", " ")
+                        .trim()
+                })
+            );
         }
-        box.pack_start(flow, false, false, 0)
+        box.pack_start(flow, false, false, 0);
     }
     return Widget.Scrollable({
         child: box,
@@ -248,29 +254,27 @@ function Page(category) {
     });
 }
 
-
 function EmojiList() {
     const search = Variable("");
-    const Button = (icon: string, name: string) => Widget.Button({
-        class_name: "emoji_category standard_icon_button",
-        child: MaterialIcon(icon),
-        setup: (self) => {
-            self.hook(current_page, () => {
-                self.toggleClassName("active", current_page.value == name)
-            })
-        },
-        on_clicked: () => {
-            current_page.setValue(name)
-        }
-    })
+    const Button = (icon: string, name: string) =>
+        Widget.Button({
+            class_name: "emoji_category standard_icon_button",
+            child: MaterialIcon(icon),
+            setup: (self) => {
+                self.hook(current_page, () => {
+                    self.toggleClassName("active", current_page.value == name);
+                });
+            },
+            on_clicked: () => {
+                current_page.setValue(name);
+            }
+        });
 
     let categories_pages = {
-        "search": SearchPage(search),
-        "recent": RecentPage()
+        search: SearchPage(search),
+        recent: RecentPage()
     };
-    let categories_buttons = [
-        Button("schedule", "recent")
-    ];
+    let categories_buttons = [Button("schedule", "recent")];
     for (const name in emojiData) {
         categories_buttons = [...categories_buttons, Button(CATEGORY_ICONS[name]!, name)];
         categories_pages[name] = Page(emojiData[name]);
@@ -296,14 +300,14 @@ function EmojiList() {
             });
         },
         transition: "crossfade"
-    })
+    });
     const entry = Widget.Entry({
         placeholder_text: "Search",
         class_name: "search",
         on_change: (self) => {
-            search.setValue(entry.text!)
+            search.setValue(entry.text!);
         }
-    })
+    });
 
     const box = Widget.Box({
         class_name: "emoji_list",
@@ -314,17 +318,14 @@ function EmojiList() {
                 hscroll: "always",
                 child: Widget.Box({
                     class_name: "top_bar",
-                    children: [
-                        entry,
-                        ...categories_buttons
-                    ]
+                    children: [entry, ...categories_buttons]
                 })
             }),
             stack
         ]
-    })
+    });
 
-    return box
+    return box;
 }
 
 export const EmojisWindow = () => {
@@ -337,17 +338,17 @@ export const EmojisWindow = () => {
         setup(win: any) {
             current_window = win;
             win.keybind("Escape", () => {
-                win.close()
-            })
+                win.close();
+            });
         },
-        visible: true,
+        visible: true
     });
     // @ts-ignore
     window.on("delete-event", () => {
         // @ts-ignore
-        window.hide()
-        return true
-    })
+        window.hide();
+        return true;
+    });
 
-    return window
-}
+    return window;
+};

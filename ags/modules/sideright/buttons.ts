@@ -2,7 +2,7 @@ import { MaterialIcon } from "icons";
 
 const { GLib } = imports.gi;
 
-const scripts_dir = `${GLib.get_home_dir()}/dotfiles/hypr/scripts`
+const scripts_dir = `${GLib.get_home_dir()}/dotfiles/hypr/scripts`;
 const lock_command = `${scripts_dir}/lock.sh`;
 const logout_command = `${scripts_dir}/exit.sh`;
 const shutdown_command = `${scripts_dir}/shutdown.sh`;
@@ -15,10 +15,10 @@ function LockButton({ icon, ...props }) {
         tooltip_text: "Lock",
         child: MaterialIcon(icon, "20px"),
         class_name: "outline_button",
-        ...props,
-    })
+        ...props
+    });
 
-    button.connect('clicked', () => {
+    button.connect("clicked", () => {
         clickCount++;
         if (clickCount === 2) {
             Utils.execAsync(lock_command).catch(print);
@@ -26,13 +26,12 @@ function LockButton({ icon, ...props }) {
         }
     });
 
-    button.connect('focus-out-event', () => {
+    button.connect("focus-out-event", () => {
         clickCount = 0;
     });
 
-    return button
+    return button;
 }
-
 
 function SuspendButton({ icon, ...props }) {
     let clickCount = 0;
@@ -40,10 +39,10 @@ function SuspendButton({ icon, ...props }) {
         tooltip_text: "Suspend",
         child: MaterialIcon(icon, "20px"),
         class_name: "outline_button",
-        ...props,
-    })
+        ...props
+    });
 
-    button.connect('clicked', () => {
+    button.connect("clicked", () => {
         clickCount++;
         if (clickCount === 2) {
             Utils.execAsync(`mpc -q pause`).catch();
@@ -53,13 +52,12 @@ function SuspendButton({ icon, ...props }) {
         }
     });
 
-    button.connect('focus-out-event', () => {
+    button.connect("focus-out-event", () => {
         clickCount = 0;
     });
 
-    return button
+    return button;
 }
-
 
 function LogoutButton({ icon, ...props }) {
     let clickCount = 0;
@@ -67,10 +65,10 @@ function LogoutButton({ icon, ...props }) {
         tooltip_text: "Logout",
         child: MaterialIcon(icon, "20px"),
         class_name: "outline_button",
-        ...props,
-    })
+        ...props
+    });
 
-    button.connect('clicked', () => {
+    button.connect("clicked", () => {
         clickCount++;
         if (clickCount === 2) {
             Utils.execAsync(logout_command).catch();
@@ -78,13 +76,12 @@ function LogoutButton({ icon, ...props }) {
         }
     });
 
-    button.connect('focus-out-event', () => {
+    button.connect("focus-out-event", () => {
         clickCount = 0;
     });
 
-    return button
+    return button;
 }
-
 
 function RebootButton({ icon, ...props }) {
     let clickCount = 0;
@@ -92,10 +89,10 @@ function RebootButton({ icon, ...props }) {
         tooltip_text: "Reboot",
         child: MaterialIcon(icon, "20px"),
         class_name: "outline_button",
-        ...props,
-    })
+        ...props
+    });
 
-    button.connect('clicked', () => {
+    button.connect("clicked", () => {
         clickCount++;
         if (clickCount === 2) {
             Utils.execAsync(reboot_command).catch();
@@ -103,13 +100,12 @@ function RebootButton({ icon, ...props }) {
         }
     });
 
-    button.connect('focus-out-event', () => {
+    button.connect("focus-out-event", () => {
         clickCount = 0;
     });
 
-    return button
+    return button;
 }
-
 
 function ShutdownButton({ icon, ...props }) {
     let clickCount = 0;
@@ -117,10 +113,10 @@ function ShutdownButton({ icon, ...props }) {
         tooltip_text: "Shutdown",
         child: MaterialIcon(icon, "20px"),
         class_name: "outline_button",
-        ...props,
-    })
+        ...props
+    });
 
-    button.connect('clicked', () => {
+    button.connect("clicked", () => {
         clickCount++;
         if (clickCount === 2) {
             Utils.execAsync(shutdown_command).catch();
@@ -128,13 +124,12 @@ function ShutdownButton({ icon, ...props }) {
         }
     });
 
-    button.connect('focus-out-event', () => {
+    button.connect("focus-out-event", () => {
         clickCount = 0;
     });
 
-    return button
+    return button;
 }
-
 
 export function Buttons() {
     return Widget.Box({
@@ -144,24 +139,24 @@ export function Buttons() {
         children: [
             LockButton({
                 icon: "lock",
-                hexpand: true,
+                hexpand: true
             }),
             SuspendButton({
                 icon: "clear_night",
-                hexpand: true,
+                hexpand: true
             }),
             LogoutButton({
                 icon: "logout",
-                hexpand: true,
+                hexpand: true
             }),
             RebootButton({
                 icon: "restart_alt",
-                hexpand: true,
+                hexpand: true
             }),
             ShutdownButton({
                 icon: "power_settings_new",
-                hexpand: true,
+                hexpand: true
             })
         ]
-    })
+    });
 }

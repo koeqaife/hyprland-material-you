@@ -1,8 +1,7 @@
-const WINDOW_NAME = "cliphist"
-import popupwindow from './misc/popupwindow.ts';
-import Box from 'types/widgets/box.js';
-import Gtk from "gi://Gtk?version=3.0"
-
+const WINDOW_NAME = "cliphist";
+import popupwindow from "./misc/popupwindow.ts";
+import Box from "types/widgets/box.js";
+import Gtk from "gi://Gtk?version=3.0";
 
 type EntryObject = {
     id: string;
@@ -12,7 +11,7 @@ type EntryObject = {
 // ·
 
 function ClipHistItem(entry: string) {
-    let [id, ...content] = entry.split('\t');
+    let [id, ...content] = entry.split("\t");
     let clickCount = 0;
     let button = Widget.Button({
         class_name: "clip_container",
@@ -22,40 +21,40 @@ function ClipHistItem(entry: string) {
                     label: id,
                     class_name: "clip_id",
                     xalign: 0,
-                    vpack: "center",
+                    vpack: "center"
                 }),
                 Widget.Label({
                     label: "・",
                     class_name: "dot_divider",
                     xalign: 0,
-                    vpack: "center",
+                    vpack: "center"
                 }),
                 Widget.Label({
-                    label: content.join(' ').trim(),
+                    label: content.join(" ").trim(),
                     class_name: "clip_label",
                     xalign: 0,
                     vpack: "center",
-                    truncate: "end",
-                }),
+                    truncate: "end"
+                })
             ]
         })
-    })
+    });
 
-    button.connect('clicked', () => {
+    button.connect("clicked", () => {
         clickCount++;
         if (clickCount === 2) {
             App.closeWindow(WINDOW_NAME);
-            Utils.execAsync(`${App.configDir}/scripts/cliphist.sh --copy-by-id ${id}`)
+            Utils.execAsync(`${App.configDir}/scripts/cliphist.sh --copy-by-id ${id}`);
             clickCount = 0;
         }
     });
 
-    button.connect('focus-out-event', () => {
+    button.connect("focus-out-event", () => {
         clickCount = 0;
     });
 
     return Widget.Box({
-        attribute: { content: content.join(' ').trim() },
+        attribute: { content: content.join(" ").trim() },
         orientation: Gtk.Orientation.VERTICAL,
         children: [
             button,
@@ -64,9 +63,8 @@ function ClipHistItem(entry: string) {
                 orientation: Gtk.Orientation.HORIZONTAL
             })
         ]
-    })
+    });
 }
-
 
 function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
     let output: string;
@@ -76,22 +74,22 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
 
     const list = Widget.Box({
         vertical: true,
-        spacing,
+        spacing
     });
 
     async function repopulate() {
         output = await Utils.execAsync(`${App.configDir}/scripts/cliphist.sh --get`)
-            .then(str => str)
-            .catch(err => {
-                print(err)
-                return ""
+            .then((str) => str)
+            .catch((err) => {
+                print(err);
+                return "";
             });
-        entries = output.split('\n').filter(line => line.trim() !== '');
-        clipHistItems = entries.map(entry => {
-            let [id, ...content] = entry.split('\t');
-            return { id: id.trim(), content: content.join(' ').trim(), entry: entry };
+        entries = output.split("\n").filter((line) => line.trim() !== "");
+        clipHistItems = entries.map((entry) => {
+            let [id, ...content] = entry.split("\t");
+            return { id: id.trim(), content: content.join(" ").trim(), entry: entry };
         });
-        widgets = clipHistItems.map(item => ClipHistItem(item.entry));
+        widgets = clipHistItems.map((item) => ClipHistItem(item.entry));
         list.children = widgets;
     }
     repopulate();
@@ -101,10 +99,11 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
         class_name: "cliphistory_entry",
         placeholder_text: "Search",
 
-        on_change: ({ text }) => widgets.forEach(item => {
-            item.visible = item.attribute.content.match(text ?? "")
-        }),
-    })
+        on_change: ({ text }) =>
+            widgets.forEach((item) => {
+                item.visible = item.attribute.content.match(text ?? "");
+            })
+    });
 
     return Widget.Box({
         vertical: true,
@@ -116,23 +115,21 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
             Widget.Separator(),
             Widget.Scrollable({
                 hscroll: "never",
-                css: `min-width: ${width}px;`
-                    + `min-height: ${height}px;`,
-                child: list,
-            }),
+                css: `min-width: ${width}px;` + `min-height: ${height}px;`,
+                child: list
+            })
         ],
-        setup: self => self.hook(App, (_, windowName, visible) => {
-            if (windowName !== WINDOW_NAME)
-                return
+        setup: (self) =>
+            self.hook(App, (_, windowName, visible) => {
+                if (windowName !== WINDOW_NAME) return;
 
-            if (visible) {
-                repopulate()
-                entry.text = ""
-            }
-        }),
-    })
+                if (visible) {
+                    repopulate();
+                    entry.text = "";
+                }
+            })
+    });
 }
-
 
 export const cliphist = popupwindow({
     name: WINDOW_NAME,
@@ -143,8 +140,7 @@ export const cliphist = popupwindow({
     child: ClipHistWidget({
         width: 500,
         height: 500,
-        spacing: 0,
+        spacing: 0
     }),
     anchor: ["top", "right"]
-})
-
+});

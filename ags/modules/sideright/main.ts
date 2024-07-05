@@ -1,8 +1,7 @@
-import popupwindow from '../misc/popupwindow.js';
-import { SideBar } from './sidebar.ts'
+import popupwindow from "../misc/popupwindow.js";
+import { SideBar } from "./sidebar.ts";
 
-export const WINDOW_NAME = "sidebar" 
-
+export const WINDOW_NAME = "sidebar";
 
 export const sideright = popupwindow({
     name: WINDOW_NAME,
@@ -13,4 +12,4 @@ export const sideright = popupwindow({
     child: SideBar(),
     anchor: ["top", "right", "bottom"],
     css: "min-width: 443px;"
-})
+});

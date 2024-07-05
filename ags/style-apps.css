@@ -122,7 +122,7 @@
 }
 
 .settings .row:hover {
-    background-color: mix(@onSurface, @surface, 0.92)
+    background-color: mix(@onSurface, @surface, 0.92);
 }
 
 .settings .row:active:not(.focused) {
@@ -139,13 +139,13 @@
 .settings .row .title {
     font-weight: normal;
     font-size: 17px;
-    color: @onSurface
+    color: @onSurface;
 }
 
 .settings .row .description {
     font-weight: normal;
     font-size: 14px;
-    color: @onSurfaceVariant
+    color: @onSurfaceVariant;
 }
 
 .settings .row .icon {
@@ -194,13 +194,13 @@
 .settings .device_list .row .title {
     font-weight: normal;
     font-size: 16px;
-    color: @onSurface
+    color: @onSurface;
 }
 
 .settings .device_list .row .description {
     font-weight: normal;
     font-size: 14px;
-    color: @onSurfaceVariant
+    color: @onSurfaceVariant;
 }
 
 .settings .device_list .row image {

@@ -68,11 +68,11 @@ menu {
 }
 
 menuitem {
-    color: @onSurface
+    color: @onSurface;
 }
 
 menuitem:disabled {
-    color: mix(@onSurface, transparent, 0.38)
+    color: mix(@onSurface, transparent, 0.38);
 }
 
 menu separator {
@@ -168,7 +168,6 @@ separator {
  * Tray
  * ----------------------------------------------------- */
 
-
 .tray {
     background-color: @surfaceContainer;
     border-radius: 16px;
@@ -191,7 +190,6 @@ separator {
 window.notification-popups box.notifications {
     padding: 14px;
 }
-
 
 .notification-icon {
     min-width: 68px;
@@ -234,8 +232,8 @@ window.notification-popups box.notifications {
 }
 
 .notification-actions .notification-action-button {
-    margin: 0 .4em;
-    margin-top: .8em;
+    margin: 0 0.4em;
+    margin-top: 0.8em;
 }
 
 .notification-action-button {
@@ -305,7 +303,7 @@ window.notification-popups box.notifications {
 }
 
 .application_container:hover {
-    background-color: mix(@onSurface, @surface, 0.92)
+    background-color: mix(@onSurface, @surface, 0.92);
 }
 
 .application_container:focus {
@@ -325,7 +323,7 @@ window.notification-popups box.notifications {
 }
 
 .application_label {
-    color: @onSurface
+    color: @onSurface;
 }
 
 .application_icon {
@@ -373,7 +371,7 @@ window.notification-popups box.notifications {
 }
 
 .clip_container:hover {
-    background-color: mix(@onSurface, @surface, 0.92)
+    background-color: mix(@onSurface, @surface, 0.92);
 }
 
 .clip_container:focus {
@@ -453,12 +451,12 @@ window.notification-popups box.notifications {
 }
 
 .player .icon {
-    color: @foreground
+    color: @foreground;
 }
 
 .player scale.position {
     padding: 0;
-    margin-bottom: .3em;
+    margin-bottom: 0.3em;
     margin-left: 10px;
 }
 
@@ -478,7 +476,7 @@ window.notification-popups box.notifications {
 .player button {
     min-height: 1em;
     min-width: 1em;
-    padding: .3em;
+    padding: 0.3em;
     padding-top: 0px;
     padding-bottom: 0px;
     color: @onSecondary;
@@ -629,7 +627,7 @@ window.notification-popups box.notifications {
 }
 
 .management_button.active label {
-    color: @onPrimary
+    color: @onPrimary;
 }
 
 .management_button.active .icon {
@@ -651,11 +649,11 @@ window.notification-popups box.notifications {
 }
 
 .management_button.waiting label {
-    color: @onError
+    color: @onError;
 }
 
 .management_button.waiting .icon {
-    color: @onError
+    color: @onError;
 }
 
 .management_button.waiting {
@@ -775,11 +773,11 @@ window.notification-popups box.notifications {
 }
 
 .usage_box label {
-    color: @onSurface
+    color: @onSurface;
 }
 
 .info_box label {
-    color: @onSurface
+    color: @onSurface;
 }
 
 .usage_bar_point {
@@ -812,7 +810,8 @@ window.notification-popups box.notifications {
     color: @surfaceContainerHigh;
 }
 
-.dotbutton:hover {}
+.dotbutton:hover {
+}
 
 .dotbutton.active label {
     color: @secondary;
@@ -988,7 +987,6 @@ filled_button.disabled .awesome_icon,
  * Navigation bar
  * ----------------------------------------------------- */
 
-
 .navigation {
     background-color: @surfaceContainer;
     padding-top: 3px;
@@ -1054,7 +1052,6 @@ filled_button.disabled .awesome_icon,
 /* -----------------------------------------------------
  * Switch
  * ----------------------------------------------------- */
-
 
 switch {
     border: 2px solid;
@@ -1126,7 +1123,6 @@ switch:checked:hover slider,
 switch:checked:active slider {
     background-color: @primaryContainer;
 }
-
 
 /* -----------------------------------------------------
  * Cheatsheet
