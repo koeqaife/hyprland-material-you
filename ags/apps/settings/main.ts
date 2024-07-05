@@ -6,8 +6,8 @@ import { Wallpapers } from "./wallpapers";
 import { Info } from "./info";
 import { Apps } from "./apps";
 import { MaterialIcon } from "icons";
-const hyprland = await Service.import("hyprland")
-import Gtk from "gi://Gtk?version=3.0"
+const hyprland = await Service.import("hyprland");
+import Gtk from "gi://Gtk?version=3.0";
 
 globalThis.OpenSettings = OpenSettings;
 let current_window;
@@ -16,21 +16,16 @@ const current_tab = Variable("network");
 export async function OpenSettings(cur_tab: string = "network") {
     if (current_window) {
         const _current_workspace = hyprland.active.workspace.id;
-        const _client = hyprland.clients.find(client => {
-            return (client.class == "com.github.Aylur.ags" && client.title == "Settings")
-        })
+        const _client = hyprland.clients.find((client) => {
+            return client.class == "com.github.Aylur.ags" && client.title == "Settings";
+        });
         if (_client && _current_workspace != _client.workspace.id) {
-            current_tab.setValue(cur_tab)
-            current_window.hide()
-            current_window.show()
-        }
-        else
-            current_tab.setValue(cur_tab)
-    }
-    else
-        SettingsWindow(cur_tab);
+            current_tab.setValue(cur_tab);
+            current_window.hide();
+            current_window.show();
+        } else current_tab.setValue(cur_tab);
+    } else SettingsWindow(cur_tab);
 }
-
 
 function Settings(cur_tab: string) {
     current_tab.setValue(cur_tab);
@@ -41,24 +36,24 @@ function Settings(cur_tab: string) {
         hexpand: true,
         transition: "crossfade",
         children: {
-            "network": Page(Network(), "Network"),
-            "bluetooth": Page(Bluetooth(), "Bluetooth"),
-            "appearance": Page(Appearance(), "Appearance"),
-            "wallpaper": Page(Wallpapers(), "Wallpapers"),
-            "info": Page(Info(), "Info"),
-            "apps": Page(Apps(), "Apps")
+            network: Page(Network(), "Network"),
+            bluetooth: Page(Bluetooth(), "Bluetooth"),
+            appearance: Page(Appearance(), "Appearance"),
+            wallpaper: Page(Wallpapers(), "Wallpapers"),
+            info: Page(Info(), "Info"),
+            apps: Page(Apps(), "Apps")
         }
-    })
-    const Row = (name: string, label: string, icon: string = "image-missing") => Widget.Button({
-        on_clicked: () => { current_tab.setValue(name) },
-        child: Widget.Box({
-            children: [
-                MaterialIcon(icon),
-                Widget.Label(label)
-            ]
-        }),
-        class_name: current_tab.bind().as(c => c == name ? "sidebar_row active" : "sidebar_row")
-    })
+    });
+    const Row = (name: string, label: string, icon: string = "image-missing") =>
+        Widget.Button({
+            on_clicked: () => {
+                current_tab.setValue(name);
+            },
+            child: Widget.Box({
+                children: [MaterialIcon(icon), Widget.Label(label)]
+            }),
+            class_name: current_tab.bind().as((c) => (c == name ? "sidebar_row active" : "sidebar_row"))
+        });
     const sidebar = Widget.Box({
         vertical: true,
         vexpand: true,
@@ -75,7 +70,7 @@ function Settings(cur_tab: string) {
             Widget.Separator(),
             Row("info", "Info", "info")
         ]
-    })
+    });
     return Widget.Box({
         hexpand: true,
         vexpand: true,
@@ -93,7 +88,7 @@ function Settings(cur_tab: string) {
                     Widget.Scrollable({
                         hscroll: "never",
                         child: sidebar
-                    }),
+                    })
                 ]
             }),
             stack
@@ -101,24 +96,20 @@ function Settings(cur_tab: string) {
     });
 }
 
+export const Page = (widget: Gtk.Widget, name: string) =>
+    Widget.Box({
+        vertical: true,
+        children: [PageTitle(name), widget]
+    });
 
-export const Page = (widget: Gtk.Widget, name: string) => Widget.Box({
-    vertical: true,
-    children: [
-        PageTitle(name),
-        widget
-    ]
-})
-
-
-export const PageTitle = (label: string) => Widget.Box({
-    class_name: "page_title",
-    child: Widget.Label({
-        label: label,
-        hpack: "start"
-    })
-})
-
+export const PageTitle = (label: string) =>
+    Widget.Box({
+        class_name: "page_title",
+        child: Widget.Label({
+            label: label,
+            hpack: "start"
+        })
+    });
 
 export const SettingsWindow = (cur_tab: string) => {
     let window = RegularWindow({
@@ -130,17 +121,17 @@ export const SettingsWindow = (cur_tab: string) => {
         setup(win: any) {
             current_window = win;
             win.keybind("Escape", () => {
-                win.close()
-            })
+                win.close();
+            });
         },
-        visible: true,
+        visible: true
     });
     // @ts-ignore
     window.on("delete-event", () => {
         // @ts-ignore
-        window.destroy()
+        window.destroy();
         current_window = undefined;
-        return true
-    })
-    return window
-}
+        return true;
+    });
+    return window;
+};

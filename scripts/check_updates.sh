@@ -33,5 +33,3 @@ else
     echo "Your branch and the remote branch have diverged."
     exit 3
 fi
-
-
