@@ -1,16 +1,15 @@
 const { GLib } = imports.gi;
 
 export const default_config = {
-    "always_show_battery": false,
-    "show_taskbar": true,
-    "show_battery_percent": true,
-}
+    always_show_battery: false,
+    show_taskbar: true,
+    show_battery_percent: true
+};
 
-
-Utils.exec(["mkdir", "-p", `${GLib.get_home_dir()}/.config/ags_config/`])
+Utils.exec(["mkdir", "-p", `${GLib.get_home_dir()}/.config/ags_config/`]);
 const config_file = `${GLib.get_home_dir()}/.config/ags_config/conf.json`;
 if (Utils.readFile(config_file).length < 2) {
-    Utils.writeFileSync(JSON.stringify(default_config), config_file)
+    Utils.writeFileSync(JSON.stringify(default_config), config_file);
 }
 
 class ConfigService extends Service {
@@ -18,11 +17,11 @@ class ConfigService extends Service {
         Service.register(
             this,
             {
-                'config-changed': ['jsobject'],
+                "config-changed": ["jsobject"]
             },
             {
-                'config': ['jsobject', 'rw'],
-            },
+                config: ["jsobject", "rw"]
+            }
         );
     }
 
@@ -34,7 +33,7 @@ class ConfigService extends Service {
     }
 
     set config(conf) {
-        Utils.writeFile(JSON.stringify(conf), this.#config_file).catch(print)
+        Utils.writeFile(JSON.stringify(conf), this.#config_file).catch(print);
     }
 
     constructor() {
@@ -47,21 +46,20 @@ class ConfigService extends Service {
     }
 
     #onChange() {
-        Utils.readFileAsync(this.#config_file)
-            .then(out => {
-                this.#config = {...default_config, ...JSON.parse(out)}
-                this.emit('changed');
-                this.notify('config');
+        Utils.readFileAsync(this.#config_file).then((out) => {
+            this.#config = { ...default_config, ...JSON.parse(out) };
+            this.emit("changed");
+            this.notify("config");
 
-                this.emit('config-changed', this.#config);
-            })
+            this.emit("config-changed", this.#config);
+        });
     }
 
-    connect(event = 'config-changed', callback) {
+    connect(event = "config-changed", callback) {
         return super.connect(event, callback);
     }
 }
 
-const service = new ConfigService;
+const service = new ConfigService();
 
 export default service;
