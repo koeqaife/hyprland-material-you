@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if ! grep -q "Arch" /etc/os-release; then
+if ! grep -q "arch" /etc/os-release; then
     echo ":: This script is designed to run on Arch Linux."
     exit 1
 fi
