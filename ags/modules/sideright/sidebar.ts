@@ -1,7 +1,7 @@
-import { Management } from "./management.ts"
+import { Management } from "./management.ts";
 import { Buttons } from "./buttons.ts";
 import { Navigation } from "./navigation.ts";
-import Gtk from "gi://Gtk?version=3.0"
+import Gtk from "gi://Gtk?version=3.0";
 
 export function SideBar() {
     return Widget.Box({
@@ -14,5 +14,5 @@ export function SideBar() {
             Navigation()
             // NotificationsBox()
         ]
-    })
+    });
 }

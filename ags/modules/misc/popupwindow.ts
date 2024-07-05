@@ -1,16 +1,16 @@
-import App from 'resource:///com/github/Aylur/ags/app.js';
-import Widget from 'resource:///com/github/Aylur/ags/widget.js';
-import { WindowProps, Window } from 'types/widgets/window';
-import Gtk from "gi://Gtk?version=3.0"
+import App from "resource:///com/github/Aylur/ags/app.js";
+import Widget from "resource:///com/github/Aylur/ags/widget.js";
+import { WindowProps, Window } from "types/widgets/window";
+import Gtk from "gi://Gtk?version=3.0";
 
 type _WindowProps = WindowProps<any, unknown, Window<any, unknown>> | undefined[];
 
 type Type = {
-    name: string,
-    child: any,
-    showClassName?: string,
-    hideClassName?: string,
-}
+    name: string;
+    child: any;
+    showClassName?: string;
+    hideClassName?: string;
+};
 
 export default <T extends Type>({
     name,
@@ -23,7 +23,7 @@ export default <T extends Type>({
         name,
         visible: false,
         type: Gtk.WindowType.POPUP,
-        layer: 'overlay',
+        layer: "overlay",
         resizable: true,
         ...props,
         setup: (self) => {
@@ -35,10 +35,9 @@ export default <T extends Type>({
                     }
                 });
 
-                if (showClassName !== "" && hideClassName !== "")
-                    self.class_name = `${showClassName} ${hideClassName}`;
+                if (showClassName !== "" && hideClassName !== "") self.class_name = `${showClassName} ${hideClassName}`;
             }
         },
-        child: child,
+        child: child
     });
-}
+};

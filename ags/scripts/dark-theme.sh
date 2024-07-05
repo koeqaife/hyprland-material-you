@@ -9,11 +9,11 @@ toggle() {
 
     if [ "$VALUE" == "dark" ]; then
         python -O $GENERATOR -R --color-scheme light --scheme $GENERATION_SCHEME
-        echo "light" > $FILE
-        
+        echo "light" >$FILE
+
     elif [ "$VALUE" == "light" ]; then
         python -O $GENERATOR -R --color-scheme dark --scheme $GENERATION_SCHEME
-        echo "dark" > $FILE
+        echo "dark" >$FILE
     else
         echo "Unknown value: $VALUE"
     fi
@@ -21,12 +21,11 @@ toggle() {
 
 set() {
     python -O $GENERATOR -R --color-scheme $1 --scheme $GENERATION_SCHEME
-    echo $1 > $FILE
+    echo $1 >$FILE
 }
 
 if [[ "$1" == "--toggle" ]]; then
     toggle
-    elif [[ "$1" == "--set" ]]; then
+elif [[ "$1" == "--set" ]]; then
     set $2
 fi
-

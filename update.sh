@@ -1,7 +1,7 @@
 #!/bin/bash
 NOTIFICATION_SENT_FILE="/tmp/git_update_notification_sent"
 
-"$HOME"/dotfiles/scripts/check_updates.sh > /dev/null
+"$HOME"/dotfiles/scripts/check_updates.sh >/dev/null
 status=$?
 
 if [ $status -eq 0 ]; then
