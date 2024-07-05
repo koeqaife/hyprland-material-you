@@ -39,24 +39,24 @@ install_packages() {
     sleep 1
     yay -Syu --noconfirm --needed
     yay -S --noconfirm --needed \
-    hyprland hyprshot hyprcursor hypridle hyprlang hyprpaper hyprpicker \
-    hyprutils hyprwayland-scanner xdg-dbus-proxy xdg-desktop-portal \
-    xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-user-dirs \
-    xdg-utils libxdg-basedir python-pyxdg aylurs-gtk-shell swww gtk3 gtk4 \
-    adw-gtk3 adw-gtk-theme libdbusmenu-gtk3 python-pip python-pillow sddm \
-    sddm-theme-corners-git nautilus nm-connection-editor network-manager-applet \
-    networkmanager gnome-bluetooth-3.0 wl-gammarelay bluez bluez-libs bluez-utils \
-    cliphist wl-clipboard pywal-16-colors libadwaita swappy nwg-look alacritty \
-    pavucontrol polkit-gnome brightnessctl man-pages gvfs xarchiver zip imagemagick \
-    blueman fastfetch bibata-cursor-theme gum python-pywayland brave dbus \
-    libdrm mesa fwupd rofi-wayland bun-bin pipewire wireplumber udiskie \
-    lm_sensors gnome-system-monitor playerctl ttf-meslo-nerd ttf-google-sans \
-    ttf-font-awesome ttf-opensans ttf-roboto lshw ttf-material-symbols-variable-git \
-    fontconfig dart-sass ttf-meslo-nerd-font-powerlevel10k cpio meson cmake
+        hyprland hyprshot hyprcursor hypridle hyprlang hyprpaper hyprpicker \
+        hyprutils hyprwayland-scanner xdg-dbus-proxy xdg-desktop-portal \
+        xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-user-dirs \
+        xdg-utils libxdg-basedir python-pyxdg aylurs-gtk-shell swww gtk3 gtk4 \
+        adw-gtk3 adw-gtk-theme libdbusmenu-gtk3 python-pip python-pillow sddm \
+        sddm-theme-corners-git nautilus nm-connection-editor network-manager-applet \
+        networkmanager gnome-bluetooth-3.0 wl-gammarelay bluez bluez-libs bluez-utils \
+        cliphist wl-clipboard pywal-16-colors libadwaita swappy nwg-look alacritty \
+        pavucontrol polkit-gnome brightnessctl man-pages gvfs xarchiver zip imagemagick \
+        blueman fastfetch bibata-cursor-theme gum python-pywayland brave dbus \
+        libdrm mesa fwupd rofi-wayland bun-bin pipewire wireplumber udiskie \
+        lm_sensors gnome-system-monitor playerctl ttf-meslo-nerd ttf-google-sans \
+        ttf-font-awesome ttf-opensans ttf-roboto lshw ttf-material-symbols-variable-git \
+        fontconfig dart-sass ttf-meslo-nerd-font-powerlevel10k cpio meson cmake
 }
 
 setup_yay() {
-    if command -v yay &> /dev/null; then
+    if command -v yay &>/dev/null; then
         echo ":: Yay is installed"
         sleep 1
     else
@@ -67,20 +67,20 @@ setup_yay() {
 }
 
 setup_sensors() {
-    sudo sensors-detect --auto > /dev/null
+    sudo sensors-detect --auto >/dev/null
 }
 
 check_config_folders() {
     local CHECK_CONFIG_FOLDERS="ags alacritty hypr swappy wal"
     local EXIT="NO"
-    
+
     for dir in $CHECK_CONFIG_FOLDERS; do
         if [ -d "$HOME/.config/$dir" ]; then
             echo ":: Error: directory $dir already exists in .config"
             EXIT="YES"
         fi
     done
-    
+
     if [[ $EXIT == "YES" ]]; then
         echo ":: Please remove it or make a backup of it"
         exit 1
@@ -158,7 +158,7 @@ remove_gtk_buttons() {
 
 setup_services() {
     echo ":: Services"
-    
+
     if systemctl is-active --quiet bluetooth.service; then
         echo ":: bluetooth.service already running."
     else
@@ -166,7 +166,7 @@ setup_services() {
         sudo systemctl start bluetooth.service
         echo ":: bluetooth.service activated successfully."
     fi
-    
+
     if systemctl is-active --quiet NetworkManager.service; then
         echo ":: NetworkManager.service already running."
     else
@@ -194,8 +194,7 @@ main() {
         exit 0
     fi
     setup_yay
-    if ! command -v gum &> /dev/null
-    then
+    if ! command -v gum &>/dev/null; then
         echo ":: gum not installed"
         sudo pacman -S gum
     fi
@@ -214,7 +213,7 @@ main() {
     ask_continue "Proceed with setting up services?*" && setup_services
     ask_continue "Proceed with updating user directories?*" && update_user_dirs
     ask_continue "Proceed with miscellaneous tasks?*" && misc_tasks
-    
+
     echo "Please restart your PC"
 }
 

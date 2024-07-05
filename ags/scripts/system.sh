@@ -1,8 +1,8 @@
 #!/bin/bash
 
 get_cpu_usage() {
-    top -bn1 | grep "Cpu(s)" | \
-    awk '{printf "%.0f\n", $2 + $4 + $6}'
+    top -bn1 | grep "Cpu(s)" |
+        awk '{printf "%.0f\n", $2 + $4 + $6}'
 }
 
 get_ram_usage() {
@@ -42,31 +42,31 @@ get_os() {
 }
 
 get_uptime() {
-    uptime -p | sed -e 's/up //' -e 's/ hours\{0,1\}/h/g' -e 's/ minutes\{0,1\}/min/g' -e 's/ days\{0,1\}/d/g' -e 's/ seconds\{0,1\}/sec/g' -e 's/ //g' -e 's/,/, /' 
+    uptime -p | sed -e 's/up //' -e 's/ hours\{0,1\}/h/g' -e 's/ minutes\{0,1\}/min/g' -e 's/ days\{0,1\}/d/g' -e 's/ seconds\{0,1\}/sec/g' -e 's/ //g' -e 's/,/, /'
 }
 
 if [[ "$1" == "--cpu-usage" ]]; then
     get_cpu_usage
-    elif [[ "$1" == "--ram-usage" ]]; then
+elif [[ "$1" == "--ram-usage" ]]; then
     get_ram_usage
-    elif [[ "$1" == "--swap-usage" ]]; then
+elif [[ "$1" == "--swap-usage" ]]; then
     get_swap_usage
-    elif [[ "$1" == "--cpu-temp" ]]; then
+elif [[ "$1" == "--cpu-temp" ]]; then
     get_cpu_temp
-    elif [[ "$1" == "--cpu-name" ]]; then
+elif [[ "$1" == "--cpu-name" ]]; then
     get_cpu_name
-    elif [[ "$1" == "--cpu-cores" ]]; then
+elif [[ "$1" == "--cpu-cores" ]]; then
     nproc
-    elif [[ "$1" == "--ram" ]]; then
+elif [[ "$1" == "--ram" ]]; then
     get_ram
-    elif [[ "$1" == "--kernel" ]]; then
+elif [[ "$1" == "--kernel" ]]; then
     get_kernel
-    elif [[ "$1" == "--gpu-name" ]]; then
+elif [[ "$1" == "--gpu-name" ]]; then
     get_gpu
-    elif [[ "$1" == "--hostname" ]]; then
+elif [[ "$1" == "--hostname" ]]; then
     get_hostname
-    elif [[ "$1" == "--os" ]]; then
+elif [[ "$1" == "--os" ]]; then
     get_os
-    elif [[ "$1" == "--uptime" ]]; then
+elif [[ "$1" == "--uptime" ]]; then
     get_uptime
 fi

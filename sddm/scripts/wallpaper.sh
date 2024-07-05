@@ -7,7 +7,7 @@ fi
 
 cp $HOME/dotfiles/sddm/sddm.conf /etc/sddm.conf.d/
 cp $HOME/dotfiles/sddm/sddm.conf /etc/
-if [ "$1" != "init" ] ;then
+if [ "$1" != "init" ]; then
     echo "File /etc/sddm.conf.d/sddm.conf updated."
 fi
 
@@ -16,15 +16,15 @@ extension="${current_wallpaper##*.}"
 
 cp $current_wallpaper /usr/share/sddm/themes/corners/backgrounds/current_wallpaper.$extension
 
-if [ "$1" != "init" ] ;then
+if [ "$1" != "init" ]; then
     echo "Current wallpaper copied into /usr/share/sddm/themes/corners/backgrounds/"
-fi 
+fi
 
 new_wall=$(echo $current_wallpaper | sed "s|$HOME/wallpaper/||g")
 cp $HOME/.cache/wal/colors-sddm-style.conf /usr/share/sddm/themes/corners/theme.conf
 sed -i 's/CURRENTWALLPAPER/'"current_wallpaper.$extension"'/' /usr/share/sddm/themes/corners/theme.conf
 
-if [ "$1" != "init" ] ;then
+if [ "$1" != "init" ]; then
     echo "File theme.conf updated in /usr/share/sddm/themes/corners/"
 
     echo "DONE! Please logout to test sddm."
