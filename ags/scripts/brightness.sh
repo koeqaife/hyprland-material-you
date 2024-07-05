@@ -19,7 +19,7 @@ set_brightness() {
     # fi
     # trap "rm -f $LOCKFILE; exit" INT TERM EXIT
     # echo $$ > "$LOCKFILE"
-    if (( $(echo "$1 < 0.05" | bc -l) )); then
+    if (($(echo "$1 < 0.05" | bc -l))); then
         BRIGHTNESS=0.05
     else
         BRIGHTNESS=$1
@@ -45,12 +45,12 @@ get() {
         exit 0
     fi
     percentage=$(get_brightness)
-    
+
     echo "$percentage"
 }
 
 if [[ "$1" == "--set" ]]; then
     set $2
-    elif [[ "$1" == "--get" ]]; then
+elif [[ "$1" == "--get" ]]; then
     get
 fi

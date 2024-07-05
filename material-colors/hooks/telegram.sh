@@ -11,4 +11,4 @@ mkdir -p $telegram_theme_cache
 
 cp $cache_folder/colors.tdesktop-theme $telegram_theme_cache/colors.tdesktop-theme
 
-zip -q -j $telegram_theme_cache/pallete.tdesktop-theme  $telegram_theme_cache/tiled.png $telegram_theme_cache/colors.tdesktop-theme
+zip -q -j $telegram_theme_cache/pallete.tdesktop-theme $telegram_theme_cache/tiled.png $telegram_theme_cache/colors.tdesktop-theme
