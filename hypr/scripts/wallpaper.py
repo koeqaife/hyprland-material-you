@@ -181,7 +181,9 @@ async def main():
         with open(hyprpaper_conf_file, 'w') as file:
             file.write(output)
 
-        subprocess.Popen(['hyprpaper'])
+        subprocess.run([
+            "hyprctl", "dispatch", "exec", "hyprpaper"
+        ])
 
     else:
         print(":: Wallpaper Engine disabled")
