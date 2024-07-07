@@ -2,7 +2,6 @@
 
 window.bar {
     background-color: @surface;
-    padding: 6px;
 }
 
 .bar label {
@@ -95,7 +94,10 @@ separator {
 .modules-left,
 .modules-center,
 .modules-right {
-    padding: 6px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    margin-left: 12px;
+    margin-right: 12px;
 }
 
 /* -----------------------------------------------------
