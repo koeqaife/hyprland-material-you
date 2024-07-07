@@ -8,7 +8,6 @@ type EntryObject = {
     content: string;
     entry: string;
 };
-// ·
 
 function ClipHistItem(entry: string) {
     let [id, ...content] = entry.split("\t");
@@ -99,10 +98,12 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
         class_name: "cliphistory_entry",
         placeholder_text: "Search",
 
-        on_change: ({ text }) =>
+        on_change: ({ text }) => {
+            const searchText = (text ?? "").toLowerCase();
             widgets.forEach((item) => {
-                item.visible = item.attribute.content.match(text ?? "");
-            })
+                item.visible = item.attribute.content.toLowerCase().includes(searchText);
+            });
+        }
     });
 
     return Widget.Box({
