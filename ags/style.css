@@ -217,7 +217,7 @@ window.notification-popups box.notifications {
     border-radius: 24px;
     padding: 1em;
     margin: 1px;
-    background-color: @surfaceContainerLowest;
+    background-color: @surfaceContainerLow;
 }
 
 .notification.critical {
@@ -509,7 +509,7 @@ window.notification-popups box.notifications {
 }
 
 .sidebar_bottom {
-    background-color: @surfaceContainerLow;
+    background-color: @surface;
     border-radius: 24px 24px 0px 0px;
     transition: all 0.25s ease-in-out;
 }
@@ -520,7 +520,8 @@ window.notification-popups box.notifications {
     border-radius: 14px;
     margin-top: 10px;
     padding: 15px;
-    background-color: @background;
+    background-color: @surfaceContainerLow;
+    box-shadow: 0px 0px 2px mix(@shadow, transparent, 0.75);
     transition: all 0.25s ease-in-out;
 }
 
@@ -589,12 +590,17 @@ window.notification-popups box.notifications {
 .system_box .slider_box,
 .system_box .usage_box,
 .system_box .info_box {
-    background-color: @surfaceContainerLowest;
+    background-color: @surfaceContainerLow;
     padding: 26px;
     border-radius: 14px;
+    box-shadow: 0px 0px 2px mix(@shadow, transparent, 0.75);
 }
 
 .system_box .usage_box {
+    padding: 10px;
+}
+
+.system_box .usage_box_inner {
     padding: 10px;
 }
 
@@ -611,7 +617,7 @@ window.notification-popups box.notifications {
     min-width: 6px;
     min-height: 6px;
     background-color: @primary;
-    box-shadow: 5px 0px 0px 1px @surfaceContainerLowest;
+    box-shadow: 5px 0px 0px 1px @surfaceContainerLow;
     border-radius: 100px;
 }
 
@@ -1009,6 +1015,7 @@ switch:checked:active slider {
     border-radius: 17px;
     padding-top: 7px;
     padding-bottom: 7px;
+    box-shadow: 0px 0px 2px mix(@shadow, transparent, 0.75);
 }
 
 .cheatsheet .category separator {

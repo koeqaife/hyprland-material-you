@@ -16,7 +16,7 @@ $lightness: round(lightness($primary));
 	--main-color: #{$background};
 	--main-alt: #{$surfaceContainerLow};
 
-	--message-color: #{$surfaceContainerLowest};
+	--message-color: #{$surfaceContainerLow};
 	--message-color-hover: #{$surfaceContainer};
 	--message-color-alt: #{$surfaceContainer};
 	--attachment-color: #{$background};
