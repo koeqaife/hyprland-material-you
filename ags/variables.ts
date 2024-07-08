@@ -1,8 +1,80 @@
+import { Variable as VariableType } from "types/variable";
 const GLib = imports.gi.GLib;
+import configuration from "services/configuration.ts";
+
+export type WeatherJson = {
+    coord: {
+        lon: number;
+        lat: number;
+    };
+    weather: [
+        {
+            id: number;
+            main: string;
+            description: string;
+            icon: string;
+        }
+    ];
+    base: string;
+    main: {
+        temp: number;
+        feels_like: number;
+        temp_min: number;
+        temp_max: number;
+        pressure: number;
+        humidity: number;
+        sea_level: number;
+        grnd_level: number;
+    };
+    visibility: number;
+    wind: {
+        speed: number;
+        deg: number;
+        gust: number;
+    };
+    clouds: {
+        all: number;
+    };
+    rain?: {
+        "1h"?: string;
+        "3h"?: string;
+    };
+    snow?: {
+        "1h"?: string;
+        "3h"?: string;
+    };
+    dt: number;
+    sys: {
+        type: number;
+        id: number;
+        country: string;
+        sunrise: number;
+        sunset: number;
+    };
+    timezone: number;
+    id: number;
+    name: string;
+    cod: number;
+    no_data?: boolean;
+};
 
 export const theme = Variable("dark");
 export const main_color = Variable("#000000");
 export const current_wallpaper = Variable(`${GLib.get_home_dir()}/dotfiles/wallpapers/default.png`);
+// @ts-expect-error
+export const weather: VariableType<WeatherJson> = Variable({ no_data: true });
+const reload = () => {
+    if (configuration.config.weather != "" && configuration.config.weather_location_id != "")
+        Utils.execAsync(
+            `${App.configDir}/scripts/weather.sh weather ${configuration.config.weather} ${configuration.config.weather_location_id}`
+        )
+            .then((out) => {
+                weather.setValue(JSON.parse(out));
+            })
+            .catch(print);
+}
+Utils.interval(15000, reload);
+configuration.connect("changed", reload)
 
 export const idle_inhibitor = Variable(false);
 export const cur_uptime = Variable("error");

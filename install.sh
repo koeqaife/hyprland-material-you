@@ -53,7 +53,8 @@ install_packages() {
         lm_sensors gnome-system-monitor playerctl ttf-meslo-nerd ttf-google-sans \
         ttf-font-awesome ttf-opensans ttf-roboto lshw ttf-material-symbols-variable-git \
         fontconfig dart-sass ttf-meslo-nerd-font-powerlevel10k cpio meson cmake \
-        python-materialyoucolor-git
+        python-materialyoucolor-git gtksourceview3 gtksourceviewmm cairomm \
+        gtkmm3 tinyxml2
 }
 
 setup_yay() {
