@@ -3,7 +3,9 @@ const { GLib } = imports.gi;
 export const default_config = {
     always_show_battery: false,
     show_taskbar: true,
-    show_battery_percent: true
+    show_battery_percent: true,
+    weather: "",
+    weather_location_id: ""
 };
 
 Utils.exec(["mkdir", "-p", `${GLib.get_home_dir()}/.config/ags_config/`]);
@@ -34,6 +36,10 @@ class ConfigService extends Service {
 
     set config(conf) {
         Utils.writeFile(JSON.stringify(conf), this.#config_file).catch(print);
+    }
+
+    set_value(key: keyof typeof default_config, value: string) {
+        this.config = {...this.config, [key]: value}
     }
 
     constructor() {

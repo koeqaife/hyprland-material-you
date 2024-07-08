@@ -18,6 +18,7 @@ const bluetooth = await Service.import("bluetooth");
 import Gtk from "gi://Gtk?version=3.0";
 import { MaterialIcon } from "icons.js";
 import config from "services/configuration.ts";
+import { toggleAppsWindow, toggleMediaWindow } from "./sideleft/main.js";
 
 const keyboard_layout = Variable("none");
 hyprland.connect("keyboard-layout", (hyprland, keyboardname, layoutname) => {
@@ -242,9 +243,21 @@ function AppLauncher() {
     const button = Widget.Button({
         class_name: "filled_tonal_button",
         on_clicked: () => {
-            App.toggleWindow("applauncher");
+            toggleAppsWindow();
         },
         child: MaterialIcon("search")
+    });
+
+    return button;
+}
+
+function OpenSideLeft() {
+    const button = Widget.Button({
+        class_name: "filled_tonal_button",
+        on_clicked: () => {
+            App.toggleWindow("sideleft");
+        },
+        child: MaterialIcon("dock_to_right")
     });
 
     return button;
@@ -313,7 +326,7 @@ function MediaPlayer() {
     const button = Widget.Button({
         class_name: "filled_tonal_button",
         on_primary_click_release: () => {
-            App.toggleWindow("media");
+            toggleMediaWindow();
         },
         on_secondary_click_release: () => {
             Utils.execAsync(["playerctl", "play-pause"]).catch(print);
@@ -456,7 +469,7 @@ function Left() {
         class_name: "modules-left",
         hpack: "start",
         spacing: 8,
-        children: [AppLauncher(), MediaPlayer(), TaskBar()]
+        children: [AppLauncher(), OpenSideLeft(), MediaPlayer(), TaskBar()]
     });
 }
 

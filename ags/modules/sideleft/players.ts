@@ -1,5 +1,4 @@
 import { MprisPlayer } from "types/service/mpris.js";
-import popupwindow from "./misc/popupwindow.ts";
 import Label from "types/widgets/label.js";
 import { MaterialIcon } from "icons.ts";
 const mpris = await Service.import("mpris");
@@ -10,7 +9,6 @@ const PLAY_ICON = "play_arrow";
 const PAUSE_ICON = "pause";
 const PREV_ICON = "skip_previous";
 const NEXT_ICON = "skip_next";
-const WINDOW_NAME = "media";
 
 function lengthStr(length: number): string {
     const min = Math.floor(length / 60);
@@ -128,9 +126,8 @@ function Player(player: MprisPlayer) {
 
     return Widget.Box(
         {
-            class_name: "player",
-            margin_left: 14,
-            margin_top: 14
+            class_name: "card player",
+            vpack: "start"
         },
         img,
         Widget.Box(
@@ -162,12 +159,3 @@ export function Media() {
         children: players.as((p) => p.map(Player))
     });
 }
-
-export const media = popupwindow({
-    name: WINDOW_NAME,
-    class_name: "player_window",
-    visible: false,
-    keymode: "exclusive",
-    child: Media(),
-    anchor: ["left", "top"]
-});

@@ -260,80 +260,6 @@ window.notification-popups box.notifications {
 }
 
 /* -----------------------------------------------------
- * Applications
- * ----------------------------------------------------- */
-
-.applauncher_box {
-    border-radius: 24px;
-    background-color: @background;
-    border: 2px solid;
-    border-color: @outlineVariant;
-}
-
-.applauncher_box separator {
-    margin: 0px;
-}
-
-.applauncher_entry {
-    margin: 11px;
-
-    background-color: @surfaceContainerHigh;
-    border: none;
-    outline: none;
-    border-radius: 100px;
-    margin-bottom: 16px;
-    padding: 5px;
-    font-weight: normal;
-    padding-left: 25px;
-}
-
-.application_container label {
-    color: @onSurface;
-    font-weight: normal;
-}
-
-.application_container {
-    border-radius: 0px;
-    border: none;
-    outline: none;
-    margin: 0px;
-    min-height: 47px;
-}
-
-.application_container image {
-    margin-left: 11px;
-}
-
-.application_container:hover {
-    background-color: mix(@onSurface, @surface, 0.92);
-}
-
-.application_container:focus {
-    background-color: mix(@onSurface, @surface, 0.8);
-    border: 0px solid;
-    border: none;
-    outline: none;
-}
-
-.application_container:active {
-    background-image: radial-gradient(circle, mix(@onSurface, @surface, 0.78) 10%, transparent 0%);
-}
-
-.application_divider {
-    color: @outline;
-    margin: 0px 0px 0px 0px;
-}
-
-.application_label {
-    color: @onSurface;
-}
-
-.application_icon {
-    margin-right: 16px;
-    color: @onSurface;
-}
-
-/* -----------------------------------------------------
  * Clipboard history
  * ----------------------------------------------------- */
 
@@ -411,91 +337,6 @@ window.notification-popups box.notifications {
 }
 
 /* -----------------------------------------------------
- * Media player
- * ----------------------------------------------------- */
-
-.player {
-    background-color: @background;
-    padding: 15px;
-    min-width: 350px;
-    border: 2px solid @outlineVariant;
-    border-radius: 24px;
-}
-
-.player .img {
-    min-width: 100px;
-    min-height: 100px;
-    background-size: cover;
-    background-position: center;
-    border-radius: 13px;
-    color: @foreground;
-}
-
-.player .title {
-    font-size: 1.2em;
-    margin-left: 10px;
-    color: @foreground;
-}
-
-.player .artist {
-    font-size: 1.1em;
-    margin-left: 10px;
-    color: @foreground;
-}
-
-.player .length {
-    color: @foreground;
-}
-
-.player .position {
-    color: @foreground;
-    margin-left: 10px;
-}
-
-.player .icon {
-    color: @foreground;
-}
-
-.player scale.position {
-    padding: 0;
-    margin-bottom: 0.3em;
-    margin-left: 10px;
-}
-
-.player scale.position trough {
-    background-color: @secondaryContainer;
-    min-height: 8px;
-}
-
-.player scale.position highlight {
-    background-color: @primary;
-}
-
-.player scale.position slider {
-    all: unset;
-}
-
-.player button {
-    min-height: 1em;
-    min-width: 1em;
-    padding: 0.3em;
-    padding-top: 0px;
-    padding-bottom: 0px;
-    color: @onSecondary;
-}
-
-.player button .icon {
-    color: @onSecondary;
-}
-
-.player_buttons {
-    background-color: @secondary;
-    border-radius: 100px;
-    padding: 3px;
-    margin-top: 2px;
-}
-
-/* -----------------------------------------------------
  * Misc
  * ----------------------------------------------------- */
 
@@ -558,7 +399,7 @@ window.notification-popups box.notifications {
 }
 
 /* -----------------------------------------------------
- * Sidebar
+ * Sideright
  * ----------------------------------------------------- */
 
 .sidebar_main_box {
@@ -986,7 +827,7 @@ filled_button.disabled .awesome_icon,
 }
 
 /* -----------------------------------------------------
- * Navigation bar
+ * Navigation bar/rail
  * ----------------------------------------------------- */
 
 .navigation {
@@ -995,7 +836,14 @@ filled_button.disabled .awesome_icon,
     padding-bottom: 3px;
 }
 
-.navigation .label {
+.rail {
+    background-color: @surface;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.navigation .label,
+.rail .label {
     font-weight: normal;
     font-size: 12px;
     margin-top: 3px;
@@ -1018,6 +866,11 @@ filled_button.disabled .awesome_icon,
     min-width: 0px;
 }
 
+.rail .navigation_button .container {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
 .navigation_button .icon {
     font-weight: 400;
     color: @onSurface;
@@ -1028,12 +881,20 @@ filled_button.disabled .awesome_icon,
 }
 
 .navigation_button .container_outer {
-    min-width: 60px;
+    min-width: 56px;
+}
+
+.rail .navigation_button .container_outer {
+    margin-bottom: 12px;
 }
 
 .navigation_button:hover .container {
     background-color: mix(@onSurface, @surfaceContainer, 0.92);
     min-width: 40px;
+}
+
+.rail .navigation_button:hover .container {
+    min-width: 26px;
 }
 
 .navigation_button:active .container {
@@ -1049,6 +910,10 @@ filled_button.disabled .awesome_icon,
     background-color: @secondaryContainer;
     background-image: radial-gradient(circle, @secondaryContainer 10%, transparent 0%);
     min-width: 40px;
+}
+
+.rail .navigation_button.active .container {
+    min-width: 26px;
 }
 
 /* -----------------------------------------------------
@@ -1200,6 +1065,367 @@ switch:checked:active slider {
 .cheatsheet .category .awesome_icon.key {
     padding: 4px;
 }
+
+/* -----------------------------------------------------
+ * Sideleft
+ * ----------------------------------------------------- */
+
+.sideleft {
+    background-color: @surface;
+    padding-top: 12px;
+}
+
+.sideleft label {
+    color: @onSurface;
+}
+
+.sideleft .page {
+    min-width: 320px;
+}
+
+.sideleft .card {
+    background-color: @surfaceContainerLow;
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    margin-right: 12px;
+    box-shadow: 0px 0px 2px mix(@shadow, transparent, 0.75);
+    margin-left: 2px;
+}
+
+.sideleft .main_title {
+    color: @onSurface;
+    font-size: 24px;
+    font-weight: 400;
+    margin: 0px;
+    margin-left: 2px;
+    margin-bottom: 5px;
+}
+
+/* weather */
+.weather .icon {
+    margin-right: 8px;
+    text-shadow: 0px 0px 2px mix(@shadow, transparent, 0.75);
+}
+
+.weather .description {
+    color: @onSurface;
+    font-weight: 400;
+    font-size: 16px;
+}
+
+.weather .current {
+    font-weight: 900;
+    font-size: 38px;
+    margin: 0px;
+    margin-right: 4px;
+    color: @onSurface;
+}
+
+.weather .min,
+.weather .max {
+    font-weight: 400;
+    font-size: 16px;
+    color: @onSurfaceVariant;
+}
+
+.weather .title {
+    font-weight: 500;
+    font-size: 17px;
+    color: @onSurface;
+    margin-right: 4px;
+}
+
+.weather .primary_label {
+    font-weight: 400;
+    font-size: 16px;
+    color: @onSurface;
+    margin-right: 2px;
+}
+
+.weather .label {
+    font-weight: 400;
+    font-size: 16px;
+    color: @onSurfaceVariant;
+}
+
+.weather separator {
+    margin-right: 4px;
+}
+
+.sideleft .info_box {
+    background-color: @surfaceContainerHigh;
+    padding: 6px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-radius: 100px;
+    margin-top: 12px;
+    min-width: 75px;
+}
+
+.sideleft .info_box .icon {
+    color: @primary;
+    margin: 0px;
+    margin-right: 4px;
+}
+
+/* players */
+.sideleft .player {
+    min-width: 340px;
+}
+
+.sideleft .player .img {
+    min-width: 100px;
+    min-height: 100px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 4px;
+    color: @foreground;
+}
+
+.sideleft .player .title {
+    font-size: 1.2em;
+    margin-left: 10px;
+    color: @foreground;
+}
+
+.sideleft .player .artist {
+    font-size: 1.1em;
+    margin-left: 10px;
+    color: @foreground;
+}
+
+.sideleft .player .length {
+    color: @foreground;
+}
+
+.sideleft .player .position {
+    color: @foreground;
+    margin-left: 10px;
+}
+
+.sideleft .player .icon {
+    color: @foreground;
+    font-weight: 600;
+}
+
+.sideleft .player scale.position {
+    padding: 0;
+    margin-bottom: 0.3em;
+    margin-left: 10px;
+}
+
+.sideleft .player scale.position trough {
+    background-color: @secondaryContainer;
+    min-height: 6px;
+}
+
+.sideleft .player scale.position highlight {
+    background-color: @primary;
+    box-shadow: 5px 0px 0px 1px @surfaceContainerLow;
+    min-width: 6px;
+    min-height: 6px;
+}
+
+.sideleft .player scale.position slider {
+    all: unset;
+}
+
+.sideleft .player button {
+    min-height: 1em;
+    min-width: 1em;
+    padding: 0.3em;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    color: @onSecondary;
+}
+
+.sideleft .player button .icon {
+    color: @onSecondary;
+}
+
+.sideleft .player_buttons {
+    background-color: @secondary;
+    border-radius: 100px;
+    padding: 3px;
+    margin-top: 2px;
+}
+
+/* applauncher */
+.sideleft .applauncher_box {
+    border-radius: 24px;
+    background-color: @background;
+    margin-right: 12px;
+}
+
+.sideleft .applauncher_box separator {
+    margin: 0px;
+}
+
+.sideleft .applauncher_entry {
+    margin: 11px;
+
+    background-color: @surfaceContainerHigh;
+    border: none;
+    outline: none;
+    border-radius: 100px;
+    margin-bottom: 16px;
+    margin-top: 0px;
+    padding: 5px;
+    font-weight: normal;
+    padding-left: 25px;
+}
+
+.sideleft .application_container label {
+    color: @onSurface;
+    font-weight: normal;
+}
+
+.sideleft .application_container {
+    border-radius: 0px;
+    border: none;
+    outline: none;
+    margin: 0px;
+    min-height: 47px;
+}
+
+.sideleft .application_container image {
+    margin-left: 11px;
+}
+
+.sideleft .application_container:hover {
+    background-color: mix(@onSurface, @surface, 0.92);
+}
+
+.sideleft .application_container:focus {
+    background-color: mix(@onSurface, @surface, 0.8);
+    border: 0px solid;
+    border: none;
+    outline: none;
+}
+
+.sideleft .application_container:active {
+    background-image: radial-gradient(circle, mix(@onSurface, @surface, 0.78) 10%, transparent 0%);
+}
+
+.sideleft .application_divider {
+    color: @outline;
+    margin: 0px 0px 0px 0px;
+}
+
+.sideleft .application_label {
+    color: @onSurface;
+}
+
+.sideleft .application_icon {
+    margin-right: 16px;
+    color: @onSurface;
+}
+/* Gemini */
+.gemini .chat_wrapper {
+    background-color: @surfaceContainerHigh;
+    padding: 5px;
+    border-radius: 4px;
+    margin-right: 12px;
+    margin-bottom: 8px;
+}
+
+.gemini .chat_wrapper text {
+    background-color: transparent;
+}
+
+.gemini .message {
+    background-color: @surfaceContainerLow;
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0px 0px 2px mix(@shadow, transparent, 0.75);
+    margin-right: 12px;
+    margin-left: 2px;
+}
+
+.codeblock_top_bar {
+    border-radius: 12px 12px 0px 0px;
+    background-color: @surfaceContainerLowest;
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+.codeblock_top_bar_text {
+    font-weight: 400;
+    font-size: 16px;
+}
+
+.codeblock_top_bar_button {
+    border-radius: 12px;
+    padding: 0px;
+    padding-left: 6px;
+    padding-right: 6px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+.codeblock_code text,
+.codeblock_code {
+    background-color: transparent;
+}
+
+.codeblock_code textview {
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-bottom: 6px;
+    border-radius: 0px 0px 12px 12px;
+    background-color: @surfaceContainerLowest;
+}
+
+.gemini .divider {
+    background-color: @outlineVariant;
+}
+
+.gemini .command_button {
+    padding: 6px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.gemini .command_buttons {
+    margin-right: 12px;
+    margin-bottom: 4px;
+    margin-top: 4px;
+}
+
+.gemini .skeleton_line {
+    min-width: 4px;
+    min-height: 4px;
+    background-color: transparent;
+    animation: pulsate 2s infinite;
+    border-radius: 100%;
+}
+
+.gemini .chat_name {
+    font-size: 17px;
+    font-weight: 500;
+}
+
+.gemini .description {
+    font-size: 15px;
+}
+
+.gemini .name {
+    font-size: 17px;
+}
+
+@keyframes pulsate {
+    0% {
+      background-color: transparent;
+    }
+    50% {
+        background-color: @outline;
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
 
 /* -----------------------------------------------------
  * Material
