@@ -21,39 +21,51 @@ function apiSendMessage(textView: any) {
     chatEntry.set_valign(Gtk.Align.CENTER);
 }
 
-export const chatEntry: any = TextView({
+const chatEntry: any = TextView({
     hexpand: true,
     wrap_mode: Gtk.WrapMode.WORD_CHAR,
     accepts_tab: false,
     class_name: "chat_entry",
-    setup: (self: any) =>
-        self
-            .hook(
-                GeminiService,
-                (self) => {
-                    self.placeholderText =
-                        GeminiService.key.length > 0 ? "Message Gemini..." : "Enter Google AI API Key...";
-                },
-                "hasKey"
-            )
-            .on("key-press-event", (widget, event) => {
-                // Don't send when Shift+Enter
-                if (event.get_keyval()[1] === Gdk.KEY_Return) {
-                    if (event.get_state()[1] !== 17) {
-                        // SHIFT_MASK doesn't work but 17 should be shift
-                        apiSendMessage(widget);
-                        return true;
-                    }
-                    return false;
+    setup: (self: any) => {
+        self.hook(
+            GeminiService,
+            (self) => {
+                self.placeholderText =
+                    GeminiService.key.length > 0 ? "Message Gemini..." : "Enter Google AI API Key...";
+            },
+            "hasKey"
+        ).on("key-press-event", (widget, event) => {
+            // Don't send when Shift+Enter
+            if (event.get_keyval()[1] === Gdk.KEY_Return) {
+                if (event.get_state()[1] !== 17) {
+                    // SHIFT_MASK doesn't work but 17 should be shift
+                    apiSendMessage(widget);
+                    return true;
                 }
-            })
+                return false;
+            }
+        });
+        const buffer = self.get_buffer();
+        buffer.connect("changed", () => {
+            const line_count = buffer.get_line_count();
+            chatEntryWrapper.toggleClassName("chat_wrapper_extended", line_count >= 2);
+        });
+    }
 });
 
 const chatEntryWrapper = Widget.Scrollable({
     class_name: "chat_wrapper",
     hscroll: "never",
     vscroll: "always",
-    child: chatEntry
+    child: chatEntry,
+    setup: (self) => {
+        chatEntry.connect("focus-in-event", () => {
+            self.toggleClassName("focused", true);
+        });
+        chatEntry.connect("focus-out-event", () => {
+            self.toggleClassName("focused", false);
+        });
+    }
 });
 
 const GeminiInfo = () => {
