@@ -45,7 +45,7 @@ install_packages() {
         xdg-utils libxdg-basedir python-pyxdg aylurs-gtk-shell swww gtk3 gtk4 \
         adw-gtk3 adw-gtk-theme libdbusmenu-gtk3 python-pip python-pillow sddm \
         sddm-theme-corners-git nautilus nm-connection-editor network-manager-applet \
-        networkmanager gnome-bluetooth-3.0 wl-gammarelay bluez bluez-libs bluez-utils \
+        networkmanager gnome-bluetooth-3.0 wl-gammarelay-rs bluez bluez-libs bluez-utils \
         cliphist wl-clipboard pywal-16-colors libadwaita swappy nwg-look alacritty \
         pavucontrol polkit-gnome brightnessctl man-pages gvfs xarchiver zip imagemagick \
         blueman fastfetch bibata-cursor-theme gum python-pywayland brave dbus \
