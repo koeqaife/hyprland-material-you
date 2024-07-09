@@ -1330,11 +1330,21 @@ switch:checked:active slider {
 }
 /* Gemini */
 .gemini .chat_wrapper {
-    background-color: @surfaceContainerHigh;
+    background-color: transparent;
     padding: 5px;
     border-radius: 4px;
     margin-right: 12px;
     margin-bottom: 8px;
+    box-shadow: inset 0 0 0 1px @outline;
+    transition: box-shadow 0.2s ease-in-out, min-height 0.35s ease-in-out;
+}
+
+.gemini .chat_wrapper_extended {
+    min-height: 5rem;
+}
+
+.gemini .chat_wrapper.focused {
+    box-shadow: inset 0 0 0 2px @primary;
 }
 
 .gemini .chat_wrapper text {
