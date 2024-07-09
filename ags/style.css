@@ -856,6 +856,10 @@ filled_button.disabled .awesome_icon,
     color: @onSurface;
 }
 
+.rail .label {
+    font-weight: 500;
+}
+
 .navigation_button .container {
     transition-property: all, border-image, background-size, background-image;
     transition-duration: 0.3s, 0.3s, 0.3s, 0.3s;
@@ -875,6 +879,7 @@ filled_button.disabled .awesome_icon,
 .rail .navigation_button .container {
     padding-left: 12px;
     padding-right: 12px;
+    min-height: 28px;
 }
 
 .navigation_button .icon {
