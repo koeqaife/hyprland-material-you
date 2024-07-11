@@ -9,19 +9,47 @@ type NotificationsBoxType = {
     include?: string[];
 };
 
-const NotificationNoReveal = (notification: NotificationType, visible = false, dismiss = true) => {
+const NotificationReveal = (notification: NotificationType, visible = false, dismiss = true) => {
+    const transition_duration = 200;
+    const secondRevealer = Widget.Revealer({
+        vpack: "center",
+        child: Notification(notification, dismiss),
+        reveal_child: visible,
+        transition: "crossfade",
+        transition_duration: transition_duration,
+        hexpand: true,
+        class_name: "second_revealer",
+        setup: (revealer) => {
+            Utils.timeout(1, () => {
+                revealer.reveal_child = true;
+            });
+        }
+    });
+
+    const firstRevealer = Widget.Revealer({
+        child: secondRevealer,
+        reveal_child: true,
+        transition: "slide_down",
+        transition_duration: transition_duration,
+        class_name: "first_revealer"
+    });
+
     type BoxAttrs = {
         destroyWithAnims: any;
         count: number;
         id: number;
     };
 
-    const _notification = Notification(notification, dismiss);
-
     let box: Box<any, BoxAttrs>;
 
     const destroyWithAnims = () => {
-        box.destroy();
+        secondRevealer.reveal_child = false;
+        Utils.timeout(transition_duration, () => {
+            firstRevealer.reveal_child = false;
+            Utils.timeout(transition_duration, () => {
+                box.destroy();
+            });
+        });
     };
     box = Widget.Box({
         hexpand: true,
@@ -30,13 +58,13 @@ const NotificationNoReveal = (notification: NotificationType, visible = false, d
             count: 0,
             id: notification.id
         },
-        children: [_notification]
+        children: [firstRevealer]
     });
     return box;
 };
 
 export function NotificationsBox({ exclude = [], include = [] }: NotificationsBoxType) {
-    const popups = NotificationPopups(false, { exclude: exclude, include: include }, false, NotificationNoReveal);
+    const popups = NotificationPopups(false, { exclude: exclude, include: include }, false, NotificationReveal);
 
     const menu = Widget.Menu({
         class_name: "notifications_menu",
