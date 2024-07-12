@@ -514,15 +514,36 @@ window.notification-popups box.notifications {
     transition: all 0.25s ease-in-out;
 }
 
+.notifications_sidebar_scrollable {
+    padding-top: 6px;
+}
+
+.notifications_sidebar_scrollable scrollbar {
+    opacity: 0.1;
+}
+
 .notifications_sidebar_scrollable .notification {
     margin-left: 10px;
     margin-right: 9px;
-    border-radius: 14px;
-    margin-top: 10px;
+    margin-top: 4px;
+    border-radius: 6px;
     padding: 15px;
     background-color: @surfaceContainerLow;
     box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.12), 0px 1px 2px rgba(0, 0, 0, 0.24);
-    transition: all 0.25s ease-in-out;
+    transition: all 0.2s ease-in-out, border-radius 0.1s ease-in-out;
+}
+
+.notifications_sidebar_scrollable viewport > box > :first-child .notification {
+    border-radius: 14px 14px 6px 6px;
+}
+
+.notifications_sidebar_scrollable viewport > box > :last-child .notification {
+    border-radius: 6px 6px 14px 14px;
+    margin-bottom: 10px;
+}
+
+.notifications_sidebar_scrollable viewport > box > :last-child:first-child .notification {
+    border-radius: 14px;
 }
 
 .notifications_sidebar_scrollable .notification-time {
@@ -1087,10 +1108,6 @@ switch:checked:active slider {
     padding-top: 12px;
 }
 
-.sideleft label {
-    color: @onSurface;
-}
-
 .sideleft .page {
     min-width: 320px;
 }
@@ -1103,6 +1120,10 @@ switch:checked:active slider {
     margin-right: 12px;
     box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.12), 0px 1px 2px rgba(0, 0, 0, 0.24);
     margin-left: 2px;
+}
+
+.sideleft .card {
+    color: @onSurface;
 }
 
 .sideleft .main_title {
@@ -1333,30 +1354,64 @@ switch:checked:active slider {
     margin-right: 16px;
     color: @onSurface;
 }
-/* Gemini */
-.gemini .chat_wrapper {
+/* Chats */
+.sideleft .textbox {
     background-color: transparent;
     padding: 5px;
     border-radius: 4px;
     margin-right: 12px;
     margin-bottom: 8px;
     box-shadow: inset 0 0 0 1px @outline;
-    transition: box-shadow 0.2s ease-in-out, min-height 0.35s ease-in-out;
+    transition: box-shadow 0.2s ease-in-out;
 }
 
-.gemini .chat_wrapper_extended {
+.sideleft .textbox scrollbar {
+    opacity: 0;
+}
+
+.sideleft .send .icon {
+    font-weight: 400;
+}
+
+.sideleft .send {
+    padding: 5px;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.sideleft .placeholder label {
+    color: @onSurfaceVariant;
+}
+
+.sideleft .chat_wrapper {
+    transition: min-height 0.35s ease-in-out;
+}
+
+.sideleft .chat_wrapper scrollbar {
+    opacity: 0;
+}
+
+.sideleft .chat_wrapper_extended {
     min-height: 5rem;
 }
 
-.gemini .chat_wrapper.focused {
+.sideleft .chat_wrapper_extended scrollbar {
+    opacity: 0.1;
+}
+
+.sideleft .textbox.focused {
     box-shadow: inset 0 0 0 2px @primary;
 }
 
-.gemini .chat_wrapper text {
+.sideleft .chat_wrapper text {
     background-color: transparent;
 }
 
-.gemini .message {
+.sideleft .latex * {
+    color: @onSurface;
+}
+
+.sideleft .message {
     background-color: @surfaceContainerLow;
     padding: 14px;
     border-radius: 12px;
@@ -1364,6 +1419,12 @@ switch:checked:active slider {
     box-shadow: 0px 0px 2px mix(@shadow, transparent, 0.75);
     margin-right: 12px;
     margin-left: 2px;
+}
+
+.sideleft .message.ephemeral {
+    background-color: @surface;
+    box-shadow: none;
+    border: 1px solid @outlineVariant;
 }
 
 .codeblock_top_bar {
@@ -1400,10 +1461,24 @@ switch:checked:active slider {
     background-color: @surfaceContainerLowest;
 }
 
-.gemini .divider {
+.sideleft .divider {
     background-color: @outlineVariant;
 }
 
+.sideleft .chat_name {
+    font-size: 17px;
+    font-weight: 500;
+}
+
+.sideleft .description {
+    font-size: 15px;
+}
+
+.sideleft .name {
+    font-size: 17px;
+}
+
+/* Gemini */
 .gemini .command_button {
     padding: 6px;
     padding-left: 8px;
@@ -1424,19 +1499,6 @@ switch:checked:active slider {
     border-radius: 100%;
 }
 
-.gemini .chat_name {
-    font-size: 17px;
-    font-weight: 500;
-}
-
-.gemini .description {
-    font-size: 15px;
-}
-
-.gemini .name {
-    font-size: 17px;
-}
-
 @keyframes pulsate {
     0% {
         background-color: transparent;
@@ -1449,11 +1511,39 @@ switch:checked:active slider {
     }
 }
 
+/* Chatrooms */
+.chats .filled_tonal_button {
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.chats .login,
+.chats .room {
+    margin-right: 12px;
+    margin-top: 10px;
+}
+
+.chats entry {
+    background-color: transparent;
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 1px @outline;
+    transition: box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+    color: @onSurface;
+}
+
+.chats entry:focus {
+    box-shadow: inset 0 0 0 2px @primary;
+}
+
 /* -----------------------------------------------------
  * Material
  * ----------------------------------------------------- */
 
-.material_icon {
+.material_icon,
+.material_icon * {
     all: unset;
     font-family: "Material Symbols Outlined", "Material Symbols Sharp";
 }
