@@ -16,31 +16,32 @@ const MATERIAL_ICONS = {
     "40d": "air", "40n": "air"
 };
 const ICON_COLORS = {
-    mist: "#90A4AE",
-    clear_day: "#FFF176",
-    bedtime: "#7986CB",
-    partly_cloudy_day: "#2196F3",
-    partly_cloudy_night: "#7986CB",
-    cloud: "#4FC3F7",
+    mist: "#B0BEC5",
+    clear_day: "#FFEB3B",
+    bedtime: "#9575CD",
+    partly_cloudy_day: "#42A5F5",
+    partly_cloudy_night: "#8C9EFF",
+    cloud: "#81D4FA",
     rainy_heavy: "#039BE5",
-    rainy: "#2196F3",
-    thunderstorm: "#FFC107",
-    weather_snowy: "#00BCD4",
-    air: "#00BCD4"
+    rainy: "#64B5F6",
+    thunderstorm: "#FFB300",
+    weather_snowy: "#4DD0E1",
+    air: "#00ACC1"
 };
 const _T = "°";
 
 function WeatherFirstCard(weather: WeatherJson) {
-    const _box = (icon: string, info: string, tooltip?: string) => Widget.Box({
-        class_name: "info_box",
-        children: [
-            MaterialIcon(icon, "20px"),
-            Widget.Label({
-                label: info
-            })
-        ],
-        tooltip_text: tooltip
-    })
+    const _box = (icon: string, info: string, tooltip?: string) =>
+        Widget.Box({
+            class_name: "info_box",
+            children: [
+                MaterialIcon(icon, "20px"),
+                Widget.Label({
+                    label: info
+                })
+            ],
+            tooltip_text: tooltip
+        });
     const temp_label = Widget.Label({
         class_name: "current",
         vpack: "end",
@@ -83,7 +84,7 @@ function WeatherFirstCard(weather: WeatherJson) {
             _box("cloud", `${weather.clouds.all}%`, "Cloudiness"),
             _box("humidity_percentage", `${weather.main.humidity}%`, "Humidity")
         ]
-    })
+    });
     const color = ICON_COLORS[MATERIAL_ICONS[weather.weather[0].icon]];
     const temp = Widget.Box({
         class_name: "card",
@@ -96,7 +97,6 @@ function WeatherFirstCard(weather: WeatherJson) {
                 hpack: "start",
                 children: [
                     MaterialIcon(MATERIAL_ICONS[weather.weather[0].icon], "", {
-                        vpack: "end",
                         css: `font-size: 32px; color: ${color}`
                     }),
                     temp_label,
@@ -178,11 +178,7 @@ export function WeatherBox() {
                         label: cur_weather.name,
                         hpack: "start"
                     });
-                    self.children = [
-                        title,
-                        WeatherFirstCard(cur_weather),
-                        WeatherSecondCard(cur_weather)
-                    ];
+                    self.children = [title, WeatherFirstCard(cur_weather), WeatherSecondCard(cur_weather)];
                 }
             });
         }
