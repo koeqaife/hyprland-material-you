@@ -1,5 +1,4 @@
 // Converts from Markdown to Pango. This does not support code blocks.
-// For illogical-impulse, code blocks are treated separately, in their own GtkSourceView widgets.
 // Partly inherited from https://github.com/ubunatic/md2pango
 
 const monospaceFonts = 'JetBrains Mono NF, JetBrains Mono Nerd Font, JetBrains Mono NL, SpaceMono NF, SpaceMono Nerd Font, monospace';
@@ -28,7 +27,7 @@ const replacements = {
         { name: 'EMPH', re: /\*(\S.*?\S)\*/g, sub: "<i>$1</i>" },
         // { name: 'EMPH', re: /_(\S.*?\S)_/g, sub: "<i>$1</i>" },
         { name: 'HEXCOLOR', re: /#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/g, sub: '<span bgcolor="#$1" fgcolor="#000000" font_family="' + monospaceFonts + '">#$1</span>' },
-        { name: 'INLCODE', re: /(`)([^`]*)(`)/g, sub: '<span font_weight="bold" font_family="' + monospaceFonts + '">$2</span>' },
+        { name: 'INLCODE', re: /(`)([^`]*)(`)/g, sub: '<span font_weight="500" font_family="' + monospaceFonts + '">$2</span>' },
         // { name: 'UND', re: /(__|\*\*)(\S[\s\S]*?\S)(__|\*\*)/g, sub: "<u>$2</u>" },
     ],
 }
@@ -67,6 +66,9 @@ export const markdownTest = `## Inline formatting
 #include <bits/stdc++.h>
 const std::string GREETING="UwU";
 int main() { std::cout << GREETING; }
+\`\`\`
+\`\`\`py
+print("Hello world!")
 \`\`\`
 ## LaTeX
 \`\`\`latex
