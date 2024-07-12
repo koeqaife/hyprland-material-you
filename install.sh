@@ -69,7 +69,7 @@ install_packages() {
         xdg-utils libxdg-basedir python-pyxdg aylurs-gtk-shell swww gtk3 gtk4 \
         adw-gtk3 adw-gtk-theme libdbusmenu-gtk3 python-pip python-pillow sddm \
         sddm-theme-corners-git nm-connection-editor network-manager-applet \
-        networkmanager gnome-bluetooth-3.0 wl-gammarelay bluez bluez-libs bluez-utils \
+        networkmanager gnome-bluetooth-3.0 wl-gammarelay-rs bluez bluez-libs bluez-utils \
         cliphist wl-clipboard pywal-16-colors libadwaita swappy nwg-look \
         pavucontrol polkit-gnome brightnessctl man-pages gvfs xarchiver zip imagemagick \
         blueman fastfetch bibata-cursor-theme gum python-pywayland dbus \
@@ -225,6 +225,7 @@ main() {
     preference_select "file manager" "nautilus" "dolphin" "thunar"
     preference_select "internet browser" "brave" "firefox" "google-chrome"
     preference_select "terminal emulator" "alacritty" "kitty" "konsole"
+    ask_continue "Proceed with installing MicroTex?*" && install_microtex
     ask_continue "Proceed with setting up sensors?" false && setup_sensors
     ask_continue "Proceed with checking config folders?*" && check_config_folders
     ask_continue "Proceed with installing Tela Nord icons?" false && install_tela_nord_icons
