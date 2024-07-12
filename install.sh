@@ -34,6 +34,11 @@ install_yay() {
     makepkg -si --noconfirm --needed
 }
 
+install_microtex() {
+    cd ~/dotfiles/setup/MicroTex/
+    makepkg -si
+}
+
 install_packages() {
     echo ":: Installing packages"
     sleep 1
@@ -45,7 +50,7 @@ install_packages() {
         xdg-utils libxdg-basedir python-pyxdg aylurs-gtk-shell swww gtk3 gtk4 \
         adw-gtk3 adw-gtk-theme libdbusmenu-gtk3 python-pip python-pillow sddm \
         sddm-theme-corners-git nautilus nm-connection-editor network-manager-applet \
-        networkmanager gnome-bluetooth-3.0 wl-gammarelay bluez bluez-libs bluez-utils \
+        networkmanager gnome-bluetooth-3.0 wl-gammarelay-rs bluez bluez-libs bluez-utils \
         cliphist wl-clipboard pywal-16-colors libadwaita swappy nwg-look alacritty \
         pavucontrol polkit-gnome brightnessctl man-pages gvfs xarchiver zip imagemagick \
         blueman fastfetch bibata-cursor-theme gum python-pywayland brave dbus \
@@ -53,7 +58,8 @@ install_packages() {
         lm_sensors gnome-system-monitor playerctl ttf-meslo-nerd ttf-google-sans \
         ttf-font-awesome ttf-opensans ttf-roboto lshw ttf-material-symbols-variable-git \
         fontconfig dart-sass ttf-meslo-nerd-font-powerlevel10k cpio meson cmake \
-        python-materialyoucolor-git
+        python-materialyoucolor-git gtksourceview3 gtksourceviewmm cairomm \
+        gtkmm3 tinyxml2 python-requests
 }
 
 setup_yay() {
@@ -195,6 +201,7 @@ main() {
         sudo pacman -S gum
     fi
     ask_continue "Proceed with installing packages?" false && install_packages
+    ask_continue "Proceed with installing MicroTex?*" && install_microtex
     ask_continue "Proceed with setting up sensors?" false && setup_sensors
     ask_continue "Proceed with checking config folders?*" && check_config_folders
     ask_continue "Proceed with installing Tela Nord icons?" false && install_tela_nord_icons

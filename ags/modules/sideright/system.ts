@@ -96,7 +96,7 @@ const Usage = (name: string, var_name: keyof InfoType, class_name: string | unde
         })
     });
     const _usage = Widget.Box({
-        class_name: `${class_name} usage_box`,
+        class_name: `${class_name} usage_box_inner`,
         orientation: Gtk.Orientation.VERTICAL,
         children: [
             Widget.Label({

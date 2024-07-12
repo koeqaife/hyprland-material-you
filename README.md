@@ -59,4 +59,8 @@ cd dotfiles
 
 [![Screenshot](screenshots/emoji.png "emoji picker")](screenshots/emoji.png)
 
+- Left sidebar
+
+[![Screenshot](screenshots/sideleft.png "sideleft")](screenshots/sideleft.png)
+
 > I got some code for AGS from [end-4](https://github.com/end-4/dots-hyprland/) and [kotontrion](https://github.com/kotontrion/dotfiles) configs, thanks to them.

@@ -5,7 +5,7 @@ After=graphical-session.target
 ConditionEnvironment=WAYLAND_DISPLAY
 
 [Service]
-ExecStart=/usr/bin/wl-gammarelay
+ExecStart=/usr/bin/wl-gammarelay-rs
 Restart=always
 Environment="XDG_RUNTIME_DIR=/run/user/%U"
 

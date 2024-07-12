@@ -6,6 +6,7 @@ import { Wallpapers } from "./wallpapers";
 import { Info } from "./info";
 import { Apps } from "./apps";
 import { MaterialIcon } from "icons";
+import { Weather } from "./weather";
 const hyprland = await Service.import("hyprland");
 import Gtk from "gi://Gtk?version=3.0";
 
@@ -41,7 +42,8 @@ function Settings(cur_tab: string) {
             appearance: Page(Appearance(), "Appearance"),
             wallpaper: Page(Wallpapers(), "Wallpapers"),
             info: Page(Info(), "Info"),
-            apps: Page(Apps(), "Apps")
+            apps: Page(Apps(), "Apps"),
+            "weather": Page(Weather(), "Weather")
         }
     });
     const Row = (name: string, label: string, icon: string = "image-missing") =>
@@ -67,6 +69,7 @@ function Settings(cur_tab: string) {
             Row("wallpaper", "Wallpapers", "image"),
             Widget.Separator(),
             Row("apps", "Apps", "grid_view"),
+            Row("weather", "Weather", "cloud"),
             Widget.Separator(),
             Row("info", "Info", "info")
         ]
