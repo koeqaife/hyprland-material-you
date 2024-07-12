@@ -1,11 +1,11 @@
 import Gtk from "gi://Gtk?version=3.0";
-import GeminiService from "services/gemini.js";
+import GeminiService from "services/gemini.ts";
 import { MaterialIcon } from "icons.ts";
-import { ChatMessage, SystemMessage } from "modules/misc/ai_chat_message.ts";
+import { ChatMessage, SystemMessage } from "modules/misc/chat_message.ts";
 import { markdownTest } from "modules/misc/md2pango.ts";
 import Gdk from "gi://Gdk";
-
-const TextView = Widget.subclass<typeof Gtk.TextView, Gtk.TextView.ConstructorProperties>(Gtk.TextView, "AgsTextView");
+import { enableClickThrough } from "../misc/clickthrough.js";
+import { TextView } from "modules/misc/textview.js";
 
 function apiSendMessage(textView: any) {
     // Get text
@@ -26,12 +26,15 @@ const chatEntry: any = TextView({
     wrap_mode: Gtk.WrapMode.WORD_CHAR,
     accepts_tab: false,
     class_name: "chat_entry",
+    attribute: { placeholder: "Message Gemini..." },
     setup: (self: any) => {
+        self.set_valign(Gtk.Align.CENTER);
         self.hook(
             GeminiService,
-            (self) => {
-                self.placeholderText =
+            () => {
+                self.attribute.placeholder =
                     GeminiService.key.length > 0 ? "Message Gemini..." : "Enter Google AI API Key...";
+                chatPlaceholder.label = self.attribute.placeholder;
             },
             "hasKey"
         ).on("key-press-event", (widget, event) => {
@@ -45,11 +48,6 @@ const chatEntry: any = TextView({
                 return false;
             }
         });
-        const buffer = self.get_buffer();
-        buffer.connect("changed", () => {
-            const line_count = buffer.get_line_count();
-            chatEntryWrapper.toggleClassName("chat_wrapper_extended", line_count >= 2);
-        });
     }
 });
 
@@ -60,12 +58,67 @@ const chatEntryWrapper = Widget.Scrollable({
     child: chatEntry,
     setup: (self) => {
         chatEntry.connect("focus-in-event", () => {
-            self.toggleClassName("focused", true);
+            textboxArea.toggleClassName("focused", true);
         });
         chatEntry.connect("focus-out-event", () => {
-            self.toggleClassName("focused", false);
+            textboxArea.toggleClassName("focused", false);
         });
     }
+});
+
+chatEntry.get_buffer().connect("changed", (buffer) => {
+    const bufferText = buffer.get_text(buffer.get_start_iter(), buffer.get_end_iter(), true);
+    // chatSendButton.toggleClassName("chat_wrapper_extended", bufferText.length > 0);
+    chatPlaceholderRevealer.reveal_child = bufferText.length == 0;
+    if (buffer.get_line_count() > 2 || bufferText.length > 30) {
+        chatEntryWrapper.toggleClassName("chat_wrapper_extended", true);
+        chatEntry.set_valign(Gtk.Align.FILL);
+        chatPlaceholder.set_valign(Gtk.Align.FILL);
+    } else {
+        chatEntryWrapper.toggleClassName("chat_wrapper_extended", false);
+        chatEntry.set_valign(Gtk.Align.CENTER);
+        chatPlaceholder.set_valign(Gtk.Align.CENTER);
+    }
+});
+
+const chatPlaceholder = Widget.Label({
+    className: "placeholder",
+    hpack: "start",
+    vpack: "center",
+    label: chatEntry.attribute.placeholder
+});
+
+const chatPlaceholderRevealer = Widget.Revealer({
+    revealChild: true,
+    transition: "crossfade",
+    transitionDuration: 200,
+    child: chatPlaceholder,
+    setup: enableClickThrough
+});
+
+const chatSendButton = Widget.Button({
+    className: "send standard_icon_button",
+    child: MaterialIcon("send", "24px"),
+    vpack: "center",
+    hpack: "end",
+    css: "font-size: 24px",
+    onClicked: (self) => {
+        apiSendMessage(chatEntry);
+    }
+});
+
+const textboxArea = Widget.Box({
+    // Entry area
+    className: "textbox",
+    children: [
+        Widget.Overlay({
+            passThrough: true,
+            child: chatEntryWrapper,
+            overlays: [chatPlaceholderRevealer]
+        }),
+        Widget.Box({ className: "width-10" }),
+        chatSendButton
+    ]
 });
 
 const GeminiInfo = () => {
@@ -96,7 +149,7 @@ const GeminiInfo = () => {
                         label: "Powered by Google"
                     }),
                     Widget.Button({
-                        class_name: "description",
+                        class_name: "description icon material_icon",
                         label: "info",
                         tooltipText:
                             "Uses gemini-pro.\nNot affiliated, endorsed, or sponsored by Google.\n\nPrivacy: Chat messages aren't linked to your account,\n    but will be read by human reviewers to improve the model."
@@ -269,5 +322,5 @@ const geminiView = Widget.Box({
 export const geminiPage = Widget.Box({
     class_name: "page gemini",
     vertical: true,
-    children: [geminiView, geminiCommands, chatEntryWrapper]
+    children: [geminiView, geminiCommands, textboxArea]
 });
