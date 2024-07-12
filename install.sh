@@ -34,6 +34,11 @@ install_yay() {
     makepkg -si --noconfirm --needed
 }
 
+install_microtex() {
+    cd ~/dotfiles/setup/MicroTex/
+    makepkg -si
+}
+
 install_packages() {
     echo ":: Installing packages"
     sleep 1
@@ -54,7 +59,7 @@ install_packages() {
         ttf-font-awesome ttf-opensans ttf-roboto lshw ttf-material-symbols-variable-git \
         fontconfig dart-sass ttf-meslo-nerd-font-powerlevel10k cpio meson cmake \
         python-materialyoucolor-git gtksourceview3 gtksourceviewmm cairomm \
-        gtkmm3 tinyxml2
+        gtkmm3 tinyxml2 python-requests
 }
 
 setup_yay() {
@@ -196,6 +201,7 @@ main() {
         sudo pacman -S gum
     fi
     ask_continue "Proceed with installing packages?" false && install_packages
+    ask_continue "Proceed with installing MicroTex?*" && install_microtex
     ask_continue "Proceed with setting up sensors?" false && setup_sensors
     ask_continue "Proceed with checking config folders?*" && check_config_folders
     ask_continue "Proceed with installing Tela Nord icons?" false && install_tela_nord_icons
