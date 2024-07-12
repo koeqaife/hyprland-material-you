@@ -1,5 +1,5 @@
-import { MprisPlayer } from "types/service/mpris.js";
-import Label from "types/widgets/label.js";
+import { MprisPlayer } from "types/service/mpris.ts";
+import Label from "types/widgets/label.ts";
 import { MaterialIcon } from "icons.ts";
 const mpris = await Service.import("mpris");
 const players = mpris.bind("players");
@@ -98,7 +98,7 @@ function Player(player: MprisPlayer) {
         on_clicked: () => player.playPause(),
         visible: player.bind("can_play"),
         child: MaterialIcon(
-            // @ts-ignore
+            // @ts-expect-error
             player.bind("play_back_status").transform((s) => {
                 switch (s) {
                     case "Playing":
@@ -155,6 +155,7 @@ export function Media() {
     return Widget.Box({
         vertical: true,
         css: "min-height: 2px; min-width: 2px;",
+        vpack: "start",
         visible: players.as((p) => p.length > 0),
         children: players.as((p) => p.map(Player))
     });
