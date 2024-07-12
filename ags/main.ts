@@ -4,10 +4,9 @@ import Gdk from "gi://Gdk";
 // widgets
 import { Bar, BarCornerTopLeft, BarCornerTopRight } from "./modules/bar.ts";
 import { Notifications } from "./modules/notificationPopups.ts";
-import { applauncher } from "./modules/applauncher.js";
-import { media } from "./modules/media.ts";
 import { cliphist } from "./modules/cliphist.ts";
 import { sideright } from "./modules/sideright/main.ts";
+import { sideleft } from "./modules/sideleft/main.ts";
 import {} from "apps/settings/main.ts";
 import {} from "apps/emoji/main.ts";
 import { cheatsheet } from "modules/cheatsheet.ts";
@@ -28,11 +27,10 @@ const Windows = () => [
     forMonitors(Notifications),
     forMonitors(BarCornerTopLeft),
     forMonitors(BarCornerTopRight),
-    media,
-    applauncher,
     cliphist,
     sideright,
-    cheatsheet
+    cheatsheet,
+    sideleft
 ];
 
 const CLOSE_ANIM_TIME = 210;
@@ -50,7 +48,6 @@ App.config({
 
 function ReloadCSS() {
     App.resetCss();
-    // Utils.execAsync(`cp -f -r ${GLib.get_home_dir()}/dotfiles/material-colors/generated/svg/ ${App.configDir}/`).catch(print)
     App.applyCss(`${App.configDir}/style.css`);
     App.applyCss(`${App.configDir}/style-apps.css`);
 }
