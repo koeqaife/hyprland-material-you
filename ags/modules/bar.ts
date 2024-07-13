@@ -221,6 +221,8 @@ function SysTray() {
                 const items = systemtray.items;
                 // @ts-expect-error
                 self.children = items.map((item) => {
+                    if (!item.id)
+                        return undefined;
                     if (item.id.trim() != "nm-applet" && item.id.trim() != "blueman") {
                         return Widget.Button({
                             child: Widget.Icon({ icon: item.bind("icon") }),
