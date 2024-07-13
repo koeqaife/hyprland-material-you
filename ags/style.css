@@ -533,16 +533,16 @@ window.notification-popups box.notifications {
     transition: all 0.2s ease-in-out, border-radius 0.1s ease-in-out;
 }
 
-.notifications_sidebar_scrollable viewport > box > :first-child .notification {
+.notifications_sidebar_scrollable viewport > box > .first .notification{
     border-radius: 14px 14px 6px 6px;
 }
 
-.notifications_sidebar_scrollable viewport > box > :last-child .notification {
+.notifications_sidebar_scrollable viewport > box > .last .notification {
     border-radius: 6px 6px 14px 14px;
     margin-bottom: 10px;
 }
 
-.notifications_sidebar_scrollable viewport > box > :last-child:first-child .notification {
+.notifications_sidebar_scrollable viewport > box > .first.last .notification {
     border-radius: 14px;
 }
 
