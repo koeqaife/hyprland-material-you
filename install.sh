@@ -9,6 +9,7 @@ if [ ! -d "$HOME/dotfiles" ]; then
     echo ":: The directory $HOME/dotfiles does not exist."
     exit 1
 fi
+
 ask_continue() {
     local message=$1
     local exit_on_no=${2:-true}
@@ -22,6 +23,30 @@ ask_continue() {
         else
             return 1
         fi
+    fi
+}
+
+preference_select() {
+    local type=$1
+    shift
+    local app_type=$1
+    shift
+    local options=("$@")
+
+    gum style \
+        --foreground 212 --border-foreground 212 --border normal \
+        --align center --width 50 --margin "0 2" --padding "1 2" \
+        "Select a(n) $type to install"
+
+    CHOICE=$(gum choose "${options[@]}" "NONE")
+
+    if [[ $CHOICE != "NONE" ]]; then
+        yay -Syu --noconfirm --needed
+        yay -S --noconfirm --needed $CHOICE
+        python -O "$HOME"/dotfiles/ags/scripts/apps.py --"$app_type" $CHOICE
+    else
+        echo "Not installing a(n) $type..."
+        sleep .4
     fi
 }
 
@@ -49,11 +74,11 @@ install_packages() {
         xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-user-dirs \
         xdg-utils libxdg-basedir python-pyxdg aylurs-gtk-shell swww gtk3 gtk4 \
         adw-gtk3 adw-gtk-theme libdbusmenu-gtk3 python-pip python-pillow sddm \
-        sddm-theme-corners-git nautilus nm-connection-editor network-manager-applet \
+        sddm-theme-corners-git nm-connection-editor network-manager-applet \
         networkmanager gnome-bluetooth-3.0 wl-gammarelay-rs bluez bluez-libs bluez-utils \
-        cliphist wl-clipboard pywal-16-colors libadwaita swappy nwg-look alacritty \
+        cliphist wl-clipboard pywal-16-colors libadwaita swappy nwg-look \
         pavucontrol polkit-gnome brightnessctl man-pages gvfs xarchiver zip imagemagick \
-        blueman fastfetch bibata-cursor-theme gum python-pywayland brave dbus \
+        blueman fastfetch bibata-cursor-theme gum python-pywayland dbus \
         libdrm mesa fwupd rofi-wayland bun-bin pipewire wireplumber udiskie \
         lm_sensors gnome-system-monitor playerctl ttf-meslo-nerd ttf-google-sans \
         ttf-font-awesome ttf-opensans ttf-roboto lshw ttf-material-symbols-variable-git \
@@ -195,12 +220,17 @@ main() {
         install_packages
         exit 0
     fi
+
     setup_yay
     if ! command -v gum &>/dev/null; then
         echo ":: gum not installed"
         sudo pacman -S gum
     fi
+
     ask_continue "Proceed with installing packages?" false && install_packages
+    preference_select "file manager" "filemanager" "nautilus" "dolphin" "thunar"
+    preference_select "internet browser" "browser" "brave" "firefox" "google-chrome" "chromium"
+    preference_select "terminal emulator" "terminal" "alacritty" "kitty" "konsole"
     ask_continue "Proceed with installing MicroTex?*" && install_microtex
     ask_continue "Proceed with setting up sensors?" false && setup_sensors
     ask_continue "Proceed with checking config folders?*" && check_config_folders
