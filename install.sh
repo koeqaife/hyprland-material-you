@@ -26,20 +26,26 @@ ask_continue() {
     fi
 }
 
-preference_select(){
+preference_select() {
     local type=$1
-    gum style \
-    	--foreground 212 --border-foreground 212 --border normal \
-    	--align center --width 50 --margin "0 2" --padding "1 2" \
-    	"Select a(n) $type to install"
+    shift
+    local app_type=$1
+    shift
+    local options=("$@")
 
-    CHOICE=$(gum choose "$2" "$3" "$4" "NONE")
+    gum style \
+        --foreground 212 --border-foreground 212 --border normal \
+        --align center --width 50 --margin "0 2" --padding "1 2" \
+        "Select a(n) $type to install"
+
+    CHOICE=$(gum choose "${options[@]}" "NONE")
 
     if [[ $CHOICE != "NONE" ]]; then
-    	yay -Syu --noconfirm --needed
-    	yay -S --noconfirm --needed $CHOICE
+        yay -Syu --noconfirm --needed
+        yay -S --noconfirm --needed $CHOICE
+        python -O "$HOME"/dotfiles/ags/scripts/apps.py --"$app_type" $CHOICE
     else
-    	echo "Not installing a(n) $type..."
+        echo "Not installing a(n) $type..."
         sleep .4
     fi
 }
@@ -222,9 +228,9 @@ main() {
     fi
 
     ask_continue "Proceed with installing packages?" false && install_packages
-    preference_select "file manager" "nautilus" "dolphin" "thunar"
-    preference_select "internet browser" "brave" "firefox" "google-chrome"
-    preference_select "terminal emulator" "alacritty" "kitty" "konsole"
+    preference_select "file manager" "filemanager" "nautilus" "dolphin" "thunar"
+    preference_select "internet browser" "browser" "brave" "firefox" "google-chrome" "chromium"
+    preference_select "terminal emulator" "terminal" "alacritty" "kitty" "konsole"
     ask_continue "Proceed with installing MicroTex?*" && install_microtex
     ask_continue "Proceed with setting up sensors?" false && setup_sensors
     ask_continue "Proceed with checking config folders?*" && check_config_folders
