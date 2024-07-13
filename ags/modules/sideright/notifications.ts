@@ -38,6 +38,7 @@ const NotificationReveal = (notification: NotificationType, visible = false, dis
         destroyWithAnims: any;
         count: number;
         id: number;
+        app: string;
     };
 
     let box: Box<any, BoxAttrs>;
@@ -56,7 +57,8 @@ const NotificationReveal = (notification: NotificationType, visible = false, dis
         attribute: {
             destroyWithAnims: destroyWithAnims,
             count: 0,
-            id: notification.id
+            id: notification.id,
+            app: notification.app_name
         },
         children: [firstRevealer]
     });

@@ -154,6 +154,7 @@ const NotificationReveal = (notification: NotificationType, visible = false, dis
         destroyWithAnims: any;
         count: number;
         id: number;
+        app: string;
     };
 
     let box: Box<any, BoxAttrs>;
@@ -173,7 +174,8 @@ const NotificationReveal = (notification: NotificationType, visible = false, dis
         attribute: {
             destroyWithAnims: destroyWithAnims,
             count: 0,
-            id: notification.id
+            id: notification.id,
+            app: notification.app_name
         },
         children: [firstRevealer]
     });
@@ -196,6 +198,29 @@ export function NotificationPopups(
         vertical: true,
         children: notifications.popups.map((id) => revealer(id, false, dismiss))
     });
+
+    function onChange() {
+        for (let i = 0; i < list.children.length; i++) {
+            const current = list.children[i];
+            const next = list.children[i + 1];
+            const prev = list.children[i - 1];
+            let is_last = true;
+            let is_first = true;
+            if (next) {
+                if (next.attribute.app === current.attribute.app) {
+                    is_last = false;
+                }
+            }
+            if (prev) {
+                if (prev.attribute.app === current.attribute.app) {
+                    is_first = false;
+                }
+            }
+            current.toggleClassName("last", is_last);
+            current.toggleClassName("first", is_first);
+            current.toggleClassName("middle", !is_first && !is_last);
+        }
+    }
 
     function onNotified(_: any, id: number) {
         const n = notifications.getNotification(id);
@@ -221,15 +246,17 @@ export function NotificationPopups(
                     onDismissed(_, id);
                 }
             });
+        onChange();
     }
 
     function onDismissed(_: any, id: number) {
         const original = list.children.find((n) => n.attribute.id === id);
         if (!original) return;
         original.attribute.count--;
-        if (original?.attribute.count <= 0) {
-            original?.attribute.destroyWithAnims();
+        if (original.attribute.count <= 0) {
+            original.attribute.destroyWithAnims();
         }
+        original.connect("destroy", () => onChange())
     }
 
     list.hook(notifications, onNotified, "notified").hook(notifications, onDismissed, dismiss ? "dismissed" : "closed");
