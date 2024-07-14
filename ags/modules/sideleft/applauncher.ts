@@ -3,10 +3,10 @@ const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
-const WINDOW_NAME = "applauncher";
 import Box from "types/widgets/box";
 import { Application } from "types/service/applications";
 import Gtk from "gi://Gtk?version=3.0";
+import { WINDOW_NAME } from "modules/sideleft/main";
 
 const LAUNCH_COUNT_FILE = Gio.File.new_for_path(
     GLib.build_filenamev([GLib.get_home_dir(), ".cache", "launch_counts.json"])
@@ -122,7 +122,7 @@ export const Applauncher = () => {
         on_accept: () => {
             const results = applications.filter((item) => item.visible);
             if (results[0]) {
-                App.toggleWindow(WINDOW_NAME);
+                App.closeWindow(WINDOW_NAME);
                 results[0].attribute.app.launch();
             }
         },
