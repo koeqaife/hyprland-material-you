@@ -221,8 +221,7 @@ function SysTray() {
                 const items = systemtray.items;
                 // @ts-expect-error
                 self.children = items.map((item) => {
-                    if (!item.id)
-                        return undefined;
+                    if (!item.id) return undefined;
                     if (item.id.trim() != "nm-applet" && item.id.trim() != "blueman") {
                         return Widget.Button({
                             child: Widget.Icon({ icon: item.bind("icon") }),
@@ -344,7 +343,6 @@ function MediaPlayer() {
         } else {
             self.visible = false;
             self.tooltip_text = "Unknown";
-            App.closeWindow("media");
         }
     });
 
@@ -420,7 +418,12 @@ function TaskBar() {
     return Widget.Box({
         class_name: "tray",
         spacing: 5,
-        children: hyprland.bind("clients").as(Clients)
+        setup: (self) => {
+            self.hook(hyprland, () => {
+                self.children = Clients(hyprland.clients);
+                self.visible = self.children.length > 0;
+            });
+        }
     });
 }
 
