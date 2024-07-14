@@ -39,11 +39,13 @@ const NotificationReveal = (notification: NotificationType, visible = false, dis
         count: number;
         id: number;
         app: string;
+        destroying: boolean;
     };
 
     let box: Box<any, BoxAttrs>;
 
     const destroyWithAnims = () => {
+        box.attribute.destroying = true;
         secondRevealer.reveal_child = false;
         Utils.timeout(transition_duration, () => {
             firstRevealer.reveal_child = false;
@@ -58,7 +60,8 @@ const NotificationReveal = (notification: NotificationType, visible = false, dis
             destroyWithAnims: destroyWithAnims,
             count: 0,
             id: notification.id,
-            app: notification.app_name
+            app: notification.app_name,
+            destroying: false
         },
         children: [firstRevealer]
     });
