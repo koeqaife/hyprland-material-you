@@ -1421,6 +1421,10 @@ switch:checked:active slider {
     margin-left: 2px;
 }
 
+.sideleft .message label {
+    color: @onSurface;
+}
+
 .sideleft .message.ephemeral {
     background-color: @surface;
     box-shadow: none;
