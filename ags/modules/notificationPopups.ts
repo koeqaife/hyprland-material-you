@@ -155,11 +155,13 @@ const NotificationReveal = (notification: NotificationType, visible = false, dis
         count: number;
         id: number;
         app: string;
+        destroying: boolean;
     };
 
     let box: Box<any, BoxAttrs>;
 
     const destroyWithAnims = () => {
+        box.attribute.destroying = true;
         secondRevealer.reveal_child = false;
         timeout(transition_duration, () => {
             firstRevealer.reveal_child = false;
@@ -175,7 +177,8 @@ const NotificationReveal = (notification: NotificationType, visible = false, dis
             destroyWithAnims: destroyWithAnims,
             count: 0,
             id: notification.id,
-            app: notification.app_name
+            app: notification.app_name,
+            destroying: false
         },
         children: [firstRevealer]
     });
@@ -206,17 +209,24 @@ export function NotificationPopups(
             const prev = list.children[i - 1];
             let is_last = true;
             let is_first = true;
-            if (next) {
+            let margin_bottom = false;
+            if (next && !next?.attribute.destroying) {
                 if (next.attribute.app === current.attribute.app) {
                     is_last = false;
                 }
             }
-            if (prev) {
+            if (prev && !prev?.attribute.destroying) {
                 if (prev.attribute.app === current.attribute.app) {
                     is_first = false;
                 }
             }
+            if (next) {
+                if (!(next.attribute.app === current.attribute.app)) {
+                    margin_bottom = true;
+                }
+            }
             current.toggleClassName("last", is_last);
+            current.toggleClassName("margin_bottom", margin_bottom);
             current.toggleClassName("first", is_first);
             current.toggleClassName("middle", !is_first && !is_last);
         }
@@ -256,7 +266,8 @@ export function NotificationPopups(
         if (original.attribute.count <= 0) {
             original.attribute.destroyWithAnims();
         }
-        original.connect("destroy", () => onChange())
+        onChange();
+        original.connect("destroy", () => onChange());
     }
 
     list.hook(notifications, onNotified, "notified").hook(notifications, onDismissed, dismiss ? "dismissed" : "closed");
