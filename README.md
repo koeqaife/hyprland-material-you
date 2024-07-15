@@ -24,6 +24,13 @@ cd dotfiles
 
 > I'm not sure if it will work, if you have any problems installing it, post in Issues
 
+<details> 
+  <summary>Support</summary>
+
+  If you can support me please :3
+  [DonationAlerts](https://www.donationalerts.com/r/koeqaife)
+</details>
+
 ## Screenshots
 
 - Sidebar
