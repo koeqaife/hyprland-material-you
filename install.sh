@@ -41,13 +41,22 @@ preference_select() {
     CHOICE=$(gum choose "${options[@]}" "NONE")
 
     if [[ $CHOICE != "NONE" ]]; then
-        yay -Syu --noconfirm --needed
-        yay -S --noconfirm --needed $CHOICE
+        "$helper" -Syu --noconfirm --needed
+        "$helper" -S --noconfirm --needed $CHOICE
         python -O "$HOME"/dotfiles/ags/scripts/apps.py --"$app_type" $CHOICE
     else
         echo "Not installing a(n) $type..."
         sleep .4
     fi
+}
+
+get_helper() {
+    for helper in aurman pacaur pakku paru pikaur trizen yay; do
+        if command -v "$helper" &>/dev/null; then
+            echo "$helper"
+            return
+        fi
+    done
 }
 
 install_yay() {
@@ -67,8 +76,8 @@ install_microtex() {
 install_packages() {
     echo ":: Installing packages"
     sleep 1
-    yay -Syu --noconfirm --needed
-    yay -S --noconfirm --needed \
+    "$helper" -Syu --noconfirm --needed
+    "$helper" -S --noconfirm --needed \
         hyprland hyprshot hyprcursor hypridle hyprlang hyprpaper hyprpicker hyprlock \
         hyprutils hyprwayland-scanner xdg-dbus-proxy xdg-desktop-portal \
         xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-user-dirs \
@@ -88,13 +97,12 @@ install_packages() {
 }
 
 setup_yay() {
-    if command -v yay &>/dev/null; then
-        echo ":: Yay is installed"
-        sleep 1
-    else
-        echo ":: Yay is not installed!"
+    helper=$(get_helper)
+    if [ -z "$helper" ]; then
+        echo ":: No AUR helper found. Installing Yay."
         sleep 1
         install_yay
+        helper="yay"
     fi
 }
 
