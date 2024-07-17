@@ -141,6 +141,8 @@ if [[ $CHOICE != "Tela Icon Theme" ]]; then
 	if [[ $CHOICE == "Papirus Icon Theme" ]]; then
 		"$helper" -Syu --noconfirm --needed
 		"$helper" -S --noconfirm --needed papirus-icon-theme papirus-folders
+
+        echo -e "Papirus-Dark\nPapirus-Light" > $HOME/dotfiles/.settings/icon-theme
 		
 		gum style \
             --foreground 212 --border-foreground 212 --border normal \
@@ -155,6 +157,7 @@ if [[ $CHOICE != "Tela Icon Theme" ]]; then
 	else
 		"$helper" -Syu --noconfirm --needed
 		"$helper" -S --noconfirm --needed adwaita-icon-theme
+        echo -e "Adwaita\nAdwaita" > $HOME/dotfiles/.settings/icon-theme
 	fi
 
 else
@@ -163,6 +166,8 @@ else
 	cd /tmp/install
 	git clone https://github.com/vinceliuice/Tela-icon-theme
 	cd Tela-icon-theme
+
+    echo -e "Tela-nord-dark\Tela-nord-light" > $HOME/dotfiles/.settings/icon-theme
 
 	gum style \
         --foreground 212 --border-foreground 212 --border normal \
