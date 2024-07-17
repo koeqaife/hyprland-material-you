@@ -167,7 +167,7 @@ else
 	git clone https://github.com/vinceliuice/Tela-icon-theme
 	cd Tela-icon-theme
 
-    echo -e "Tela-nord-dark\Tela-nord-light" > $HOME/dotfiles/.settings/icon-theme
+    echo -e "Tela-nord-dark\nTela-nord-light" > $HOME/dotfiles/.settings/icon-theme
 
 	gum style \
         --foreground 212 --border-foreground 212 --border normal \
