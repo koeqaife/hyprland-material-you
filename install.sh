@@ -51,7 +51,7 @@ preference_select() {
 }
 
 get_helper() {
-    for helper in aurman pacaur pakku paru pikaur trizen yay; do
+    for helper in yay aurman pacaur pakku paru pikaur trizen; do
         if command -v "$helper" &>/dev/null; then
             echo "$helper"
             return
