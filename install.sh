@@ -147,7 +147,7 @@ install_icon_theme() {
             --align center --width 50 --margin "0 2" --padding "1 2" \
             "Select a color theme"
 
-        COLOR_CHOICE=$(gum choose "nord" "black" "blue" "green" "grey" "orange" \
+        COLOR_CHOICE=$(gum choose --height=20 "nord" "black" "blue" "green" "grey" "orange" \
             "pink" "purple" "red" "yellow" "brown")
 
         ./install.sh $COLOR_CHOICE
