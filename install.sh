@@ -128,59 +128,51 @@ check_config_folders() {
 }
 
 install_icon_theme() {
-
-gum style \
+    gum style \
         --foreground 212 --border-foreground 212 --border normal \
         --align center --width 50 --margin "0 2" --padding "1 2" \
         "Select an icon theme to install"
 
-CHOICE=$(gum choose "Tela Icon Theme" "Papirus Icon Theme" "Adwaita Icon Theme")
+    CHOICE=$(gum choose "Tela Icon Theme" "Papirus Icon Theme" "Adwaita Icon Theme")
 
-if [[ $CHOICE != "Tela Icon Theme" ]]; then
+    if [[ $CHOICE == "Tela Icon Theme" ]]; then
+        echo ":: Installing Tela icons..."
+        mkdir -p /tmp/install
+        cd /tmp/install
+        git clone https://github.com/vinceliuice/Tela-icon-theme
+        cd Tela-icon-theme
 
-	if [[ $CHOICE == "Papirus Icon Theme" ]]; then
-		"$helper" -Syu --noconfirm --needed
-		"$helper" -S --noconfirm --needed papirus-icon-theme papirus-folders
-
-        echo -e "Papirus-Dark\nPapirus-Light" > $HOME/dotfiles/.settings/icon-theme
-		
-		gum style \
+        gum style \
             --foreground 212 --border-foreground 212 --border normal \
             --align center --width 50 --margin "0 2" --padding "1 2" \
             "Select a color theme"
 
-		COLOR_CHOICE=$(gum choose --height=20 "black" "blue" "cyan" "green" "grey" "indigo" \
-			"brown" "purple" "nordic" "pink" "red" "deeporange" "white" "yellow")
+        COLOR_CHOICE=$(gum choose "nord" "black" "blue" "green" "grey" "orange" \
+            "pink" "purple" "red" "yellow" "brown")
 
-		papirus-folders -C $COLOR_CHOICE
-		
-	else
-		"$helper" -Syu --noconfirm --needed
-		"$helper" -S --noconfirm --needed adwaita-icon-theme
-        echo -e "Adwaita\nAdwaita" > $HOME/dotfiles/.settings/icon-theme
-	fi
+        ./install.sh $COLOR_CHOICE
+        echo -e "Tela-$COLOR_CHOICE-dark\nTela-$COLOR_CHOICE-light" >$HOME/dotfiles/.settings/icon-theme
+        cd $HOME/dotfiles
 
-else
-	echo ":: Installing Tela icons..."
-	mkdir -p /tmp/install
-	cd /tmp/install
-	git clone https://github.com/vinceliuice/Tela-icon-theme
-	cd Tela-icon-theme
+    elif [[ $CHOICE == "Papirus Icon Theme" ]]; then
+        "$helper" -S --noconfirm --needed papirus-icon-theme papirus-folders
 
-    echo -e "Tela-nord-dark\nTela-nord-light" > $HOME/dotfiles/.settings/icon-theme
+        echo -e "Papirus-Dark\nPapirus-Light" >$HOME/dotfiles/.settings/icon-theme
 
-	gum style \
-        --foreground 212 --border-foreground 212 --border normal \
-        --align center --width 50 --margin "0 2" --padding "1 2" \
-        "Select a color theme"
-	
+        gum style \
+            --foreground 212 --border-foreground 212 --border normal \
+            --align center --width 50 --margin "0 2" --padding "1 2" \
+            "Select a color theme"
 
-	COLOR_CHOICE=$(gum choose "nord" "black" "blue" "green" "grey" "orange" \
-									"pink" "purple" "red" "yellow" "brown")
-	
-	./install.sh $COLOR_CHOICE
-	cd $HOME/dotfiles
-fi	
+        COLOR_CHOICE=$(gum choose --height=20 "black" "blue" "cyan" "green" "grey" "indigo" \
+            "brown" "purple" "nordic" "pink" "red" "deeporange" "white" "yellow")
+
+        papirus-folders -C $COLOR_CHOICE
+
+    else
+        "$helper" -S --noconfirm --needed adwaita-icon-theme
+        echo -e "Adwaita\nAdwaita" >$HOME/dotfiles/.settings/icon-theme
+    fi
 }
 
 setup_colors() {
