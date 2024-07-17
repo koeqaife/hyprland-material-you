@@ -127,14 +127,55 @@ check_config_folders() {
     fi
 }
 
-install_tela_nord_icons() {
-    echo ":: Installing Tela Nord icons..."
-    mkdir -p /tmp/install
-    cd /tmp/install
-    git clone https://github.com/vinceliuice/Tela-icon-theme
-    cd Tela-icon-theme
-    ./install.sh nord
-    cd $HOME/dotfiles
+install_icon_theme() {
+
+gum style \
+        --foreground 212 --border-foreground 212 --border normal \
+        --align center --width 50 --margin "0 2" --padding "1 2" \
+        "Select an icon theme to install"
+
+CHOICE=$(gum choose "Tela Icon Theme" "Papirus Icon Theme" "Adwaita Icon Theme")
+
+if [[ $CHOICE != "Tela Icon Theme" ]]; then
+
+	if [[ $CHOICE == "Papirus Icon Theme" ]]; then
+		"$helper" -Syu --noconfirm --needed
+		"$helper" -S --noconfirm --needed papirus-icon-theme papirus-folders
+		
+		gum style \
+            --foreground 212 --border-foreground 212 --border normal \
+            --align center --width 50 --margin "0 2" --padding "1 2" \
+            "Select a color theme"
+
+		COLOR_CHOICE=$(gum choose --height=20 "black" "blue" "cyan" "green" "grey" "indigo" \
+			"brown" "purple" "nordic" "pink" "red" "deeporange" "white" "yellow")
+
+		papirus-folders -C $COLOR_CHOICE
+		
+	else
+		"$helper" -Syu --noconfirm --needed
+		"$helper" -S --noconfirm --needed adwaita-icon-theme
+	fi
+
+else
+	echo ":: Installing Tela icons..."
+	mkdir -p /tmp/install
+	cd /tmp/install
+	git clone https://github.com/vinceliuice/Tela-icon-theme
+	cd Tela-icon-theme
+
+	gum style \
+        --foreground 212 --border-foreground 212 --border normal \
+        --align center --width 50 --margin "0 2" --padding "1 2" \
+        "Select a color theme"
+	
+
+	COLOR_CHOICE=$(gum choose "nord" "black" "blue" "green" "grey" "orange" \
+									"pink" "purple" "red" "yellow" "brown")
+	
+	./install.sh $COLOR_CHOICE
+	cd $HOME/dotfiles
+fi	
 }
 
 setup_colors() {
@@ -242,7 +283,7 @@ main() {
     ask_continue "Proceed with installing MicroTex?*" && install_microtex
     ask_continue "Proceed with setting up sensors?" false && setup_sensors
     ask_continue "Proceed with checking config folders?*" && check_config_folders
-    ask_continue "Proceed with installing Tela Nord icons?" false && install_tela_nord_icons
+    ask_continue "Proceed with installing icon themes?" false && install_icon_theme
     ask_continue "Proceed with setting up colors?*" && setup_colors
     ask_continue "Proceed with setting up SDDM?" false && setup_sddm
     ask_continue "Proceed with copying files?*" && copy_files
