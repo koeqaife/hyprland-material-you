@@ -10,6 +10,8 @@ Here are some key features:
 - **Design**: The design wherever possible is made by [Material 3 design](https://m3.material.io/) (or Material You).
 - **Ripple effect**: There is a ripple effect on almost all of the buttons on the interface
 
+Discord: https://discord.gg/nCK3sh8mNU
+
 ## To install
 
 ```sh
