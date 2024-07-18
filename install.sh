@@ -116,13 +116,14 @@ check_config_folders() {
 
     for dir in $CHECK_CONFIG_FOLDERS; do
         if [ -d "$HOME/.config/$dir" ]; then
-            echo ":: Error: directory $dir already exists in .config"
+            echo ":: Attention: directory $dir already exists in .config"
+			mv $HOME/.config/$dir $HOME/.backup/
             EXIT="YES"
         fi
     done
 
     if [[ $EXIT == "YES" ]]; then
-        echo ":: Please remove it or make a backup of it"
+        echo ":: Old config folder(s) backed up at ~/.backup folder"
         exit 1
     fi
 }
