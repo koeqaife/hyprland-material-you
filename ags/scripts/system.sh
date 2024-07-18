@@ -10,7 +10,7 @@ get_ram_usage() {
 }
 
 get_swap_usage() {
-    free -m | awk 'NR==3{printf "%.0f\n", $3*100/$2 }'
+    free -m | awk 'NR==3 { if ($2 == 0) { print 0 } else { printf "%.0f\n", $3*100/$2 } }'
 }
 
 get_cpu_temp() {
