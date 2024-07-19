@@ -23,6 +23,12 @@ git clone https://github.com/koeqaife/hyprland-material-you.git
 mv hyprland-material-you dotfiles
 cd dotfiles
 ./install.sh
+
+```
+
+#### Change wallpaper to random wallpaper (after installation)
+```sh
+python ~/dotfiles/hypr/scripts/wallpaper.py -R
 ```
 
 > I'm not sure if it will work, if you have any problems installing it, post in Issues
