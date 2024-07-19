@@ -10,7 +10,8 @@ Here are some key features:
 - **Design**: The design wherever possible is made by [Material 3 design](https://m3.material.io/) (or Material You).
 - **Ripple effect**: There is a ripple effect on almost all of the buttons on the interface
 
-Discord: https://discord.gg/nCK3sh8mNU
+> Discord: <https://discord.gg/nCK3sh8mNU>  
+> If you can support me please :3 [DonationAlerts](https://www.donationalerts.com/r/koeqaife)
 
 ## To install
 
@@ -25,13 +26,6 @@ cd dotfiles
 ```
 
 > I'm not sure if it will work, if you have any problems installing it, post in Issues
-
-<details> 
-  <summary>Support</summary>
-
-  If you can support me please :3
-  [DonationAlerts](https://www.donationalerts.com/r/koeqaife)
-</details>
 
 ## Screenshots
 
