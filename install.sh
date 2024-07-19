@@ -192,12 +192,13 @@ setup_sddm() {
     sudo chmod 777 /etc/sddm.conf.d/sddm.conf
     sudo chmod 777 /etc/sddm.conf
     sudo chmod -R 777 /usr/share/sddm/themes/corners/
-    sh $HOME/dotfiles/sddm/scripts/wallpaper.sh
+    "$HOME"/dotfiles/sddm/scripts/wallpaper.sh
 }
 
 copy_files() {
     echo ":: Copying files"
-    sh $HOME/dotfiles/setup/copy.sh
+    mkdir -p $HOME/.config
+    "$HOME"/dotfiles/setup/copy.sh
 }
 
 create_links() {
@@ -217,7 +218,7 @@ create_links() {
 install_plugins() {
     echo ":: Plugins"
     hyprpm update
-    sh $HOME/dotfiles/plugins.sh
+    "$HOME"/dotfiles/plugins.sh
 }
 
 install_vencord() {
