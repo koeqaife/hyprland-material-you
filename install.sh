@@ -112,19 +112,21 @@ setup_sensors() {
 
 check_config_folders() {
     local CHECK_CONFIG_FOLDERS="ags alacritty hypr swappy wal"
-    local EXIT="NO"
+    local DATETIME=$(date '+%Y-%m-%d %H:%M:%S')
+    local EXISTING="NO"
+
+    mkdir -p "$HOME/.backup/$DATETIME/"
 
     for dir in $CHECK_CONFIG_FOLDERS; do
         if [ -d "$HOME/.config/$dir" ]; then
             echo ":: Attention: directory $dir already exists in .config"
-			mv $HOME/.config/$dir $HOME/.backup/
-            EXIT="YES"
+            mv $HOME/.config/$dir "$HOME/.backup/$DATETIME/"
+            EXISTING="YES"
         fi
     done
 
-    if [[ $EXIT == "YES" ]]; then
+    if [[ $EXISTING == "YES" ]]; then
         echo ":: Old config folder(s) backed up at ~/.backup folder"
-        exit 1
     fi
 }
 
