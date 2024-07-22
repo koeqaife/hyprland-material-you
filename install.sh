@@ -41,22 +41,13 @@ preference_select() {
     CHOICE=$(gum choose "${options[@]}" "NONE")
 
     if [[ $CHOICE != "NONE" ]]; then
-        "$helper" -Syu --noconfirm --needed
-        "$helper" -S --noconfirm --needed $CHOICE
+        yay -Syu --noconfirm --needed
+        yay -S --noconfirm --needed $CHOICE
         python -O "$HOME"/dotfiles/ags/scripts/apps.py --"$app_type" $CHOICE
     else
         echo "Not installing a(n) $type..."
         sleep .4
     fi
-}
-
-get_helper() {
-    for helper in yay aurman pacaur pakku paru pikaur trizen; do
-        if command -v "$helper" &>/dev/null; then
-            echo "$helper"
-            return
-        fi
-    done
 }
 
 install_yay() {
@@ -76,8 +67,8 @@ install_microtex() {
 install_packages() {
     echo ":: Installing packages"
     sleep 1
-    "$helper" -Syu --noconfirm --needed
-    "$helper" -S --noconfirm --needed \
+    yay -Syu --noconfirm --needed
+    yay -S --noconfirm --needed \
         hyprland hyprshot hyprcursor hypridle hyprlang hyprpaper hyprpicker hyprlock \
         hyprutils hyprwayland-scanner xdg-dbus-proxy xdg-desktop-portal \
         xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-user-dirs \
@@ -97,12 +88,13 @@ install_packages() {
 }
 
 setup_yay() {
-    helper=$(get_helper)
-    if [ -z "$helper" ]; then
-        echo ":: No AUR helper found. Installing Yay."
+    if command -v yay &>/dev/null; then
+        echo ":: Yay is installed"
+        sleep 1
+    else
+        echo ":: Yay is not installed!"
         sleep 1
         install_yay
-        helper="yay"
     fi
 }
 
@@ -158,7 +150,7 @@ install_icon_theme() {
         cd $HOME/dotfiles
 
     elif [[ $CHOICE == "Papirus Icon Theme" ]]; then
-        "$helper" -S --noconfirm --needed papirus-icon-theme papirus-folders
+        yay -S --noconfirm --needed papirus-icon-theme papirus-folders
 
         echo -e "Papirus-Dark\nPapirus-Light" >$HOME/dotfiles/.settings/icon-theme
 
@@ -173,7 +165,7 @@ install_icon_theme() {
         papirus-folders -C $COLOR_CHOICE
 
     else
-        "$helper" -S --noconfirm --needed adwaita-icon-theme
+        yay -S --noconfirm --needed adwaita-icon-theme
         echo -e "Adwaita\nAdwaita" >$HOME/dotfiles/.settings/icon-theme
     fi
 }
