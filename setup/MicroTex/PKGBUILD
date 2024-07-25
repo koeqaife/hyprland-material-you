@@ -1,4 +1,4 @@
-pkgname=microtex-git
+pkgname=m-microtex-git
 _pkgname=MicroTeX
 pkgver=r492.d87ebec
 pkgrel=1
