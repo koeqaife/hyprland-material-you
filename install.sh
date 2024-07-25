@@ -273,7 +273,7 @@ main() {
     preference_select "file manager" "filemanager" "nautilus" "dolphin" "thunar"
     preference_select "internet browser" "browser" "brave" "firefox" "google-chrome" "chromium"
     preference_select "terminal emulator" "terminal" "alacritty" "kitty" "konsole"
-    ask_continue "Proceed with installing MicroTex?*" && install_microtex
+    ask_continue "Proceed with installing MicroTex?" false && install_microtex
     ask_continue "Proceed with setting up sensors?" false && setup_sensors
     ask_continue "Proceed with checking config folders?*" && check_config_folders
     ask_continue "Proceed with installing icon themes?" false && install_icon_theme
