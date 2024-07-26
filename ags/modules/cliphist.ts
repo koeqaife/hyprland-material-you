@@ -49,19 +49,20 @@ function ClipHistItem(entry: string) {
         const box = button.child;
         box.children[2].destroy();
         const icon = Widget.Box({
+            vpack: "center",
             css: (() => {
                 const _widthPx = Number(width);
                 const heightPx = Number(height);
                 const maxWidth = 400;
-                const widthPx = (_widthPx / heightPx) * 100;
+                const widthPx = (_widthPx / heightPx) * 150;
 
                 let css = `background-image: url("${file}");`;
 
                 if (widthPx > maxWidth) {
-                    const newHeightPx = (100 / widthPx) * maxWidth;
+                    const newHeightPx = (150 / widthPx) * maxWidth;
                     css += `min-height: ${newHeightPx}px; min-width: ${maxWidth}px;`;
                 } else {
-                    css += `min-height: 100px; min-width: ${widthPx}px;`;
+                    css += `min-height: 150px; min-width: ${widthPx}px;`;
                 }
 
                 return css;
