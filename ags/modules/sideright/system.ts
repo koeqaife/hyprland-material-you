@@ -5,11 +5,11 @@ import {
     amount_of_ram,
     gpu_name,
     cur_uptime,
-    current_backlight,
     current_brightness
 } from "variables.ts";
 import Gtk from "gi://Gtk?version=3.0";
 import { Variable as VariableType } from "types/variable";
+import backlight_service from "services/backlight.ts";
 
 type InfoType = {
     cpu: string;
@@ -132,10 +132,9 @@ export function SystemBox() {
         draw_value: false,
         class_name: "system_scale backlight",
         // @ts-ignore
-        value: current_backlight.bind(),
+        value: backlight_service.bind("screen_value").as(n => n * 100),
         on_change: (self) => {
-            current_backlight.setValue(Number(self.value));
-            Utils.execAsync(`${App.configDir}/scripts/backlight.sh --smooth ${self.value}`).catch(print);
+            backlight_service.screen_value = self.value / 100;
         },
         tooltip_markup: "Backlight"
     });
