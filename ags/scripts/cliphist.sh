@@ -1,11 +1,7 @@
 #!/bin/bash
 
 get() {
-    clip_list=$(cliphist list)
-
-    while IFS= read -r line; do
-        echo "$line" | iconv -t UTF-8
-    done <<<"$clip_list"
+    cliphist list | iconv -f ISO-8859-1 -t UTF-8 -c
 }
 
 copy_by_id() {
