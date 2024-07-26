@@ -54,9 +54,12 @@ const saved_networks: VariableType<string[]> = Variable([], {
 });
 
 function WifiScan() {
-    network.wifi.scan();
+    try {
+        network.wifi?.scan();
+    } catch (error) {
+        print(error)
+    }
     // await Utils.execAsync("nmcli device wifi rescan").catch(print)
-    return undefined;
 }
 
 const WifiNetwork = (access_point: AccessPoint) => {
