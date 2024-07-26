@@ -88,17 +88,13 @@ function ClipHistItem(entry: string) {
         const width = matches[4];
         const height = matches[5];
         if (format == "png") {
-            const file = `/tmp/ags/cliphist/${id}.png`;
             button.toggleClassName("with_image", true);
             button.connect("clicked", () => {
                 if (!_show_image) {
-                    if (Utils.lookUpIcon(file)) {
-                        show_image(file, width, height);
-                    }
                     Utils.execAsync(`${App.configDir}/scripts/cliphist.sh --save-by-id ${id}`)
                         .then((file) => {
                             show_image(file, width, height);
-                            Utils.exec(`rm -f /tmp/ags/cliphist/${id}.png`)
+                            Utils.exec(`rm -f /tmp/ags/cliphist/${id}.png`);
                         })
                         .catch(print);
                 }
@@ -162,7 +158,7 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
         }
         list.children = list.children.sort((a, b) => Number(a.attribute.id) - Number(b.attribute.id)).reverse();
     }
-    repopulate()
+    repopulate();
 
     const entry = Widget.Entry({
         hexpand: true,
