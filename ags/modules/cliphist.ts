@@ -157,7 +157,6 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
             if (!list_ids.has(item.id)) {
                 const _item = ClipHistItem(item.entry);
                 list.pack_end(_item, false, false, 0);
-                print('add')
             }
         }
         list.children = list.children.sort((a, b) => Number(a.attribute.id) - Number(b.attribute.id)).reverse();
