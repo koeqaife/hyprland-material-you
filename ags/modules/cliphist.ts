@@ -1,6 +1,5 @@
 const WINDOW_NAME = "cliphist";
 import popupwindow from "./misc/popupwindow.ts";
-import Box from "types/widgets/box.js";
 import Gtk from "gi://Gtk?version=3.0";
 
 type EntryObject = {
@@ -9,8 +8,14 @@ type EntryObject = {
     entry: string;
 };
 
+const binary_data = /\[\[ binary data (\d+) (KiB|MiB) (\w+) (\d+)x(\d+) \]\]/;
+
 function ClipHistItem(entry: string) {
-    let [id, ...content] = entry.split("\t");
+    let [id, ..._content] = entry.split("\t");
+    let content = _content.join(" ").trim();
+    const matches = content.match(binary_data);
+    let _show_image = false;
+
     let clickCount = 0;
     let button = Widget.Button({
         class_name: "clip_container",
@@ -29,7 +34,7 @@ function ClipHistItem(entry: string) {
                     vpack: "center"
                 }),
                 Widget.Label({
-                    label: content.join(" ").trim(),
+                    label: content,
                     class_name: "clip_label",
                     xalign: 0,
                     vpack: "center",
@@ -39,6 +44,35 @@ function ClipHistItem(entry: string) {
         })
     });
 
+    function show_image(file: string, width: string | number, height: string | number) {
+        if (_show_image) return;
+        const box = button.child;
+        box.children[2].destroy();
+        const icon = Widget.Box({
+            css: (() => {
+                const _widthPx = Number(width);
+                const heightPx = Number(height);
+                const maxWidth = 400;
+                const widthPx = (_widthPx / heightPx) * 100;
+
+                let css = `background-image: url("${file}");`;
+
+                if (widthPx > maxWidth) {
+                    const newHeightPx = (100 / widthPx) * maxWidth;
+                    css += `min-height: ${newHeightPx}px; min-width: ${maxWidth}px;`;
+                } else {
+                    css += `min-height: 100px; min-width: ${widthPx}px;`;
+                }
+
+                return css;
+            })(),
+            class_name: "preview"
+        });
+        // @ts-expect-error
+        box.children = [...box.children, icon];
+        _show_image = true;
+    }
+
     button.connect("clicked", () => {
         clickCount++;
         if (clickCount === 2) {
@@ -47,14 +81,38 @@ function ClipHistItem(entry: string) {
             clickCount = 0;
         }
     });
+    if (matches) {
+        // const size = matches[1];
+        const format = matches[3];
+        const width = matches[4];
+        const height = matches[5];
+        if (format == "png") {
+            const file = `/tmp/ags/cliphist/${id}.png`;
+            button.toggleClassName("with_image", true);
+            button.connect("clicked", () => {
+                if (!_show_image) {
+                    if (Utils.lookUpIcon(file)) {
+                        show_image(file, width, height);
+                    }
+                    Utils.execAsync(`${App.configDir}/scripts/cliphist.sh --save-by-id ${id}`)
+                        .then((file) => {
+                            show_image(file, width, height);
+                            Utils.exec(`rm -f /tmp/ags/cliphist/${id}.png`)
+                        })
+                        .catch(print);
+                }
+            });
+        }
+    }
 
     button.connect("focus-out-event", () => {
         clickCount = 0;
     });
 
     return Widget.Box({
-        attribute: { content: content.join(" ").trim() },
+        attribute: { content: content, id: id },
         orientation: Gtk.Orientation.VERTICAL,
+        visible: true,
         children: [
             button,
             Widget.Separator({
@@ -69,11 +127,9 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
     let output: string;
     let entries: string[];
     let clipHistItems: EntryObject[];
-    let widgets: Box<any, any>[];
 
-    const list = Widget.Box({
-        vertical: true,
-        spacing
+    const list = Widget.Box<ReturnType<typeof ClipHistItem>, unknown>({
+        vertical: true
     });
 
     async function repopulate() {
@@ -88,10 +144,25 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
             let [id, ...content] = entry.split("\t");
             return { id: id.trim(), content: content.join(" ").trim(), entry: entry };
         });
-        widgets = clipHistItems.map((item) => ClipHistItem(item.entry));
-        list.children = widgets;
+
+        const widget_ids = new Set(clipHistItems.map((item) => item.id));
+        for (const item of list.children) {
+            if (!widget_ids.has(item.attribute.id)) {
+                item.destroy();
+            }
+        }
+
+        const list_ids = new Set(list.children.map((item) => item.attribute.id));
+        for (const item of clipHistItems) {
+            if (!list_ids.has(item.id)) {
+                const _item = ClipHistItem(item.entry);
+                list.pack_end(_item, false, false, 0);
+                print('add')
+            }
+        }
+        list.children = list.children.sort((a, b) => Number(a.attribute.id) - Number(b.attribute.id)).reverse();
     }
-    repopulate();
+    repopulate()
 
     const entry = Widget.Entry({
         hexpand: true,
@@ -100,7 +171,7 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
 
         on_change: ({ text }) => {
             const searchText = (text ?? "").toLowerCase();
-            widgets.forEach((item) => {
+            list.children.forEach((item) => {
                 item.visible = item.attribute.content.toLowerCase().includes(searchText);
             });
         }
@@ -125,7 +196,7 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
                 if (windowName !== WINDOW_NAME) return;
 
                 if (visible) {
-                    repopulate();
+                    repopulate().catch(print);
                     entry.text = "";
                 }
             })

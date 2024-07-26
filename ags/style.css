@@ -318,6 +318,13 @@ window.notification-popups box.notifications {
     font-feature-settings: "tnum";
 }
 
+.clip_container .preview {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 8px;
+}
+
 .clip_container .dot_divider {
     font-weight: 900;
     font-size: 12px;
@@ -334,6 +341,10 @@ window.notification-popups box.notifications {
 .clip_label {
     color: @onSurface;
     font-weight: normal;
+}
+
+.clip_container.with_image .clip_label {
+    color: @tertiary;
 }
 
 /* -----------------------------------------------------

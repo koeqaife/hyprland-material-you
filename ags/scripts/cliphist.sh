@@ -9,8 +9,29 @@ copy_by_id() {
     cliphist decode $id | wl-copy
 }
 
+save_cache_file() {
+    id=$1
+
+    output_file="/tmp/ags/cliphist/$id.png"
+
+    if [[ ! -f "$output_file" ]]; then
+        mkdir -p "/tmp/ags/cliphist/"
+        cliphist decode "$id" >"$output_file"
+    fi
+
+    echo $output_file
+}
+
+clear_tmp() {
+    rm "/tmp/ags/cliphist/*"
+}
+
 if [[ "$1" == "--get" ]]; then
     get
 elif [[ "$1" == "--copy-by-id" ]]; then
     { copy_by_id "$2"; }
+elif [[ "$1" == "--save-by-id" ]]; then
+    { save_cache_file "$2"; }
+elif [[ "$1" == "--clear-cache" ]]; then
+    clear_tmp
 fi
