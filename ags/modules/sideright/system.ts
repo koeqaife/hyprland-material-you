@@ -1,4 +1,13 @@
-import { cpu_cores, cpu_name, kernel_name, amount_of_ram, gpu_name, cur_uptime } from "variables";
+import {
+    cpu_cores,
+    cpu_name,
+    kernel_name,
+    amount_of_ram,
+    gpu_name,
+    cur_uptime,
+    current_backlight,
+    current_brightness
+} from "variables.ts";
 import Gtk from "gi://Gtk?version=3.0";
 import { Variable as VariableType } from "types/variable";
 
@@ -59,28 +68,6 @@ const usage = Variable(
         ]
     }
 );
-
-function checkBacklight() {
-    const get = Utils.execAsync(`${App.configDir}/scripts/backlight.sh --get`)
-        .then((out) => Number(out.trim()))
-        .catch(print);
-    return get;
-}
-
-function checkBrightness() {
-    const get = Utils.execAsync(`${App.configDir}/scripts/brightness.sh --get`)
-        .then((out) => Number(out.trim()))
-        .catch(print);
-    return get;
-}
-
-const current_backlight = Variable(100, {
-    poll: [500, checkBacklight]
-});
-
-const current_brightness = Variable(100, {
-    poll: [500, checkBrightness]
-});
 
 const Usage = (name: string, var_name: keyof InfoType, class_name: string | undefined) => {
     const usage_progress_bar = Widget.ProgressBar({
