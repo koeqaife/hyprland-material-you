@@ -391,6 +391,14 @@ window.notification-popups box.notifications {
     color: @onSurface;
 }
 
+.battery.critical {
+    background-color: @error;
+}
+
+.battery.critical label, .battery.critical .icon {
+    color: @onError;
+}
+
 .bar_applets {
     background-color: @surfaceContainer;
     border-radius: 100px;
