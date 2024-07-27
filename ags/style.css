@@ -1572,7 +1572,7 @@ switch:checked:active slider {
 }
 
 .popups .popup {
-    background-color: @surfaceContainerLow;
+    background-color: @surfaceContainer;
     margin-top: 14px;
     padding: 4px;
     border-radius: 14px;
@@ -1600,7 +1600,7 @@ switch:checked:active slider {
     margin-right: 0px;
     margin-top: -16px;
     margin-bottom: -16px;
-    box-shadow: -4px 0px 0px 1px @surfaceContainerLow, 4px 0px 0px 1px @surfaceContainerLow;
+    box-shadow: -4px 0px 0px 1px @surfaceContainer, 4px 0px 0px 1px @surfaceContainer;
 }
 
 .popup_slider trough {
