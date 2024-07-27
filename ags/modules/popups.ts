@@ -18,8 +18,23 @@ const brightnessIcons = [
 ];
 
 function getBrightnessIcon(brightness: number): string {
-    const index = Math.min(Math.floor(brightness * (brightnessIcons.length - 1)), brightnessIcons.length - 1);
-    return brightnessIcons[index];
+    const totalIcons = brightnessIcons.length;
+    const maxBrightness = 1;
+    const ratio = 1.6;
+
+    let thresholds: number[] = [];
+    for (let i = 0; i < totalIcons; i++) {
+        const threshold = maxBrightness / Math.pow(ratio, totalIcons - i - 1);
+        thresholds.push(threshold);
+    }
+
+    for (let i = 0; i < totalIcons; i++) {
+        if (brightness < thresholds[i]) {
+            return brightnessIcons[i];
+        }
+    }
+
+    return brightnessIcons[totalIcons - 1];
 }
 
 type popup_on_change = ((self: Slider<any>) => void) | undefined;
