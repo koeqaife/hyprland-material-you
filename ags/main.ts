@@ -11,6 +11,7 @@ import {} from "apps/settings/main.ts";
 import {} from "apps/emoji/main.ts";
 import { cheatsheet } from "modules/cheatsheet.ts";
 import Window from "types/widgets/window";
+import { popups } from "modules/popups.ts";
 const GLib = imports.gi.GLib;
 
 const range = (length: number, start = 1) => Array.from({ length }, (_, i) => i + start);
@@ -30,7 +31,8 @@ const Windows = () => [
     cliphist,
     sideright,
     cheatsheet,
-    sideleft
+    sideleft,
+    forMonitors(popups)
 ];
 
 const CLOSE_ANIM_TIME = 210;
