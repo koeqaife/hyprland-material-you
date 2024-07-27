@@ -15,29 +15,44 @@ import Window from "types/widgets/window";
 const GLib = imports.gi.GLib;
 
 
-const criticalPowerNotification = new Gio.Notification();
-criticalPowerNotification.set_title("Battery exhausted");
-criticalPowerNotification.set_body("Shutdown imminen");
+const criticalPowerNotification = {
+  title: "Battery exhausted",
+  body: "Shutdown imminent"
+};
 
-const lowPowerNotification = new Gio.Notification();
-lowPowerNotification.set_title("Battery low");
-lowPowerNotification.set_body("Plug the cable!");
+const lowPowerNotification = {
+  title: "Battery low",
+  body: "Plug the cable!"
+};
 
-const chargedPowerNotification = new Gio.Notification();
-chargedPowerNotification.set_title("Battery full");
-chargedPowerNotification.set_body("You can unplug the cable");
+const chargedPowerNotification = {
+  title: "Battery full",
+  body: "You can unplug the cable"
+};
+
+let lastNotification = "";
 
 Battery.connect("notify::percent", () => {
   if (Battery.charged === true) {
-    App.send_notification(null, chargedPowerNotification);
-  } else if (Battery.percent === 30 && Battery.charging === false) {
-    App.send_notification(null, lowPowerNotification);
-  } else if (Battery.percent === 10 && Battery.charging === false) {
-    App.send_notification(null, criticalPowerNotification);
+    if (lastNotification !== "charged") {
+      Utils.notify(chargedPowerNotification.title, chargedPowerNotification.body);
+      lastNotification = "charged";
+    }
+  } else if (Battery.percent === 66 && Battery.charging === false) {
+    if (lastNotification !== "low") {
+      Utils.notify(lowPowerNotification.title, lowPowerNotification.body);
+      lastNotification = "low";
+    }
+  } else if (Battery.percent === 65 && Battery.charging === false) {
+    if (lastNotification !== "critical") {
+      Utils.notify(criticalPowerNotification.title, criticalPowerNotification.body);
+      lastNotification = "critical";
+    }
   } else {
-    return;
+    lastNotification = "";
   }
 });
+
 
 
 const range = (length: number, start = 1) => Array.from({ length }, (_, i) => i + start);
