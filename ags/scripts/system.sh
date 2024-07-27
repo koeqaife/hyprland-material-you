@@ -42,7 +42,15 @@ get_os() {
 }
 
 get_uptime() {
-    uptime -p | sed -e 's/up //' -e 's/ hours\{0,1\}/h/g' -e 's/ minutes\{0,1\}/min/g' -e 's/ days\{0,1\}/d/g' -e 's/ seconds\{0,1\}/sec/g' -e 's/ //g' -e 's/,/, /'
+    uptime -p | sed -e 's/up //' \
+        -e 's/ hours\{0,1\}/h/g' \
+        -e 's/ minutes\{0,1\}/min/g' \
+        -e 's/ days\{0,1\}/d/g' \
+        -e 's/ seconds\{0,1\}/sec/g' \
+        -e 's/,/, /g' \
+        -e 's/  */ /g' \
+        -e 's/^ //g' \
+        -e 's/ $//g'
 }
 
 if [[ "$1" == "--cpu-usage" ]]; then

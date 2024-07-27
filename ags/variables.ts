@@ -105,6 +105,17 @@ export const generation_scheme_file = `${GLib.get_home_dir()}/dotfiles/.settings
 export const color_scheme_file = `${GLib.get_home_dir()}/dotfiles/.settings/color-scheme`;
 export const wallpaper_cache_file = `${GLib.get_home_dir()}/.cache/current_wallpaper`;
 
+function checkBrightness() {
+    const get = Utils.execAsync(`${App.configDir}/scripts/brightness.sh --get`)
+        .then((out) => Number(out.trim()))
+        .catch(print);
+    return get;
+}
+
+export const current_brightness = Variable(100, {
+    poll: [500, checkBrightness]
+});
+
 function readFiles() {
     Utils.readFileAsync(custom_color_file)
         .then((out) => {

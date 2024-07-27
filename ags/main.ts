@@ -11,6 +11,8 @@ import {} from "apps/settings/main.ts";
 import {} from "apps/emoji/main.ts";
 import { cheatsheet } from "modules/cheatsheet.ts";
 import Window from "types/widgets/window";
+import { popups } from "modules/popups.ts";
+import { start_battery_warning_service } from "services/battery_warning.ts";
 const GLib = imports.gi.GLib;
 
 const range = (length: number, start = 1) => Array.from({ length }, (_, i) => i + start);
@@ -30,7 +32,8 @@ const Windows = () => [
     cliphist,
     sideright,
     cheatsheet,
-    sideleft
+    sideleft,
+    forMonitors(popups)
 ];
 
 const CLOSE_ANIM_TIME = 210;
@@ -66,3 +69,5 @@ Utils.monitorFile(`${GLib.get_home_dir()}/.cache/material/colors.json`, ReloadCS
 Utils.monitorFile(`${GLib.get_home_dir()}/.config/gtk-3.0/gtk.css`, ReloadGtkCSS);
 forMonitorsAsync(Bar);
 ReloadGtkCSS();
+
+start_battery_warning_service()
