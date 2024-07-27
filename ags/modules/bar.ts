@@ -200,6 +200,7 @@ function BatteryLabel() {
             self.hook(battery, () => {
                 self.children[0].label = getClosestBatteryLevel(battery.percent, battery.charging);
                 self.visible = (battery.percent < 100 && battery.available) || config.config.always_show_battery;
+                self.toggleClassName("critical", battery.percent < 15);
             });
             self.hook(config, () => {
                 if (config.config.always_show_battery) {
