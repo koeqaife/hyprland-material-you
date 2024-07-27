@@ -46,7 +46,7 @@ export type GetInfo = Message & {
     max_rate_limit: number;
     version: number;
 } & {
-    [key: string]: value;
+    [key: string]: any;
 };
 
 export type RequestParams = {
