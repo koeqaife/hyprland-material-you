@@ -1,6 +1,7 @@
 "use strict";
 // Import
 import Gdk from "gi://Gdk";
+const Battery = await Service.import("battery");
 // widgets
 import { Bar, BarCornerTopLeft, BarCornerTopRight } from "./modules/bar.ts";
 import { Notifications } from "./modules/notificationPopups.ts";
@@ -12,6 +13,32 @@ import {} from "apps/emoji/main.ts";
 import { cheatsheet } from "modules/cheatsheet.ts";
 import Window from "types/widgets/window";
 const GLib = imports.gi.GLib;
+
+
+const criticalPowerNotification = new Gio.Notification();
+criticalPowerNotification.set_title("Battery exhausted");
+criticalPowerNotification.set_body("Shutdown imminen");
+
+const lowPowerNotification = new Gio.Notification();
+lowPowerNotification.set_title("Battery low");
+lowPowerNotification.set_body("Plug the cable!");
+
+const chargedPowerNotification = new Gio.Notification();
+chargedPowerNotification.set_title("Battery full");
+chargedPowerNotification.set_body("You can unplug the cable");
+
+Battery.connect("notify::percent", () => {
+  if (Battery.charged === true) {
+    App.send_notification(null, chargedPowerNotification);
+  } else if (Battery.percent === 30 && Battery.charging === false) {
+    App.send_notification(null, lowPowerNotification);
+  } else if (Battery.percent === 10 && Battery.charging === false) {
+    App.send_notification(null, criticalPowerNotification);
+  } else {
+    return;
+  }
+});
+
 
 const range = (length: number, start = 1) => Array.from({ length }, (_, i) => i + start);
 function forMonitors(widget: (index: number) => Window<any, any>): Window<any, any>[] {
