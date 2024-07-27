@@ -22,13 +22,19 @@ const icons = {
     super: ""
 };
 
+const replace = {
+    slash: "/",
+    period: ".",
+    escape: "Esc"
+};
+
 const category_icons = {
     actions: "accessibility_new",
     applications: "apps",
     windows: "select_window",
     workspaces: "overview_key",
     misc: "construction",
-    plugins: "extension"
+    tools: "build"
 };
 
 const CheatSheet = () =>
@@ -89,7 +95,7 @@ const CheatSheet = () =>
                             else
                                 key_box.pack_start(
                                     Widget.Label({
-                                        label: key.charAt(0).toUpperCase() + key.slice(1),
+                                        label: replace[key.toLowerCase()] || key.charAt(0).toUpperCase() + key.slice(1),
                                         class_name: "key",
                                         hpack: "start",
                                         vpack: "center"
