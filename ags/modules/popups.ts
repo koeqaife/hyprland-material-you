@@ -106,7 +106,7 @@ const volume_popup = () =>
             audio.speaker.volume = self.value / 100;
         },
         (self) => {
-            audio.connect("speaker-changed", (_) => {
+            audio.speaker.connect("notify::volume", (_) => {
                 self.attribute.count++;
                 if (self.attribute.count > 0) self.reveal_child = true;
                 _popup_count.setValue(_popup_count.value + 1);
