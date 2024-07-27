@@ -17,8 +17,6 @@ const brightnessIcons = [
     "brightness_7"
 ];
 
-const _popup_count = Variable(0);
-
 function getBrightnessIcon(brightness: number): string {
     const index = Math.min(Math.floor(brightness * (brightnessIcons.length - 1)), brightnessIcons.length - 1);
     return brightnessIcons[index];
@@ -43,25 +41,37 @@ const default_popup = (
     setup?: popup_setup
 ) =>
     Widget.Revealer({
-        reveal_child: false,
         transition_duration: 200,
         transition: "slide_up",
-        child: Widget.Box({
-            class_name: "popup",
-            children: [
-                icon,
-                Widget.Slider({
-                    min: 0,
-                    max: 100,
-                    draw_value: false,
-                    class_name: "popup_slider",
-                    value: value,
-                    on_change: on_change
-                })
-            ]
+        child: Widget.Revealer({
+            reveal_child: false,
+            transition_duration: 190,
+            transition: "crossfade",
+            child: Widget.Box({
+                class_name: "popup",
+                children: [
+                    icon,
+                    Widget.Slider({
+                        min: 0,
+                        max: 100,
+                        draw_value: false,
+                        class_name: "popup_slider",
+                        value: value,
+                        on_change: on_change
+                    })
+                ]
+            }),
+            attribute: { count: 0 },
+            setup: setup
         }),
-        attribute: { count: -1 },
-        setup: setup
+        setup: (self) => {
+            self.child.connect("notify::child-revealed", () => {
+                self.reveal_child = self.child.child_revealed;
+            });
+            self.child.connect("notify::reveal-child", () => {
+                if (self.child.reveal_child) self.reveal_child = true;
+            });
+        }
     });
 
 const backlight_popup = () =>
@@ -77,10 +87,8 @@ const backlight_popup = () =>
             backlight_service.connect("screen-changed", (_) => {
                 self.attribute.count++;
                 if (self.attribute.count > 0) self.reveal_child = true;
-                _popup_count.setValue(_popup_count.value + 1);
                 Utils.timeout(1500, () => {
                     self.attribute.count--;
-                    _popup_count.setValue(_popup_count.value - 1);
                     if (self.attribute.count <= 0) self.reveal_child = false;
                 });
             });
@@ -109,34 +117,27 @@ const volume_popup = () =>
             audio.speaker.connect("notify::volume", (_) => {
                 self.attribute.count++;
                 if (self.attribute.count > 0) self.reveal_child = true;
-                _popup_count.setValue(_popup_count.value + 1);
                 Utils.timeout(1500, () => {
                     self.attribute.count--;
-                    _popup_count.setValue(_popup_count.value - 1);
                     if (self.attribute.count <= 0) self.reveal_child = false;
                 });
             });
         }
     );
 
-export const popups = (monitor = 0) =>
-    Widget.Window({
+export const popups = (monitor = 0) => {
+    const _volume_popup = volume_popup();
+    const _backlight_popup = backlight_popup();
+    return Widget.Window({
         monitor,
         name: `popups${monitor}`,
         child: Widget.Box({
+            css: "min-height: 1px; min-width: 1px;",
             vertical: true,
-            children: [backlight_popup(), volume_popup()]
+            children: [_backlight_popup, _volume_popup]
         }),
         class_name: "popups",
         anchor: ["top"],
-        visible: false,
-        setup: (self) => {
-            self.hook(_popup_count, () => {
-                if (_popup_count.value <= 0)
-                    Utils.timeout(210, () => {
-                        if (_popup_count.value <= 0) self.visible = false;
-                    });
-                else self.visible = true;
-            });
-        }
+        visible: true
     });
+};
