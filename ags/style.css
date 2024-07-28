@@ -391,6 +391,14 @@ window.notification-popups box.notifications {
     color: @onSurface;
 }
 
+.battery.critical {
+    background-color: @error;
+}
+
+.battery.critical label, .battery.critical .icon {
+    color: @onError;
+}
+
 .bar_applets {
     background-color: @surfaceContainer;
     border-radius: 100px;
@@ -1554,6 +1562,56 @@ switch:checked:active slider {
 
 .chats entry:focus {
     box-shadow: inset 0 0 0 2px @primary;
+}
+
+/* -----------------------------------------------------
+ * Popups
+ * ----------------------------------------------------- */
+.popups {
+    background-color: transparent;
+}
+
+.popups .popup {
+    background-color: @surfaceContainer;
+    margin-top: 14px;
+    padding: 4px;
+    border-radius: 14px;
+}
+
+.popup_slider {
+    min-width: 150px;
+}
+
+.popup .icon {
+    margin-left: 4px;
+}
+
+.popup_slider slider {
+    color: @onPrimary;
+    background-color: @primary;
+    background-size: 20px 20px;
+    min-width: 5px;
+    min-height: 14px;
+    border-radius: 100px;
+    padding: 0px;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: -16px;
+    margin-bottom: -16px;
+    box-shadow: -4px 0px 0px 1px @surfaceContainer, 4px 0px 0px 1px @surfaceContainer;
+}
+
+.popup_slider trough {
+    background-color: @secondaryContainer;
+    min-height: 10px;
+    margin-right: 4px;
+}
+
+.popup_slider highlight {
+    border-radius: 100px 0px 0px 100px;
+    background-color: @primary;
 }
 
 /* -----------------------------------------------------
