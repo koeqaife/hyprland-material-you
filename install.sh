@@ -68,9 +68,9 @@ install_packages() {
     echo ":: Installing packages"
     sleep 1
     yay -Syu --noconfirm --needed
-    yay -S --noconfirm --needed \
-        hyprland-git hyprshot hyprcursor hypridle hyprlang hyprpaper hyprpicker hyprlock \
-        hyprutils hyprwayland-scanner xdg-dbus-proxy xdg-desktop-portal \
+    yay -S --needed \
+        hyprland-git hyprshot hyprcursor-git hypridle hyprlang-git hyprpaper hyprpicker hyprlock \
+        hyprutils-git hyprwayland-scanner-git xdg-dbus-proxy xdg-desktop-portal \
         xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-user-dirs \
         xdg-utils libxdg-basedir python-pyxdg aylurs-gtk-shell swww gtk3 gtk4 \
         adw-gtk3 adw-gtk-theme libdbusmenu-gtk3 python-pip python-pillow sddm \
@@ -84,7 +84,7 @@ install_packages() {
         ttf-font-awesome ttf-opensans ttf-roboto lshw ttf-material-symbols-variable-git \
         fontconfig dart-sass ttf-meslo-nerd-font-powerlevel10k cpio meson cmake \
         python-materialyoucolor-git gtksourceview3 gtksourceviewmm cairomm \
-        gtkmm3 tinyxml2 python-requests hyprwayland-scanner-git
+        gtkmm3 tinyxml2 python-requests
 }
 
 setup_yay() {
