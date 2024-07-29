@@ -1,4 +1,4 @@
-import { theme, theme_settings, generation_scheme_file } from "variables.ts";
+import { theme, theme_settings, settings_file } from "variables.ts";
 const GLib = imports.gi.GLib;
 import Gtk from "gi://Gtk?version=3.0";
 import config from "services/configuration.ts";
@@ -22,6 +22,17 @@ const color_schemes = {
         for (const key of keys) {
             yield { key, value: this[key] };
         }
+    }
+};
+
+export const updateGenerationScheme = async (scheme: string) => {
+    try {
+        const settingsContent = await Utils.readFile(settings_file);
+        const settings = JSON.parse(settingsContent);
+        settings["generation-scheme"] = scheme;
+        await Utils.writeFile(JSON.stringify(settings, null, 2), settings_file);
+    } catch (error) {
+        print(`Failed to update generation-scheme in settings.json: ${error}`);
     }
 };
 
@@ -71,41 +82,59 @@ function toHex(value: number) {
     return hex.length == 1 ? "0" + hex : hex;
 }
 
-const ReloadTheme = () => {
+const ReloadTheme = async () => {
     let { color, scheme } = theme_settings;
     let _color = color.value;
     let color_to_write = _color;
+
     if (_color.length > 0 && isNumeric(_color) && Number(_color) >= 0 && Number(_color) <= 360) {
         _color = hueToHex(Number(_color));
-        color_to_write = `-${color.value}`;
+        color_to_write = `${color.value}`;
     }
+
     if (theme_reload_lock) return;
-    function Default() {
-        Utils.execAsync(`python -O ${color_generator} -w --color-scheme "${theme.value}" --scheme "${scheme.value}"`)
-            .finally(() => {
-                theme_reload_lock = false;
-            })
-            .then(() => {
-                Utils.writeFile("none", `${GLib.get_home_dir()}/dotfiles/.settings/custom-color`).catch(print);
-            })
-            .catch(print);
-    }
+
     theme_reload_lock = true;
-    if (_color != "none" && _color.length > 6)
-        Utils.execAsync(
-            `python -O ${color_generator} --color "${_color}" --color-scheme "${theme.value}" --scheme "${scheme.value}"`
-        )
-            .finally(() => {
-                theme_reload_lock = false;
-            })
-            .then(() => {
-                Utils.writeFile(color_to_write, `${GLib.get_home_dir()}/dotfiles/.settings/custom-color`).catch(print);
-            })
-            .catch((err) => {
-                print(err);
-                Default();
-            });
-    else Default();
+
+    const updateSettingsFile = async (customColor: string) => {
+        try {
+            const settingsContent = await Utils.readFile(settings_file);
+            const settings = JSON.parse(settingsContent);
+            settings["custom-color"] = customColor;
+            await Utils.writeFile(JSON.stringify(settings, null, 2), settings_file);
+        } catch (error) {
+            print(`Failed to update custom-color in settings.json: ${error}`);
+        }
+    };
+
+    const Default = async () => {
+        try {
+            await Utils.execAsync(
+                `python -O ${color_generator} -w --color-scheme "${theme.value}" --scheme "${scheme.value}"`
+            );
+            await updateSettingsFile("none");
+        } catch (error) {
+            print(error);
+        } finally {
+            theme_reload_lock = false;
+        }
+    };
+
+    if (_color !== "none" && _color.length > 6) {
+        try {
+            await Utils.execAsync(
+                `python -O ${color_generator} --color "${_color}" --color-scheme "${theme.value}" --scheme "${scheme.value}"`
+            );
+            await updateSettingsFile(color_to_write);
+        } catch (error) {
+            print(error);
+            await Default();
+        } finally {
+            theme_reload_lock = false;
+        }
+    } else {
+        await Default();
+    }
 };
 
 const DarkTheme = () =>
@@ -243,7 +272,7 @@ const ColorScheme = () =>
                         self.connect("changed", () => {
                             selected = self.get_active_text();
                             theme_settings.scheme.setValue(color_schemes[selected!]);
-                            Utils.writeFile(color_schemes[selected!], generation_scheme_file).catch(print);
+                            updateGenerationScheme(color_schemes[selected!]);
                             ReloadTheme();
                         });
                     }
