@@ -36,7 +36,6 @@ export const updateGenerationScheme = async (scheme: string) => {
     }
 };
 
-
 let theme_reload_lock = false;
 const color_generator = `${GLib.get_home_dir()}/dotfiles/material-colors/generate.py`;
 
@@ -110,7 +109,9 @@ const ReloadTheme = async () => {
 
     const Default = async () => {
         try {
-            await Utils.execAsync(`python -O ${color_generator} -w --color-scheme "${theme.value}" --scheme "${scheme.value}"`);
+            await Utils.execAsync(
+                `python -O ${color_generator} -w --color-scheme "${theme.value}" --scheme "${scheme.value}"`
+            );
             await updateSettingsFile("none");
         } catch (error) {
             print(error);
@@ -135,7 +136,6 @@ const ReloadTheme = async () => {
         await Default();
     }
 };
-
 
 const DarkTheme = () =>
     Widget.EventBox({
