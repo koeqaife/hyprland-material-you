@@ -73,7 +73,7 @@ const reload = () => {
             })
             .catch(print);
 }
-Utils.interval(150, reload);
+Utils.interval(15000, reload);
 configuration.connect("changed", reload)
 
 export const idle_inhibitor = Variable(false);
