@@ -1,0 +1,6 @@
+{
+    "browser": "firefox",
+    "editor": "nvim",
+    "filemanager": "thunar",
+    "terminal": "kitty"
+}

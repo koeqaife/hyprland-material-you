@@ -1,4 +1,4 @@
-import { theme, theme_settings, generation_scheme_file } from "variables.ts";
+import { theme, theme_settings, settings_file } from "variables.ts";
 const GLib = imports.gi.GLib;
 import Gtk from "gi://Gtk?version=3.0";
 import config from "services/configuration.ts";
@@ -24,6 +24,18 @@ const color_schemes = {
         }
     }
 };
+
+export const updateGenerationScheme = async (scheme: string) => {
+    try {
+        const settingsContent = await Utils.readFile(settings_file);
+        const settings = JSON.parse(settingsContent);
+        settings["generation-scheme"] = scheme;
+        await Utils.writeFile(JSON.stringify(settings, null, 2), settings_file);
+    } catch (error) {
+        print(`Failed to update generation-scheme in settings.json: ${error}`);
+    }
+};
+
 
 let theme_reload_lock = false;
 const color_generator = `${GLib.get_home_dir()}/dotfiles/material-colors/generate.py`;
@@ -86,7 +98,14 @@ const ReloadTheme = () => {
                 theme_reload_lock = false;
             })
             .then(() => {
-                Utils.writeFile("none", `${GLib.get_home_dir()}/dotfiles/.settings/custom-color`).catch(print);
+                // Update custom-color in settings.json
+                Utils.readFileAsync(settings_file)
+                    .then((out) => {
+                        const settings = JSON.parse(out);
+                        settings["custom-color"] = "none";
+                        Utils.writeFile(JSON.stringify(settings, null, 2), settings_file).catch(print);
+                    })
+                    .catch(print);
             })
             .catch(print);
     }
@@ -99,7 +118,14 @@ const ReloadTheme = () => {
                 theme_reload_lock = false;
             })
             .then(() => {
-                Utils.writeFile(color_to_write, `${GLib.get_home_dir()}/dotfiles/.settings/custom-color`).catch(print);
+                // Update custom-color in settings.json
+                Utils.readFileAsync(settings_file)
+                    .then((out) => {
+                        const settings = JSON.parse(out);
+                        settings["custom-color"] = color_to_write;
+                        Utils.writeFile(JSON.stringify(settings, null, 2), settings_file).catch(print);
+                    })
+                    .catch(print);
             })
             .catch((err) => {
                 print(err);
@@ -243,7 +269,7 @@ const ColorScheme = () =>
                         self.connect("changed", () => {
                             selected = self.get_active_text();
                             theme_settings.scheme.setValue(color_schemes[selected!]);
-                            Utils.writeFile(color_schemes[selected!], generation_scheme_file).catch(print);
+                            updateGenerationScheme(color_schemes[selected!]);
                             ReloadTheme();
                         });
                     }

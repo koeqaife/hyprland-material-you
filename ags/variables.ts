@@ -60,7 +60,7 @@ export type WeatherJson = {
 
 export const theme = Variable("dark");
 export const main_color = Variable("#000000");
-export const current_wallpaper = Variable(`${GLib.get_home_dir()}/dotfiles/wallpapers/default.png`);
+export const current_wallpaper = Variable(`${GLib.get_home_dir()}/Pictures/wallpapers/default.png`);
 // @ts-expect-error
 export const weather: VariableType<WeatherJson> = Variable({ no_data: true });
 const reload = () => {
@@ -73,7 +73,7 @@ const reload = () => {
             })
             .catch(print);
 }
-Utils.interval(15000, reload);
+Utils.interval(150, reload);
 configuration.connect("changed", reload)
 
 export const idle_inhibitor = Variable(false);
@@ -100,9 +100,7 @@ export const kernel_name = await Utils.execAsync(`${App.configDir}/scripts/syste
 export const hostname = await Utils.execAsync(`${App.configDir}/scripts/system.sh --hostname`);
 export const current_os = await Utils.execAsync(`${App.configDir}/scripts/system.sh --os`);
 
-export const custom_color_file = `${GLib.get_home_dir()}/dotfiles/.settings/custom-color`;
-export const generation_scheme_file = `${GLib.get_home_dir()}/dotfiles/.settings/generation-scheme`;
-export const color_scheme_file = `${GLib.get_home_dir()}/dotfiles/.settings/color-scheme`;
+export const settings_file = `${GLib.get_home_dir()}/dotfiles/ags/assets/settings.json`;
 export const wallpaper_cache_file = `${GLib.get_home_dir()}/.cache/current_wallpaper`;
 
 function checkBrightness() {
@@ -116,28 +114,16 @@ export const current_brightness = Variable(100, {
     poll: [500, checkBrightness]
 });
 
-function readFiles() {
-    Utils.readFileAsync(custom_color_file)
+
+function readSettingsFile() {
+    Utils.readFileAsync(settings_file)
         .then((out) => {
-            let _out = out;
-            if (_out.startsWith("-")) {
-                _out = _out.substring(1);
-            }
-            theme_settings.color.setValue(_out.trim());
+            const settings = JSON.parse(out);
+            theme_settings.color.setValue(settings["custom-color"].trim());
+            theme_settings.scheme.setValue(settings["generation-scheme"].trim());
+            theme.setValue(settings["color-scheme"].trim());
         })
         .catch(print);
-
-    Utils.readFileAsync(generation_scheme_file)
-        .then((out) => {
-            theme_settings.scheme.setValue(out);
-        })
-        .catch(print);
-
-    Utils.readFileAsync(color_scheme_file)
-        .then((out) => {
-            theme.setValue(out.trim());
-        })
-        .catch((err) => {});
 
     Utils.readFileAsync(wallpaper_cache_file)
         .then((out) => {
@@ -147,36 +133,9 @@ function readFiles() {
             Utils.writeFileSync(current_wallpaper.value, wallpaper_cache_file);
         });
 }
-readFiles();
+readSettingsFile();
 
-Utils.monitorFile(custom_color_file, () => {
-    Utils.readFileAsync(custom_color_file)
-        .then((out) => {
-            let _out = out;
-            if (_out.startsWith("-")) {
-                _out = _out.substring(1);
-            }
-            theme_settings.color.setValue(_out.trim());
-        })
-        .catch((err) => {});
-});
-
-Utils.monitorFile(generation_scheme_file, () => {
-    Utils.readFileAsync(generation_scheme_file)
-        .then((out) => {
-            theme_settings.scheme.setValue(out.trim());
-        })
-        .catch((err) => {});
-});
-
-Utils.monitorFile(color_scheme_file, () => {
-    Utils.readFileAsync(color_scheme_file)
-        .then((out) => {
-            theme.setValue(out.trim());
-        })
-        .catch((err) => {});
-});
-
+Utils.monitorFile(settings_file, readSettingsFile);
 Utils.monitorFile(wallpaper_cache_file, () => {
     Utils.readFileAsync(wallpaper_cache_file)
         .then((out) => {

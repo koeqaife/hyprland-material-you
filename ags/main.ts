@@ -1,11 +1,9 @@
 "use strict";
 // Import
 import Gdk from "gi://Gdk";
-const Battery = await Service.import("battery");
 // widgets
 import { Bar, BarCornerTopLeft, BarCornerTopRight } from "./modules/bar.ts";
 import { Notifications } from "./modules/notificationPopups.ts";
-import { cliphist } from "./modules/cliphist.ts";
 import { sideright } from "./modules/sideright/main.ts";
 import { sideleft } from "./modules/sideleft/main.ts";
 import {} from "apps/settings/main.ts";
@@ -15,47 +13,6 @@ import Window from "types/widgets/window";
 import { popups } from "modules/popups.ts";
 import { start_battery_warning_service } from "services/battery_warning.ts";
 const GLib = imports.gi.GLib;
-
-
-const criticalPowerNotification = {
-  title: "Battery exhausted",
-  body: "Shutdown imminent"
-};
-
-const lowPowerNotification = {
-  title: "Battery low",
-  body: "Plug the cable!"
-};
-
-const chargedPowerNotification = {
-  title: "Battery full",
-  body: "You can unplug the cable"
-};
-
-let lastNotification = "";
-
-Battery.connect("notify::percent", () => {
-  if (Battery.charged === true) {
-    if (lastNotification !== "charged") {
-      Utils.notify(chargedPowerNotification.title, chargedPowerNotification.body);
-      lastNotification = "charged";
-    }
-  } else if (Battery.percent === 66 && Battery.charging === false) {
-    if (lastNotification !== "low") {
-      Utils.notify(lowPowerNotification.title, lowPowerNotification.body);
-      lastNotification = "low";
-    }
-  } else if (Battery.percent === 65 && Battery.charging === false) {
-    if (lastNotification !== "critical") {
-      Utils.notify(criticalPowerNotification.title, criticalPowerNotification.body);
-      lastNotification = "critical";
-    }
-  } else {
-    lastNotification = "";
-  }
-});
-
-
 
 const range = (length: number, start = 1) => Array.from({ length }, (_, i) => i + start);
 function forMonitors(widget: (index: number) => Window<any, any>): Window<any, any>[] {
@@ -71,9 +28,7 @@ const Windows = () => [
     forMonitors(Notifications),
     forMonitors(BarCornerTopLeft),
     forMonitors(BarCornerTopRight),
-    cliphist,
     sideright,
-    cheatsheet,
     sideleft,
     forMonitors(popups)
 ];
