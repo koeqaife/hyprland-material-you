@@ -72,9 +72,9 @@ const reload = () => {
                 weather.setValue(JSON.parse(out));
             })
             .catch(print);
-}
+};
 Utils.interval(15000, reload);
-configuration.connect("changed", reload)
+configuration.connect("changed", reload);
 
 export const idle_inhibitor = Variable(false);
 export const cur_uptime = Variable("error");
@@ -113,7 +113,6 @@ function checkBrightness() {
 export const current_brightness = Variable(100, {
     poll: [500, checkBrightness]
 });
-
 
 function readSettingsFile() {
     Utils.readFileAsync(settings_file)
