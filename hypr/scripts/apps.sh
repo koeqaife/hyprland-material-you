@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Path to your JSON file
-JSON_FILE="$HOME/dotfiles/ags/assets/apps.json"
+JSON_FILE="$HOME/dotfiles/.settings/apps.json"
 
 # Read the application type from the argument
 APP_TYPE=$1

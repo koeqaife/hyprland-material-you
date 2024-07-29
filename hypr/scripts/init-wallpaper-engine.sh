@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Path to your settings JSON file
-settings_file="$HOME/dotfiles/ags/assets/settings.json"
+settings_file="$HOME/dotfiles/.settings/settings.json"
 
 # Read wallpaper engine from the JSON file
 wallpaper_engine=$(jq -r '.["wallpaper-engine"]' "$settings_file")

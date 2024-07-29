@@ -2,7 +2,7 @@
 
 cd $HOME/dotfiles
 
-git update-index --skip-worktree $HOME/dotfiles/ags/assets/icons/*
+git update-index --skip-worktree $HOME/dotfiles/.settings/*
 git update-index --skip-worktree $HOME/dotfiles/hypr/conf/custom.conf
 git update-index --skip-worktree $HOME/dotfiles/hypr/conf/apps.conf
 git update-index --skip-worktree $HOME/dotfiles/alacritty/alacritty.toml

@@ -10,7 +10,8 @@ import colorsys
 import json
 
 lock_file_path = '/tmp/wallpaper.lock'
-settings_file_path = os.path.expanduser('~/dotfiles/ags/assets/settings.json')
+settings_file_path = os.path.expanduser('~/dotfiles/.settings/settings.json')
+
 
 def acquire_lock():
     global lock_file
@@ -23,21 +24,27 @@ def acquire_lock():
         print("Another instance of the script is already running.")
         sys.exit(1)
 
+
 def release_lock():
     fcntl.flock(lock_file, fcntl.LOCK_UN)
     lock_file.close()
     os.remove(lock_file_path)
 
+
 def hue_to_numeric_hex(hue):
     hue = hue / 360.0
     rgb = colorsys.hls_to_rgb(hue, 0.5, 1.0)
-    hex_color_str = '#{:02x}{:02x}{:02x}'.format(int(rgb[0] * 255), int(rgb[1] * 255), int(rgb[2] * 255))
+    hex_color_str = '#{:02x}{:02x}{:02x}'.format(
+        int(rgb[0] * 255), int(rgb[1] * 255), int(rgb[2] * 255)
+    )
     numeric_hex_color = int(hex_color_str.lstrip('#'), 16)
     return numeric_hex_color
+
 
 def load_settings():
     with open(settings_file_path, 'r') as file:
         return json.load(file)
+
 
 parser = argparse.ArgumentParser()
 group = parser.add_mutually_exclusive_group(required=True)
@@ -71,14 +78,17 @@ cache_file = f"{HOME}/.cache/current_wallpaper"
 square = f"{HOME}/.cache/square_wallpaper.png"
 png = f"{HOME}/.cache/current_wallpaper.png"
 
-def current_state(str: str):
+
+def current_state(state_str: str):
     with open(status, 'w') as f:
-        f.write(str)
+        f.write(state_str)
+
 
 def send_notify(label: str, desc: str):
     if not notify:
         return
     subprocess.run(["notify-send", label, desc])
+
 
 def state(name: str | None, label: str | None, desc: str | None):
     if name is not None:
@@ -86,8 +96,10 @@ def state(name: str | None, label: str | None, desc: str | None):
     if label is not None:
         send_notify(label, desc or "")
 
+
 def join(*args):
     return os.path.join(*args)
+
 
 async def main():
     global color_scheme, custom_color, generation_scheme, swww_animation, wallpaper_engine, hyprpaper_tpl
@@ -105,9 +117,9 @@ async def main():
     new_wallpaper = f"{HOME}/dotfiles/wallpapers/lake.png"
 
     if random:
-        files = [f for f in os.listdir(f"{HOME}/wallpapers") if f.endswith(('.png', '.jpg', '.jpeg'))]
+        files = [f for f in os.listdir(f"{HOME}/wallpaper") if f.endswith(('.png', '.jpg', '.jpeg'))]
         if files:
-            new_wallpaper = join(f"{HOME}/wallpapers", _random.choice(files))
+            new_wallpaper = join(f"{HOME}/wallpaper", _random.choice(files))
     elif prev:
         try:
             with open(cache_file) as f:
@@ -197,6 +209,7 @@ async def main():
     await asyncio.gather(square_task, png_task)
     state("finish", "Wallpaper procedure complete!", with_image)
 
+
 async def png_image(wallpaper: str):
     _from = (".jpg", "jpeg")
     if not wallpaper.endswith(_from):
@@ -218,6 +231,7 @@ async def png_image(wallpaper: str):
     else:
         print(":: JPG successfully converted to PNG!")
 
+
 async def square_image(wallpaper):
     with_image = f"with image {wallpaper}"
     state(None, "Creating square version...", with_image)
@@ -234,6 +248,7 @@ async def square_image(wallpaper):
         print(f":: Error while processing image: {stderr.decode()}")
     else:
         print(":: Square image created!")
+
 
 if __name__ == "__main__":
     acquire_lock()
