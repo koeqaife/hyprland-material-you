@@ -1,7 +1,7 @@
 #!/bin/bash
 
 GENERATOR="$HOME/dotfiles/material-colors/generate.py"
-SETTINGS_FILE="$HOME/dotfiles/ags/assets/settings.json"
+SETTINGS_FILE="$HOME/dotfiles/.settings/settings.json"
 
 # Function to read a value from the JSON file
 get_json_value() {

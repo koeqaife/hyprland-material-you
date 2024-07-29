@@ -100,7 +100,7 @@ export const kernel_name = await Utils.execAsync(`${App.configDir}/scripts/syste
 export const hostname = await Utils.execAsync(`${App.configDir}/scripts/system.sh --hostname`);
 export const current_os = await Utils.execAsync(`${App.configDir}/scripts/system.sh --os`);
 
-export const settings_file = `${GLib.get_home_dir()}/dotfiles/ags/assets/settings.json`;
+export const settings_file = `${GLib.get_home_dir()}/dotfiles/.settings/settings.json`;
 export const wallpaper_cache_file = `${GLib.get_home_dir()}/.cache/current_wallpaper`;
 
 function checkBrightness() {

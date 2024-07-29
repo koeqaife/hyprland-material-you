@@ -83,56 +83,59 @@ function toHex(value: number) {
     return hex.length == 1 ? "0" + hex : hex;
 }
 
-const ReloadTheme = () => {
+const ReloadTheme = async () => {
     let { color, scheme } = theme_settings;
     let _color = color.value;
     let color_to_write = _color;
+
     if (_color.length > 0 && isNumeric(_color) && Number(_color) >= 0 && Number(_color) <= 360) {
         _color = hueToHex(Number(_color));
-        color_to_write = `-${color.value}`;
+        color_to_write = `${color.value}`;
     }
+
     if (theme_reload_lock) return;
-    function Default() {
-        Utils.execAsync(`python -O ${color_generator} -w --color-scheme "${theme.value}" --scheme "${scheme.value}"`)
-            .finally(() => {
-                theme_reload_lock = false;
-            })
-            .then(() => {
-                // Update custom-color in settings.json
-                Utils.readFileAsync(settings_file)
-                    .then((out) => {
-                        const settings = JSON.parse(out);
-                        settings["custom-color"] = "none";
-                        Utils.writeFile(JSON.stringify(settings, null, 2), settings_file).catch(print);
-                    })
-                    .catch(print);
-            })
-            .catch(print);
-    }
+
     theme_reload_lock = true;
-    if (_color != "none" && _color.length > 6)
-        Utils.execAsync(
-            `python -O ${color_generator} --color "${_color}" --color-scheme "${theme.value}" --scheme "${scheme.value}"`
-        )
-            .finally(() => {
-                theme_reload_lock = false;
-            })
-            .then(() => {
-                // Update custom-color in settings.json
-                Utils.readFileAsync(settings_file)
-                    .then((out) => {
-                        const settings = JSON.parse(out);
-                        settings["custom-color"] = color_to_write;
-                        Utils.writeFile(JSON.stringify(settings, null, 2), settings_file).catch(print);
-                    })
-                    .catch(print);
-            })
-            .catch((err) => {
-                print(err);
-                Default();
-            });
-    else Default();
+
+    const updateSettingsFile = async (customColor: string) => {
+        try {
+            const settingsContent = await Utils.readFile(settings_file);
+            const settings = JSON.parse(settingsContent);
+            settings["custom-color"] = customColor;
+            await Utils.writeFile(JSON.stringify(settings, null, 2), settings_file);
+        } catch (error) {
+            print(`Failed to update custom-color in settings.json: ${error}`);
+        }
+    };
+
+    const Default = async () => {
+        try {
+            await Utils.execAsync(`python -O ${color_generator} -w --color-scheme "${theme.value}" --scheme "${scheme.value}"`);
+            await updateSettingsFile("none");
+        } catch (error) {
+            print(error);
+        } finally {
+            theme_reload_lock = false;
+        }
+    };
+
+    if (_color !== "none" && _color.length > 6) {
+        try {
+            await Utils.execAsync(
+                `python -O ${color_generator} --color "${_color}" --color-scheme "${theme.value}" --scheme "${scheme.value}"`
+            );
+            await updateSettingsFile(color_to_write);
+        } catch (error) {
+            print(error);
+            await Default();
+        } finally {
+            theme_reload_lock = false;
+        }
+    } else {
+        await Default();
+    }
 };
+
 
 const DarkTheme = () =>
     Widget.EventBox({
