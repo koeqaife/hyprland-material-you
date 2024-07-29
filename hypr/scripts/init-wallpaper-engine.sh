@@ -1,5 +1,11 @@
 #!/bin/bash
-wallpaper_engine=$(cat $HOME/dotfiles/.settings/wallpaper-engine.sh)
+
+# Path to your settings JSON file
+settings_file="$HOME/dotfiles/.settings/settings.json"
+
+# Read wallpaper engine from the JSON file
+wallpaper_engine=$(jq -r '.["wallpaper-engine"]' "$settings_file")
+
 if [ "$wallpaper_engine" == "swww" ]; then
     # swww
     echo ":: Using swww"
