@@ -60,7 +60,7 @@ export type WeatherJson = {
 
 export const theme = Variable("dark");
 export const main_color = Variable("#000000");
-export const current_wallpaper = Variable(`${GLib.get_home_dir()}/Pictures/wallpapers/default.png`);
+export const current_wallpaper = Variable(`${GLib.get_home_dir()}/dotfiles/wallpapers/default.png`);
 // @ts-expect-error
 export const weather: VariableType<WeatherJson> = Variable({ no_data: true });
 const reload = () => {

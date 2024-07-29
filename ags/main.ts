@@ -4,6 +4,7 @@ import Gdk from "gi://Gdk";
 // widgets
 import { Bar, BarCornerTopLeft, BarCornerTopRight } from "./modules/bar.ts";
 import { Notifications } from "./modules/notificationPopups.ts";
+import { cliphist } from "./modules/cliphist.ts";
 import { sideright } from "./modules/sideright/main.ts";
 import { sideleft } from "./modules/sideleft/main.ts";
 import {} from "apps/settings/main.ts";
@@ -28,7 +29,9 @@ const Windows = () => [
     forMonitors(Notifications),
     forMonitors(BarCornerTopLeft),
     forMonitors(BarCornerTopRight),
+    cliphist,
     sideright,
+    cheatsheet,
     sideleft,
     forMonitors(popups)
 ];
