@@ -1,6 +1,6 @@
 {
-    "browser": "firefox",
-    "editor": "nvim",
+    "browser": "brave",
+    "editor": "code",
     "filemanager": "thunar",
-    "terminal": "kitty"
+    "terminal": "alacritty"
 }
