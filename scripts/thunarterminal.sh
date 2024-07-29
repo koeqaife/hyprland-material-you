@@ -1,7 +1,7 @@
 #!/bin/bash
 clear
 
-settings_file=~/dotfiles/ags/assets/apps.json
+settings_file=~/dotfiles/.settings/apps.json
 
 echo "Checking for settings file: $settings_file"
 if [ -f "$settings_file" ]; then
