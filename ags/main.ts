@@ -53,7 +53,7 @@ function ReloadColors() {
     App.applyCss(`${GLib.get_home_dir()}/.cache/material/colors.css`);
 }
 
-Utils.monitorFile(`${GLib.get_home_dir()}/.cache/material/colors.json`, ReloadColors);
+Utils.monitorFile(`${GLib.get_home_dir()}/.cache/material/colors.css`, ReloadCSS);
 
 forMonitorsAsync(Bar);
 ReloadCSS();
