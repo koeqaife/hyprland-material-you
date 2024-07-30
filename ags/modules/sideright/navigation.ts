@@ -3,7 +3,6 @@ import { SystemBox } from "./system.ts";
 let shown = Variable("Messages");
 import Gtk from "gi://Gtk?version=3.0";
 import { MaterialIcon } from "icons.ts";
-import { enableClickThrough } from "modules/misc/clickthrough.js";
 
 type ButtonType = {
     page: string;
@@ -13,8 +12,9 @@ type ButtonType = {
 
 function Button({ page, label, icon }: ButtonType) {
     return Widget.Button({
-        class_name: shown.bind().as((_page) => (_page == page ? "navigation_button active" : "navigation_button")),
+        class_name: "navigation_button",
         hexpand: true,
+        attribute: { page: page },
         child: Widget.Box({
             orientation: Gtk.Orientation.VERTICAL,
             class_name: "container_outer",
@@ -72,7 +72,14 @@ export function Navigation() {
                 label: "System",
                 icon: "info"
             })
-        ]
+        ],
+        setup: (self) => {
+            self.hook(shown, () => {
+                for (const button of self.children) {
+                    button.toggleClassName("active", button.attribute.page == shown.value);
+                }
+            });
+        }
     });
     return Widget.Box({
         vexpand: true,

@@ -1,6 +1,4 @@
-import { Variable as VariableType } from "types/variable";
 const GLib = imports.gi.GLib;
-import configuration from "services/configuration.ts";
 
 export type WeatherJson = {
     coord: {
@@ -61,32 +59,21 @@ export type WeatherJson = {
 export const theme = Variable("dark");
 export const main_color = Variable("#000000");
 export const current_wallpaper = Variable(`${GLib.get_home_dir()}/dotfiles/wallpapers/default.png`);
-// @ts-expect-error
-export const weather: VariableType<WeatherJson> = Variable({ no_data: true });
-const reload = () => {
-    if (configuration.config.weather != "" && configuration.config.weather_location_id != "")
-        Utils.execAsync(
-            `${App.configDir}/scripts/weather.sh weather ${configuration.config.weather} ${configuration.config.weather_location_id}`
-        )
-            .then((out) => {
-                weather.setValue(JSON.parse(out));
-            })
-            .catch(print);
-};
-Utils.interval(15000, reload);
-configuration.connect("changed", reload);
 
 export const idle_inhibitor = Variable(false);
 export const cur_uptime = Variable("error");
-Utils.interval(5000, () => {
+Utils.interval(60000, () => {
     Utils.execAsync(`${App.configDir}/scripts/system.sh --uptime`)
         .then((out) => cur_uptime.setValue(out))
         .catch(print);
 });
 export const night_light = Variable(false);
-export const bluetooth_enabled = Variable("off", {
-    poll: [1000, `${App.configDir}/scripts/bluetooth.sh --get`]
-});
+Utils.execAsync(`${App.configDir}/scripts/night-light.sh --get`)
+    .then((out) => {
+        if (out.trim() == "enabled") night_light.setValue(true);
+        else if (out.trim() == "disabled") night_light.setValue(false);
+    })
+    .catch(print);
 export const theme_settings = {
     color: Variable("none"),
     scheme: Variable("tonalSpot")
@@ -102,17 +89,6 @@ export const current_os = await Utils.execAsync(`${App.configDir}/scripts/system
 
 export const settings_file = `${GLib.get_home_dir()}/dotfiles/.settings/settings.json`;
 export const wallpaper_cache_file = `${GLib.get_home_dir()}/.cache/current_wallpaper`;
-
-function checkBrightness() {
-    const get = Utils.execAsync(`${App.configDir}/scripts/brightness.sh --get`)
-        .then((out) => Number(out.trim()))
-        .catch(print);
-    return get;
-}
-
-export const current_brightness = Variable(100, {
-    poll: [500, checkBrightness]
-});
 
 function readSettingsFile() {
     Utils.readFileAsync(settings_file)
