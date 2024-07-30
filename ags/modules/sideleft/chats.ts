@@ -6,7 +6,6 @@ import type * as Types from "services/chatroom.d.ts";
 import { chatrooms } from "services/chatrooms.ts";
 import { MessageContent } from "modules/misc/chat_message.ts";
 import { TextView } from "modules/misc/textview.js";
-import Pango10 from "gi://Pango";
 
 const ChatMessage = (message: Types.ChatMessage) => {
     const messageContentBox = MessageContent(message.message);
