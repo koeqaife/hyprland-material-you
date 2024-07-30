@@ -7,25 +7,9 @@ if [ "$1" == "--force" ]; then
 fi
 
 perform_update() {
-    if [ "$FORCE_UPDATE" == true ]; then
-        echo ":: Forced update. Performing git pull with rebase..."
-        if git pull --rebase; then
-            "$HOME/dotfiles/setup/after_update.sh"
-            rm -f $NOTIFICATION_SENT_FILE
-        else
-            echo ":: Rebase failed. Manual intervention required."
-            exit 1
-        fi
-    else
-        echo ":: Performing git pull..."
-        if git pull; then
-            "$HOME/dotfiles/setup/after_update.sh"
-            rm -f $NOTIFICATION_SENT_FILE
-        else
-            echo ":: Pull failed. Manual intervention required."
-            exit 1
-        fi
-    fi
+    echo ":: Performing git pull..."
+    git pull && "$HOME/dotfiles/setup/after_update.sh"
+    rm -f $NOTIFICATION_SENT_FILE
 }
 
 "$HOME/dotfiles/scripts/check_updates.sh" >/dev/null
