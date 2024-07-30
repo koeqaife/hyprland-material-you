@@ -36,38 +36,29 @@ const Windows = () => [
     forMonitors(popups)
 ];
 
-const CLOSE_ANIM_TIME = 210;
-const closeWindowDelays = {};
-for (let i = 0; i < (Gdk.Display.get_default()?.get_n_monitors() || 1); i++) {
-    closeWindowDelays[`osk${i}`] = CLOSE_ANIM_TIME;
-}
-
 App.config({
     windows: Windows().flat(1),
     // @ts-ignore
-    closeWindowDelay: closeWindowDelays,
     onConfigParsed: function () {}
 });
 
 function ReloadCSS() {
     App.resetCss();
+    App.applyCss(`${GLib.get_home_dir()}/.config/gtk-3.0/gtk.css`);
     App.applyCss(`${App.configDir}/style.css`);
     App.applyCss(`${App.configDir}/style-apps.css`);
 }
 
-function ReloadGtkCSS() {
-    App.applyCss(`${GLib.get_home_dir()}/.config/gtk-3.0/gtk.css`);
-    ReloadCSS();
+function ReloadColors() {
+    App.applyCss(`${GLib.get_home_dir()}/.cache/material/colors.css`);
 }
 
-Utils.monitorFile(`${App.configDir}/style.css`, ReloadCSS);
+Utils.monitorFile(`${GLib.get_home_dir()}/.cache/material/colors.json`, ReloadColors);
 
-Utils.monitorFile(`${App.configDir}/style-apps.css`, ReloadCSS);
-
-Utils.monitorFile(`${GLib.get_home_dir()}/.cache/material/colors.json`, ReloadCSS);
-
-Utils.monitorFile(`${GLib.get_home_dir()}/.config/gtk-3.0/gtk.css`, ReloadGtkCSS);
 forMonitorsAsync(Bar);
-ReloadGtkCSS();
+ReloadCSS();
 
-start_battery_warning_service()
+globalThis.ReloadCSS = ReloadCSS;
+globalThis.ReloadColors = ReloadColors;
+
+start_battery_warning_service();

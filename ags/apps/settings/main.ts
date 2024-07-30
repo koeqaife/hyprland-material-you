@@ -7,12 +7,11 @@ import { Info } from "./info";
 import { Apps } from "./apps";
 import { MaterialIcon } from "icons";
 import { Weather } from "./weather";
+import { current_tab, current_window, set_current_window } from "./variables";
 const hyprland = await Service.import("hyprland");
 import Gtk from "gi://Gtk?version=3.0";
 
 globalThis.OpenSettings = OpenSettings;
-let current_window;
-const current_tab = Variable("network");
 
 export async function OpenSettings(cur_tab: string = "network") {
     if (current_window) {
@@ -43,7 +42,7 @@ function Settings(cur_tab: string) {
             wallpaper: Page(Wallpapers(), "Wallpapers"),
             info: Page(Info(), "Info"),
             apps: Page(Apps(), "Apps"),
-            "weather": Page(Weather(), "Weather")
+            weather: Page(Weather(), "Weather")
         }
     });
     const Row = (name: string, label: string, icon: string = "image-missing") =>
@@ -122,7 +121,7 @@ export const SettingsWindow = (cur_tab: string) => {
         class_name: "settings",
         child: Settings(cur_tab),
         setup(win: any) {
-            current_window = win;
+            set_current_window(win);
             win.keybind("Escape", () => {
                 win.close();
             });
@@ -133,7 +132,7 @@ export const SettingsWindow = (cur_tab: string) => {
     window.on("delete-event", () => {
         // @ts-ignore
         window.destroy();
-        current_window = undefined;
+        set_current_window(undefined);
         return true;
     });
     return window;
