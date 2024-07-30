@@ -68,14 +68,15 @@ const usage_default = {
     cpu_temp: "0"
 };
 
-const usage = Variable(usage_default, {
-    poll: [
-        1000,
-        async () => {
-            if (sideright?.visible) return await SystemInfo().then((result) => result);
-            else return usage?.value || usage_default;
+const usage = Variable(usage_default);
+Utils.interval(1000, async () => {
+    Utils.idle(() => {
+        if (sideright?.visible) {
+            SystemInfo().then((result) => {
+                usage.setValue(result);
+            });
         }
-    ]
+    });
 });
 
 const Usage = (name: string, var_name: keyof InfoType, class_name: string | undefined) => {
