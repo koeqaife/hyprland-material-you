@@ -207,12 +207,6 @@ create_links() {
     ln -s $HOME/dotfiles/swappy $HOME/.config/swappy
 }
 
-install_plugins() {
-    echo ":: Plugins"
-    hyprpm update
-    "$HOME"/dotfiles/plugins.sh
-}
-
 install_vencord() {
     echo ":: Vencord"
     sh -c "$(curl -sS https://raw.githubusercontent.com/Vendicated/VencordInstaller/main/install.sh)"
@@ -281,7 +275,6 @@ main() {
     ask_continue "Proceed with setting up SDDM?" false && setup_sddm
     ask_continue "Proceed with copying files?*" && copy_files
     ask_continue "Proceed with creating links?*" && create_links
-    ask_continue "Proceed with installing plugins?*" && install_plugins
     ask_continue "Proceed with installing Vencord?" false && install_vencord
     ask_continue "Proceed with removing GTK buttons?" false && remove_gtk_buttons
     ask_continue "Proceed with setting up services?*" && setup_services
