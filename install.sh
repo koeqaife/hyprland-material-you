@@ -69,8 +69,8 @@ install_packages() {
     sleep 1
     yay -Syu --noconfirm --needed
     yay -S --needed \
-        hyprland-git hyprshot hyprcursor-git hypridle hyprlang-git hyprpaper hyprpicker hyprlock \
-        hyprutils-git hyprwayland-scanner-git xdg-dbus-proxy xdg-desktop-portal \
+        hyprland hyprshot hyprcursor hypridle hyprlang hyprpaper hyprpicker hyprlock \
+        hyprutils hyprwayland-scanner xdg-dbus-proxy xdg-desktop-portal \
         xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-user-dirs \
         xdg-utils libxdg-basedir python-pyxdg aylurs-gtk-shell swww gtk3 gtk4 \
         adw-gtk3 adw-gtk-theme libdbusmenu-gtk3 python-pip python-pillow sddm \
