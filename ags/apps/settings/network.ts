@@ -1,8 +1,8 @@
-import Gtk from "gi://Gtk?version=3.0";
 import { timeout } from "resource:///com/github/Aylur/ags/utils.js";
-import { Variable as VariableType } from "types/variable";
 import { MaterialIcon } from "icons";
 const systemtray = await Service.import("systemtray");
+const network = await Service.import("network");
+import { current_tab, saved_networks, current_window } from "./variables";
 
 const MATERIAL_SYMBOL_SIGNAL_STRENGTH = {
     "network-wireless-signal-excellent-symbolic": "signal_wifi_4_bar",
@@ -23,10 +23,9 @@ type AccessPoint = {
     iconName: string | undefined;
 };
 
-const network = await Service.import("network");
-
-const _scan_timer = Variable(undefined, {
-    poll: [15000, WifiScan]
+Utils.interval(1500, () => {
+    if (current_tab.value != "network" || !current_window?.visible) return;
+    WifiScan();
 });
 
 const network_state = {
@@ -43,21 +42,11 @@ const network_state = {
     failed: "Connection failed"
 };
 
-const saved_networks: VariableType<string[]> = Variable([], {
-    poll: [
-        5000,
-        () => {
-            const _saved = Utils.exec(`${App.configDir}/scripts/network.sh --saved`);
-            return _saved.split("\n");
-        }
-    ]
-});
-
 function WifiScan() {
     try {
         network.wifi?.scan();
     } catch (error) {
-        print(error)
+        print(error);
     }
     // await Utils.execAsync("nmcli device wifi rescan").catch(print)
 }

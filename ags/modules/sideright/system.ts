@@ -1,15 +1,8 @@
-import {
-    cpu_cores,
-    cpu_name,
-    kernel_name,
-    amount_of_ram,
-    gpu_name,
-    cur_uptime,
-    current_brightness
-} from "variables.ts";
+import { cpu_cores, cpu_name, kernel_name, amount_of_ram, gpu_name, cur_uptime } from "variables.ts";
 import Gtk from "gi://Gtk?version=3.0";
 import { Variable as VariableType } from "types/variable";
 import backlight_service from "services/backlight.ts";
+import { sideright } from "./main";
 
 type InfoType = {
     cpu: string;
@@ -51,23 +44,39 @@ async function SystemInfo(): Promise<InfoType> {
     };
 }
 
-const usage = Variable(
-    {
-        cpu: "0",
-        ram: "0",
-        swap: "0",
-        cpu_temp: "0"
-    } as unknown as Promise<InfoType>,
-    {
-        poll: [
-            1000,
-            async () => {
-                const result = await SystemInfo().then((result) => result);
-                return result;
-            }
-        ]
-    }
-);
+function checkBrightness() {
+    const get = Utils.execAsync(`${App.configDir}/scripts/brightness.sh --get`)
+        .then((out) => Number(out.trim()))
+        .catch(print);
+    return get;
+}
+
+export const current_brightness = Variable(100, {
+    poll: [
+        500,
+        () => {
+            if (sideright?.visible) return checkBrightness();
+            else return current_brightness?.value || 100;
+        }
+    ]
+});
+
+const usage_default = {
+    cpu: "0",
+    ram: "0",
+    swap: "0",
+    cpu_temp: "0"
+};
+
+const usage = Variable(usage_default, {
+    poll: [
+        1000,
+        async () => {
+            if (sideright?.visible) return await SystemInfo().then((result) => result);
+            else return usage?.value || usage_default;
+        }
+    ]
+});
 
 const Usage = (name: string, var_name: keyof InfoType, class_name: string | undefined) => {
     const usage_progress_bar = Widget.ProgressBar({
@@ -132,7 +141,7 @@ export function SystemBox() {
         draw_value: false,
         class_name: "system_scale backlight",
         // @ts-ignore
-        value: backlight_service.bind("screen_value").as(n => n * 100),
+        value: backlight_service.bind("screen_value").as((n) => n * 100),
         on_change: (self) => {
             backlight_service.screen_value = self.value / 100;
         },

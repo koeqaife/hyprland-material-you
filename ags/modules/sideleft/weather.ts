@@ -1,6 +1,8 @@
-import { weather } from "variables";
 import { MaterialIcon } from "icons.ts";
 import { type WeatherJson } from "variables";
+import { Variable as VariableType } from "types/variable";
+import configuration from "services/configuration.ts";
+import { sideleft } from "./main";
 
 // prettier-ignore
 const MATERIAL_ICONS = {
@@ -15,6 +17,28 @@ const MATERIAL_ICONS = {
     "13d": "weather_snowy", "13n": "weather_snowy",
     "40d": "air", "40n": "air"
 };
+
+// @ts-expect-error
+export const weather: VariableType<WeatherJson> = Variable({ no_data: true });
+const reload = () => {
+    if (configuration.config.weather != "" && configuration.config.weather_location_id != "")
+        Utils.execAsync(
+            `${App.configDir}/scripts/weather.sh weather ${configuration.config.weather} ${configuration.config.weather_location_id}`
+        )
+            .then((out) => {
+                weather.setValue(JSON.parse(out));
+            })
+            .catch(print);
+};
+const _reload = () => {
+    if (sideleft?.visible) reload();
+};
+Utils.interval(15000, _reload);
+configuration.connect("changed", _reload);
+App.connect("window-toggled", (_, window_name, visible) => {
+    if (window_name == "sideleft" && visible) reload();
+});
+
 const ICON_COLORS = {
     mist: "#B0BEC5",
     clear_day: "#FFEB3B",

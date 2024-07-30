@@ -1,8 +1,9 @@
 const notifications = await Service.import("notifications");
 const network = await Service.import("network");
+const bluetooth = await Service.import("bluetooth");
 import { OpenSettings } from "apps/settings/main.ts";
 import { WINDOW_NAME } from "./main.ts";
-import { bluetooth_enabled, idle_inhibitor, night_light, theme } from "variables.ts";
+import { idle_inhibitor, night_light, theme } from "variables.ts";
 import { MaterialIcon } from "icons.ts";
 
 import Gtk from "gi://Gtk?version=3.0";
@@ -10,32 +11,32 @@ import Gtk from "gi://Gtk?version=3.0";
 const currentPage = Variable(0);
 
 function WifiIndicator() {
+    const ssid = Widget.Label({
+        label: "Unknown",
+        visible: false,
+        class_name: "ssid",
+        xalign: 0,
+        vpack: "center",
+        truncate: "end"
+    });
+    const name = Widget.Box({
+        vertical: true,
+        vpack: "center",
+        children: [
+            Widget.Box([
+                Widget.Label({
+                    label: "Internet",
+                    vpack: "center"
+                })
+            ]),
+            ssid
+        ]
+    });
     return Widget.Box({
         css: "padding-left: 15px; padding-right: 15px; padding-top: 5px; padding-bottom: 5px;",
         children: [
             MaterialIcon("signal_wifi_4_bar", "20px"),
-            Widget.Box({
-                visible: network.wifi.bind("enabled"),
-                orientation: Gtk.Orientation.VERTICAL,
-                children: [
-                    Widget.Box([
-                        Widget.Label({
-                            label: "Internet"
-                        })
-                    ]),
-                    Widget.Label({
-                        label: network.wifi.bind("ssid").as((ssid) => ssid || "Unknown"),
-                        class_name: "ssid",
-                        xalign: 0,
-                        vpack: "center",
-                        truncate: "end"
-                    })
-                ]
-            }),
-            Widget.Label({
-                visible: network.wifi.bind("enabled").as((enabled) => !enabled),
-                label: "Internet"
-            }),
+            name,
             Widget.Box({
                 hpack: "end",
                 hexpand: true,
@@ -43,7 +44,13 @@ function WifiIndicator() {
                     class_name: "material_icon icon arrow"
                 })
             })
-        ]
+        ],
+        setup: (self) => {
+            self.hook(network, () => {
+                ssid.label = network.wifi.ssid || "Unknown";
+                ssid.visible = !!network.wifi.ssid;
+            });
+        }
     });
 }
 
@@ -106,9 +113,7 @@ function Page1() {
                 children: [
                     Widget.Button({
                         hexpand: true,
-                        class_name: network.wifi
-                            .bind("enabled")
-                            .as((enabled) => (enabled ? "management_button active" : "management_button")),
+                        class_name: "management_button",
                         child: NetworkIndicator(),
                         on_primary_click_release: () => {
                             network.toggleWifi();
@@ -116,26 +121,33 @@ function Page1() {
                         on_secondary_click_release: () => {
                             App.closeWindow(WINDOW_NAME);
                             OpenSettings("network");
+                        },
+                        setup: (self) => {
+                            if (network.wifi)
+                                self.hook(network.wifi, () => {
+                                    self.toggleClassName("active", network.wifi.enabled);
+                                });
                         }
                     }),
                     Widget.Button({
                         hexpand: true,
-                        class_name: bluetooth_enabled
-                            .bind()
-                            .as((state) => (state.trim() == "yes" ? "management_button active" : "management_button")),
+                        class_name: "management_button",
                         child: IconAndName({
                             label: "Bluetooth",
                             icon: "bluetooth",
                             arrow: true
                         }),
                         on_primary_click_release: () => {
-                            Utils.execAsync(`${App.configDir}/scripts/bluetooth.sh --toggle`).then((out) => {
-                                bluetooth_enabled.setValue(out);
-                            });
+                            bluetooth.toggle();
                         },
                         on_secondary_click_release: () => {
                             OpenSettings("bluetooth");
                             App.closeWindow(WINDOW_NAME);
+                        },
+                        setup: (self) => {
+                            self.hook(bluetooth, () => {
+                                self.toggleClassName("active", bluetooth.enabled);
+                            });
                         }
                     })
                 ]
@@ -147,9 +159,7 @@ function Page1() {
                 children: [
                     Widget.Button({
                         hexpand: true,
-                        class_name: theme.bind().as((str) => {
-                            return str.trim() == "dark" ? "management_button active" : "management_button";
-                        }),
+                        class_name: "management_button",
                         on_clicked: () => {
                             Utils.execAsync(`${App.configDir}/scripts/dark-theme.sh --toggle`).catch(print);
                             theme.setValue(theme.value.trim() == "dark" ? "light" : "dark");
@@ -157,22 +167,31 @@ function Page1() {
                         child: IconAndName({
                             label: "Dark theme",
                             icon: "contrast"
-                        })
+                        }),
+                        setup: (self) => {
+                            self.hook(theme, () => {
+                                self.toggleClassName("active", theme.value.trim() == "dark");
+                            });
+                        }
                     }),
                     Widget.Button({
                         hexpand: true,
-                        class_name: notifications.bind("dnd").as((bool) => {
-                            return bool ? "management_button active" : "management_button";
-                        }),
+                        class_name: "management_button",
                         on_clicked: () => {
-                            notifications.dnd = notifications.dnd ? false : true;
+                            notifications.dnd = !notifications.dnd;
                         },
                         child: IconAndName({
                             label: "Do Not Disturb",
-                            icon: notifications
-                                .bind("dnd")
-                                .as((bool) => (bool ? "do_not_disturb_on" : "do_not_disturb_off"))
-                        })
+                            icon: "do_not_disturb_off"
+                        }),
+                        setup: (self) => {
+                            notifications.connect("notify::dnd", (_) => {
+                                self.toggleClassName("active", notifications.dnd);
+                                self.child.children[0].label = notifications.dnd
+                                    ? "do_not_disturb_on"
+                                    : "do_not_disturb_off";
+                            });
+                        }
                     })
                 ]
             }),
@@ -183,9 +202,7 @@ function Page1() {
                 children: [
                     Widget.Button({
                         hexpand: true,
-                        class_name: idle_inhibitor
-                            .bind()
-                            .as((bool) => (bool ? "management_button active" : "management_button")),
+                        class_name: "management_button",
                         child: IconAndName({
                             label: "Idle inhibitor",
                             icon: "schedule"
@@ -200,15 +217,16 @@ function Page1() {
                                 ]).catch(print);
                             else Utils.execAsync("pkill -f wayland-idle-inhibitor.py").catch(print);
                         },
-                        setup: () => {
+                        setup: (self) => {
                             idle_inhibitor.setValue(!!Utils.exec("pidof wayland-idle-inhibitor.py"));
+                            self.hook(idle_inhibitor, () => {
+                                self.toggleClassName("active", idle_inhibitor.value);
+                            });
                         }
                     }),
                     Widget.Button({
                         hexpand: true,
-                        class_name: night_light
-                            .bind()
-                            .as((mode) => (mode ? "management_button active" : "management_button")),
+                        class_name: "management_button",
                         child: IconAndName({
                             label: "Night Light",
                             icon: "nightlight"
@@ -217,20 +235,16 @@ function Page1() {
                             night_light.setValue(!night_light.value);
                             Utils.execAsync(`${App.configDir}/scripts/night-light.sh --toggle`)
                                 .then((out) => {
-                                    if (out.trim() == "enabled") night_light.setValue(true);
-                                    else if (out.trim() == "disabled") night_light.setValue(false);
+                                    night_light.setValue(out.trim() == "enabled");
                                 })
                                 .catch((err) => {
                                     night_light.setValue(!night_light.value);
                                 });
                         },
-                        setup: () => {
-                            Utils.execAsync(`${App.configDir}/scripts/night-light.sh --get`)
-                                .then((out) => {
-                                    if (out.trim() == "enabled") night_light.setValue(true);
-                                    else if (out.trim() == "disabled") night_light.setValue(false);
-                                })
-                                .catch(print);
+                        setup: (self) => {
+                            self.hook(night_light, () => {
+                                self.toggleClassName("active", night_light.value);
+                            });
                         }
                     })
                 ]
@@ -288,8 +302,13 @@ const createDotButton = (index: number) =>
     Widget.Button({
         label: "●",
         onClicked: () => currentPage.setValue(index),
-        class_name: currentPage.bind().as((v) => (v == index ? "dotbutton active" : "dotbutton")),
-        hexpand: false
+        class_name: "dotbutton",
+        hexpand: false,
+        setup: (self) => {
+            self.hook(currentPage, () => {
+                self.toggleClassName("active", currentPage.value == index);
+            });
+        }
     });
 
 export function Management() {
