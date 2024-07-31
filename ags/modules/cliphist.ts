@@ -74,6 +74,21 @@ function ClipHistItem(entry: string) {
         _show_image = true;
     }
 
+    function hide_image() {
+        if (!_show_image) return;
+        const box = button.child;
+        box.children[2].destroy();
+        const label = Widget.Label({
+            label: content,
+            class_name: "clip_label",
+            xalign: 0,
+            vpack: "center",
+            truncate: "end"
+        });
+        box.children = [...box.children, label];
+        _show_image = false;
+    }
+
     button.connect("clicked", () => {
         clickCount++;
         if (clickCount === 2) {
@@ -107,7 +122,7 @@ function ClipHistItem(entry: string) {
     });
 
     return Widget.Box({
-        attribute: { content: content, id: id },
+        attribute: { content: content, id: id, hide_image: hide_image, show_image: show_image },
         orientation: Gtk.Orientation.VERTICAL,
         visible: true,
         children: [
@@ -194,6 +209,10 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
                 if (visible) {
                     repopulate().catch(print);
                     entry.text = "";
+                } else {
+                    for (const item of list.children) {
+                        item.attribute.hide_image();
+                    }
                 }
             })
     });
