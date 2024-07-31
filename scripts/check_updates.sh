@@ -2,8 +2,15 @@
 
 cd $HOME/dotfiles
 
+OLD_SETTINGS=$HOME/dotfiles/.settings/old
+
+# Remove $OLD_SETTINGS folder if it is empty
+if [ -z "$(ls -A "$OLD_SETTINGS")" ]; then
+  rmdir "$OLD_SETTINGS"
+fi
+
 git update-index --skip-worktree $HOME/dotfiles/.settings/*
-git update-index --skip-worktree $HOME/dotfiles/hypr/conf/custom.conf
+git update-index --skip-worktree $HOME/dotfiles/hypr/conf/custom/*
 git update-index --skip-worktree $HOME/dotfiles/hypr/conf/apps.conf
 git update-index --skip-worktree $HOME/dotfiles/alacritty/alacritty.toml
 git update-index --skip-worktree $HOME/dotfiles/wallpapers/*
