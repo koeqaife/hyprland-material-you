@@ -1,7 +1,7 @@
 #!/bin/bash
 
 get() {
-    cliphist list | iconv -f ISO-8859-1 -t UTF-8 -c
+    cliphist list
 }
 
 copy_by_id() {
