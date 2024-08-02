@@ -76,7 +76,7 @@ install_packages() {
         adw-gtk3 adw-gtk-theme libdbusmenu-gtk3 python-pip python-pillow sddm \
         sddm-theme-corners-git nm-connection-editor network-manager-applet \
         networkmanager gnome-bluetooth-3.0 wl-gammarelay-rs bluez bluez-libs bluez-utils \
-        cliphist wl-clipboard pywal-16-colors libadwaita swappy nwg-look \
+        cliphist wl-clipboard libadwaita swappy nwg-look \
         pavucontrol polkit-gnome brightnessctl man-pages gvfs xarchiver zip imagemagick \
         blueman fastfetch bibata-cursor-theme gum python-pywayland dbus \
         libdrm mesa fwupd rofi-wayland bun-bin pipewire wireplumber udiskie \
