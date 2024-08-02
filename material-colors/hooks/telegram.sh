@@ -1,9 +1,8 @@
 #!/bin/bash
-wal_folder="$HOME"/.cache/wal
 cache_folder="$HOME"/.cache/material
 telegram_theme_cache="$HOME"/.cache/telegram-theme
 
-bg_color_file="$wal_folder/bg-color"
+bg_color_file="$cache_folder/bg-color"
 bg_color=$(cat "$bg_color_file")
 magick -size 256x256 "xc:$bg_color" $telegram_theme_cache/tiled.png
 
