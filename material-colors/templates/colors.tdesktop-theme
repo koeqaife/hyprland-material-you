@@ -18,10 +18,10 @@ ON_BACKGROUND_DARKER:  <onSurfaceVariant>;
 
 ACCENT: <primary>;
 ON_ACCENT: <onPrimary>;
-ACCENT_LIGHT: <tertiary>;
-ON_ACCENT_LIGHT: <onTertiary>;
-ACCENT_DARK: <secondary>;
-ON_ACCENT_DARK: <onSecondary>;
+ACCENT_LIGHT: <primary.lighten(10)>;
+ON_ACCENT_LIGHT: <onPrimary>;
+ACCENT_DARK: <primary.darken(25)>;
+ON_ACCENT_DARK: <onPrimary>;
 
 ERROR: <error>;
 ERROR_RIPPLE: #ff9180;

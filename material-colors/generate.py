@@ -7,20 +7,21 @@ import argparse
 from materialyoucolor.quantize import QuantizeCelebi  # type: ignore
 from materialyoucolor.score.score import Score  # type: ignore
 from materialyoucolor.hct import Hct  # type: ignore
-from materialyoucolor.dynamiccolor.material_dynamic_colors import MaterialDynamicColors  # type: ignore
-from materialyoucolor.scheme.dynamic_scheme import DynamicScheme  # type: ignore
-from materialyoucolor.scheme.scheme_tonal_spot import SchemeTonalSpot  # type: ignore
-from materialyoucolor.scheme.scheme_expressive import SchemeExpressive  # type: ignore
-from materialyoucolor.scheme.scheme_fruit_salad import SchemeFruitSalad  # type: ignore
-from materialyoucolor.scheme.scheme_monochrome import SchemeMonochrome  # type: ignore
-from materialyoucolor.scheme.scheme_rainbow import SchemeRainbow  # type: ignore
-from materialyoucolor.scheme.scheme_vibrant import SchemeVibrant  # type: ignore
-from materialyoucolor.scheme.scheme_neutral import SchemeNeutral  # type: ignore
-from materialyoucolor.scheme.scheme_fidelity import SchemeFidelity  # type: ignore
-from materialyoucolor.scheme.scheme_content import SchemeContent  # type: ignore
+from materialyoucolor.dynamiccolor.material_dynamic_colors import MaterialDynamicColors  # type: ignore # noqa
+from materialyoucolor.scheme.dynamic_scheme import DynamicScheme  # type: ignore # noqa
+from materialyoucolor.scheme.scheme_tonal_spot import SchemeTonalSpot  # type: ignore # noqa
+from materialyoucolor.scheme.scheme_expressive import SchemeExpressive  # type: ignore # noqa
+from materialyoucolor.scheme.scheme_fruit_salad import SchemeFruitSalad  # type: ignore # noqa
+from materialyoucolor.scheme.scheme_monochrome import SchemeMonochrome  # type: ignore # noqa
+from materialyoucolor.scheme.scheme_rainbow import SchemeRainbow  # type: ignore # noqa
+from materialyoucolor.scheme.scheme_vibrant import SchemeVibrant  # type: ignore # noqa
+from materialyoucolor.scheme.scheme_neutral import SchemeNeutral  # type: ignore # noqa
+from materialyoucolor.scheme.scheme_fidelity import SchemeFidelity  # type: ignore # noqa
+from materialyoucolor.scheme.scheme_content import SchemeContent  # type: ignore # noqa
 import hashlib
 import pickle
 import numpy as np
+import re
 
 
 schemes = {
@@ -45,7 +46,6 @@ home = os.path.expanduser('~')
 script_dir = os.path.dirname(os.path.abspath(__file__))
 cache_path = f"{home}/.cache/material/"
 os.makedirs(cache_path, exist_ok=True)
-os.makedirs(f"{home}/.cache/wal/", exist_ok=True)
 
 
 def rgb_to_hex(rgb):
@@ -68,41 +68,10 @@ class Color():
             return "#000000"
 
 
-def update_pywal_colors_with_material_you(scheme: DynamicScheme, wallpaper: str) -> dict:
-    color = Color(scheme)
-    dict = {
-        "wallpaper": wallpaper,
-        "alpha": "100",
-
-        "special": {
-            "background": color("background"),
-            "foreground": color("onBackground"),
-            "cursor": color("onBackground")
-        },
-        "colors": {
-            "color0": color("background"),
-            "color1": color("onBackground"),
-            "color2": color("primary"),
-            "color3": color("onPrimary"),
-            "color4": color("surfaceContainer"),
-            "color5": color("onSurface"),
-            "color6": color("error"),
-            "color7": color("onError"),
-            "color8": color("tertiary"),
-            "color9": color("onTertiary"),
-            "color10": color("secondary"),
-            "color11": color("onSecondary"),
-            "color12": color("secondaryContainer"),
-            "color13": color("onSecondaryContainer"),
-            "color14": color("shadow"),
-            "color15": color("outlineVariant")
-        }
-    }
-    return dict
-
-
 class ColorsCache:
-    def __init__(self, colors: DynamicScheme | dict, wallpaper: str, original_color: int) -> None:
+    def __init__(
+        self, colors: DynamicScheme | dict, wallpaper: str, original_color: int
+    ) -> None:
         self.colors: dict[str, str] = {}
         self.wallpaper = wallpaper
         self.original_color = original_color
@@ -110,7 +79,9 @@ class ColorsCache:
             for color in vars(MaterialDynamicColors).keys():
                 color_name = getattr(MaterialDynamicColors, color)
                 if hasattr(color_name, "get_hct"):
-                    self.colors[str(color)] = rgb_to_hex(color_name.get_hct(colors).to_rgba())
+                    self.colors[str(color)] = rgb_to_hex(
+                        color_name.get_hct(colors).to_rgba()
+                    )
         else:
             self.colors = colors
 
@@ -150,7 +121,107 @@ additional = {
 }
 
 
-def generate_templates(folder: str, output_folder: str, scheme: DynamicScheme, color_scheme: str, wallpaper: str = ''):
+def generate_color_map(scheme: DynamicScheme):
+    color_map: dict[str, str] = {}
+    for color in vars(MaterialDynamicColors).keys():
+        color_name = getattr(MaterialDynamicColors, color)
+        if hasattr(color_name, "get_hct"):
+            rgba = color_name.get_hct(scheme).to_rgba()
+            color_map[color.strip()] = rgb_to_hex(rgba)
+    return color_map
+
+
+class ColorFormatter:
+    def __init__(self, scheme: DynamicScheme):
+        self.color_map = generate_color_map(scheme)
+
+    def apply_transformations(self, value, transformations):
+        intermediate_transforms = [
+            t for t in transformations
+            if not (t.startswith("strip") or t == "rgb")
+        ]
+        final_transforms = [
+            t for t in transformations
+            if t.startswith("strip") or t == "rgb"
+        ]
+
+        for transform in intermediate_transforms:
+            if transform.startswith("lighten"):
+                percent = int(re.search(r'\d+', transform).group())
+                value = self.adjust_brightness(value, percent)
+            elif transform.startswith("darken"):
+                percent = int(re.search(r'\d+', transform).group())
+                value = self.adjust_brightness(value, -percent)
+
+        for transform in final_transforms:
+            if transform.startswith("strip"):
+                value = value.lstrip('#')
+            elif transform == "rgb":
+                value = self.hex_to_rgb(value)
+
+        return value
+
+    def adjust_brightness(self, hex_color, factor):
+        def min_max(v):
+            return min(255, max(0, v))
+
+        hex_color = hex_color.lstrip('#')
+        r, g, b = (int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+
+        r = min_max(int(r * (1 + factor / 100)))
+        g = min_max(int(g * (1 + factor / 100)))
+        b = min_max(int(b * (1 + factor / 100)))
+
+        return f'#{r:02X}{g:02X}{b:02X}'.lower()
+
+    def hex_to_rgb(self, hex_color):
+        hex_color = hex_color.lstrip('#')
+        r, g, b = (int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+        return f'{r},{g},{b}'
+
+    def parse_transformations(self, transformations_str):
+        transformations = re.findall(
+            r'(\w+)(?:\((\d*)\))?', transformations_str
+        )
+        result = []
+        for command, arg in transformations:
+            if command:
+                if arg:
+                    result.append(f"{command}({arg})")
+                else:
+                    result.append(command)
+        return result
+
+    def format(self, text):
+        pattern = r'(<(\w+)(?:\.(.+))?>)'
+        matches = re.findall(pattern, text)
+        result = []
+        last_end = 0
+
+        for match in matches:
+            full_match, key, transformations_str = match
+            if key in self.color_map:
+                result.append(text[last_end:text.find(full_match, last_end)])
+                value = self.color_map[key]
+                if transformations_str:
+                    transformations = self.parse_transformations(
+                        transformations_str
+                    )
+                    value = self.apply_transformations(value, transformations)
+                result.append(value)
+                last_end = text.find(full_match, last_end) + len(full_match)
+
+        result.append(text[last_end:])
+        result = ''.join(result)
+        pattern = r'<\\\\([^>]+)>'
+
+        result = re.sub(pattern, r'<\1>', result)
+
+        return result
+
+
+def generate_templates(folder: str, output_folder: str, scheme: DynamicScheme,
+                       color_scheme: str, wallpaper: str = ''):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
     if not os.path.exists(folder):
@@ -160,14 +231,8 @@ def generate_templates(folder: str, output_folder: str, scheme: DynamicScheme, c
     for file_path in file_list:
         with open(file_path) as f:
             template = f.read()
-        for color in vars(MaterialDynamicColors).keys():
-            color_name = getattr(MaterialDynamicColors, color)
-            if hasattr(color_name, "get_hct"):
-                rgba = color_name.get_hct(scheme).to_rgba()
-                hex_color = rgb_to_hex(rgba)
-                rgb_color = rgba_to_rgb(rgba)
-                template = template.replace(f"<{color}>", hex_color)
-                template = template.replace(f"<{color}.rgb>", rgb_color)
+        formatter = ColorFormatter(scheme)
+        template = formatter.format(template)
         template = (
             template
             .replace("<color-scheme>", color_scheme)
@@ -205,7 +270,6 @@ def generate_templates(folder: str, output_folder: str, scheme: DynamicScheme, c
             f.write(_template)
 
 
-
 def run_hooks(folder: str):
     if not os.path.exists(folder):
         os.makedirs(folder)
@@ -216,12 +280,6 @@ def run_hooks(folder: str):
             subprocess.run(['python', '-O', file_path])
         elif str(file_name).endswith(".sh"):
             subprocess.run(['sh', file_path])
-
-
-def save_updated_colors(updated_colors):
-    wal_colors_path = f"{home}/.cache/wal/colors.json"
-    with open(wal_colors_path, 'w') as f:
-        json.dump(updated_colors, f, indent=4)
 
 
 def process_image(image_path, quality=2, num_colors=128):
@@ -244,26 +302,29 @@ def process_image(image_path, quality=2, num_colors=128):
             pickle.dump(data, f)
 
     cache_path = get_cache_path(image_path)
-    
+
     cached_result = load_from_cache(cache_path)
     if cached_result is not None:
         return cached_result
-    
+
     image = Image.open(image_path).convert('RGB')
-    
+
     image_data = np.array(image)
     pixel_array = image_data[::quality, ::quality].reshape(-1, 3)
-    
+
     result = QuantizeCelebi(pixel_array, num_colors)
-    
+
     color = Score.score(result)[0]
-    
+
     save_to_cache(cache_path, color)
-    
+
     return color
 
 
-def main(color_scheme: str, image_path: str, use_color: int | None = None, scheme: DynamicScheme = schemes["tonalSpot"]):
+def main(
+    color_scheme: str, image_path: str, use_color: int | None = None,
+    scheme: DynamicScheme = schemes["tonalSpot"]
+):
     is_dark = True if color_scheme == "dark" else False
     if use_color is None:
         color = process_image(image_path, 4, 1024)
@@ -285,13 +346,14 @@ def main(color_scheme: str, image_path: str, use_color: int | None = None, schem
         object = ColorsCache(scheme, image_path, color)
         json.dump(colors_dict(object), f, indent=2)
 
-    updated_pywal_colors = update_pywal_colors_with_material_you(scheme, image_path)
+    generate_templates(
+        f"{script_dir}/templates", cache_path, scheme, color_scheme, image_path
+    )
+    generate_templates(
+        f"{script_dir}/templates/svg", join(cache_path, "svg/"), scheme,
+        color_scheme, image_path
+    )
 
-    generate_templates(f"{script_dir}/templates", cache_path, scheme, color_scheme, image_path)
-    generate_templates(f"{script_dir}/templates/svg", join(cache_path, "svg/"), scheme, color_scheme, image_path)
-    save_updated_colors(updated_pywal_colors)
-
-    subprocess.run(['wal', '-s', '-q', '-e', '-n', '-R'])
     if is_dark:
         subprocess.run(['sh', join(script_dir, 'gtk-material.sh')])
     else:
@@ -303,14 +365,27 @@ def main(color_scheme: str, image_path: str, use_color: int | None = None, schem
 def _argparse() -> tuple[bool, bool, str, str, str, str]:
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-R", help="Restore previous colorscheme.", action='store_true')
-    group.add_argument("-w", help="Use last used wallpaper for color generation.", action='store_true')
-    group.add_argument("--image", type=str, help="Image for color scheme generation")
-    group.add_argument("--color", type=str, help="Main color for color scheme generation")
-    parser.add_argument('--color-scheme', type=str, default='dark', choices=['dark', 'light'],
-                        help="Color scheme variant")
-    parser.add_argument('--scheme', type=str, default="tonalSpot", choices=list(schemes.keys()),
-                        help="Scheme for color generation")
+    group.add_argument(
+        "-R", help="Restore previous colorscheme.", action='store_true'
+    )
+    group.add_argument(
+        "-w", help="Use last used wallpaper for color generation.",
+        action='store_true'
+    )
+    group.add_argument(
+        "--image", type=str, help="Image for color scheme generation"
+    )
+    group.add_argument(
+        "--color", type=str, help="Main color for color scheme generation"
+    )
+    parser.add_argument(
+        '--color-scheme', type=str, default='dark', choices=['dark', 'light'],
+        help="Color scheme variant"
+    )
+    parser.add_argument(
+        '--scheme', type=str, default="tonalSpot",
+        choices=list(schemes.keys()), help="Scheme for color generation"
+    )
 
     args = parser.parse_args()
 
@@ -320,31 +395,49 @@ def _argparse() -> tuple[bool, bool, str, str, str, str]:
     color_scheme = args.color_scheme
     use_color = args.color
     scheme = args.scheme
-    return restore_palette, use_last_used_wallpaper, image, color_scheme, use_color, scheme
+    return (
+        restore_palette, use_last_used_wallpaper, image,
+        color_scheme, use_color, scheme
+    )
 
 
 def _main():
-    restore_palette, use_last_used_wallpaper, image, color_scheme, use_color, _scheme = _argparse()
+    (
+        restore_palette, use_last_used_wallpaper, image,
+        color_scheme, use_color, _scheme
+    ) = _argparse()
     scheme = schemes[_scheme]
     if use_color is not None:
         try:
             with open(join(cache_path, "colors.json")) as f:
                 content = get_cache_object(f.read())
-            main(color_scheme, image_path=content.wallpaper, use_color=int(use_color.lstrip('#'), 16), scheme=scheme)
-        except:
-            main(color_scheme, image_path="/dev/null", use_color=int(use_color.lstrip('#'), 16), scheme=scheme)
+            main(
+                color_scheme, image_path=content.wallpaper,
+                use_color=int(use_color.lstrip('#'), 16), scheme=scheme
+            )
+        except Exception:
+            main(
+                color_scheme, image_path="/dev/null",
+                use_color=int(use_color.lstrip('#'), 16), scheme=scheme
+            )
 
     elif restore_palette:
         with open(join(cache_path, "colors.json")) as f:
             content = get_cache_object(f.read())
-        main(color_scheme, image_path=content.wallpaper, use_color=content.original_color, scheme=scheme)
+        main(
+            color_scheme, image_path=content.wallpaper,
+            use_color=content.original_color, scheme=scheme
+        )
     elif use_last_used_wallpaper:
         with open(join(cache_path, "colors.json")) as f:
             content = get_cache_object(f.read()).wallpaper
         main(color_scheme, image_path=content, scheme=scheme)
     else:
         if os.path.isdir(image):
-            files = [f for f in os.listdir(image) if f.endswith(('.png', '.jpg', '.jpeg'))]
+            files = [
+                f for f in os.listdir(image)
+                if f.endswith(('.png', '.jpg', '.jpeg'))
+            ]
             if files:
                 image = join(image, random.choice(files))
         main(color_scheme, image_path=image, scheme=scheme)
