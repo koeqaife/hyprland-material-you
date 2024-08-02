@@ -21,7 +21,7 @@ if [ "$1" != "init" ]; then
 fi
 
 new_wall=$(echo $current_wallpaper | sed "s|$HOME/wallpaper/||g")
-cp $HOME/.cache/wal/colors-sddm-style.conf /usr/share/sddm/themes/corners/theme.conf
+cp $HOME/.cache/material/colors-sddm-style.conf /usr/share/sddm/themes/corners/theme.conf
 sed -i 's/CURRENTWALLPAPER/'"current_wallpaper.$extension"'/' /usr/share/sddm/themes/corners/theme.conf
 
 if [ "$1" != "init" ]; then
