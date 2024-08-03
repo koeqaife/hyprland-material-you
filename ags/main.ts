@@ -13,6 +13,7 @@ import { cheatsheet } from "modules/cheatsheet.ts";
 import Window from "types/widgets/window";
 import { popups } from "modules/popups.ts";
 import { start_battery_warning_service } from "services/battery_warning.ts";
+import Gtk from "gi://Gtk?version=3.0";
 const GLib = imports.gi.GLib;
 
 const range = (length: number, start = 1) => Array.from({ length }, (_, i) => i + start);
@@ -58,7 +59,14 @@ Utils.monitorFile(`${GLib.get_home_dir()}/.cache/material/colors.css`, ReloadCSS
 forMonitorsAsync(Bar);
 ReloadCSS();
 
+function enableAnimations(bool: boolean) {
+    const settings = Gtk.Settings.get_default()!;
+
+    settings.gtk_enable_animations = bool;
+}
+
 globalThis.ReloadCSS = ReloadCSS;
 globalThis.ReloadColors = ReloadColors;
+globalThis.enableAnimations = enableAnimations;
 
 start_battery_warning_service();
