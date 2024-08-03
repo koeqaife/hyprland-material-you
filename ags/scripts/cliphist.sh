@@ -1,7 +1,7 @@
 #!/bin/bash
 
 get() {
-    cliphist list
+    cliphist list | iconv -f $(locale charmap) -t UTF-8 -c
 }
 
 copy_by_id() {
