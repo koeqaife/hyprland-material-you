@@ -1,10 +1,10 @@
 # Hyprland dotfiles
+
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/koeqaife/hyprland-material-you?style=for-the-badge&labelColor=%23424242&color=%23B2FF59)
 ![GitHub repo size](https://img.shields.io/github/repo-size/koeqaife/hyprland-material-you?style=for-the-badge&labelColor=%23424242&color=%2384FFFF)
 ![GitHub Repo stars](https://img.shields.io/github/stars/koeqaife/hyprland-material-you?style=for-the-badge&labelColor=%23424242&color=%23B9F6CA)
 ![GitHub contributors](https://img.shields.io/github/contributors/koeqaife/hyprland-material-you?style=for-the-badge&labelColor=%23424242&color=%23FFAB40)
 ![GitHub License](https://img.shields.io/github/license/koeqaife/hyprland-material-you?style=for-the-badge&labelColor=%23424242&color=%23FF9E80)
-
 
 [![Screenshot](screenshots/screenshot1.png "Screenshot")](screenshots/screenshot1.png)
 
@@ -16,10 +16,11 @@ Here are some key features:
 - **Design**: The design wherever possible is made by [Material 3 design](https://m3.material.io/) (or Material You).
 - **Ripple effect**: There is a ripple effect on almost all of the buttons on the interface
 
-> Discord: <https://discord.gg/nCK3sh8mNU>  
-> If you can support me please :3 [DonationAlerts](https://www.donationalerts.com/r/koeqaife)
+> Discord: <https://discord.gg/nCK3sh8mNU>
 
 ## To install
+
+### Installation
 
 ```sh
 sudo pacman -Syu
@@ -32,7 +33,8 @@ cd dotfiles
 
 ```
 
-#### Change wallpaper to random wallpaper (after installation)
+### Change wallpaper to random wallpaper (after installation)
+
 ```sh
 python ~/dotfiles/hypr/scripts/wallpaper.py -R
 ```
