@@ -1,6 +1,7 @@
 import { MprisPlayer } from "types/service/mpris.ts";
 import Label from "types/widgets/label.ts";
 import { MaterialIcon } from "icons.ts";
+import Pango10 from "gi://Pango?version=1.0";
 const mpris = await Service.import("mpris");
 const players = mpris.bind("players");
 
@@ -31,7 +32,8 @@ function Player(player: MprisPlayer) {
     const title = Widget.Label({
         class_name: "title",
         wrap: true,
-        hpack: "start",
+        wrap_mode: Pango10.WrapMode.WORD_CHAR,
+        xalign: 0,
         label: player.bind("track_title"),
         use_markup: false
     });
@@ -39,7 +41,8 @@ function Player(player: MprisPlayer) {
     const artist = Widget.Label({
         class_name: "artist",
         wrap: true,
-        hpack: "start",
+        wrap_mode: Pango10.WrapMode.WORD_CHAR,
+        xalign: 0,
         use_markup: false,
         label: player.bind("track_artists").transform((a) => a.join(", "))
     });
