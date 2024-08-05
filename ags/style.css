@@ -226,7 +226,7 @@ window.notification-popups box.notifications {
     min-width: 350px;
     border-radius: 20px;
     padding: 1em;
-    margin: 1px;
+    margin-bottom: 2px;
     background-color: @surfaceContainerLow;
 }
 
