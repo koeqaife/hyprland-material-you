@@ -13,6 +13,7 @@ import { cheatsheet } from "modules/cheatsheet.ts";
 import Window from "types/widgets/window";
 import { popups } from "modules/popups.ts";
 import { start_battery_warning_service } from "services/battery_warning.ts";
+import { audio_popup } from "./modules/audio.ts"
 import Gtk from "gi://Gtk?version=3.0";
 const GLib = imports.gi.GLib;
 
@@ -34,7 +35,8 @@ const Windows = () => [
     sideright,
     cheatsheet,
     sideleft,
-    forMonitors(popups)
+    forMonitors(popups),
+    audio_popup
 ];
 
 App.config({

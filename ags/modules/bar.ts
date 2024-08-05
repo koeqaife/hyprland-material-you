@@ -454,7 +454,8 @@ function volumeIndicator() {
         onScrollDown: () => (audio.speaker.volume -= 0.01),
         class_name: "volume_box",
         child: Widget.Button({
-            on_primary_click_release: () => Utils.execAsync("pavucontrol").catch(print),
+            on_primary_click_release: () => App.toggleWindow("audio"),
+            on_middle_click_release: () => Utils.execAsync("pavucontrol").catch(print),
             on_secondary_click_release: () => (audio.speaker.is_muted = !audio.speaker.is_muted),
             child: MaterialIcon("volume_off", "16px").hook(audio.speaker, (self) => {
                 const vol = audio.speaker.volume * 100;

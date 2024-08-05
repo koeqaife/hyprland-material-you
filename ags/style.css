@@ -1241,13 +1241,13 @@ switch:checked:active slider {
 }
 
 .sideleft .player .title {
-    font-size: 1.2em;
+    font-size: 20px;
     margin-left: 10px;
     color: @foreground;
 }
 
 .sideleft .player .artist {
-    font-size: 1.1em;
+    font-size: 18px;
     margin-left: 10px;
     color: @foreground;
 }
@@ -1612,6 +1612,72 @@ switch:checked:active slider {
 }
 
 .popup_slider highlight {
+    border-radius: 100px 0px 0px 100px;
+    background-color: @primary;
+}
+
+/* -----------------------------------------------------
+ * Audio
+ * ----------------------------------------------------- */
+
+.audio scrollbar {
+    opacity: 0;
+}
+
+.audio scrollbar:hover {
+    opacity: 0.1;
+}
+
+.audio .device {
+    background-color: @surfaceContainerLow;
+    border-radius: 6px;
+    min-width: 300px;
+    margin-top: 3px;
+    margin-right: 14px;
+    padding: 10px;
+    padding-bottom: 6px;
+}
+
+.audio .device:first-child {
+    border-radius: 24px 24px 6px 6px;
+    margin-top: 14px;
+}
+
+.audio .device:last-child {
+    border-radius: 6px 6px 24px 24px;
+}
+
+.audio .device label {
+    color: @onSurface;
+}
+
+.audio .device button {
+    padding: 0px;
+}
+
+.audio .device slider {
+    color: @onPrimary;
+    background-color: @primary;
+    background-size: 20px 20px;
+    min-width: 5px;
+    min-height: 14px;
+    border-radius: 100px;
+    padding: 0px;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: -16px;
+    margin-bottom: -16px;
+    box-shadow: -4px 0px 0px 1px @surfaceContainerLow, 4px 0px 0px 1px @surfaceContainerLow;
+}
+
+.audio .device trough {
+    background-color: @secondaryContainer;
+    min-height: 10px;
+}
+
+.audio .device highlight {
     border-radius: 100px 0px 0px 100px;
     background-color: @primary;
 }
