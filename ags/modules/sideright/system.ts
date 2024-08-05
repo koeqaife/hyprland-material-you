@@ -3,6 +3,7 @@ import Gtk from "gi://Gtk?version=3.0";
 import { Variable as VariableType } from "types/variable";
 import backlight_service from "services/backlight.ts";
 import { sideright } from "./main";
+import Pango10 from "gi://Pango";
 
 type InfoType = {
     cpu: string;
@@ -111,7 +112,8 @@ const Usage = (name: string, var_name: keyof InfoType, class_name: string | unde
 const InfoLabel = (name: string, var_name: keyof InfoType, end: string) => {
     return Widget.Label({
         class_name: "info_label",
-        truncate: "end",
+        wrap: true,
+        xalign: 0,
         hpack: "start",
         label: usage.bind().as((usage) => `${name}: ${usage[var_name]}${end}`)
     });
@@ -120,7 +122,9 @@ const InfoLabel = (name: string, var_name: keyof InfoType, end: string) => {
 const InfoLabelString = (name: string, value: string, end: string) => {
     return Widget.Label({
         class_name: "info_label",
-        truncate: "end",
+        wrap: true,
+        wrap_mode: Pango10.WrapMode.WORD_CHAR,
+        xalign: 0,
         hpack: "start",
         label: `${name}: ${value}${end}`
     });
@@ -129,7 +133,9 @@ const InfoLabelString = (name: string, value: string, end: string) => {
 const InfoLabelVariableString = (name: string, value: VariableType<string>, end: string) => {
     return Widget.Label({
         class_name: "info_label",
-        truncate: "end",
+        wrap: true,
+        wrap_mode: Pango10.WrapMode.WORD_CHAR,
+        xalign: 0,
         hpack: "start",
         label: value.bind().as((value) => `${name}: ${value}${end}`)
     });
