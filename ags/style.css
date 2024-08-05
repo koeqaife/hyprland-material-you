@@ -372,15 +372,6 @@ window.notification-popups box.notifications {
     border-radius: 100px;
 }
 
-.volume_box button {
-    padding-top: 0px;
-    padding-bottom: 0px;
-}
-
-.volume_box .icon {
-    margin-right: 5px;
-}
-
 .awesome_icon {
     font-family: "Font Awesome 6 Free";
 }

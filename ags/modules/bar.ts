@@ -342,13 +342,6 @@ function Bluetooth() {
     });
 }
 
-const Applets = () =>
-    Widget.Box({
-        class_name: "bar_applets",
-        spacing: 5,
-        children: [Bluetooth(), Wifi()]
-    });
-
 function MediaPlayer() {
     let metadata = mpris.players[0]?.metadata;
     const button = Widget.Button({
@@ -459,33 +452,33 @@ function volumeIndicator() {
     return Widget.EventBox({
         onScrollUp: () => (audio.speaker.volume += 0.01),
         onScrollDown: () => (audio.speaker.volume -= 0.01),
-        class_name: "filled_tonal_button volume_box",
+        class_name: "volume_box",
         child: Widget.Button({
             on_primary_click_release: () => Utils.execAsync("pavucontrol").catch(print),
             on_secondary_click_release: () => (audio.speaker.is_muted = !audio.speaker.is_muted),
-            child: Widget.Box({
-                children: [
-                    MaterialIcon("volume_off", "20px").hook(audio.speaker, (self) => {
-                        const vol = audio.speaker.volume * 100;
-                        const icon = [
-                            [101, "sound_detection_loud_sound"],
-                            [67, "volume_up"],
-                            [34, "volume_down"],
-                            [1, "volume_mute"],
-                            [0, "volume_off"]
-                        ].find(([threshold]) => Number(threshold) <= vol)?.[1];
-                        if (audio.speaker.is_muted) self.label = "volume_off";
-                        else self.label = String(icon!);
-                        self.tooltip_text = `Volume ${Math.floor(vol)}%`;
-                    }),
-                    Widget.Label({
-                        label: audio.speaker.bind("volume").as((volume) => `${Math.floor(volume * 100)}%`)
-                    })
-                ]
+            child: MaterialIcon("volume_off", "16px").hook(audio.speaker, (self) => {
+                const vol = audio.speaker.volume * 100;
+                const icon = [
+                    [101, "sound_detection_loud_sound"],
+                    [67, "volume_up"],
+                    [34, "volume_down"],
+                    [1, "volume_mute"],
+                    [0, "volume_off"]
+                ].find(([threshold]) => Number(threshold) <= vol)?.[1];
+                if (audio.speaker.is_muted) self.label = "volume_off";
+                else self.label = String(icon!);
+                self.tooltip_text = `Volume ${Math.floor(vol)}%`;
             })
         })
     });
 }
+
+const Applets = () =>
+    Widget.Box({
+        class_name: "bar_applets",
+        spacing: 5,
+        children: [volumeIndicator(), Bluetooth(), Wifi()]
+    });
 
 const Dot = () =>
     Widget.Label({
@@ -521,7 +514,7 @@ function Right() {
         class_name: "modules-right",
         hpack: "end",
         spacing: 8,
-        children: [volumeIndicator(), KeyboardLayout(), BatteryLabel(), SysTray(), Applets(), Clock(), OpenSideBar()]
+        children: [KeyboardLayout(), BatteryLabel(), SysTray(), Applets(), Clock(), OpenSideBar()]
     });
 }
 
