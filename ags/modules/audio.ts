@@ -98,7 +98,7 @@ export const audio_popup = popupwindow({
             vertical: true,
             children: [],
             setup: (self) => {
-                self.hook(audio, () => {
+                function update() {
                     for (let s of audio.speakers) {
                         // @ts-expect-error
                         const existing = self.children.some((v) => v.attribute.stream.id == s.id);
@@ -119,10 +119,18 @@ export const audio_popup = popupwindow({
 
                         if (!existing) self.pack_start(speaker(s, _icons.default, _icons.off), false, false, 0);
                     }
+                }
+                self.hook(App, (_, windowName, visible) => {
+                    if (windowName !== WINDOW_NAME) return;
+
+                    if (visible) update();
+                });
+                self.hook(audio, () => {
+                    if (self.visible) update();
                 });
             }
         }),
-        hscroll: "never",
+        hscroll: "never"
     }),
     anchor: ["top", "right", "bottom"]
 });
