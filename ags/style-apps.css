@@ -243,8 +243,13 @@
     padding: 0px;
 }
 
+.emojis .emoji_category:active {
+    background-color: mix(@onSurfaceVariant, transparent, 0.8);
+}
+
 .emojis .emoji_category.active {
     background-color: @secondaryContainer;
+    background-image: radial-gradient(circle, @secondaryContainer 10%, transparent 0%);
     color: @onSecondaryContainer;
 }
 
@@ -274,7 +279,8 @@
 }
 
 .emojis .emoji:active {
-    background-color: @secondaryContainer;
+    background-color: mix(@onSurfaceVariant, transparent, 0.8);
+    background-image: radial-gradient(circle, @secondaryContainer 10%, transparent 0%);
 }
 
 .emojis .emoji label {
