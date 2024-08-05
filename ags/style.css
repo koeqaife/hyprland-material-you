@@ -34,6 +34,7 @@ highlight {
     margin: 0px;
     border: none;
     outline: none;
+    box-shadow: none;
 
     transition-property: border-image, background-size, background-image, color, background-color, border-color;
     transition-duration: 0.3s, 0.3s, 0.3s, 0.2s, 0.2s, 0.2s;
