@@ -43,7 +43,7 @@ highlight {
 
 .corner {
     background-color: @background;
-    border-radius: 38px;
+    border-radius: 34px;
 }
 
 tooltip {
@@ -224,7 +224,7 @@ window.notification-popups box.notifications {
 
 .notification {
     min-width: 350px;
-    border-radius: 24px;
+    border-radius: 20px;
     padding: 1em;
     margin: 1px;
     background-color: @surfaceContainerLow;
@@ -274,9 +274,9 @@ window.notification-popups box.notifications {
  * ----------------------------------------------------- */
 
 .cliphistory_box {
-    border-radius: 24px;
+    border-radius: 20px;
     background-color: @background;
-    border: 2px solid;
+    border: 1px solid;
     border-color: @outlineVariant;
 }
 
@@ -1055,14 +1055,14 @@ switch:checked:active slider {
     margin-top: 14px;
     margin-bottom: 14px;
     background-color: @background;
-    border-radius: 24px;
-    border: 2px solid @outlineVariant;
+    border-radius: 20px;
+    border: 1px solid @outlineVariant;
     padding: 5px;
 }
 
 .cheatsheet .category {
     background-color: @surfaceContainerLow;
-    border-radius: 17px;
+    border-radius: 12px;
     padding-top: 7px;
     padding-bottom: 7px;
     box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.12), 0px 1px 2px rgba(0, 0, 0, 0.24);
@@ -1310,7 +1310,7 @@ switch:checked:active slider {
 
 /* applauncher */
 .sideleft .applauncher_box {
-    border-radius: 24px;
+    border-radius: 20px;
     background-color: @background;
     margin-right: 12px;
 }
@@ -1639,12 +1639,12 @@ switch:checked:active slider {
 }
 
 .audio .device:first-child {
-    border-radius: 24px 24px 6px 6px;
+    border-radius: 20px 20px 6px 6px;
     margin-top: 14px;
 }
 
 .audio .device:last-child {
-    border-radius: 6px 6px 24px 24px;
+    border-radius: 6px 6px 20px 20px;
 }
 
 .audio .device label {
