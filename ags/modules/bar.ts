@@ -96,20 +96,10 @@ function getIconNameFromClass(windowClass: string) {
     return Utils.lookUpIcon(icon) ? icon : "image-missing";
 }
 
-function workspaces_ids_are_equal(arr1: Workspace[] | undefined, arr2: Workspace[] | undefined): boolean {
-    if (!arr1 || !arr2) return false;
-    if (arr1.length !== arr2.length) return false;
-
-    return arr1.every((value, index) => {
-        return value.id === arr2[index].id;
-    });
-}
-
 const dispatch = (ws: string) => hyprland.messageAsync(`dispatch workspace ${ws}`).catch(print);
 
 function Workspaces() {
     let workspaceButtons = new Map<Number, any>();
-    let _old_workspaces: Workspace[];
     const workspaceButtonsArray: VariableType<Button<any, any>[] | any> = Variable([]);
 
     function createWorkspaceButton(id: Number) {
@@ -121,24 +111,18 @@ function Workspaces() {
         });
     }
 
-    function updateWorkspaceButtons() {
-        const workspaces = hyprland.workspaces;
-        if (workspaces_ids_are_equal(workspaces, _old_workspaces)) {
-            return;
+    function initializeWorkspaceButtons() {
+        for (let i = 1; i <= 10; i++) {
+            workspaceButtons.set(i, createWorkspaceButton(i));
         }
-        workspaces.sort((a, b) => a.id - b.id);
-        const updatedButtons = new Map<Number, any>();
-
-        workspaces.forEach(({ id }) => {
-            if (!workspaceButtons.has(id)) {
-                workspaceButtons.set(id, createWorkspaceButton(id));
-            }
-            updatedButtons.set(id, workspaceButtons.get(id));
-        });
-
-        workspaceButtons = updatedButtons;
-        _old_workspaces = workspaces;
         workspaceButtonsArray.setValue(Array.from(workspaceButtons.values()));
+    }
+
+    function update() {
+        workspaceButtons.forEach((workspace) => {
+            const existingWorkspace = hyprland.workspaces.some((element) => element.id === workspace.attribute.id);
+            workspace.toggleClassName("exists", existingWorkspace);
+        });
     }
 
     function activeWorkspace() {
@@ -147,11 +131,12 @@ function Workspaces() {
         });
     }
 
-    updateWorkspaceButtons();
+    initializeWorkspaceButtons();
     activeWorkspace();
+    update();
     hyprland.connect("notify::workspaces", () => {
         activeWorkspace();
-        updateWorkspaceButtons();
+        update();
     });
     hyprland.connect("notify::active", () => {
         activeWorkspace();
@@ -160,6 +145,7 @@ function Workspaces() {
     return Widget.EventBox({
         onScrollUp: () => dispatch("+1"),
         onScrollDown: () => dispatch("-1"),
+        hpack: "center",
         child: Widget.Box({
             children: workspaceButtonsArray.bind(),
             class_name: "workspaces"

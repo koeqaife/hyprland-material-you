@@ -111,22 +111,28 @@ separator {
     font-size: 16px;
     color: @onSurface;
     background: @surfaceContainer;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
 .workspaces * {
     transition: all 0.35s ease-in-out;
-    transition-property: background-color, color, min-width;
 }
 
 .workspaces button {
     padding: 0px 5px;
-    margin: 4px 3px;
+    margin: 4px 0px;
+    margin-right: 3px;
     border-radius: 16px;
     border: 0px;
 }
 
+.workspaces button:last-child {
+    margin-right: 0px;
+}
+
 .workspaces button label {
-    color: @onSurfaceVariant;
+    color: @onSurface;
     font-weight: bold;
 }
 
@@ -135,9 +141,13 @@ separator {
     background-color: mix(@onSurface, @surface, 0.85);
 }
 
+.workspaces button:not(.exists) label {
+    color: @onSurfaceVariant;
+    opacity: 0.6;
+}
+
 .workspaces button.active {
     background: @secondaryContainer;
-    min-width: 40px;
 }
 
 .workspaces button.active label {
@@ -395,7 +405,8 @@ window.notification-popups box.notifications {
     background-color: @error;
 }
 
-.battery.critical label, .battery.critical .icon {
+.battery.critical label,
+.battery.critical .icon {
     color: @onError;
 }
 
