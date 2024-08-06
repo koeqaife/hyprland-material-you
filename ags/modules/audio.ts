@@ -89,7 +89,10 @@ const speaker = (stream: Stream, icons: [number, string][], off: string) => {
 
 const app = (stream: Stream) => {
     const icon = Widget.Button({
-        child: Widget.Icon(stream.icon_name || "image-missing"),
+        child: Widget.Icon({
+            icon: stream.icon_name || "image-missing",
+            size: 20
+        }),
         on_clicked: () => {
             stream.is_muted = !stream.is_muted;
         }
