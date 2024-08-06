@@ -1621,13 +1621,21 @@ switch:checked:active slider {
  * Audio
  * ----------------------------------------------------- */
 
-.audio .tabs .active button {
-    border-bottom: 1px solid @primary;
-}
-
 .audio .tabs button {
     border-radius: 0px;
-    transition: border 0.2s ease-in-out;
+    border-bottom: 1px solid @surfaceVariant;
+}
+
+.audio .tabs button:hover {
+    background-color: mix(@onSurfaceVariant, transparent, 0.8);
+}
+
+.audio .tabs button:active {
+    background-image: radial-gradient(circle, mix(@onSurfaceVariant, transparent, 0.7) 10%, transparent 0%);
+}
+
+.audio .tabs .active button {
+    border-color: @primary;
 }
 
 .audio .tabs {
