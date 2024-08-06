@@ -1622,7 +1622,7 @@ switch:checked:active slider {
  * ----------------------------------------------------- */
 
 .audio .tabs .active button {
-    border-bottom: 1px solid @secondary;
+    border-bottom: 1px solid @primary;
 }
 
 .audio .tabs button {
