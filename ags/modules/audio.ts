@@ -31,21 +31,27 @@ const off_icons = {
     headset_mic: "headset_off",
     speaker: "volume_off"
 };
-
-const speaker = (stream: Stream, icons: [number, string][], off: string) => {
-    const icon = Widget.Button({
-        child: MaterialIcon(off, "20px").hook(stream, (self) => {
+const button_with_icon = (
+    icon: string,
+    size: string,
+    stream: Stream,
+    on_clicked: () => void,
+    icons: [number, string][],
+    off: string
+) =>
+    Widget.Button({
+        child: MaterialIcon(icon, size).hook(stream, (self) => {
             const vol = stream.volume * 100;
             const icon = icons.find(([threshold]) => Number(threshold) <= vol)?.[1];
             if (stream.is_muted) self.label = off;
             else self.label = String(icon!);
             self.tooltip_text = `${Math.floor(stream.volume * 100)}%`;
         }),
-        on_clicked: () => {
-            stream.is_muted = !stream.is_muted;
-        }
+        on_clicked: on_clicked
     });
-    const slider = Widget.Slider({
+
+const create_slider = (stream: Stream) =>
+    Widget.Slider({
         min: 0,
         max: 100,
         draw_value: false,
@@ -58,17 +64,15 @@ const speaker = (stream: Stream, icons: [number, string][], off: string) => {
         },
         setup: (self) => {
             self.hook(stream, () => {
-                if (stream.volume > 1) {
-                    if (self.max != 150) self.max = 150;
-                } else {
-                    if (self.max != 100) self.max = 100;
-                }
+                self.max = stream.volume > 1 ? 150 : 100;
                 self.value = stream.volume * 100;
                 self.tooltip_text = `${Math.floor(stream.volume * 100)}%`;
             });
         }
     });
-    return Widget.Box({
+
+const speaker = (stream: Stream, icons: [number, string][], off: string) =>
+    Widget.Box({
         class_name: "device",
         vertical: true,
         attribute: { stream: stream },
@@ -81,45 +85,24 @@ const speaker = (stream: Stream, icons: [number, string][], off: string) => {
                 tooltip_text: stream.name
             }),
             Widget.Box({
-                children: [icon, slider]
+                children: [
+                    button_with_icon(
+                        off,
+                        "20px",
+                        stream,
+                        () => {
+                            stream.is_muted = !stream.is_muted;
+                        },
+                        icons,
+                        off
+                    ),
+                    create_slider(stream)
+                ]
             })
         ]
     });
-};
 
 const app = (stream: Stream) => {
-    const icon = Widget.Button({
-        child: Widget.Icon({
-            icon: stream.icon_name || "image-missing",
-            size: 20
-        }),
-        on_clicked: () => {
-            stream.is_muted = !stream.is_muted;
-        }
-    });
-    const slider = Widget.Slider({
-        min: 0,
-        max: 100,
-        draw_value: false,
-        hexpand: true,
-        vpack: "end",
-        value: stream.volume * 100,
-        on_change: (self) => {
-            stream.volume = self.value / 100;
-            self.tooltip_text = `${Math.floor(stream.volume * 100)}%`;
-        },
-        setup: (self) => {
-            self.hook(stream, () => {
-                if (stream.volume > 1) {
-                    if (self.max != 150) self.max = 150;
-                } else {
-                    if (self.max != 100) self.max = 100;
-                }
-                self.value = stream.volume * 100;
-                self.tooltip_text = `${Math.floor(stream.volume * 100)}%`;
-            });
-        }
-    });
     const label = !!stream.name ? `${stream.name}: ${stream.description}` : stream.description;
     return Widget.Box({
         class_name: "device",
@@ -134,7 +117,15 @@ const app = (stream: Stream) => {
                 tooltip_text: label
             }),
             Widget.Box({
-                children: [icon, slider]
+                children: [
+                    Widget.Button({
+                        child: Widget.Icon({ icon: stream.icon_name || "image-missing", size: 20 }),
+                        on_clicked: () => {
+                            stream.is_muted = !stream.is_muted;
+                        }
+                    }),
+                    create_slider(stream)
+                ]
             })
         ]
     });
@@ -162,78 +153,69 @@ const audio_widget = () => {
         ],
         setup: (self) => {
             self.hook(cur_page, () => {
-                for (const widget of self.children) {
+                self.children.forEach((widget) => {
                     widget.toggleClassName("active", widget.attribute.page == cur_page.value);
-                }
+                });
             });
         }
     });
-    const speakers = Widget.Box({
-        vertical: true,
-        children: [],
-        setup: (self) => {
-            function update() {
-                for (let s of audio.speakers) {
-                    // @ts-expect-error
-                    const existing = self.children.some((v) => v.attribute.stream.id == s.id);
-                    if (!existing) self.pack_start(speaker(s, icons.speaker, off_icons.speaker), false, false, 0);
-                }
-                for (let s of audio.microphones) {
-                    // @ts-expect-error
-                    const existing = self.children.some((v) => v.attribute.stream.id == s.id);
-                    let _icons = {
-                        off: off_icons.microphone,
-                        default: icons.microphone
-                    };
-                    if (s.icon_name == "audio-headset-analog-usb")
-                        _icons = {
-                            off: off_icons.headset_mic,
-                            default: icons.headset_mic
-                        };
+    const speakers = Widget.Box({ vertical: true, children: [] as ReturnType<typeof speaker>[] });
+    const apps = Widget.Box({ vertical: true, children: [] as ReturnType<typeof app>[] });
 
-                    if (!existing) self.pack_start(speaker(s, _icons.default, _icons.off), false, false, 0);
-                }
+    function update() {
+        const speaker_ids = audio.speakers.map((s) => s.id);
+        const app_ids = audio.apps.map((s) => s.id);
+        const microphone_ids = audio.microphones.map((s) => s.id);
+
+        speakers.children
+            .filter(
+                (widget) =>
+                    !speaker_ids.includes(widget.attribute.stream.id) &&
+                    !microphone_ids.includes(widget.attribute.stream.id)
+            )
+            .forEach((widget) => widget.destroy());
+
+        apps.children
+            .filter((widget) => !app_ids.includes(widget.attribute.stream.id))
+            .forEach((widget) => widget.destroy());
+
+        audio.speakers.forEach((s) => {
+            if (!speakers.children.some((v) => v.attribute.stream.id == s.id)) {
+                speakers.pack_start(speaker(s, icons.speaker, off_icons.speaker), false, false, 0);
             }
-            self.hook(App, (_, windowName, visible) => {
-                if (windowName !== WINDOW_NAME) return;
+        });
 
-                if (visible) update();
-            });
-            self.hook(audio, () => {
-                if (self.visible) update();
-            });
-        }
-    });
-    const apps = Widget.Box({
-        vertical: true,
-        children: [],
-        setup: (self) => {
-            function update() {
-                for (let s of audio.apps) {
-                    // @ts-expect-error
-                    const existing = self.children.some((v) => v.attribute.stream.id == s.id);
-                    if (!existing) self.pack_start(app(s), false, false, 0);
-                }
+        audio.microphones.forEach((s) => {
+            if (!speakers.children.some((v) => v.attribute.stream.id == s.id)) {
+                const _icons =
+                    s.icon_name == "audio-headset-analog-usb"
+                        ? { off: off_icons.headset_mic, default: icons.headset_mic }
+                        : { off: off_icons.microphone, default: icons.microphone };
+                speakers.pack_start(speaker(s, _icons.default, _icons.off), false, false, 0);
             }
-            self.hook(App, (_, windowName, visible) => {
-                if (windowName !== WINDOW_NAME) return;
+        });
 
-                if (visible) update();
-            });
-            self.hook(audio, () => {
-                if (self.visible) update();
-            });
-        }
+        audio.apps.forEach((s) => {
+            if (!apps.children.some((v) => v.attribute.stream.id == s.id)) {
+                apps.pack_start(app(s), false, false, 0);
+            }
+        });
+    }
+
+    update();
+    ["notify::speakers", "notify::apps", "notify::microphones"].forEach((event) => {
+        audio.connect(event, () => {
+            if (audio_popup.visible) update();
+        });
     });
+
     const stack = Widget.Stack({
-        children: {
-            speakers: speakers,
-            apps: apps
-        },
+        children: { speakers, apps },
         // @ts-expect-error
         shown: cur_page.bind(),
         transition: "crossfade"
     });
+
     return Widget.Scrollable({
         child: Widget.Box({
             class_name: "audio_box",
@@ -241,13 +223,18 @@ const audio_widget = () => {
             vertical: true,
             children: [tabs, stack]
         }),
-        hscroll: "never"
+        hscroll: "never",
+        setup: (self) => {
+            self.hook(App, (_, windowName, visible) => {
+                if (windowName !== WINDOW_NAME) return;
+                if (visible) update();
+            });
+        }
     });
 };
 
 export const audio_popup = popupwindow({
     name: WINDOW_NAME,
-
     class_name: "audio",
     visible: false,
     keymode: "exclusive",
