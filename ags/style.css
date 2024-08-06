@@ -1621,6 +1621,32 @@ switch:checked:active slider {
  * Audio
  * ----------------------------------------------------- */
 
+.audio .tabs .active button {
+    border-bottom: 1px solid @secondary;
+}
+
+.audio .tabs button {
+    border-radius: 0px;
+    transition: border 0.2s ease-in-out;
+}
+
+.audio .tabs {
+    margin-bottom: 4px;
+}
+
+.audio_box {
+    background-color: @background;
+    border-radius: 20px;
+    border: 1px solid @outlineVariant;
+    padding: 6px;
+    margin-right: 14px;
+    margin-top: 14px;
+}
+
+.audio .icon {
+    color: @onSurface;
+}
+
 .audio scrollbar {
     opacity: 0;
 }
@@ -1634,18 +1660,17 @@ switch:checked:active slider {
     border-radius: 6px;
     min-width: 300px;
     margin-top: 3px;
-    margin-right: 14px;
     padding: 10px;
     padding-bottom: 6px;
 }
 
 .audio .device:first-child {
-    border-radius: 20px 20px 6px 6px;
-    margin-top: 14px;
+    border-radius: 14px 14px 6px 6px;
+    margin-top: 0px;
 }
 
 .audio .device:last-child {
-    border-radius: 6px 6px 20px 20px;
+    border-radius: 6px 6px 14px 14px;
 }
 
 .audio .device label {
