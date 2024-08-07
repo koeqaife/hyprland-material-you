@@ -96,20 +96,10 @@ function getIconNameFromClass(windowClass: string) {
     return Utils.lookUpIcon(icon) ? icon : "image-missing";
 }
 
-function workspaces_ids_are_equal(arr1: Workspace[] | undefined, arr2: Workspace[] | undefined): boolean {
-    if (!arr1 || !arr2) return false;
-    if (arr1.length !== arr2.length) return false;
-
-    return arr1.every((value, index) => {
-        return value.id === arr2[index].id;
-    });
-}
-
 const dispatch = (ws: string) => hyprland.messageAsync(`dispatch workspace ${ws}`).catch(print);
 
 function Workspaces() {
     let workspaceButtons = new Map<Number, any>();
-    let _old_workspaces: Workspace[];
     const workspaceButtonsArray: VariableType<Button<any, any>[] | any> = Variable([]);
 
     function createWorkspaceButton(id: Number) {
@@ -121,24 +111,18 @@ function Workspaces() {
         });
     }
 
-    function updateWorkspaceButtons() {
-        const workspaces = hyprland.workspaces;
-        if (workspaces_ids_are_equal(workspaces, _old_workspaces)) {
-            return;
+    function initializeWorkspaceButtons() {
+        for (let i = 1; i <= 10; i++) {
+            workspaceButtons.set(i, createWorkspaceButton(i));
         }
-        workspaces.sort((a, b) => a.id - b.id);
-        const updatedButtons = new Map<Number, any>();
-
-        workspaces.forEach(({ id }) => {
-            if (!workspaceButtons.has(id)) {
-                workspaceButtons.set(id, createWorkspaceButton(id));
-            }
-            updatedButtons.set(id, workspaceButtons.get(id));
-        });
-
-        workspaceButtons = updatedButtons;
-        _old_workspaces = workspaces;
         workspaceButtonsArray.setValue(Array.from(workspaceButtons.values()));
+    }
+
+    function update() {
+        workspaceButtons.forEach((workspace) => {
+            const existingWorkspace = hyprland.workspaces.some((element) => element.id === workspace.attribute.id);
+            workspace.toggleClassName("exists", existingWorkspace);
+        });
     }
 
     function activeWorkspace() {
@@ -147,11 +131,12 @@ function Workspaces() {
         });
     }
 
-    updateWorkspaceButtons();
+    initializeWorkspaceButtons();
     activeWorkspace();
+    update();
     hyprland.connect("notify::workspaces", () => {
         activeWorkspace();
-        updateWorkspaceButtons();
+        update();
     });
     hyprland.connect("notify::active", () => {
         activeWorkspace();
@@ -160,6 +145,7 @@ function Workspaces() {
     return Widget.EventBox({
         onScrollUp: () => dispatch("+1"),
         onScrollDown: () => dispatch("-1"),
+        hpack: "center",
         child: Widget.Box({
             children: workspaceButtonsArray.bind(),
             class_name: "workspaces"
@@ -356,13 +342,6 @@ function Bluetooth() {
     });
 }
 
-const Applets = () =>
-    Widget.Box({
-        class_name: "bar_applets",
-        spacing: 5,
-        children: [Bluetooth(), Wifi()]
-    });
-
 function MediaPlayer() {
     let metadata = mpris.players[0]?.metadata;
     const button = Widget.Button({
@@ -473,33 +452,34 @@ function volumeIndicator() {
     return Widget.EventBox({
         onScrollUp: () => (audio.speaker.volume += 0.01),
         onScrollDown: () => (audio.speaker.volume -= 0.01),
-        class_name: "filled_tonal_button volume_box",
+        class_name: "volume_box",
         child: Widget.Button({
-            on_primary_click_release: () => Utils.execAsync("pavucontrol").catch(print),
+            on_primary_click_release: () => App.toggleWindow("audio"),
+            on_middle_click_release: () => Utils.execAsync("pavucontrol").catch(print),
             on_secondary_click_release: () => (audio.speaker.is_muted = !audio.speaker.is_muted),
-            child: Widget.Box({
-                children: [
-                    MaterialIcon("volume_off", "20px").hook(audio.speaker, (self) => {
-                        const vol = audio.speaker.volume * 100;
-                        const icon = [
-                            [101, "sound_detection_loud_sound"],
-                            [67, "volume_up"],
-                            [34, "volume_down"],
-                            [1, "volume_mute"],
-                            [0, "volume_off"]
-                        ].find(([threshold]) => Number(threshold) <= vol)?.[1];
-                        if (audio.speaker.is_muted) self.label = "volume_off";
-                        else self.label = String(icon!);
-                        self.tooltip_text = `Volume ${Math.floor(vol)}%`;
-                    }),
-                    Widget.Label({
-                        label: audio.speaker.bind("volume").as((volume) => `${Math.floor(volume * 100)}%`)
-                    })
-                ]
+            child: MaterialIcon("volume_off", "16px").hook(audio.speaker, (self) => {
+                const vol = audio.speaker.volume * 100;
+                const icon = [
+                    [101, "sound_detection_loud_sound"],
+                    [67, "volume_up"],
+                    [34, "volume_down"],
+                    [1, "volume_mute"],
+                    [0, "volume_off"]
+                ].find(([threshold]) => Number(threshold) <= vol)?.[1];
+                if (audio.speaker.is_muted) self.label = "volume_off";
+                else self.label = String(icon!);
+                self.tooltip_text = `Volume ${Math.floor(vol)}%`;
             })
         })
     });
 }
+
+const Applets = () =>
+    Widget.Box({
+        class_name: "bar_applets",
+        spacing: 5,
+        children: [volumeIndicator(), Bluetooth(), Wifi()]
+    });
 
 const Dot = () =>
     Widget.Label({
@@ -535,7 +515,7 @@ function Right() {
         class_name: "modules-right",
         hpack: "end",
         spacing: 8,
-        children: [volumeIndicator(), KeyboardLayout(), BatteryLabel(), SysTray(), Applets(), Clock(), OpenSideBar()]
+        children: [KeyboardLayout(), BatteryLabel(), SysTray(), Applets(), Clock(), OpenSideBar()]
     });
 }
 
