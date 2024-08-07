@@ -34,6 +34,7 @@ highlight {
     margin: 0px;
     border: none;
     outline: none;
+    box-shadow: none;
 
     transition-property: border-image, background-size, background-image, color, background-color, border-color;
     transition-duration: 0.3s, 0.3s, 0.3s, 0.2s, 0.2s, 0.2s;
@@ -43,7 +44,7 @@ highlight {
 
 .corner {
     background-color: @background;
-    border-radius: 38px;
+    border-radius: 34px;
 }
 
 tooltip {
@@ -111,22 +112,28 @@ separator {
     font-size: 16px;
     color: @onSurface;
     background: @surfaceContainer;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
 .workspaces * {
     transition: all 0.35s ease-in-out;
-    transition-property: background-color, color, min-width;
 }
 
 .workspaces button {
     padding: 0px 5px;
-    margin: 4px 3px;
+    margin: 4px 0px;
+    margin-right: 3px;
     border-radius: 16px;
     border: 0px;
 }
 
+.workspaces button:last-child {
+    margin-right: 0px;
+}
+
 .workspaces button label {
-    color: @onSurfaceVariant;
+    color: @onSurface;
     font-weight: bold;
 }
 
@@ -135,9 +142,13 @@ separator {
     background-color: mix(@onSurface, @surface, 0.85);
 }
 
+.workspaces button:not(.exists) label {
+    color: @onSurfaceVariant;
+    opacity: 0.6;
+}
+
 .workspaces button.active {
     background: @secondaryContainer;
-    min-width: 40px;
 }
 
 .workspaces button.active label {
@@ -214,9 +225,9 @@ window.notification-popups box.notifications {
 
 .notification {
     min-width: 350px;
-    border-radius: 24px;
+    border-radius: 20px;
     padding: 1em;
-    margin: 1px;
+    margin-bottom: 2px;
     background-color: @surfaceContainerLow;
 }
 
@@ -264,9 +275,9 @@ window.notification-popups box.notifications {
  * ----------------------------------------------------- */
 
 .cliphistory_box {
-    border-radius: 24px;
+    border-radius: 20px;
     background-color: @background;
-    border: 2px solid;
+    border: 1px solid;
     border-color: @outlineVariant;
 }
 
@@ -362,15 +373,6 @@ window.notification-popups box.notifications {
     border-radius: 100px;
 }
 
-.volume_box button {
-    padding-top: 0px;
-    padding-bottom: 0px;
-}
-
-.volume_box .icon {
-    margin-right: 5px;
-}
-
 .awesome_icon {
     font-family: "Font Awesome 6 Free";
 }
@@ -395,7 +397,8 @@ window.notification-popups box.notifications {
     background-color: @error;
 }
 
-.battery.critical label, .battery.critical .icon {
+.battery.critical label,
+.battery.critical .icon {
     color: @onError;
 }
 
@@ -1053,14 +1056,14 @@ switch:checked:active slider {
     margin-top: 14px;
     margin-bottom: 14px;
     background-color: @background;
-    border-radius: 24px;
-    border: 2px solid @outlineVariant;
+    border-radius: 20px;
+    border: 1px solid @outlineVariant;
     padding: 5px;
 }
 
 .cheatsheet .category {
     background-color: @surfaceContainerLow;
-    border-radius: 17px;
+    border-radius: 12px;
     padding-top: 7px;
     padding-bottom: 7px;
     box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.12), 0px 1px 2px rgba(0, 0, 0, 0.24);
@@ -1239,13 +1242,13 @@ switch:checked:active slider {
 }
 
 .sideleft .player .title {
-    font-size: 1.2em;
+    font-size: 20px;
     margin-left: 10px;
     color: @foreground;
 }
 
 .sideleft .player .artist {
-    font-size: 1.1em;
+    font-size: 18px;
     margin-left: 10px;
     color: @foreground;
 }
@@ -1308,7 +1311,7 @@ switch:checked:active slider {
 
 /* applauncher */
 .sideleft .applauncher_box {
-    border-radius: 24px;
+    border-radius: 20px;
     background-color: @background;
     margin-right: 12px;
 }
@@ -1610,6 +1613,105 @@ switch:checked:active slider {
 }
 
 .popup_slider highlight {
+    border-radius: 100px 0px 0px 100px;
+    background-color: @primary;
+}
+
+/* -----------------------------------------------------
+ * Audio
+ * ----------------------------------------------------- */
+
+.audio .tabs button {
+    border-radius: 0px;
+    border-bottom: 1px solid @surfaceVariant;
+}
+
+.audio .tabs button:hover {
+    background-color: mix(@onSurfaceVariant, transparent, 0.8);
+}
+
+.audio .tabs button:active {
+    background-image: radial-gradient(circle, mix(@onSurfaceVariant, transparent, 0.7) 10%, transparent 0%);
+}
+
+.audio .tabs .active button {
+    border-color: @primary;
+}
+
+.audio .tabs {
+    margin-bottom: 4px;
+}
+
+.audio_box {
+    background-color: @background;
+    border-radius: 20px;
+    border: 1px solid @outlineVariant;
+    padding: 6px;
+    margin-right: 14px;
+    margin-top: 14px;
+}
+
+.audio .icon {
+    color: @onSurface;
+}
+
+.audio scrollbar {
+    opacity: 0;
+}
+
+.audio scrollbar:hover {
+    opacity: 0.1;
+}
+
+.audio .device {
+    background-color: @surfaceContainerLow;
+    border-radius: 6px;
+    min-width: 300px;
+    margin-top: 3px;
+    padding: 10px;
+    padding-bottom: 6px;
+}
+
+.audio .device:first-child {
+    border-radius: 14px 14px 6px 6px;
+    margin-top: 0px;
+}
+
+.audio .device:last-child {
+    border-radius: 6px 6px 14px 14px;
+}
+
+.audio .device label {
+    color: @onSurface;
+}
+
+.audio .device button {
+    padding: 0px;
+}
+
+.audio .device slider {
+    color: @onPrimary;
+    background-color: @primary;
+    background-size: 20px 20px;
+    min-width: 5px;
+    min-height: 14px;
+    border-radius: 100px;
+    padding: 0px;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: -16px;
+    margin-bottom: -16px;
+    box-shadow: -4px 0px 0px 1px @surfaceContainerLow, 4px 0px 0px 1px @surfaceContainerLow;
+}
+
+.audio .device trough {
+    background-color: @secondaryContainer;
+    min-height: 10px;
+}
+
+.audio .device highlight {
     border-radius: 100px 0px 0px 100px;
     background-color: @primary;
 }
