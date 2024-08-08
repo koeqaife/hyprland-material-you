@@ -182,6 +182,19 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
 
         on_change: ({ text }) => {
             const searchText = (text ?? "").toLowerCase();
+
+            if (searchText === "/clear") {
+                list.children.forEach((item) => {
+                    item.destroy();
+                });
+                clipHistItems = [];
+                Utils.execAsync(`${App.configDir}/scripts/cliphist.sh --clear`).catch(print);
+                setTimeout(() => {
+                    entry.text = "";
+                }, 300);
+                return;
+            }
+
             list.children.forEach((item) => {
                 item.visible = item.attribute.content.toLowerCase().includes(searchText);
             });
