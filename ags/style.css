@@ -1717,6 +1717,45 @@ switch:checked:active slider {
 }
 
 /* -----------------------------------------------------
+ * Calendar
+ * ----------------------------------------------------- */
+
+.calendar_widget {
+    padding: 4px;
+    margin-top: 14px;
+    margin-right: 14px;
+    background-color: @background;
+    border-radius: 20px;
+    border: 1px solid @outlineVariant;
+}
+
+.calendar_button .overlay_box {
+    min-width: 22px;
+    min-height: 32px;
+}
+
+.calendar_button label {
+    font-size: 14px;
+    color: @onSurface;
+}
+
+.calendar_button.today {
+    background-color: @primary;
+}
+
+.calendar_button.today label {
+    color: @onPrimary;
+}
+
+.calendar_button.othermonth label {
+    color: mix(@onSurfaceVariant, transparent, 0.3);
+}
+
+.calendar_monthyear {
+    color: @foreground;
+}
+
+/* -----------------------------------------------------
  * Material
  * ----------------------------------------------------- */
 

@@ -14,6 +14,7 @@ import Window from "types/widgets/window";
 import { popups } from "modules/popups.ts";
 import { start_battery_warning_service } from "services/battery_warning.ts";
 import { audio_popup } from "./modules/audio.ts"
+import { calendar } from "modules/calendar.ts";
 import Gtk from "gi://Gtk?version=3.0";
 const GLib = imports.gi.GLib;
 
@@ -36,7 +37,8 @@ const Windows = () => [
     cheatsheet,
     sideleft,
     forMonitors(popups),
-    audio_popup
+    audio_popup,
+    calendar
 ];
 
 App.config({
