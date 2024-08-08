@@ -84,7 +84,7 @@ install_packages() {
         ttf-font-awesome ttf-opensans ttf-roboto lshw ttf-material-symbols-variable-git \
         fontconfig dart-sass ttf-meslo-nerd-font-powerlevel10k cpio meson cmake \
         python-materialyoucolor-git gtksourceview3 gtksourceviewmm cairomm \
-        gtkmm3 tinyxml2 python-requests
+        gtkmm3 tinyxml2 python-requests python-numpy
 }
 
 setup_yay() {
