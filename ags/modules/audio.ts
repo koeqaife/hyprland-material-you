@@ -77,12 +77,21 @@ const speaker = (stream: Stream, icons: [number, string][], off: string) =>
         vertical: true,
         attribute: { stream: stream },
         children: [
-            Widget.Label({
-                label: stream.description,
-                hpack: "start",
-                xalign: 0,
-                truncate: "middle",
-                tooltip_text: stream.name
+            Widget.Box({
+                children: [
+                    Widget.Label({
+                        label: stream.description,
+                        xalign: 0,
+                        truncate: "end",
+                        hexpand: true,
+                        tooltip_text: stream.name,
+                        css: "margin-right: 4px;"
+                    }),
+                    Widget.Label({
+                        label: stream.bind("volume").as((v) => `${Math.round(v * 100)}%`),
+                        xalign: 1
+                    })
+                ]
             }),
             Widget.Box({
                 children: [
@@ -109,13 +118,23 @@ const app = (stream: Stream) => {
         vertical: true,
         attribute: { stream: stream },
         children: [
-            Widget.Label({
-                label: label,
-                hpack: "start",
-                xalign: 0,
-                truncate: "middle",
-                tooltip_text: label
+            Widget.Box({
+                children: [
+                    Widget.Label({
+                        label: label,
+                        xalign: 0,
+                        truncate: "end",
+                        hexpand: true,
+                        tooltip_text: label,
+                        css: "margin-right: 4px;"
+                    }),
+                    Widget.Label({
+                        label: stream.bind("volume").as((v) => `${Math.round(v * 100)}%`),
+                        xalign: 1
+                    })
+                ]
             }),
+
             Widget.Box({
                 children: [
                     Widget.Button({
