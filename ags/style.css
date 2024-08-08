@@ -1740,11 +1740,11 @@ switch:checked:active slider {
 }
 
 .calendar_button.today {
-    background-color: @secondary;
+    background-color: @primary;
 }
 
 .calendar_button.today label {
-    color: @onSecondary;
+    color: @onPrimary;
 }
 
 .calendar_button.othermonth label {
