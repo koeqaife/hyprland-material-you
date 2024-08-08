@@ -154,19 +154,24 @@ function Workspaces() {
 }
 
 function Clock() {
-    return Widget.Box({
-        orientation: Gtk.Orientation.VERTICAL,
+    return Widget.Button({
         class_name: "clock",
-        children: [
-            Widget.Label({
-                class_name: "time",
-                label: time.bind()
-            }),
-            Widget.Label({
-                class_name: "date",
-                label: date.bind()
-            })
-        ]
+        child: Widget.Box({
+            orientation: Gtk.Orientation.VERTICAL,
+            children: [
+                Widget.Label({
+                    class_name: "time",
+                    label: time.bind()
+                }),
+                Widget.Label({
+                    class_name: "date",
+                    label: date.bind()
+                })
+            ]
+        }),
+        on_clicked: (self) => {
+            App.toggleWindow("calendar");
+        }
     });
 }
 
