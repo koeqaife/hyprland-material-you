@@ -9,6 +9,10 @@ copy_by_id() {
     cliphist decode $id | wl-copy
 }
 
+clear(){
+    cliphist wipe
+}
+
 save_cache_file() {
     id=$1
 
@@ -34,4 +38,6 @@ elif [[ "$1" == "--save-by-id" ]]; then
     { save_cache_file "$2"; }
 elif [[ "$1" == "--clear-cache" ]]; then
     clear_tmp
+elif [[ "$1" == "--clear" ]]; then
+    clear
 fi
