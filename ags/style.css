@@ -102,7 +102,7 @@ separator {
 }
 
 /* -----------------------------------------------------
- * Workspaces 
+ * Workspaces
  * ----------------------------------------------------- */
 
 .workspaces {
@@ -356,6 +356,26 @@ window.notification-popups box.notifications {
 
 .clip_container.with_image .clip_label {
     color: @tertiary;
+}
+
+.clear_button {
+    background-color: @surfaceContainerHigh;
+    color: @onSurface;
+    border: none;
+    outline: none;
+    border-radius: 50%;
+    margin-right: 5px;
+    margin-left: 5px;
+    margin-top: 11px;
+    margin-bottom: 11px;
+}
+
+.clear_button:hover {
+    background-color: mix(@onSurface, @surface, 0.92);
+}
+
+.clear_button:active {
+    background-color: mix(@onSurface, @surface, 0.8);
 }
 
 /* -----------------------------------------------------
