@@ -103,7 +103,7 @@ setup_sensors() {
 }
 
 check_config_folders() {
-    local CHECK_CONFIG_FOLDERS="ags alacritty hypr swappy wal"
+    local CHECK_CONFIG_FOLDERS="ags alacritty hypr swappy"
     local DATETIME=$(date '+%Y-%m-%d %H:%M:%S')
     local EXISTING="NO"
 
@@ -172,7 +172,6 @@ install_icon_theme() {
 
 setup_colors() {
     echo ":: Setting colors"
-    ln -s -f $HOME/dotfiles/wal $HOME/.config/wal
     python -O $HOME/dotfiles/material-colors/generate.py --color "#0000FF"
 }
 
