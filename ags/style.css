@@ -102,7 +102,7 @@ separator {
 }
 
 /* -----------------------------------------------------
- * Workspaces 
+ * Workspaces
  * ----------------------------------------------------- */
 
 .workspaces {
@@ -268,94 +268,6 @@ window.notification-popups box.notifications {
 
 .notification-close .icon {
     font-weight: 300;
-}
-
-/* -----------------------------------------------------
- * Clipboard history
- * ----------------------------------------------------- */
-
-.cliphistory_box {
-    border-radius: 20px;
-    background-color: @background;
-    border: 1px solid;
-    border-color: @outlineVariant;
-}
-
-.cliphistory_box separator {
-    margin: 0px;
-}
-
-.cliphistory_entry {
-    background-color: @surfaceContainerHigh;
-    color: @onSurface;
-    border: none;
-    outline: none;
-    border-radius: 100px;
-    margin-bottom: 16px;
-    padding: 5px;
-    padding-left: 25px;
-    margin: 11px;
-}
-
-.clip_container {
-    border: none;
-    outline: none;
-    border-radius: 0px;
-    min-height: 40px;
-}
-
-.clip_container label {
-    margin-left: 11px;
-    margin-right: 11px;
-}
-
-.clip_container:hover {
-    background-color: mix(@onSurface, @surface, 0.92);
-}
-
-.clip_container:focus {
-    background-color: mix(@onSurface, @surface, 0.8);
-    border: 0px solid;
-    border: none;
-    outline: none;
-}
-
-.clip_container:active {
-    background-image: radial-gradient(circle, mix(@onSurface, @surface, 0.78) 10%, transparent 0%);
-}
-
-.clip_container .clip_id {
-    font-weight: 200;
-    font-feature-settings: "tnum";
-}
-
-.clip_container .preview {
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    border-radius: 8px;
-}
-
-.clip_container .dot_divider {
-    font-weight: 900;
-    font-size: 12px;
-    min-width: 0px;
-    margin: 0px;
-    color: @outlineVariant;
-}
-
-.clip_divider {
-    color: @outline;
-    margin: 0px;
-}
-
-.clip_label {
-    color: @onSurface;
-    font-weight: normal;
-}
-
-.clip_container.with_image .clip_label {
-    color: @tertiary;
 }
 
 /* -----------------------------------------------------
@@ -1753,6 +1665,102 @@ switch:checked:active slider {
 
 .calendar_monthyear {
     color: @foreground;
+}
+
+/* -----------------------------------------------------
+ * Clipboard history
+ * ----------------------------------------------------- */
+
+.cliphistory_box {
+    border-radius: 20px;
+    background-color: @background;
+    border: 1px solid;
+    border-color: @outlineVariant;
+}
+
+.cliphistory_box separator {
+    margin: 0px;
+}
+
+.cliphistory_entry {
+    background-color: @surfaceContainerHigh;
+    color: @onSurface;
+    border: none;
+    outline: none;
+    border-radius: 100px;
+    margin-bottom: 16px;
+    padding-left: 25px;
+    margin: 11px;
+    min-height: 44px;
+}
+
+.clip_container {
+    border: none;
+    outline: none;
+    border-radius: 0px;
+    min-height: 40px;
+}
+
+.clip_container label {
+    margin-left: 11px;
+    margin-right: 11px;
+}
+
+.clip_container:hover {
+    background-color: mix(@onSurface, @surface, 0.92);
+}
+
+.clip_container:focus {
+    background-color: mix(@onSurface, @surface, 0.8);
+    border: 0px solid;
+    border: none;
+    outline: none;
+}
+
+.clip_container:active {
+    background-image: radial-gradient(circle, mix(@onSurface, @surface, 0.78) 10%, transparent 0%);
+}
+
+.clip_container .clip_id {
+    font-weight: 200;
+    font-feature-settings: "tnum";
+}
+
+.clip_container .preview {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 8px;
+}
+
+.clip_container .dot_divider {
+    font-weight: 900;
+    font-size: 12px;
+    min-width: 0px;
+    margin: 0px;
+    color: @outlineVariant;
+}
+
+.clip_divider {
+    color: @outline;
+    margin: 0px;
+}
+
+.clip_label {
+    color: @onSurface;
+    font-weight: normal;
+}
+
+.clip_container.with_image .clip_label {
+    color: @tertiary;
+}
+
+.clear_button {
+    margin: 11px;
+    margin-left: 0px;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 100%
 }
 
 /* -----------------------------------------------------
