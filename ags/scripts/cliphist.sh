@@ -9,7 +9,7 @@ copy_by_id() {
     cliphist decode $id | wl-copy
 }
 
-clear(){
+clear() {
     cliphist wipe
 }
 
