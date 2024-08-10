@@ -180,6 +180,7 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
         hexpand: true,
         class_name: "cliphistory_entry",
         placeholder_text: "Search",
+        vpack: "center",
 
         on_change: ({ text }) => {
             const searchText = (text ?? "").toLowerCase();
@@ -191,7 +192,8 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
 
     const clearButton = Widget.Button({
         child: MaterialIcon("delete_forever"),
-        class_name: "clear_button",
+        class_name: "filled_tonal_button clear_button",
+        vpack: "center",
         on_clicked: () => {
             Utils.execAsync(`${App.configDir}/scripts/cliphist.sh --clear`)
                 .then(() => {
