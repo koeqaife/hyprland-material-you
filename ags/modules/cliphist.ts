@@ -1,6 +1,7 @@
 const WINDOW_NAME = "cliphist";
 import popupwindow from "./misc/popupwindow.ts";
 import Gtk from "gi://Gtk?version=3.0";
+import { MaterialIcon } from "icons";
 
 type EntryObject = {
     id: string;
@@ -179,6 +180,7 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
         hexpand: true,
         class_name: "cliphistory_entry",
         placeholder_text: "Search",
+        vpack: "center",
 
         on_change: ({ text }) => {
             const searchText = (text ?? "").toLowerCase();
@@ -188,13 +190,31 @@ function ClipHistWidget({ width = 500, height = 500, spacing = 12 }) {
         }
     });
 
+    const clearButton = Widget.Button({
+        child: MaterialIcon("delete_forever"),
+        class_name: "filled_tonal_button clear_button",
+        vpack: "center",
+        on_clicked: () => {
+            Utils.execAsync(`${App.configDir}/scripts/cliphist.sh --clear`)
+                .then(() => {
+                    repopulate().catch(print);
+                })
+                .catch(print);
+        }
+    });
+
+    const searchBox = Widget.Box({
+        orientation: Gtk.Orientation.HORIZONTAL,
+        children: [entry, clearButton]
+    });
+
     return Widget.Box({
-        vertical: true,
+        orientation: Gtk.Orientation.VERTICAL,
         class_name: "cliphistory_box",
         margin_top: 14,
         margin_right: 14,
         children: [
-            entry,
+            searchBox,
             Widget.Separator(),
             Widget.Scrollable({
                 hscroll: "never",
