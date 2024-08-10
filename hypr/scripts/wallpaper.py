@@ -218,7 +218,7 @@ async def png_image(wallpaper: str):
         with_image = f"with image {wallpaper}"
         state(None, "Converting jpg to png...", with_image)
         print(":: Converting jpg to png...")
-        cmd = f"magick {wallpaper} {png}"
+        cmd = f"magick {wallpaper}[0] {png}"
     process = await asyncio.create_subprocess_shell(
         cmd,
         stdout=asyncio.subprocess.PIPE,
@@ -236,7 +236,7 @@ async def square_image(wallpaper):
     with_image = f"with image {wallpaper}"
     state(None, "Creating square version...", with_image)
     print(":: Creating square version")
-    cmd = f"magick {wallpaper} -gravity Center -extent 1:1 {square}"
+    cmd = f"magick {wallpaper}[0] -gravity Center -extent 1:1 {square}"
     process = await asyncio.create_subprocess_shell(
         cmd,
         stdout=asyncio.subprocess.PIPE,
