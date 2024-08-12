@@ -4,15 +4,15 @@ const decoder = new TextDecoder();
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 import Box from "types/widgets/box";
-import { Application } from "types/service/applications";
 import Gtk from "gi://Gtk?version=3.0";
+import { Application } from "types/service/applications";
 import { WINDOW_NAME } from "modules/sideleft/main";
 
 const LAUNCH_COUNT_FILE = Gio.File.new_for_path(
     GLib.build_filenamev([GLib.get_home_dir(), ".cache", "launch_counts.json"])
 );
 
-function readLaunchCounts() {
+function read_launch_counts() {
     try {
         if (!LAUNCH_COUNT_FILE.query_exists(null)) {
             return {};
@@ -24,7 +24,7 @@ function readLaunchCounts() {
     }
 }
 
-function writeLaunchCounts(launchCounts: number) {
+function write_launch_counts(launchCounts: number) {
     const data = JSON.stringify(launchCounts, null, 2);
     LAUNCH_COUNT_FILE.replace_contents(
         encoder.encode(data),
@@ -35,14 +35,14 @@ function writeLaunchCounts(launchCounts: number) {
     );
 }
 
-function incrementLaunchCount(appName: string) {
-    const launchCounts = readLaunchCounts();
+function increment_launch_count(appName: string) {
+    const launchCounts = read_launch_counts();
     launchCounts[appName] = (launchCounts[appName] || 0) + 1;
-    writeLaunchCounts(launchCounts);
+    write_launch_counts(launchCounts);
 }
 
 function sortApplicationsByLaunchCount(applications: Box<any, any>[]) {
-    const launchCounts = readLaunchCounts();
+    const launchCounts = read_launch_counts();
     return applications.sort((a: Box<any, any>, b: Box<any, any>) => {
         const countA = launchCounts[a.attribute.app.name] || 0;
         const countB = launchCounts[b.attribute.app.name] || 0;
@@ -76,7 +76,7 @@ function AppItem(app: Application): Box<any, any> {
     button.connect("clicked", () => {
         clickCount++;
         if (clickCount === 2) {
-            incrementLaunchCount(app.name);
+            increment_launch_count(app.name);
             App.closeWindow(WINDOW_NAME);
             app.launch();
             clickCount = 0;

@@ -31,7 +31,7 @@ const off_icons = {
     headset_mic: "headset_off",
     speaker: "volume_off"
 };
-const button_with_icon = (
+const IconButton = (
     icon: string,
     size: string,
     stream: Stream,
@@ -50,7 +50,7 @@ const button_with_icon = (
         on_clicked: on_clicked
     });
 
-const create_slider = (stream: Stream) =>
+const Slider = (stream: Stream) =>
     Widget.Slider({
         min: 0,
         max: 100,
@@ -71,7 +71,7 @@ const create_slider = (stream: Stream) =>
         }
     });
 
-const speaker = (stream: Stream, icons: [number, string][], off: string) =>
+const Speaker = (stream: Stream, icons: [number, string][], off: string) =>
     Widget.Box({
         class_name: "device",
         vertical: true,
@@ -95,7 +95,7 @@ const speaker = (stream: Stream, icons: [number, string][], off: string) =>
             }),
             Widget.Box({
                 children: [
-                    button_with_icon(
+                    IconButton(
                         off,
                         "20px",
                         stream,
@@ -105,7 +105,7 @@ const speaker = (stream: Stream, icons: [number, string][], off: string) =>
                         icons,
                         off
                     ),
-                    create_slider(stream)
+                    Slider(stream)
                 ]
             })
         ]
@@ -143,14 +143,14 @@ const app = (stream: Stream) => {
                             stream.is_muted = !stream.is_muted;
                         }
                     }),
-                    create_slider(stream)
+                    Slider(stream)
                 ]
             })
         ]
     });
 };
 
-const tab = (icon: string, on_clicked: (any) => void, page?: string) =>
+const Tab = (icon: string, on_clicked: (any) => void, page?: string) =>
     Widget.Overlay({
         child: Widget.Button({
             hexpand: true,
@@ -162,13 +162,13 @@ const tab = (icon: string, on_clicked: (any) => void, page?: string) =>
         overlays: [MaterialIcon(icon, "22px")]
     });
 
-const audio_widget = () => {
+const Audio = () => {
     const cur_page = Variable("speakers");
     const tabs = Widget.Box({
         class_name: "tabs",
         children: [
-            tab("volume_up", () => cur_page.setValue("speakers"), "speakers"),
-            tab("apps", () => cur_page.setValue("apps"), "apps")
+            Tab("volume_up", () => cur_page.setValue("speakers"), "speakers"),
+            Tab("apps", () => cur_page.setValue("apps"), "apps")
         ],
         setup: (self) => {
             self.hook(cur_page, () => {
@@ -178,7 +178,7 @@ const audio_widget = () => {
             });
         }
     });
-    const speakers = Widget.Box({ vertical: true, children: [] as ReturnType<typeof speaker>[] });
+    const speakers = Widget.Box({ vertical: true, children: [] as ReturnType<typeof Speaker>[] });
     const apps = Widget.Box({ vertical: true, children: [] as ReturnType<typeof app>[] });
 
     function update() {
@@ -200,7 +200,7 @@ const audio_widget = () => {
 
         audio.speakers.forEach((s) => {
             if (!speakers.children.some((v) => v.attribute.stream.id == s.id)) {
-                speakers.pack_start(speaker(s, icons.speaker, off_icons.speaker), false, false, 0);
+                speakers.pack_start(Speaker(s, icons.speaker, off_icons.speaker), false, false, 0);
             }
         });
 
@@ -210,7 +210,7 @@ const audio_widget = () => {
                     s.icon_name == "audio-headset-analog-usb"
                         ? { off: off_icons.headset_mic, default: icons.headset_mic }
                         : { off: off_icons.microphone, default: icons.microphone };
-                speakers.pack_start(speaker(s, _icons.default, _icons.off), false, false, 0);
+                speakers.pack_start(Speaker(s, _icons.default, _icons.off), false, false, 0);
             }
         });
 
@@ -257,6 +257,6 @@ export const audio_popup = popupwindow({
     class_name: "audio",
     visible: false,
     keymode: "exclusive",
-    child: audio_widget(),
+    child: Audio(),
     anchor: ["top", "right", "bottom"]
 });

@@ -25,7 +25,7 @@ type AccessPoint = {
 
 Utils.interval(1500, () => {
     if (current_tab.value != "network" || !current_window?.visible) return;
-    WifiScan();
+    wifi_scan();
 });
 
 const network_state = {
@@ -42,13 +42,12 @@ const network_state = {
     failed: "Connection failed"
 };
 
-function WifiScan() {
+function wifi_scan() {
     try {
         network.wifi?.scan();
     } catch (error) {
         print(error);
     }
-    // await Utils.execAsync("nmcli device wifi rescan").catch(print)
 }
 
 const WifiNetwork = (access_point: AccessPoint) => {
@@ -178,7 +177,7 @@ function WifiList() {
     });
 }
 
-const nm_applet_required = () =>
+const NmAppletRequired = () =>
     Widget.Box({
         class_name: "error_container",
         visible: false,
@@ -200,7 +199,7 @@ const nm_applet_required = () =>
 export function Network() {
     const box = Widget.Box({
         vertical: true,
-        children: [nm_applet_required(), WifiToggle(), WifiList()]
+        children: [NmAppletRequired(), WifiToggle(), WifiList()]
     });
     return Widget.Scrollable({
         hscroll: "never",

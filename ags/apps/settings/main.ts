@@ -8,9 +8,9 @@ import { Apps } from "./apps";
 import { MaterialIcon } from "icons";
 import { Weather } from "./weather";
 import { current_tab, current_window, set_current_window } from "./variables";
-const hyprland = await Service.import("hyprland");
 import Gtk from "gi://Gtk?version=3.0";
 
+const hyprland = await Service.import("hyprland");
 globalThis.OpenSettings = OpenSettings;
 
 export async function OpenSettings(cur_tab: string = "network") {
