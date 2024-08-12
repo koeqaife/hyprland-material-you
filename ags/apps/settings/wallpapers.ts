@@ -72,7 +72,7 @@ const Wallpaper = (image: string, name: string) =>
                     vpack: "center",
                     class_name: "image",
                     setup(self) {
-                        const cache_file = `${GLib.get_home_dir()}/.cache/thumbnails/wallpaper/${name}`;
+                        const cache_file = `${GLib.get_home_dir()}/.cache/ags/thumbnails/wallpaper/${name}`;
                         Utils.readFileAsync(cache_file).catch(() => {
                             Utils.execAsync(
                                 `magick ${image} -resize x32 -gravity Center -extent 1:1 ${cache_file}`
@@ -106,13 +106,13 @@ const Wallpaper = (image: string, name: string) =>
     });
 
 function CacheThumbnails() {
-    Utils.execAsync(`mkdir -p ${GLib.get_home_dir()}/.cache/thumbnails/wallpaper`).catch(print);
+    Utils.execAsync(`mkdir -p ${GLib.get_home_dir()}/.cache/ags/thumbnails/wallpaper`).catch(print);
     const original_directory = `${GLib.get_home_dir()}/wallpaper`;
     const extensions = [".jpg", ".jpeg", ".png"];
     const fileList = listFilesByExtensions(original_directory, extensions);
     fileList.forEach((value, index) => {
         const path = `${original_directory}/${value}`;
-        const cache_file = `${GLib.get_home_dir()}/.cache/thumbnails/wallpaper/${value}`;
+        const cache_file = `${GLib.get_home_dir()}/.cache/ags/thumbnails/wallpaper/${value}`;
         Utils.idle(() => {
             Utils.readFileAsync(cache_file).catch(() => {
                 Utils.execAsync(`magick ${path} -resize x32 -gravity Center -extent 1:1 ${cache_file}`).catch(print);
@@ -163,6 +163,54 @@ export function Wallpapers() {
         vertical: true,
         children: [WallpaperList()]
     });
+    const actions = Widget.Box({
+        class_name: "actions",
+        hpack: "end",
+        children: [
+            Widget.Button({
+                class_name: "standard_button",
+                label: "Random",
+                hpack: "end",
+                on_clicked: () => {
+                    if (!changing.value) {
+                        changing.setValue(true);
+                        Utils.execAsync(`python -O ${GLib.get_home_dir()}/dotfiles/hypr/scripts/wallpaper.py -R`)
+                            .catch(print)
+                            .finally(() => {
+                                changing.setValue(false);
+                            });
+                    }
+                },
+                setup: (self) => {
+                    self.hook(changing, () => {
+                        self.toggleClassName("disabled", changing.value);
+                    });
+                }
+            }),
+            Widget.Button({
+                class_name: "filled_button",
+                label: "Select",
+                hpack: "end",
+                on_clicked: () => {
+                    if (!changing.value) {
+                        changing.setValue(true);
+                        Utils.execAsync(
+                            `python -O ${GLib.get_home_dir()}/dotfiles/hypr/scripts/wallpaper.py -I ${focused.value}`
+                        )
+                            .catch(print)
+                            .finally(() => {
+                                changing.setValue(false);
+                            });
+                    }
+                },
+                setup: (self) => {
+                    self.hook(changing, () => {
+                        self.toggleClassName("disabled", changing.value);
+                    });
+                }
+            })
+        ]
+    });
     return Widget.Box({
         vertical: true,
         children: [
@@ -185,58 +233,7 @@ export function Wallpapers() {
                             })
                         ]
                     }),
-                    Widget.Box({
-                        class_name: "actions",
-                        hpack: "end",
-                        children: [
-                            Widget.Button({
-                                class_name: "standard_button",
-                                label: "Random",
-                                hpack: "end",
-                                on_clicked: () => {
-                                    if (!changing.value) {
-                                        changing.setValue(true);
-                                        Utils.execAsync(
-                                            `python -O ${GLib.get_home_dir()}/dotfiles/hypr/scripts/wallpaper.py -R`
-                                        )
-                                            .catch(print)
-                                            .finally(() => {
-                                                changing.setValue(false);
-                                            });
-                                    }
-                                },
-                                setup: (self) => {
-                                    self.hook(changing, () => {
-                                        self.toggleClassName("disabled", changing.value);
-                                    });
-                                }
-                            }),
-                            Widget.Button({
-                                class_name: "filled_button",
-                                label: "Select",
-                                hpack: "end",
-                                on_clicked: () => {
-                                    if (!changing.value) {
-                                        changing.setValue(true);
-                                        Utils.execAsync(
-                                            `python -O ${GLib.get_home_dir()}/dotfiles/hypr/scripts/wallpaper.py -I ${
-                                                focused.value
-                                            }`
-                                        )
-                                            .catch(print)
-                                            .finally(() => {
-                                                changing.setValue(false);
-                                            });
-                                    }
-                                },
-                                setup: (self) => {
-                                    self.hook(changing, () => {
-                                        self.toggleClassName("disabled", changing.value);
-                                    });
-                                }
-                            })
-                        ]
-                    })
+                    actions
                 ]
             })
         ]
