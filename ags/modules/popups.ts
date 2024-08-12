@@ -8,7 +8,7 @@ import Slider from "types/widgets/slider";
 import { Binding } from "types/service";
 import { audio_popup } from "./audio";
 
-const brightnessIcons = [
+const brightness_icons = [
     "brightness_1",
     "brightness_2",
     "brightness_3",
@@ -18,8 +18,8 @@ const brightnessIcons = [
     "brightness_7"
 ];
 
-function getBrightnessIcon(brightness: number): string {
-    const totalIcons = brightnessIcons.length;
+function get_brightness_icon(brightness: number): string {
+    const totalIcons = brightness_icons.length;
     const maxBrightness = 1;
     const ratio = 1.6;
 
@@ -31,11 +31,11 @@ function getBrightnessIcon(brightness: number): string {
 
     for (let i = 0; i < totalIcons; i++) {
         if (brightness < thresholds[i]) {
-            return brightnessIcons[i];
+            return brightness_icons[i];
         }
     }
 
-    return brightnessIcons[totalIcons - 1];
+    return brightness_icons[totalIcons - 1];
 }
 
 type popup_on_change = ((self: Slider<any>) => void) | undefined;
@@ -93,7 +93,7 @@ const default_popup = (
 const backlight_popup = () =>
     default_popup(
         MaterialIcon("brightness_1").hook(backlight_service, (self) => {
-            self.label = getBrightnessIcon(backlight_service.screen_value);
+            self.label = get_brightness_icon(backlight_service.screen_value);
         }),
         backlight_service.bind("screen_value").as((n) => n * 100),
         (self) => {

@@ -25,7 +25,7 @@ const color_schemes = {
     }
 };
 
-export const updateGenerationScheme = async (scheme: string) => {
+export const update_scheme = async (scheme: string) => {
     try {
         const settingsContent = await Utils.readFile(settings_file);
         const settings = JSON.parse(settingsContent);
@@ -82,7 +82,7 @@ function toHex(value: number) {
     return hex.length == 1 ? "0" + hex : hex;
 }
 
-const ReloadTheme = async () => {
+const reload_theme = async () => {
     let { color, scheme } = theme_settings;
     let _color = color.value;
     let color_to_write = _color;
@@ -96,7 +96,7 @@ const ReloadTheme = async () => {
 
     theme_reload_lock = true;
 
-    const updateSettingsFile = async (customColor: string) => {
+    const update_settings_file = async (customColor: string) => {
         try {
             const settingsContent = await Utils.readFile(settings_file);
             const settings = JSON.parse(settingsContent);
@@ -112,7 +112,7 @@ const ReloadTheme = async () => {
             await Utils.execAsync(
                 `python -O ${color_generator} -w --color-scheme "${theme.value}" --scheme "${scheme.value}"`
             );
-            await updateSettingsFile("none");
+            await update_settings_file("none");
         } catch (error) {
             print(error);
         } finally {
@@ -125,7 +125,7 @@ const ReloadTheme = async () => {
             await Utils.execAsync(
                 `python -O ${color_generator} --color "${_color}" --color-scheme "${theme.value}" --scheme "${scheme.value}"`
             );
-            await updateSettingsFile(color_to_write);
+            await update_settings_file(color_to_write);
         } catch (error) {
             print(error);
             await Default();
@@ -217,7 +217,7 @@ const ThemeColor = () =>
                     text: theme_settings.color.value,
                     on_accept: (self) => {
                         theme_settings.color.setValue(self.text!);
-                        ReloadTheme();
+                        reload_theme();
                     },
                     on_change: (self) => {
                         if (self.text!.length > 6) self.css = `border: 2px solid; border-color: ${self.text!}`;
@@ -272,8 +272,8 @@ const ColorScheme = () =>
                         self.connect("changed", () => {
                             selected = self.get_active_text();
                             theme_settings.scheme.setValue(color_schemes[selected!]);
-                            updateGenerationScheme(color_schemes[selected!]);
-                            ReloadTheme();
+                            update_scheme(color_schemes[selected!]);
+                            reload_theme();
                         });
                     }
                 })

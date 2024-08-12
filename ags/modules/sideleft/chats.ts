@@ -1,7 +1,7 @@
 import Gtk from "gi://Gtk?version=3.0";
 import { MaterialIcon } from "icons.ts";
 import Gdk from "gi://Gdk";
-import { enableClickThrough } from "../misc/clickthrough.js";
+import { enable_click_through } from "../misc/clickthrough.js";
 import type * as Types from "services/chatroom.d.ts";
 import { chatrooms } from "services/chatrooms.ts";
 import { MessageContent } from "modules/misc/chat_message.ts";
@@ -122,7 +122,7 @@ const chatPlaceholderRevealer = Widget.Revealer({
     transition: "crossfade",
     transitionDuration: 200,
     child: chatPlaceholder,
-    setup: enableClickThrough
+    setup: enable_click_through
 });
 
 const chatSendButton = Widget.Button({

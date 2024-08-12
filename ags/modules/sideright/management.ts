@@ -8,7 +8,7 @@ import { MaterialIcon } from "icons.ts";
 
 import Gtk from "gi://Gtk?version=3.0";
 
-const currentPage = Variable(0);
+const current_page = Variable(0);
 
 function WifiIndicator() {
     const ssid = Widget.Label({
@@ -207,7 +207,7 @@ function Page1() {
                             label: "Idle inhibitor",
                             icon: "schedule"
                         }),
-                        onClicked: () => {
+                        on_clicked: () => {
                             idle_inhibitor.setValue(!idle_inhibitor.value);
                             if (idle_inhibitor.value)
                                 Utils.execAsync([
@@ -231,7 +231,7 @@ function Page1() {
                             label: "Night Light",
                             icon: "nightlight"
                         }),
-                        onClicked: () => {
+                        on_clicked: () => {
                             night_light.setValue(!night_light.value);
                             Utils.execAsync(`${App.configDir}/scripts/night-light.sh --toggle`)
                                 .then((out) => {
@@ -298,15 +298,15 @@ function Page2() {
     });
 }
 
-const createDotButton = (index: number) =>
+const DotButton = (index: number) =>
     Widget.Button({
         label: "●",
-        onClicked: () => currentPage.setValue(index),
+        on_clicked: () => current_page.setValue(index),
         class_name: "dotbutton",
         hexpand: false,
         setup: (self) => {
-            self.hook(currentPage, () => {
-                self.toggleClassName("active", currentPage.value == index);
+            self.hook(current_page, () => {
+                self.toggleClassName("active", current_page.value == index);
             });
         }
     });
@@ -316,35 +316,35 @@ export function Management() {
         page1: Page1(),
         page2: Page2()
     };
-    const numberOfPages = Object.keys(pages).length;
-    const pageNames = Array.from({ length: numberOfPages }, (_, i) => `page${i + 1}`);
+    const number_of_pages = Object.keys(pages).length;
+    const page_names = Array.from({ length: number_of_pages }, (_, i) => `page${i + 1}`);
 
     const stack = Widget.Stack({
         children: pages,
         // @ts-expect-error
-        shown: currentPage.bind().as((v) => `page${v + 1}`),
+        shown: current_page.bind().as((v) => `page${v + 1}`),
         transition: "slide_left_right",
-        transitionDuration: 200
+        transition_duration: 200
     });
-    const dotButtons = pageNames.map((_, index) => createDotButton(index));
+    const dot_buttons = page_names.map((_, index) => DotButton(index));
     return Widget.EventBox({
-        onScrollUp: () => currentPage.setValue(Math.min(currentPage.value + 1, numberOfPages - 1)),
-        onScrollDown: () => currentPage.setValue(Math.max(currentPage.value - 1, 0)),
+        on_scroll_up: () => current_page.setValue(Math.min(current_page.value + 1, number_of_pages - 1)),
+        on_scroll_down: () => current_page.setValue(Math.max(current_page.value - 1, 0)),
         child: Widget.Box({
             orientation: Gtk.Orientation.VERTICAL,
             children: [
                 stack,
                 Widget.Box({
-                    children: dotButtons,
+                    children: dot_buttons,
                     class_name: "dotbuttons_box",
                     hpack: "center"
                 })
             ],
             setup: (self) => {
-                for (let page in pageNames) {
+                for (let page in page_names) {
                     // @ts-expect-error
                     self.keybind(`${Number(page.replace("page", "")) + 1}`, () => {
-                        currentPage.setValue(Number(page.replace("page", "")));
+                        current_page.setValue(Number(page.replace("page", "")));
                     });
                 }
             }
