@@ -11,7 +11,7 @@ const PAUSE_ICON = "pause";
 const PREV_ICON = "skip_previous";
 const NEXT_ICON = "skip_next";
 
-function lengthStr(length: number): string {
+function length_str(length: number): string {
     const min = Math.floor(length / 60);
     const sec = Math.floor(length % 60);
     const sec0 = sec < 10 ? "0" : "";
@@ -68,7 +68,7 @@ function Player(player: MprisPlayer) {
         hpack: "start",
         setup: (self) => {
             const update = (self: Label<any>) => {
-                self.label = lengthStr(player.position);
+                self.label = length_str(player.position);
                 self.visible = player.length > 0;
             };
 
@@ -81,7 +81,7 @@ function Player(player: MprisPlayer) {
         class_name: "length",
         hpack: "end",
         visible: player.bind("length").transform((l) => l > 0),
-        label: player.bind("length").transform(lengthStr)
+        label: player.bind("length").transform(length_str)
     });
 
     const icon = Widget.Icon({

@@ -4,7 +4,7 @@ import { MaterialIcon } from "icons.ts";
 import { ChatMessage, SystemMessage } from "modules/misc/chat_message.ts";
 import { markdownTest } from "modules/misc/md2pango.ts";
 import Gdk from "gi://Gdk";
-import { enableClickThrough } from "../misc/clickthrough.js";
+import { enable_click_through } from "../misc/clickthrough.js";
 import { TextView } from "modules/misc/textview.js";
 
 function apiSendMessage(textView: any) {
@@ -93,7 +93,7 @@ const chatPlaceholderRevealer = Widget.Revealer({
     transition: "crossfade",
     transitionDuration: 200,
     child: chatPlaceholder,
-    setup: enableClickThrough
+    setup: enable_click_through
 });
 
 const chatSendButton = Widget.Button({

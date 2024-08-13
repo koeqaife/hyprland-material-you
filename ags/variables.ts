@@ -90,7 +90,7 @@ export const current_os = await Utils.execAsync(`${App.configDir}/scripts/system
 export const settings_file = `${GLib.get_home_dir()}/dotfiles/.settings/settings.json`;
 export const wallpaper_cache_file = `${GLib.get_home_dir()}/.cache/current_wallpaper`;
 
-function readSettingsFile() {
+function read_settings() {
     Utils.readFileAsync(settings_file)
         .then((out) => {
             const settings = JSON.parse(out);
@@ -108,9 +108,10 @@ function readSettingsFile() {
             Utils.writeFileSync(current_wallpaper.value, wallpaper_cache_file);
         });
 }
-readSettingsFile();
+read_settings();
 
-Utils.monitorFile(settings_file, readSettingsFile);
+Utils.monitorFile(settings_file, read_settings);
+
 Utils.monitorFile(wallpaper_cache_file, () => {
     Utils.readFileAsync(wallpaper_cache_file)
         .then((out) => {

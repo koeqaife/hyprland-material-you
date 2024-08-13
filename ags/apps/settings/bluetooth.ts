@@ -1,6 +1,4 @@
 import { type BluetoothDevice } from "types/service/bluetooth";
-import Gtk from "gi://Gtk?version=3.0";
-import { timeout } from "resource:///com/github/Aylur/ags/utils.js";
 
 const bluetooth = await Service.import("bluetooth");
 
