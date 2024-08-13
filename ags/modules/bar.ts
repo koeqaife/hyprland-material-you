@@ -3,22 +3,23 @@ const battery = await Service.import("battery");
 const systemtray = await Service.import("systemtray");
 const audio = await Service.import("audio");
 const network = await Service.import("network");
+const bluetooth = await Service.import("bluetooth");
+const mpris = await Service.import("mpris");
 const { GLib, Gio } = imports.gi;
 const decoder = new TextDecoder();
 import { OpenSettings } from "apps/settings/main.ts";
-import { enableClickThrough } from "./misc/clickthrough.js";
+import { enable_click_through } from "./misc/clickthrough.js";
 import { RoundedCorner } from "./misc/cairo_roundedcorner.js";
-import { Client, Workspace } from "types/service/hyprland.js";
+import { Client } from "types/service/hyprland.js";
 import Button from "types/widgets/button.js";
 import Icon from "types/widgets/icon.js";
 import { FileEnumerator, FileInfo } from "types/@girs/gio-2.0/gio-2.0.cjs";
-const mpris = await Service.import("mpris");
-const bluetooth = await Service.import("bluetooth");
-import Gtk from "gi://Gtk?version=3.0";
 import { MaterialIcon } from "icons.js";
 import config from "services/configuration.ts";
 import { toggleAppsWindow, toggleMediaWindow } from "./sideleft/main.js";
 import { Variable as VariableType } from "types/variable";
+
+import Gtk from "gi://Gtk?version=3.0";
 
 const keyboard_layout = Variable("none");
 hyprland.connect("keyboard-layout", (hyprland, keyboardname, layoutname) => {
@@ -99,8 +100,8 @@ function getIconNameFromClass(windowClass: string) {
 const dispatch = (ws: string) => hyprland.messageAsync(`dispatch workspace ${ws}`).catch(print);
 
 function Workspaces() {
-    let workspaceButtons = new Map<Number, any>();
-    const workspaceButtonsArray: VariableType<Button<any, any>[] | any> = Variable([]);
+    let workspace_buttons = new Map<Number, any>();
+    const workspace_buttons_array: VariableType<Button<any, any>[] | any> = Variable([]);
 
     function createWorkspaceButton(id: Number) {
         return Widget.Button({
@@ -113,20 +114,20 @@ function Workspaces() {
 
     function initializeWorkspaceButtons() {
         for (let i = 1; i <= 10; i++) {
-            workspaceButtons.set(i, createWorkspaceButton(i));
+            workspace_buttons.set(i, createWorkspaceButton(i));
         }
-        workspaceButtonsArray.setValue(Array.from(workspaceButtons.values()));
+        workspace_buttons_array.setValue(Array.from(workspace_buttons.values()));
     }
 
     function update() {
-        workspaceButtons.forEach((workspace) => {
+        workspace_buttons.forEach((workspace) => {
             const existingWorkspace = hyprland.workspaces.some((element) => element.id === workspace.attribute.id);
             workspace.toggleClassName("exists", existingWorkspace);
         });
     }
 
     function activeWorkspace() {
-        workspaceButtons.forEach((workspace, key) => {
+        workspace_buttons.forEach((workspace, key) => {
             workspace.toggleClassName("active", workspace.attribute.id == hyprland.active.workspace.id);
         });
     }
@@ -143,11 +144,11 @@ function Workspaces() {
     });
 
     return Widget.EventBox({
-        onScrollUp: () => dispatch("+1"),
-        onScrollDown: () => dispatch("-1"),
+        on_scroll_up: () => dispatch("+1"),
+        on_scroll_down: () => dispatch("-1"),
         hpack: "center",
         child: Widget.Box({
-            children: workspaceButtonsArray.bind(),
+            children: workspace_buttons_array.bind(),
             class_name: "workspaces"
         })
     });
@@ -455,8 +456,8 @@ function TaskBar() {
 
 function volumeIndicator() {
     return Widget.EventBox({
-        onScrollUp: () => (audio.speaker.volume += 0.01),
-        onScrollDown: () => (audio.speaker.volume -= 0.01),
+        on_scroll_up: () => (audio.speaker.volume += 0.01),
+        on_scroll_down: () => (audio.speaker.volume -= 0.01),
         class_name: "volume_box",
         child: Widget.Button({
             on_primary_click_release: () => App.toggleWindow("audio"),
@@ -549,7 +550,7 @@ export const BarCornerTopLeft = (monitor = 0) =>
         exclusivity: "normal",
         visible: true,
         child: RoundedCorner("top_left", { className: "corner" }),
-        setup: enableClickThrough
+        setup: enable_click_through
     });
 
 export const BarCornerTopRight = (monitor = 0) =>
@@ -562,5 +563,5 @@ export const BarCornerTopRight = (monitor = 0) =>
         exclusivity: "normal",
         visible: true,
         child: RoundedCorner("top_right", { className: "corner" }),
-        setup: enableClickThrough
+        setup: enable_click_through
     });

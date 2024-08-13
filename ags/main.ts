@@ -47,30 +47,34 @@ App.config({
     onConfigParsed: function () {}
 });
 
-function ReloadCSS() {
+function reload_css() {
     App.resetCss();
     App.applyCss(`${GLib.get_home_dir()}/.config/gtk-3.0/gtk.css`);
     App.applyCss(`${App.configDir}/style.css`);
     App.applyCss(`${App.configDir}/style-apps.css`);
 }
 
-function ReloadColors() {
+function reload_colors() {
     App.applyCss(`${GLib.get_home_dir()}/.cache/material/colors.css`);
 }
 
-Utils.monitorFile(`${GLib.get_home_dir()}/.cache/material/colors.css`, ReloadCSS);
+Utils.monitorFile(`${GLib.get_home_dir()}/.cache/material/colors.css`, reload_css);
 
 forMonitorsAsync(Bar);
-ReloadCSS();
+reload_css();
 
-function enableAnimations(bool: boolean) {
+function enable_animations(bool: boolean) {
     const settings = Gtk.Settings.get_default()!;
 
     settings.gtk_enable_animations = bool;
 }
 
-globalThis.ReloadCSS = ReloadCSS;
-globalThis.ReloadColors = ReloadColors;
-globalThis.enableAnimations = enableAnimations;
+globalThis.ReloadCSS = reload_css;
+globalThis.ReloadColors = reload_colors;
+globalThis.enableAnimations = enable_animations;
+
+globalThis.reload_css = reload_css;
+globalThis.reload_colors = reload_colors;
+globalThis.enable_animations = enable_animations;
 
 start_battery_warning_service();
