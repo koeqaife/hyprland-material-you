@@ -107,13 +107,6 @@ export const Applauncher = () => {
         vertical: true
     });
 
-    function repopulate() {
-        applications = query("").map(AppItem);
-        applications = sortApplicationsByLaunchCount(applications);
-        list.children = applications;
-    }
-    repopulate();
-
     const entry = Widget.Entry({
         hexpand: true,
         class_name: "applauncher_entry",
@@ -132,6 +125,13 @@ export const Applauncher = () => {
                 item.visible = item.attribute.app.match(text ?? "");
             })
     });
+
+    function repopulate() {
+        applications = query("").map(AppItem);
+        applications = sortApplicationsByLaunchCount(applications);
+        list.children = applications;
+    }
+    repopulate();
 
     return Widget.Box({
         vertical: true,
@@ -153,6 +153,7 @@ export const Applauncher = () => {
                 if (visible) {
                     repopulate();
                     entry.text = "";
+                    entry.grab_focus(); // Automatically focus the search bar
                 }
             })
     });
