@@ -153,7 +153,7 @@ export const Applauncher = () => {
                 if (visible) {
                     repopulate();
                     entry.text = "";
-                    entry.grab_focus(); // Automatically focus the search bar
+                    entry.grab_focus();
                 }
             })
     });
