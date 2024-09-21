@@ -9,16 +9,6 @@ if [ -z "$(ls -A "$OLD_SETTINGS")" ]; then
   rmdir "$OLD_SETTINGS"
 fi
 
-git update-index --skip-worktree $HOME/dotfiles/.settings/*
-git update-index --skip-worktree $HOME/dotfiles/hypr/conf/custom/*
-git update-index --skip-worktree $HOME/dotfiles/hypr/conf/apps.conf
-git update-index --skip-worktree $HOME/dotfiles/alacritty/alacritty.toml
-git update-index --skip-worktree $HOME/dotfiles/wallpapers/*
-git update-index --skip-worktree $HOME/dotfiles/hypr/hypridle.conf
-git update-index --skip-worktree $HOME/dotfiles/electron-flags.conf
-git update-index --skip-worktree $HOME/dotfiles/ags/README.md
-git update-index --skip-worktree $HOME/dotfiles/ags/tsconfig.json
-
 git fetch
 UPSTREAM=${1:-'@{u}'}
 LOCAL=$(git rev-parse @)

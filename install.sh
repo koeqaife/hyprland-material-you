@@ -10,6 +10,24 @@ if [ ! -d "$HOME/dotfiles" ]; then
     exit 1
 fi
 
+execute_command() {
+    while true; do
+        "$@"
+        exit_code=$?
+        if [ $exit_code -eq 0 ]; then
+            break
+        else
+            echo "Command failed with exit code $exit_code."
+            choice=$(gum choose "Continue the script" "Retry the command" "Exit the script")
+            case $choice in
+                "Continue the script") break ;;
+                "Retry the command") continue ;;
+                "Exit the script") exit 1 ;;
+            esac
+        fi
+    done
+}
+
 ask_continue() {
     local message=$1
     local exit_on_no=${2:-true}
@@ -41,8 +59,8 @@ preference_select() {
     CHOICE=$(gum choose "${options[@]}" "NONE")
 
     if [[ $CHOICE != "NONE" ]]; then
-        yay -Syu --noconfirm --needed
-        yay -S --noconfirm --needed $CHOICE
+        execute_command yay -Sy
+        execute_command yay -S --needed $CHOICE
         python -O "$HOME"/dotfiles/ags/scripts/apps.py --"$app_type" $CHOICE
     else
         echo "Not installing a(n) $type..."
@@ -52,23 +70,23 @@ preference_select() {
 
 install_yay() {
     echo ":: Installing yay..."
-    sudo pacman -Syu --noconfirm
-    sudo pacman -S --needed --noconfirm base-devel git
-    git clone https://aur.archlinux.org/yay.git /tmp/yay
+    execute_command sudo pacman -Sy
+    execute_command sudo pacman -S --needed --noconfirm base-devel git
+    execute_command git clone https://aur.archlinux.org/yay.git /tmp/yay
     cd /tmp/yay
-    makepkg -si --noconfirm --needed
+    execute_command makepkg -si --noconfirm --needed
 }
 
 install_microtex() {
     cd ~/dotfiles/setup/MicroTex/
-    makepkg -si
+    execute_command makepkg -si
 }
 
 install_packages() {
     echo ":: Installing packages"
     sleep 1
-    yay -Syu --noconfirm --needed
-    yay -S --needed \
+    yay -Sy
+    execute_command yay -S --needed \
         hyprland hyprshot hyprcursor hypridle hyprlang hyprpaper hyprpicker hyprlock \
         hyprutils hyprwayland-scanner xdg-dbus-proxy xdg-desktop-portal \
         xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-user-dirs \
@@ -99,7 +117,7 @@ setup_yay() {
 }
 
 setup_sensors() {
-    sudo sensors-detect --auto >/dev/null
+    execute_command sudo sensors-detect --auto >/dev/null
 }
 
 check_config_folders() {
@@ -172,7 +190,7 @@ install_icon_theme() {
 
 setup_colors() {
     echo ":: Setting colors"
-    python -O $HOME/dotfiles/material-colors/generate.py --color "#0000FF"
+    execute_command python -O $HOME/dotfiles/material-colors/generate.py --color "#0000FF"
 }
 
 setup_sddm() {
@@ -190,16 +208,16 @@ copy_files() {
     echo ":: Copying files"
     mkdir -p $HOME/.config
     "$HOME"/dotfiles/setup/copy.sh
-}
-
-create_links() {
-    echo ":: Creating links"
-    ln -f $HOME/dotfiles/electron-flags.conf $HOME/.config/electron-flags.conf
     if [ -d "$HOME/wallpaper" ]; then
         echo ":: Error: directory wallpaper already exists in home"
     else
         cp -r $HOME/dotfiles/wallpapers $HOME/wallpaper
     fi
+}
+
+create_links() {
+    echo ":: Creating links"
+    ln -f $HOME/dotfiles/electron-flags.conf $HOME/.config/electron-flags.conf
     ln -s $HOME/dotfiles/ags $HOME/.config/ags
     ln -s $HOME/dotfiles/alacritty $HOME/.config/alacritty
     ln -s $HOME/dotfiles/hypr $HOME/.config/hypr
@@ -247,6 +265,7 @@ misc_tasks() {
     echo ":: Misc"
     hyprctl reload
     ags --init
+    execute_command python $HOME/dotfiles/hypr/scripts/wallpaper.py -R
 }
 
 main() {
@@ -259,7 +278,7 @@ main() {
     setup_yay
     if ! command -v gum &>/dev/null; then
         echo ":: gum not installed"
-        sudo pacman -S gum
+        execute_command sudo pacman -S gum
     fi
 
     ask_continue "Proceed with installing packages?" false && install_packages
@@ -270,10 +289,10 @@ main() {
     ask_continue "Proceed with setting up sensors?" false && setup_sensors
     ask_continue "Proceed with checking config folders?*" && check_config_folders
     ask_continue "Proceed with installing icon themes?" false && install_icon_theme
-    ask_continue "Proceed with setting up colors?*" && setup_colors
     ask_continue "Proceed with setting up SDDM?" false && setup_sddm
     ask_continue "Proceed with copying files?*" && copy_files
     ask_continue "Proceed with creating links?*" && create_links
+    ask_continue "Proceed with setting up colors?*" && setup_colors
     ask_continue "Proceed with installing Vencord?" false && install_vencord
     ask_continue "Proceed with removing GTK buttons?" false && remove_gtk_buttons
     ask_continue "Proceed with setting up services?*" && setup_services
