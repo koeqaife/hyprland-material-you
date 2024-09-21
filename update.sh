@@ -7,8 +7,27 @@ if [ "$1" == "--force" ]; then
 fi
 
 perform_update() {
-    echo ":: Performing git pull..."
-    git pull && "$HOME/dotfiles/setup/after_update.sh"
+    echo ":: Removing skip-worktree flags..."
+    git ls-files -v | grep '^S' | awk '{print $2}' | xargs git update-index --no-skip-worktree
+
+    echo ":: Creating backup of modified files..."
+    BACKUP_DIR="$HOME/dotfiles/.backup"
+    mkdir -p "$BACKUP_DIR"
+
+    git diff --name-only | while read -r file; do
+        if [ -f "$file" ]; then
+            mkdir -p "$BACKUP_DIR/$(dirname "$file")"
+            cp "$file" "$BACKUP_DIR/$file"
+        fi
+    done
+
+    echo ":: Performing full repository update..."
+    git fetch origin
+    git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)
+
+    echo ":: Running post-update script..."
+    "$HOME/dotfiles/setup/after_update.sh"
+
     rm -f $NOTIFICATION_SENT_FILE
 }
 
