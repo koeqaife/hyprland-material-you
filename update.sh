@@ -10,8 +10,17 @@ perform_update() {
     echo ":: Removing skip-worktree flags..."
     git ls-files -v | grep '^S' | awk '{print $2}' | xargs git update-index --no-skip-worktree
 
-    echo ":: Creating backup of modified files..."
     BACKUP_DIR="$HOME/dotfiles/.backup"
+    TIMESTAMP=$(date +%F_%H-%M-%S)
+
+    if [ -d "$BACKUP_DIR" ]; then
+        NEW_BACKUP_DIR="${BACKUP_DIR}_old/${TIMESTAMP}"
+        mkdir -p "$NEW_BACKUP_DIR"
+        echo ":: Moving existing backup to $NEW_BACKUP_DIR..."
+        mv "$BACKUP_DIR" "$NEW_BACKUP_DIR"
+    fi
+
+    echo ":: Creating backup of modified files..."
     mkdir -p "$BACKUP_DIR"
 
     git diff --name-only | while read -r file; do
