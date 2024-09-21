@@ -3,14 +3,14 @@
 BACKUP_DIR="$HOME/dotfiles/.backup"
 
 FILES_TO_RESTORE=(
-    "$HOME/dotfiles/hypr/conf/custom/*"
-    "$HOME/dotfiles/.settings/*"
-    "$HOME/dotfiles/hypr/conf/apps.conf"
-    "$HOME/dotfiles/wallpapers/*"
-    "$HOME/dotfiles/hypr/hypridle.conf"
-    "$HOME/dotfiles/electron-flags.conf"
-    "$HOME/dotfiles/ags/README.md"
-    "$HOME/dotfiles/ags/tsconfig.json"
+    "./hypr/conf/custom/*"
+    "./.settings/*"
+    "./hypr/conf/apps.conf"
+    "./wallpapers/*"
+    "./hypr/hypridle.conf"
+    "./electron-flags.conf"
+    "./ags/README.md"
+    "./ags/tsconfig.json"
 )
 
 ask_continue() {
@@ -36,9 +36,9 @@ install_microtex() {
 
 restore_files() {
     for file_pattern in "${FILES_TO_RESTORE[@]}"; do
-        for file in $BACKUP_DIR/$(basename "$file_pattern"); do
-            original_path="${file/$BACKUP_DIR\//}"
+        for file in $BACKUP_DIR/$file_pattern; do
             if [ -e "$file" ]; then
+                original_path="${file/$BACKUP_DIR\//}"
                 cp "$file" "$original_path"
                 echo "Restored: $original_path"
             fi
