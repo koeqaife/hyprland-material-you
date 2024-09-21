@@ -3,8 +3,9 @@ const network = await Service.import("network");
 const bluetooth = await Service.import("bluetooth");
 import { OpenSettings } from "apps/settings/main.ts";
 import { WINDOW_NAME } from "./main.ts";
-import { idle_inhibitor, night_light, theme } from "variables.ts";
+import { night_light, theme } from "variables.ts";
 import { MaterialIcon } from "icons.ts";
+import Inhibit from "services/idle_inhibitor";
 
 import Gtk from "gi://Gtk?version=3.0";
 
@@ -208,19 +209,11 @@ function Page1() {
                             icon: "schedule"
                         }),
                         on_clicked: () => {
-                            idle_inhibitor.setValue(!idle_inhibitor.value);
-                            if (idle_inhibitor.value)
-                                Utils.execAsync([
-                                    "bash",
-                                    "-c",
-                                    `pidof wayland-idle-inhibitor.py || ${App.configDir}/scripts/wayland-idle-inhibitor.py`
-                                ]).catch(print);
-                            else Utils.execAsync("pkill -f wayland-idle-inhibitor.py").catch(print);
+                            Inhibit.toggle();
                         },
                         setup: (self) => {
-                            idle_inhibitor.setValue(!!Utils.exec("pidof wayland-idle-inhibitor.py"));
-                            self.hook(idle_inhibitor, () => {
-                                self.toggleClassName("active", idle_inhibitor.value);
+                            self.hook(Inhibit, () => {
+                                self.toggleClassName("active", Inhibit.is_inhibit);
                             });
                         }
                     }),
