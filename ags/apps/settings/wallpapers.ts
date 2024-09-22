@@ -166,6 +166,7 @@ export function Wallpapers() {
     const actions = Widget.Box({
         class_name: "actions",
         hpack: "end",
+        spacing: 5,
         children: [
             Widget.Button({
                 class_name: "standard_button",
