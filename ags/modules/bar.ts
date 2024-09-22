@@ -102,14 +102,14 @@ function getIconNameFromClass(windowClass: string) {
 const dispatch = (ws: string) => hyprland.messageAsync(`dispatch workspace ${ws}`).catch(print);
 
 function Workspaces() {
-    let workspace_buttons = new Map<Number, any>();
+    let workspace_buttons = new Map<Number, ReturnType<typeof createWorkspaceButton>>();
     const workspace_buttons_array: VariableType<Button<any, any>[] | any> = Variable([]);
 
     function createWorkspaceButton(id: Number) {
         return Widget.Button({
             on_clicked: () => dispatch(`${id}`),
             child: Widget.Label(`${id}`),
-            attribute: { id: id },
+            attribute: { id: id, map: false },
             class_name: "workspace"
         });
     }
@@ -124,6 +124,17 @@ function Workspaces() {
     function update() {
         workspace_buttons.forEach((workspace) => {
             const existingWorkspace = hyprland.workspaces.some((element) => element.id === workspace.attribute.id);
+            if (config.config.hide_empty_workspaces) {
+                if (!workspace.attribute.map) {
+                    let mapSignalId = workspace.connect("map", () => {
+                        workspace.set_visible(existingWorkspace);
+                        workspace.disconnect(mapSignalId);
+                    });
+                    workspace.attribute.map = true;
+                } else workspace.set_visible(existingWorkspace);
+            } else {
+                workspace.set_visible(true);
+            }
             workspace.toggleClassName("exists", existingWorkspace);
         });
     }
@@ -134,9 +145,6 @@ function Workspaces() {
         });
     }
 
-    initializeWorkspaceButtons();
-    activeWorkspace();
-    update();
     hyprland.connect("notify::workspaces", () => {
         activeWorkspace();
         update();
@@ -144,6 +152,11 @@ function Workspaces() {
     hyprland.connect("notify::active", () => {
         activeWorkspace();
     });
+    config.connect("notify::config", () => update());
+
+    initializeWorkspaceButtons();
+    activeWorkspace();
+    update();
 
     return Widget.EventBox({
         on_scroll_up: () => dispatch("+1"),

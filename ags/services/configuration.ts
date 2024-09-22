@@ -6,15 +6,17 @@ type ConfigType = {
     always_show_battery: boolean;
     show_taskbar: boolean;
     show_battery_percent: boolean;
+    hide_empty_workspaces: boolean;
     weather: string;
     weather_location_id: string;
-    current_theme: string | null
-}
+    current_theme: string | null;
+};
 
 export const default_config: ConfigType = {
     always_show_battery: false,
     show_taskbar: true,
     show_battery_percent: true,
+    hide_empty_workspaces: false,
     weather: "",
     weather_location_id: "",
     current_theme: null
@@ -51,7 +53,7 @@ class ConfigService extends Service {
     }
 
     set_value(key: keyof typeof default_config, value: string) {
-        this.config = {...this.config, [key]: value}
+        this.config = { ...this.config, [key]: value };
     }
 
     constructor() {
@@ -71,10 +73,6 @@ class ConfigService extends Service {
 
             this.emit("config-changed", this.#config);
         });
-    }
-
-    connect(event = "config-changed", callback) {
-        return super.connect(event, callback);
     }
 }
 

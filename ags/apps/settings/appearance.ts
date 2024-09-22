@@ -359,6 +359,11 @@ export function Appearance() {
                 config.config.show_taskbar,
                 "Show taskbar",
                 "Requires ags restart"
+            ),
+            SwitchRow(
+                () => ToggleConfigVar("hide_empty_workspaces"),
+                config.config.hide_empty_workspaces,
+                "Hide empty workspaces"
             )
         ]
     });
