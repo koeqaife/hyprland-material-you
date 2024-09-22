@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 const { GLib } = imports.gi;
 
 type ConfigType = {

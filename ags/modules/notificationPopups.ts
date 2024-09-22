@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import { Gtk as GtkType } from "types/@girs/gtk-3.0/gtk-3.0";
 import { Notification as NotificationType } from "types/service/notifications";
 import Box from "types/widgets/box";

@@ -1,4 +1,5 @@
 #!/bin/bash
+# by koeqaife ;)
 
 get_cpu_usage() {
     top -bn1 | grep "Cpu(s)" |

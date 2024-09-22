@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import { Stream } from "types/service/audio";
 import popupwindow from "./misc/popupwindow.ts";
 import { MaterialIcon } from "icons.ts";

@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import { Variable as VariableType } from "types/variable";
 import { current_wallpaper } from "variables";
 import { current_tab } from "./variables";

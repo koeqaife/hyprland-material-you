@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import { cpu_cores, cpu_name, kernel_name, amount_of_ram, gpu_name, cur_uptime } from "variables.ts";
 import Gtk from "gi://Gtk?version=3.0";
 import { Variable as VariableType } from "types/variable";

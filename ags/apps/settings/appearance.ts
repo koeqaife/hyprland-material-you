@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import { theme, theme_settings, settings_file } from "variables.ts";
 const GLib = imports.gi.GLib;
 import Gtk from "gi://Gtk?version=3.0";

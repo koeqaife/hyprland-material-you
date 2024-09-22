@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import { RegularWindow } from "apps/window";
 import { Network } from "./network";
 import { Bluetooth } from "./bluetooth";

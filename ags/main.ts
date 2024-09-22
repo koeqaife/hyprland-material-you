@@ -1,4 +1,6 @@
 "use strict";
+// by koeqaife ;)
+
 // Import
 import Gdk from "gi://Gdk";
 // widgets

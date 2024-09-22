@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import { timeout } from "resource:///com/github/Aylur/ags/utils.js";
 import { MaterialIcon } from "icons";
 const systemtray = await Service.import("systemtray");

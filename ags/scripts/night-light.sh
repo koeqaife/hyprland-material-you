@@ -1,4 +1,6 @@
 #!/bin/bash
+# by koeqaife ;)
+
 wl_gammarelay() {
     if ! busctl --user list | grep rs.wl.gammarelay; then
         systemctl --user restart wl-gammarelay.service

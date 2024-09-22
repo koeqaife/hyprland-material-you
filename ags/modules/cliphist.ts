@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 const WINDOW_NAME = "cliphist";
 import popupwindow from "./misc/popupwindow.ts";
 import Gtk from "gi://Gtk?version=3.0";

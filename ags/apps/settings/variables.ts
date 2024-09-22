@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 export let current_window;
 export function set_current_window(value: any) {
     current_window = value;
