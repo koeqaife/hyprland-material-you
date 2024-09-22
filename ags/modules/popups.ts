@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 const audio = await Service.import("audio");
 import backlight_service from "services/backlight.ts";
 import { MaterialIcon } from "icons.ts";

@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import { Management } from "./management.ts";
 import { Buttons } from "./buttons.ts";
 import { Navigation } from "./navigation.ts";

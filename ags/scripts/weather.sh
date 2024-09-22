@@ -1,4 +1,5 @@
 #!/bin/bash
+# by koeqaife ;)
 
 KEY=$2
 ID=$3

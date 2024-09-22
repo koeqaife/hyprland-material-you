@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import { MaterialIcon } from "icons.ts";
 import { type WeatherJson } from "variables";
 import { Variable as VariableType } from "types/variable";

@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import { RegularWindow } from "apps/window";
 import { MaterialIcon } from "icons";
 import Gtk from "gi://Gtk?version=3.0";

@@ -1,4 +1,5 @@
 #!/bin/bash
+# by koeqaife ;)
 
 get() {
     cliphist list | iconv -f $(locale charmap) -t UTF-8 -c
