@@ -92,9 +92,9 @@ separator {
  * Modules
  * ----------------------------------------------------- */
 
-.modules-left,
-.modules-center,
-.modules-right {
+.modules_left,
+.modules_center,
+.modules_right {
     padding-top: 6px;
     padding-bottom: 6px;
     margin-left: 12px;
@@ -200,24 +200,24 @@ separator {
  * Notifications
  * ----------------------------------------------------- */
 
-window.notification-popups box.notifications {
+window.notification_popups box.notifications {
     padding: 14px;
 }
 
-.notification-icon {
+.notification_icon {
     min-width: 68px;
     min-height: 68px;
     margin-right: 1em;
 }
 
-.notification-icon image {
+.notification_icon image {
     font-size: 58px;
     /* to center the icon */
     margin: 5px;
     color: @onSurface;
 }
 
-.notification-icon box {
+.notification_icon box {
     min-width: 68px;
     min-height: 68px;
     border-radius: 7px;
@@ -235,38 +235,38 @@ window.notification-popups box.notifications {
     border: 2px solid @error;
 }
 
-.notification-title {
+.notification_title {
     color: @foreground;
     font-size: 1.4em;
 }
 
-.notification-body {
+.notification_body {
     color: @foreground;
 }
 
-.notification-actions .notification-action-button {
+.notification_actions .notification_action_button {
     margin: 0 0.4em;
     margin-top: 0.8em;
 }
 
-.notification-action-button {
+.notification_action_button {
     background-color: @primary;
     color: @onPrimary;
 }
 
-.notification-actions .notification-action-button:first-child {
+.notification_actions .notification_action_button:first-child {
     margin-left: 0;
 }
 
-.notification-actions .notification-action-button:last-child {
+.notification_actions .notification_action_button:last-child {
     margin-right: 0;
 }
 
-.notification-time {
+.notification_time {
     color: @primary;
 }
 
-.notification-close .icon {
+.notification_close .icon {
     font-weight: 300;
 }
 
@@ -483,8 +483,12 @@ window.notification-popups box.notifications {
     border-radius: 14px;
 }
 
-.notifications_sidebar_scrollable .notification-time {
+.notifications_sidebar_scrollable .notification_time {
     color: @primary;
+}
+
+.notifications_sidebar_scrollable viewport > box > :last-child {
+    margin-bottom: 10px;
 }
 
 .notifications_sidebar_scrollable {

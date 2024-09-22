@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 const apps_script = `python -OOO ${App.configDir}/scripts/apps.py`;
 import { MaterialIcon } from "icons";
 

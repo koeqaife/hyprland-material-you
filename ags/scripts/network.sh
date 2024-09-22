@@ -1,4 +1,6 @@
 #!/bin/bash
+# by koeqaife ;)
+
 get_uuid() {
     local SSID="$1"
     local UUID=$(nmcli connection show | grep "$SSID" | grep wifi | awk '{print $2}')

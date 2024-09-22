@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import GLib from "gi://GLib";
 import type * as Types from "./chatroom.d.ts";
 

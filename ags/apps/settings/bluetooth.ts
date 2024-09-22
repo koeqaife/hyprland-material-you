@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import { type BluetoothDevice } from "types/service/bluetooth";
 
 const bluetooth = await Service.import("bluetooth");

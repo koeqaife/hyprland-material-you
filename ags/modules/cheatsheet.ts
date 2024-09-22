@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import Gtk from "gi://Gtk?version=3.0";
 import popupwindow from "modules/misc/popupwindow";
 import { MaterialIcon } from "icons";

@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 const GLib = imports.gi.GLib;
 
 export type WeatherJson = {
@@ -56,9 +58,22 @@ export type WeatherJson = {
     no_data?: boolean;
 };
 
+export type ThemeJson = {
+    name: string;
+    author: string;
+    version: string;
+    config_version: string;
+    load_default_css: boolean;
+    hide: boolean;
+    description: string;
+    path?: string;
+};
+
 export const theme = Variable("dark");
 export const main_color = Variable("#000000");
 export const current_wallpaper = Variable(`${GLib.get_home_dir()}/dotfiles/wallpapers/default.png`);
+
+export const custom_theme = Variable<ThemeJson | null>(null);
 
 export const idle_inhibitor = Variable(false);
 export const cur_uptime = Variable("error");
@@ -79,13 +94,14 @@ export const theme_settings = {
     scheme: Variable("tonalSpot")
 };
 
-export const cpu_name = await Utils.execAsync(`${App.configDir}/scripts/system.sh --cpu-name`);
-export const gpu_name = await Utils.execAsync(`${App.configDir}/scripts/system.sh --gpu-name`);
-export const cpu_cores = await Utils.execAsync(`${App.configDir}/scripts/system.sh --cpu-cores`);
-export const amount_of_ram = await Utils.execAsync(`${App.configDir}/scripts/system.sh --ram`);
-export const kernel_name = await Utils.execAsync(`${App.configDir}/scripts/system.sh --kernel`);
-export const hostname = await Utils.execAsync(`${App.configDir}/scripts/system.sh --hostname`);
-export const current_os = await Utils.execAsync(`${App.configDir}/scripts/system.sh --os`);
+const system_info = JSON.parse(await Utils.execAsync(`${App.configDir}/scripts/system.sh --json`));
+export const cpu_name = system_info["cpu_name"]
+export const gpu_name = system_info["gpu_name"]
+export const cpu_cores = system_info["cpu_cores"];
+export const amount_of_ram = system_info["ram"];
+export const kernel_name = system_info["kernel"];
+export const hostname = system_info["hostname"];
+export const current_os = system_info["os"];
 
 export const settings_file = `${GLib.get_home_dir()}/dotfiles/.settings/settings.json`;
 export const wallpaper_cache_file = `${GLib.get_home_dir()}/.cache/current_wallpaper`;

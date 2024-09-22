@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import conf from "services/configuration.ts";
 
 const WeatherKey = () =>

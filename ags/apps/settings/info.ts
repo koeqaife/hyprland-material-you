@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import { Binding } from "types/service";
 const GLib = imports.gi.GLib;
 import { cpu_cores, cpu_name, kernel_name, amount_of_ram, gpu_name, hostname, current_os, cur_uptime } from "variables";

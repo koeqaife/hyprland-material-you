@@ -1,4 +1,5 @@
 #!/bin/bash
+# by koeqaife ;)
 
 GENERATOR="$HOME/dotfiles/material-colors/generate.py"
 SETTINGS_FILE="$HOME/dotfiles/.settings/settings.json"
