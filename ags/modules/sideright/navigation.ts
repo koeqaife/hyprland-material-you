@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import { NotificationsBox } from "./notifications.ts";
 import { SystemBox } from "./system.ts";
 let shown = Variable("Messages");

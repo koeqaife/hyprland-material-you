@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 const { query } = await Service.import("applications");
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();

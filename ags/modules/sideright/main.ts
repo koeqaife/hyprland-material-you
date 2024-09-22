@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import popupwindow from "../misc/popupwindow.js";
 import { SideBar } from "./sidebar.ts";
 

@@ -1,0 +1,29 @@
+/** 
+ * Name: Old Workspaces
+ * Author: koeqaife
+ * Version: 1.0.0
+ * ConfigVersion: universal
+ * LoadDefaultCss: true
+ * Hide: false
+ * Description: Includes old workspaces style (Enable "Hide empty workspaces")
+ */
+
+.workspaces button {
+    padding: 0px 5px;
+    margin: 4px 3px 4px 3px;
+    border-radius: 16px;
+    border: 0px;
+}
+
+.workspaces button:last-child {
+    margin: 4px 0px 4px 3px;
+}
+
+.workspaces button:first-child {
+    margin: 4px 3px 4px 0px;
+}
+
+.workspaces button.active {
+    background: @secondaryContainer;
+    min-width: 40px;
+}

@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import { MprisPlayer } from "types/service/mpris.ts";
 import Label from "types/widgets/label.ts";
 import { MaterialIcon } from "icons.ts";

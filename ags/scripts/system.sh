@@ -1,4 +1,5 @@
 #!/bin/bash
+# by koeqaife ;)
 
 get_cpu_usage() {
     top -bn1 | grep "Cpu(s)" |
@@ -53,6 +54,27 @@ get_uptime() {
         -e 's/ $//g'
 }
 
+get_usage() {
+    cat <<EOF
+{"cpu": $(get_cpu_usage), "ram": $(get_ram_usage), "swap": $(get_swap_usage), "cpu_temp": $(get_cpu_temp)}
+EOF
+}
+
+get_system_info() {
+    cat <<EOF
+{
+    "cpu_name": "$(get_cpu_name)",
+    "cpu_cores": $(nproc),
+    "ram": "$(get_ram)",
+    "kernel": "$(get_kernel)",
+    "gpu_name": "$(get_gpu)",
+    "hostname": "$(get_hostname)",
+    "os": "$(get_os)",
+    "uptime": "$(get_uptime)"
+}
+EOF
+}
+
 if [[ "$1" == "--cpu-usage" ]]; then
     get_cpu_usage
 elif [[ "$1" == "--ram-usage" ]]; then
@@ -77,4 +99,8 @@ elif [[ "$1" == "--os" ]]; then
     get_os
 elif [[ "$1" == "--uptime" ]]; then
     get_uptime
+elif [[ "$1" == "--usage-json" ]]; then
+    get_usage
+elif [[ "$1" == "--json" ]]; then
+    get_system_info
 fi

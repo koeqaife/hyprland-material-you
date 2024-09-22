@@ -1,3 +1,5 @@
+// by koeqaife ;)
+
 import { theme, theme_settings, settings_file } from "variables.ts";
 const GLib = imports.gi.GLib;
 import Gtk from "gi://Gtk?version=3.0";
@@ -357,6 +359,11 @@ export function Appearance() {
                 config.config.show_taskbar,
                 "Show taskbar",
                 "Requires ags restart"
+            ),
+            SwitchRow(
+                () => ToggleConfigVar("hide_empty_workspaces"),
+                config.config.hide_empty_workspaces,
+                "Hide empty workspaces"
             )
         ]
     });
