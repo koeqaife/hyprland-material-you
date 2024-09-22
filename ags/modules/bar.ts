@@ -499,7 +499,7 @@ function Left() {
     // @ts-expect-error
     return Widget.Box({
         // margin_left: 15,
-        class_name: "modules-left",
+        class_name: "modules_left",
         hpack: "start",
         spacing: 8,
         children: [AppLauncher(), OpenSideLeft(), MediaPlayer(), TaskBar()]
@@ -508,7 +508,7 @@ function Left() {
 
 function Center() {
     return Widget.Box({
-        class_name: "modules-center",
+        class_name: "modules_center",
         hpack: "center",
         spacing: 8,
         children: [Workspaces()]
@@ -518,7 +518,7 @@ function Center() {
 function Right() {
     return Widget.Box({
         // margin_right: 15,
-        class_name: "modules-right",
+        class_name: "modules_right",
         hpack: "end",
         spacing: 8,
         children: [KeyboardLayout(), BatteryLabel(), SysTray(), Applets(), Clock(), OpenSideBar()]

@@ -51,7 +51,7 @@ export const Notification = (notification: NotificationType, dismiss = true) =>
                 child: Widget.Box({
                     children: [
                         Widget.Box({
-                            class_name: "notification-icon",
+                            class_name: "notification_icon",
                             child: NotificationIcon(notification),
                             vpack: "start"
                         }),
@@ -61,7 +61,7 @@ export const Notification = (notification: NotificationType, dismiss = true) =>
                                 Widget.Box({
                                     children: [
                                         Widget.Label({
-                                            class_name: "notification-title",
+                                            class_name: "notification_title",
                                             label: notification.summary,
                                             justification: "left",
                                             max_width_chars: 3,
@@ -72,11 +72,11 @@ export const Notification = (notification: NotificationType, dismiss = true) =>
                                             tooltip_text: notification.summary
                                         }),
                                         Widget.Label({
-                                            class_name: "notification-time",
+                                            class_name: "notification_time",
                                             label: GLib.DateTime.new_from_unix_local(notification.time).format("%H:%M")
                                         }),
                                         Widget.Button({
-                                            class_name: "standard_icon_button notification-close",
+                                            class_name: "standard_icon_button notification_close",
                                             child: MaterialIcon("close"),
                                             on_clicked: () => {
                                                 if (dismiss) {
@@ -90,7 +90,7 @@ export const Notification = (notification: NotificationType, dismiss = true) =>
                                     ]
                                 }),
                                 Widget.Label({
-                                    class_name: "notification-body",
+                                    class_name: "notification_body",
                                     justification: "left",
                                     max_width_chars: 24,
                                     lines: 3,
@@ -102,7 +102,7 @@ export const Notification = (notification: NotificationType, dismiss = true) =>
                                 }),
                                 notification.hints.value
                                     ? Widget.ProgressBar({
-                                          class_name: "notification-progress",
+                                          class_name: "notification_progress",
                                           value: Number(notification.hints.value.unpack()) / 100
                                       })
                                     : Widget.Box()
@@ -113,12 +113,12 @@ export const Notification = (notification: NotificationType, dismiss = true) =>
             }),
             Widget.Box({
                 hpack: "end",
-                class_name: "notification-actions",
+                class_name: "notification_actions",
                 children: notification.actions.map((action) =>
                     Widget.Button({
                         child: Widget.Label(action.label),
                         on_clicked: () => notification.invoke(action.id),
-                        class_name: "notification-action-button"
+                        class_name: "notification_action_button"
                     })
                 )
             })
@@ -278,7 +278,7 @@ export function Notifications(monitor = 0) {
     const window = Widget.Window({
         monitor,
         name: `notifications${monitor}`,
-        class_name: "notification-popups",
+        class_name: "notification_popups",
         anchor: ["top", "right"],
         type: Gtk.WindowType.POPUP,
         child: Widget.Box({
