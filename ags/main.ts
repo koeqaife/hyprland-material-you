@@ -98,9 +98,11 @@ function enable_animations(bool: boolean) {
 globalThis.ReloadCSS = reload_css;
 globalThis.ReloadColors = reload_colors;
 globalThis.enableAnimations = enable_animations;
+globalThis.ReloadCustomCSS = load_custom_css;
 
 globalThis.reload_css = reload_css;
 globalThis.reload_colors = reload_colors;
 globalThis.enable_animations = enable_animations;
+globalThis.reload_custom_css = load_custom_css;
 
 start_battery_warning_service();
