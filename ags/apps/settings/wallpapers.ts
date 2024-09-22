@@ -20,8 +20,7 @@ Utils.monitorFile("/tmp/wallpaper.status", () => {
         })
         .catch(() => {});
 });
-// @ts-ignore
-const focused: VariableType<null | string> = Variable(null);
+const focused: VariableType<null | string> = Variable<string | null>(null);
 
 function splitListInHalf<T>(arr: T[]): [T[], T[]] {
     const midPoint = Math.ceil(arr.length / 2);
