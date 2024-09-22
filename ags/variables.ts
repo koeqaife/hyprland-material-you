@@ -56,9 +56,22 @@ export type WeatherJson = {
     no_data?: boolean;
 };
 
+export type ThemeJson = {
+    name: string;
+    author: string;
+    version: string;
+    config_version: string;
+    load_default_css: boolean;
+    hide: boolean;
+    description: string;
+    path?: string;
+};
+
 export const theme = Variable("dark");
 export const main_color = Variable("#000000");
 export const current_wallpaper = Variable(`${GLib.get_home_dir()}/dotfiles/wallpapers/default.png`);
+
+export const custom_theme = Variable<ThemeJson | null>(null);
 
 export const idle_inhibitor = Variable(false);
 export const cur_uptime = Variable("error");

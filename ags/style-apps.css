@@ -217,7 +217,7 @@
     background-color: @primary;
 }
 
-/* Theme */
+/* Wallpapers */
 .settings .wallpaper .image {
     border-radius: 7px;
     margin-right: 16px;
@@ -226,6 +226,12 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+/* Themes */
+.settings .themes .row .icon {
+    margin-right: 5px;
+    color: @error;
 }
 
 /* -----------------------------------------------------

@@ -1,11 +1,21 @@
 const { GLib } = imports.gi;
 
-export const default_config = {
+type ConfigType = {
+    always_show_battery: boolean;
+    show_taskbar: boolean;
+    show_battery_percent: boolean;
+    weather: string;
+    weather_location_id: string;
+    current_theme: string | null
+}
+
+export const default_config: ConfigType = {
     always_show_battery: false,
     show_taskbar: true,
     show_battery_percent: true,
     weather: "",
-    weather_location_id: ""
+    weather_location_id: "",
+    current_theme: null
 };
 
 Utils.exec(["mkdir", "-p", `${GLib.get_home_dir()}/.config/ags_config/`]);
