@@ -13,53 +13,28 @@ type InfoType = {
 };
 
 async function SystemInfo(): Promise<InfoType> {
-    const cpu_usage = await Utils.execAsync(`${App.configDir}/scripts/system.sh --cpu-usage`)
+    const usage = await Utils.execAsync(`${App.configDir}/scripts/system.sh --usage-json`)
         .then((str) => String(str))
         .catch((err) => {
             print(err);
             return "0";
         });
-    const ram_usage = await Utils.execAsync(`${App.configDir}/scripts/system.sh --ram-usage`)
-        .then((str) => String(str))
-        .catch((err) => {
-            print(err);
-            return "0";
-        });
-    const swap_usage = await Utils.execAsync(`${App.configDir}/scripts/system.sh --swap-usage`)
-        .then((str) => String(str))
-        .catch((err) => {
-            print(err);
-            return "0";
-        });
-    const cpu_temp = await Utils.execAsync(`${App.configDir}/scripts/system.sh --cpu-temp`)
-        .then((str) => String(str))
-        .catch((err) => {
-            print(err);
-            return "0";
-        });
-    return {
-        cpu: cpu_usage,
-        ram: ram_usage,
-        swap: swap_usage,
-        cpu_temp: cpu_temp
-    };
+    return JSON.parse(usage);
 }
 
 function checkBrightness() {
     const get = Utils.execAsync(`${App.configDir}/scripts/brightness.sh --get`)
         .then((out) => Number(out.trim()))
-        .catch(print);
+        .catch((out) => {
+            print(out);
+            return 100;
+        });
     return get;
 }
 
-export const current_brightness = Variable(100, {
-    poll: [
-        500,
-        () => {
-            if (sideright?.visible) return checkBrightness();
-            else return current_brightness?.value || 100;
-        }
-    ]
+export const current_brightness = Variable(100);
+Utils.interval(1000, async () => {
+    if (sideright?.visible) current_brightness.setValue(await checkBrightness());
 });
 
 const usage_default = {

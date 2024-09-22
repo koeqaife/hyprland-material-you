@@ -1,5 +1,6 @@
 import { Variable as VariableType } from "types/variable";
 import { current_wallpaper } from "variables";
+import { current_tab } from "./variables";
 
 const GLib = imports.gi.GLib;
 const Gio = imports.gi.Gio;
@@ -13,13 +14,32 @@ const changing_states = {
     tasks: "Waiting for some tasks to finish...",
     finish: "Finished!"
 };
-Utils.monitorFile("/tmp/wallpaper.status", () => {
-    Utils.readFileAsync("/tmp/wallpaper.status")
-        .then((c) => {
-            changing_state.setValue(c);
-        })
-        .catch(() => {});
+
+var monitor: ReturnType<typeof Utils.monitorFile> | undefined;
+
+const start_monitor = () => {
+    if (!monitor)
+        monitor = Utils.monitorFile("/tmp/wallpaper.status", () => {
+            Utils.readFileAsync("/tmp/wallpaper.status")
+                .then((c) => {
+                    changing_state.setValue(c);
+                })
+                .catch(() => {});
+        });
+};
+
+const stop_monitor = () => {
+    if (monitor) {
+        monitor.cancel();
+        monitor = undefined;
+    }
+};
+
+current_tab.connect("changed", () => {
+    if (current_tab.value == "wallpaper") start_monitor();
+    else stop_monitor();
 });
+
 const focused: VariableType<null | string> = Variable<string | null>(null);
 
 function splitListInHalf<T>(arr: T[]): [T[], T[]] {
