@@ -1,0 +1,13 @@
+/** 
+ * Name: Example
+ * Author: koeqaife
+ * Version: 1.0.0
+ * ConfigVersion: 1
+ * LoadDefaultCss: true
+ * Hide: false
+ * Description: Theme Example File
+ */
+
+/* ConfigVersion is needed so that if after changes, could warn that the theme may not be compatible. */
+/* To check the current ConfigVersion run the command “python ~/dotfiles/ags/scripts/themes.py -c” */
+/* You can specify universal in ConfigVersion, but it is not recommended to do so */

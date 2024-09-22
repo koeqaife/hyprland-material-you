@@ -7,6 +7,7 @@ import { Info } from "./info";
 import { Apps } from "./apps";
 import { MaterialIcon } from "icons";
 import { Weather } from "./weather";
+import { Themes } from "./themes";
 import { current_tab, current_window, set_current_window } from "./variables";
 import Gtk from "gi://Gtk?version=3.0";
 
@@ -42,7 +43,8 @@ function Settings(cur_tab: string) {
             wallpaper: Page(Wallpapers(), "Wallpapers"),
             info: Page(Info(), "Info"),
             apps: Page(Apps(), "Apps"),
-            weather: Page(Weather(), "Weather")
+            weather: Page(Weather(), "Weather"),
+            themes: Page(Themes(), "Themes")
         }
     });
     const Row = (name: string, label: string, icon: string = "image-missing") =>
@@ -66,6 +68,7 @@ function Settings(cur_tab: string) {
             Widget.Separator(),
             Row("appearance", "Appearance", "palette"),
             Row("wallpaper", "Wallpapers", "image"),
+            Row("themes", "Themes", "tune"),
             Widget.Separator(),
             Row("apps", "Apps", "grid_view"),
             Row("weather", "Weather", "cloud"),
