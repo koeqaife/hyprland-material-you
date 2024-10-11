@@ -294,7 +294,13 @@ function AppLauncher() {
         on_clicked: () => {
             toggleAppsWindow();
         },
-        child: MaterialIcon("search")
+        child: MaterialIcon("search"),
+        setup: (self) => {
+            self.hook(config, () => {
+                if (config.config.hide_applauncher_button != !self.is_visible())
+                    self.set_visible(!config.config.hide_applauncher_button);
+            });
+        }
     });
 
     return button;
@@ -376,16 +382,23 @@ function MediaPlayer() {
         child: MaterialIcon("play_circle"),
         visible: false,
         tooltip_text: "Unknown"
-    }).hook(mpris, (self) => {
-        if (mpris.players.length > 0) {
-            self.visible = true;
-            metadata = mpris.players[0]?.metadata;
-            if (metadata) self.tooltip_text = `${metadata["xesam:artist"]} - ${metadata["xesam:title"]}`;
-        } else {
-            self.visible = false;
-            self.tooltip_text = "Unknown";
-        }
-    });
+    })
+        .hook(mpris, (self) => {
+            if (mpris.players.length > 0) {
+                self.visible = !config.config.hide_media_button && true;
+                metadata = mpris.players[0]?.metadata;
+                if (metadata) self.tooltip_text = `${metadata["xesam:artist"]} - ${metadata["xesam:title"]}`;
+            } else {
+                self.visible = false;
+                self.tooltip_text = "Unknown";
+            }
+        })
+        .hook(config, (self) => {
+            if (mpris.players.length > 0) {
+                if (config.config.hide_media_button != !self.is_visible())
+                    self.set_visible(!config.config.hide_media_button);
+            }
+        });
 
     return button;
 }
@@ -511,22 +524,27 @@ const Dot = () =>
     });
 
 function Left() {
+    const workspaces = config.config.workspaces_to_the_left ? Workspaces() : undefined;
+
     // @ts-expect-error
     return Widget.Box({
         // margin_left: 15,
         class_name: "modules_left",
         hpack: "start",
         spacing: 8,
-        children: [AppLauncher(), OpenSideLeft(), MediaPlayer(), TaskBar()]
+        children: [AppLauncher(), OpenSideLeft(), MediaPlayer(), workspaces, TaskBar()]
     });
 }
 
 function Center() {
+    const workspaces = !config.config.workspaces_to_the_left ? Workspaces() : undefined;
+
+    // @ts-expect-error
     return Widget.Box({
         class_name: "modules_center",
         hpack: "center",
         spacing: 8,
-        children: [Workspaces()]
+        children: [workspaces]
     });
 }
 

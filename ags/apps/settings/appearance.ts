@@ -354,6 +354,19 @@ export function Appearance() {
                 config.config.show_battery_percent,
                 "Show battery percent"
             ),
+            Widget.Separator(),
+            SwitchRow(
+                () => ToggleConfigVar("hide_empty_workspaces"),
+                config.config.hide_empty_workspaces,
+                "Hide empty workspaces"
+            ),
+            SwitchRow(
+                () => ToggleConfigVar("workspaces_to_the_left"),
+                config.config.workspaces_to_the_left,
+                "Move workspaces to the left",
+                "Requires ags restart"
+            ),
+            Widget.Separator(),
             SwitchRow(
                 () => ToggleConfigVar("show_taskbar"),
                 config.config.show_taskbar,
@@ -361,9 +374,14 @@ export function Appearance() {
                 "Requires ags restart"
             ),
             SwitchRow(
-                () => ToggleConfigVar("hide_empty_workspaces"),
-                config.config.hide_empty_workspaces,
-                "Hide empty workspaces"
+                () => ToggleConfigVar("hide_applauncher_button"),
+                config.config.hide_applauncher_button,
+                "Hide applauncher button"
+            ),
+            SwitchRow(
+                () => ToggleConfigVar("hide_media_button"),
+                config.config.hide_media_button,
+                "Always hide media button"
             )
         ]
     });
