@@ -15,15 +15,15 @@ export const shown = Variable("weather");
 export function toggleAppsWindow() {
     if (shown.value == "apps" && sideleft.visible) App.closeWindow(WINDOW_NAME);
     else {
-        App.openWindow(WINDOW_NAME);
         shown.setValue("apps");
+        App.openWindow(WINDOW_NAME);
     }
 }
 export function toggleMediaWindow() {
     if (shown.value == "media" && sideleft.visible) App.closeWindow(WINDOW_NAME);
     else {
-        App.openWindow(WINDOW_NAME);
         shown.setValue("media");
+        App.openWindow(WINDOW_NAME);
     }
 }
 
