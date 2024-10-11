@@ -1,58 +1,12 @@
 // by koeqaife ;)
 
-const { query } = await Service.import("applications");
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
-const Gio = imports.gi.Gio;
-const GLib = imports.gi.GLib;
+const applications_service = await Service.import("applications");
 import Box from "types/widgets/box";
 import Gtk from "gi://Gtk?version=3.0";
 import { Application } from "types/service/applications";
-import { WINDOW_NAME } from "modules/sideleft/main";
+import { WINDOW_NAME, shown } from "modules/sideleft/main";
 
-const LAUNCH_COUNT_FILE = Gio.File.new_for_path(
-    GLib.build_filenamev([GLib.get_home_dir(), ".cache", "launch_counts.json"])
-);
-
-function read_launch_counts() {
-    try {
-        if (!LAUNCH_COUNT_FILE.query_exists(null)) {
-            return {};
-        }
-        const [, contents] = LAUNCH_COUNT_FILE.load_contents(null);
-        return JSON.parse(decoder.decode(contents));
-    } catch (error) {
-        return {};
-    }
-}
-
-function write_launch_counts(launchCounts: number) {
-    const data = JSON.stringify(launchCounts, null, 2);
-    LAUNCH_COUNT_FILE.replace_contents(
-        encoder.encode(data),
-        null,
-        false,
-        Gio.FileCreateFlags.REPLACE_DESTINATION,
-        null
-    );
-}
-
-function increment_launch_count(appName: string) {
-    const launchCounts = read_launch_counts();
-    launchCounts[appName] = (launchCounts[appName] || 0) + 1;
-    write_launch_counts(launchCounts);
-}
-
-function sortApplicationsByLaunchCount(applications: Box<any, any>[]) {
-    const launchCounts = read_launch_counts();
-    return applications.sort((a: Box<any, any>, b: Box<any, any>) => {
-        const countA = launchCounts[a.attribute.app.name] || 0;
-        const countB = launchCounts[b.attribute.app.name] || 0;
-        return countB - countA;
-    });
-}
-
-function AppItem(app: Application): Box<any, any> {
+const AppItem = (repopulate: () => void) => (app: Application) => {
     let clickCount = 0;
     const button = Widget.Button({
         class_name: "application_container",
@@ -72,16 +26,15 @@ function AppItem(app: Application): Box<any, any> {
                     truncate: "end"
                 })
             ]
-        })
-    });
-
-    button.connect("clicked", () => {
-        clickCount++;
-        if (clickCount === 2) {
-            increment_launch_count(app.name);
-            App.closeWindow(WINDOW_NAME);
-            app.launch();
-            clickCount = 0;
+        }),
+        on_primary_click_release: (self) => {
+            clickCount++;
+            if (clickCount === 2) {
+                App.closeWindow(WINDOW_NAME);
+                app.launch();
+                repopulate();
+                clickCount = 0;
+            }
         }
     });
 
@@ -100,7 +53,7 @@ function AppItem(app: Application): Box<any, any> {
             })
         ]
     });
-}
+};
 
 export const Applauncher = () => {
     let applications: Box<any, any>[];
@@ -128,35 +81,59 @@ export const Applauncher = () => {
             })
     });
 
+    function reload() {
+        applications_service.reload();
+        repopulate();
+    }
+
     function repopulate() {
-        applications = query("").map(AppItem);
-        applications = sortApplicationsByLaunchCount(applications);
+        applications = applications_service.query("").map(AppItem(repopulate));
         list.children = applications;
     }
-    repopulate();
 
-    return Widget.Box({
-        vertical: true,
-        class_name: "applauncher_box",
-        vexpand: true,
+    const menu = Widget.Menu({
         children: [
-            entry,
-            Widget.Separator(),
-            Widget.Scrollable({
-                hscroll: "never",
-                child: list,
-                vexpand: true
-            })
-        ],
-        setup: (self) =>
-            self.hook(App, (_, windowName, visible) => {
-                if (windowName !== WINDOW_NAME) return;
-
-                if (visible) {
-                    repopulate();
-                    entry.text = "";
-                    entry.grab_focus();
+            Widget.MenuItem({
+                label: "Reload apps",
+                on_activate: (self) => {
+                    reload();
                 }
             })
+        ]
+    });
+
+    repopulate();
+
+    return Widget.EventBox({
+        on_secondary_click_release: (self, event) => {
+            menu.popup_at_pointer(event);
+        },
+        child: Widget.Box({
+            vertical: true,
+            class_name: "applauncher_box",
+            vexpand: true,
+            children: [
+                entry,
+                Widget.Separator(),
+                Widget.Scrollable({
+                    hscroll: "never",
+                    child: list,
+                    vexpand: true
+                })
+            ],
+            setup: (self) => {
+                self.hook(shown, () => {
+                    if (shown.value == "apps") entry.grab_focus();
+                });
+                self.hook(App, (_, windowName, visible) => {
+                    if (windowName !== WINDOW_NAME) return;
+
+                    if (visible) {
+                        entry.text = "";
+                        entry.grab_focus();
+                    }
+                });
+            }
+        })
     });
 };
