@@ -436,13 +436,20 @@ function TaskBar() {
     let globalWidgets: Button<Icon<any>, any>[] = [];
 
     function Clients(clients: Client[]) {
-        const currentClientIds = clients.map((client) => client.pid);
-        globalWidgets = globalWidgets.filter((widget) => currentClientIds.includes(widget.attribute.pid));
+        const currentClientIds = clients.map((client) => client.address);
+        globalWidgets = globalWidgets.filter((widget) => currentClientIds.includes(widget.attribute.client.address));
+
+        globalWidgets.sort((a, b) => {
+            if (a.attribute.pid == b.attribute.pid) {
+                return a.attribute.workspace - b.attribute.workspace;
+            }
+            return a.attribute.pid - b.attribute.pid;
+        });
 
         clients.forEach((client) => {
             if (client.class === "Alacritty") return;
 
-            let widget = globalWidgets.find((w) => w.attribute.pid === client.pid);
+            let widget = globalWidgets.find((w) => w.attribute.client.address === client.address);
             if (widget) {
                 widget.tooltip_markup = client.title;
             } else {
@@ -459,7 +466,11 @@ function TaskBar() {
                 }
 
                 widget = Widget.Button({
-                    attribute: { pid: client.pid },
+                    attribute: {
+                        client: client,
+                        workspace: client.workspace,
+                        pid: client.pid
+                    },
                     child: Widget.Icon({ icon }),
                     tooltip_markup: client.title,
                     on_clicked: () => focus(client)
