@@ -63,14 +63,14 @@ EOF
 get_system_info() {
     cat <<EOF
 {
-    "cpu_name": "$(get_cpu_name)",
+    "cpu_name": "$(get_cpu_name | tr -d '\n')",
     "cpu_cores": $(nproc),
-    "ram": "$(get_ram)",
-    "kernel": "$(get_kernel)",
-    "gpu_name": "$(get_gpu)",
-    "hostname": "$(get_hostname)",
-    "os": "$(get_os)",
-    "uptime": "$(get_uptime)"
+    "ram": "$(get_ram | tr -d '\n')",
+    "kernel": "$(get_kernel | tr -d '\n')",
+    "gpu_name": "$(get_gpu | tr -d '\n')",
+    "hostname": "$(get_hostname | tr -d '\n')",
+    "os": "$(get_os | tr -d '\n')",
+    "uptime": "$(get_uptime | tr -d '\n')"
 }
 EOF
 }
