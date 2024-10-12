@@ -5,8 +5,10 @@ import { MaterialIcon } from "icons";
 const systemtray = await Service.import("systemtray");
 const network = await Service.import("network");
 import { current_tab, saved_networks, current_window } from "./variables";
+import Box from "types/widgets/box";
+import Revealer from "types/widgets/revealer";
 
-const MATERIAL_SYMBOL_SIGNAL_STRENGTH = {
+const WIFI_ICONS = {
     "network-wireless-signal-excellent-symbolic": "signal_wifi_4_bar",
     "network-wireless-signal-good-symbolic": "network_wifi_3_bar",
     "network-wireless-signal-ok-symbolic": "network_wifi_2_bar",
@@ -25,8 +27,9 @@ type AccessPoint = {
     iconName: string | undefined;
 };
 
-Utils.interval(1500, () => {
+Utils.interval(15000, () => {
     if (current_tab.value != "network" || !current_window?.visible) return;
+    if (!network.wifi.enabled) return;
     wifi_scan();
 });
 
@@ -53,55 +56,67 @@ function wifi_scan() {
 }
 
 const WifiNetwork = (access_point: AccessPoint) => {
-    const is_saved = saved_networks.value.includes(access_point.ssid!);
-    const connected = access_point.ssid == network.wifi.ssid;
-    return Widget.Button({
+    const connected = () => access_point.ssid == network.wifi.ssid;
+    const saved = () => saved_networks.value.includes(access_point.ssid!);
+
+    const icon = MaterialIcon(WIFI_ICONS[access_point.iconName!], "20px");
+    const info = Widget.Box({
+        vertical: true,
+        vpack: "center",
+        children: [
+            Widget.Label({
+                class_name: "title",
+                label: access_point.ssid,
+                hpack: "start",
+                vpack: "center"
+            }),
+            Widget.Revealer({
+                child: Widget.Label({
+                    class_name: "description",
+                    label: "",
+                    hpack: "start",
+                    visible: true
+                }),
+                reveal_child: false
+            })
+        ]
+    });
+    const button = Widget.Button({
         class_name: "row",
         on_primary_click_release: () => {
-            if (!connected) Utils.execAsync(`nmcli device wifi connect '${access_point.ssid}'`).catch(print);
-            else if (is_saved)
-                Utils.execAsync(`${App.configDir}/scripts/network.sh --edit ${access_point.ssid}`).catch(print);
+            if (!connected()) Utils.execAsync(`nmcli device wifi connect '${access_point.ssid}'`).catch(print);
         },
         on_secondary_click_release: () => {
-            if (!connected && is_saved)
-                Utils.execAsync(`${App.configDir}/scripts/network.sh --edit ${access_point.ssid}`).catch(print);
+            Utils.execAsync(`${App.configDir}/scripts/network.sh --edit ${access_point.ssid}`).catch(print);
+        },
+        attribute: {
+            ssid: access_point.ssid,
+            update: (access_point: AccessPoint) => {
+                button.attribute.ssid = access_point.ssid;
+                button.toggleClassName("active", connected());
+                icon.set_label(WIFI_ICONS[access_point.iconName!]);
+
+                const description_revealer = info.children[1] as Revealer<any, any>;
+                const description = description_revealer.child;
+                if (connected()) {
+                    description.label = network_state[network.wifi.state];
+                    description_revealer.set_reveal_child(true);
+                } else if (saved()) {
+                    description.label = "Saved";
+                    description_revealer.set_reveal_child(true);
+                } else {
+                    description.label = "";
+                    description_revealer.set_reveal_child(false);
+                }
+            }
         },
         child: Widget.Box({
             class_name: "wifi_network_box",
-            children: [
-                MaterialIcon(MATERIAL_SYMBOL_SIGNAL_STRENGTH[access_point.iconName!], "20px"),
-                // @ts-ignore
-                Widget.Box({
-                    vertical: true,
-                    vpack: "center",
-                    children: [
-                        Widget.Label({
-                            class_name: "title",
-                            label: access_point.ssid,
-                            hpack: "start"
-                        }),
-                        connected
-                            ? Widget.Label({
-                                  class_name: "description",
-                                  label: network_state[network.wifi.state],
-                                  hpack: "start"
-                              })
-                            : is_saved
-                            ? Widget.Label({
-                                  class_name: "description",
-                                  label: "Saved",
-                                  hpack: "start"
-                              })
-                            : undefined
-                    ]
-                })
-            ]
-        }),
-
-        setup: (self) => {
-            self.toggleClassName("active", connected);
-        }
+            children: [icon, info]
+        })
     });
+    button.attribute.update(access_point);
+    return button;
 };
 
 const WifiToggle = () =>
@@ -130,14 +145,15 @@ const WifiToggle = () =>
                     vexpand: false,
                     vpack: "center",
                     hpack: "end",
-                    on_activate(self) {
-                        timeout(5, () => {
-                            if (network.wifi.enabled != self.active) network.wifi.enabled = self.active;
-                        });
+                    on_activate: (self) => {
+                        if (network.wifi.enabled != self.active) network.wifi.enabled = self.active;
                     },
-                    active: Variable(false, {
-                        poll: [500, () => network.wifi.enabled]
-                    }).bind()
+                    active: network.wifi.enabled,
+                    setup: (self) => {
+                        self.hook(network, () => {
+                            if (network.wifi.enabled != self.active) self.set_active(network.wifi.enabled);
+                        });
+                    }
                 })
             ]
         }),
@@ -146,38 +162,45 @@ const WifiToggle = () =>
         }
     });
 
-function WifiList() {
+const WifiList = () => {
+    const updateNetwork = (accessPoints: AccessPoint[], self: Box<Box<any, any>, any>) => {
+        const current_ssid = network.wifi?.ssid;
+
+        accessPoints.forEach((accessPoint) => {
+            const existing_network = self.children.find((child) => child.attribute.ssid === accessPoint.ssid);
+
+            if (existing_network) {
+                existing_network.attribute.update(accessPoint);
+            } else {
+                self.pack_start(WifiNetwork(accessPoint), false, false, 0);
+            }
+        });
+
+        self.children = self.children.filter((child: any) =>
+            accessPoints.find((ap) => ap.ssid === child.attribute.ssid)
+        );
+
+        self.children = self.children.sort((a: any, b: any) => {
+            if (a.attribute.ssid === current_ssid) return -1;
+            if (b.attribute.ssid === current_ssid) return 1;
+            return 0;
+        });
+    };
+
     return Widget.Box({
         vertical: true,
+        className: "wifi_list",
         attribute: {
             updateNetworks: (self) => {
                 const accessPoints = network.wifi?.access_points || [];
-                const current_ssid = network.wifi?.ssid;
-                self.children = Object.values(
-                    accessPoints.reduce((a, accessPoint) => {
-                        if (!a[accessPoint.ssid!]) {
-                            a[accessPoint.ssid!] = accessPoint;
-                            // @ts-ignore
-                            a[accessPoint.ssid!].active |= accessPoint.active!;
-                        }
-
-                        return a;
-                    }, {})
-                )
-                    // @ts-expect-error
-                    .sort((a: AccessPoint, b: AccessPoint) => {
-                        if (a.ssid === current_ssid) return -1;
-                        if (b.ssid === current_ssid) return 1;
-                        return 0;
-                    })
-                    // @ts-expect-error
-                    .map((n: AccessPoint) => WifiNetwork(n));
+                updateNetwork(accessPoints, self);
             }
         },
-        className: "wifi_list",
-        setup: (self) => self.hook(network, self.attribute.updateNetworks)
+        setup: (self) => {
+            self.hook(network.wifi, self.attribute.updateNetworks);
+        }
     });
-}
+};
 
 const NmAppletRequired = () =>
     Widget.Box({
