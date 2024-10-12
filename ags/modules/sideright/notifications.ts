@@ -47,6 +47,7 @@ const NotificationReveal = (notification: NotificationType, visible = false, dis
     let box: Box<any, BoxAttrs>;
 
     const destroyWithAnims = () => {
+        if (box.attribute.destroying) return;
         box.attribute.destroying = true;
         secondRevealer.reveal_child = false;
         Utils.timeout(transition_duration, () => {
