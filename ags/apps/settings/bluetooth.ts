@@ -1,6 +1,7 @@
 // by koeqaife ;)
 
 import { type BluetoothDevice } from "types/service/bluetooth";
+import Revealer from "types/widgets/revealer";
 
 const bluetooth = await Service.import("bluetooth");
 
@@ -90,71 +91,95 @@ const DeviceMenu = (device: BluetoothDevice) => {
     });
 };
 
-const DeviceItem = (device: BluetoothDevice) =>
-    Widget.Button({
+const DeviceItem = (_device: BluetoothDevice) => {
+    let device = _device;
+    const icon = Widget.Icon({
+        icon: `${device.icon_name}-symbolic`,
+        hpack: "center",
+        vpack: "center",
+        size: 20
+    });
+    const info = Widget.Box({
+        vertical: true,
+        vpack: "center",
+        children: [
+            Widget.Label({
+                class_name: "title",
+                label: device.name.trim(),
+                hpack: "start"
+            }),
+            Widget.Revealer({
+                child: Widget.Label({
+                    class_name: "description",
+                    label: "",
+                    hpack: "start"
+                }),
+                reveal_child: false
+            })
+        ]
+    });
+    const button = Widget.Button({
         class_name: "row",
         on_primary_click_release: () => {
-            device.setConnection(!device.connected);
+            if (bluetooth.enabled) device.setConnection(!device.connected);
         },
         on_secondary_click_release: (self, event) => {
             DeviceMenu(device)?.popup_at_pointer(event);
         },
         child: Widget.Box({
             class_name: "device_box",
-            children: [
-                Widget.Icon({
-                    icon: `${device.icon_name}-symbolic`,
-                    hpack: "center",
-                    vpack: "center",
-                    size: 20
-                }),
-                // @ts-ignore
-                Widget.Box({
-                    vertical: true,
-                    vpack: "center",
-                    children: [
-                        Widget.Label({
-                            class_name: "title",
-                            label: device.name.trim(),
-                            hpack: "start"
-                        }),
-                        device.connecting
-                            ? Widget.Label({
-                                  class_name: "description",
-                                  label: device.connected ? "Disconnecting..." : "Connecting...",
-                                  hpack: "start"
-                              })
-                            : device.connected
-                            ? Widget.Label({
-                                  class_name: "description",
-                                  label: "Active",
-                                  hpack: "start"
-                              })
-                            : undefined
-                    ]
-                })
-            ]
+            children: [icon, info]
         }),
+        attribute: {
+            address: device.address,
+            update: (_device: BluetoothDevice) => {
+                device = _device;
+                button.attribute.address = device.address;
+                icon.icon = `${device.icon_name}-symbolic`;
 
-        setup: (self) => {
-            self.toggleClassName("active", device.connected);
+                const description_revealer = info.children[1] as Revealer<any, any>;
+                const description = description_revealer.child;
+                if (device.connected) {
+                    description.label = "Active";
+                    description_revealer.reveal_child = true;
+                } else if (device.connecting) {
+                    description.label = "Connecting...";
+                    description_revealer.reveal_child = true;
+                } else {
+                    description_revealer.reveal_child = false;
+                }
+                button.toggleClassName("active", device.connected);
+            }
         }
     });
+    button.attribute.update(device);
+    return button;
+};
 
 function DeviceList() {
     return Widget.Box({
         vertical: true,
         attribute: {
             updateDeviceList: (self) => {
-                const devices = bluetooth.devices || [];
-                self.children = Object.values(devices)
-                    .sort((a: BluetoothDevice, b: BluetoothDevice) => {
-                        if (a.connected) return -1;
-                        if (b.connected) return 1;
-                        return 0;
-                    })
-                    .filter((n: BluetoothDevice) => n.device.name !== null)
-                    .map((n: BluetoothDevice) => DeviceItem(n));
+                let devices = bluetooth.devices || [];
+
+                devices = devices.filter((device) => device.name !== null);
+
+                devices.forEach((device) => {
+                    const existing_deice = self.children.find(
+                        (child) => child.attribute.address === device.address && device.name !== null
+                    );
+
+                    if (existing_deice) {
+                        existing_deice.attribute.update(device);
+                    } else if (existing_deice?.name !== null) {
+                        self.pack_start(DeviceItem(device), false, false, 0);
+                    }
+                });
+
+                self.children = self.children.filter((child: any) =>
+                    devices.find((ap) => ap.address === child.attribute.address)
+                );
             }
         },
         className: "device_list",

@@ -17,28 +17,25 @@ const hyprland = await Service.import("hyprland");
 globalThis.OpenSettings = OpenSettings;
 
 export async function OpenSettings(cur_tab: string = "network") {
+    current_tab.setValue(cur_tab);
     if (current_window) {
         const _current_workspace = hyprland.active.workspace.id;
         const _client = hyprland.clients.find((client) => {
             return client.class == "com.github.Aylur.ags" && client.title == "Settings";
         });
         if (_client && _current_workspace != _client.workspace.id) {
-            current_tab.setValue(cur_tab);
             current_window.hide();
             current_window.show();
-        } else current_tab.setValue(cur_tab);
+        } else {
+            current_window.show();
+        }
     } else SettingsWindow(cur_tab);
 }
 
 function Settings(cur_tab: string) {
-    current_tab.setValue(cur_tab);
     const stack = Widget.Stack({
-        // @ts-ignore
-        shown: current_tab.bind(),
-        vexpand: true,
-        hexpand: true,
-        transition: "crossfade",
         children: {
+            none: Widget.Box({ visible: true }),
             network: Page(Network(), "Network"),
             bluetooth: Page(Bluetooth(), "Bluetooth"),
             appearance: Page(Appearance(), "Appearance"),
@@ -47,6 +44,18 @@ function Settings(cur_tab: string) {
             apps: Page(Apps(), "Apps"),
             weather: Page(Weather(), "Weather"),
             themes: Page(Themes(), "Themes")
+        },
+        // @ts-ignore
+        shown: cur_tab,
+        vexpand: true,
+        hexpand: true,
+        transition: "crossfade",
+        homogeneous: true,
+        transition_duration: 200,
+        setup: (self) => {
+            self.hook(current_tab, () => {
+                self.set_visible_child_name(current_tab.value);
+            });
         }
     });
     const Row = (name: string, label: string, icon: string = "image-missing") =>
@@ -57,7 +66,13 @@ function Settings(cur_tab: string) {
             child: Widget.Box({
                 children: [MaterialIcon(icon), Widget.Label(label)]
             }),
-            class_name: current_tab.bind().as((c) => (c == name ? "sidebar_row active" : "sidebar_row"))
+            class_name: "sidebar_row",
+            attribute: { name: name },
+            setup: (self) => {
+                self.hook(current_tab, () => {
+                    self.toggleClassName("active", name == current_tab.value);
+                });
+            }
         });
     const sidebar = Widget.Box({
         vertical: true,
@@ -99,7 +114,10 @@ function Settings(cur_tab: string) {
                 ]
             }),
             stack
-        ]
+        ],
+        setup: (self) => {
+            current_tab.setValue(cur_tab);
+        }
     });
 }
 
