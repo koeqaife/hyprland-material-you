@@ -11,119 +11,20 @@ const shutdown_command = `${scripts_dir}/shutdown.sh`;
 const reboot_command = `${scripts_dir}/reboot.sh`;
 const suspend_command = `${scripts_dir}/suspend.sh`;
 
-function LockButton({ icon, ...props }) {
+function Button({ icon, command, tooltip, ...props }) {
     let clickCount = 0;
-    let button = Widget.Button({
-        tooltip_text: "Lock",
+    const button = Widget.Button({
+        tooltip_text: tooltip,
         child: MaterialIcon(icon, "20px"),
         class_name: "outline_button",
+        on_clicked: (self) => {
+            clickCount++;
+            if (clickCount === 2) {
+                Utils.execAsync(command).catch(print);
+                clickCount = 0;
+            }
+        },
         ...props
-    });
-
-    button.connect("clicked", () => {
-        clickCount++;
-        if (clickCount === 2) {
-            Utils.execAsync(lock_command).catch(print);
-            clickCount = 0;
-        }
-    });
-
-    button.connect("focus-out-event", () => {
-        clickCount = 0;
-    });
-
-    return button;
-}
-
-function SuspendButton({ icon, ...props }) {
-    let clickCount = 0;
-    let button = Widget.Button({
-        tooltip_text: "Suspend",
-        child: MaterialIcon(icon, "20px"),
-        class_name: "outline_button",
-        ...props
-    });
-
-    button.connect("clicked", () => {
-        clickCount++;
-        if (clickCount === 2) {
-            Utils.execAsync(`mpc -q pause`).catch();
-            Utils.execAsync(`playerctl pause`).catch();
-            Utils.execAsync(suspend_command).catch();
-            clickCount = 0;
-        }
-    });
-
-    button.connect("focus-out-event", () => {
-        clickCount = 0;
-    });
-
-    return button;
-}
-
-function LogoutButton({ icon, ...props }) {
-    let clickCount = 0;
-    let button = Widget.Button({
-        tooltip_text: "Logout",
-        child: MaterialIcon(icon, "20px"),
-        class_name: "outline_button",
-        ...props
-    });
-
-    button.connect("clicked", () => {
-        clickCount++;
-        if (clickCount === 2) {
-            Utils.execAsync(logout_command).catch();
-            clickCount = 0;
-        }
-    });
-
-    button.connect("focus-out-event", () => {
-        clickCount = 0;
-    });
-
-    return button;
-}
-
-function RebootButton({ icon, ...props }) {
-    let clickCount = 0;
-    let button = Widget.Button({
-        tooltip_text: "Reboot",
-        child: MaterialIcon(icon, "20px"),
-        class_name: "outline_button",
-        ...props
-    });
-
-    button.connect("clicked", () => {
-        clickCount++;
-        if (clickCount === 2) {
-            Utils.execAsync(reboot_command).catch();
-            clickCount = 0;
-        }
-    });
-
-    button.connect("focus-out-event", () => {
-        clickCount = 0;
-    });
-
-    return button;
-}
-
-function ShutdownButton({ icon, ...props }) {
-    let clickCount = 0;
-    let button = Widget.Button({
-        tooltip_text: "Shutdown",
-        child: MaterialIcon(icon, "20px"),
-        class_name: "outline_button",
-        ...props
-    });
-
-    button.connect("clicked", () => {
-        clickCount++;
-        if (clickCount === 2) {
-            Utils.execAsync(shutdown_command).catch();
-            clickCount = 0;
-        }
     });
 
     button.connect("focus-out-event", () => {
@@ -139,24 +40,34 @@ export function Buttons() {
         hexpand: true,
         spacing: 5,
         children: [
-            LockButton({
+            Button({
                 icon: "lock",
+                command: lock_command,
+                tooltip: "Lock",
                 hexpand: true
             }),
-            SuspendButton({
+            Button({
                 icon: "clear_night",
+                command: suspend_command,
+                tooltip: "Suspend",
                 hexpand: true
             }),
-            LogoutButton({
+            Button({
                 icon: "logout",
+                command: logout_command,
+                tooltip: "Logout",
                 hexpand: true
             }),
-            RebootButton({
+            Button({
                 icon: "restart_alt",
+                command: reboot_command,
+                tooltip: "Reboot",
                 hexpand: true
             }),
-            ShutdownButton({
+            Button({
                 icon: "power_settings_new",
+                command: shutdown_command,
+                tooltip: "Shutdown",
                 hexpand: true
             })
         ]
