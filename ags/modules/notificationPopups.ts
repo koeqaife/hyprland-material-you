@@ -232,6 +232,7 @@ export function NotificationPopups(
             current.toggleClassName("first", is_first);
             current.toggleClassName("middle", !is_first && !is_last);
         }
+        list.notify("children");
     }
 
     function onNotified(_: any, id: number) {

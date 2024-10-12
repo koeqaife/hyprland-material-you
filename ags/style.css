@@ -448,6 +448,10 @@ window.notification_popups box.notifications {
     transition: all 0.25s ease-in-out;
 }
 
+.no_notifications {
+    color: @onSurface;
+}
+
 .notifications_sidebar_scrollable {
     padding-top: 6px;
 }
@@ -467,19 +471,19 @@ window.notification_popups box.notifications {
     transition: all 0.2s ease-in-out, border-radius 0.1s ease-in-out;
 }
 
-.notifications_sidebar_scrollable viewport > box > .first .notification {
+.notifications_sidebar_scrollable viewport > box > box > .first .notification {
     border-radius: 14px 14px 6px 6px;
 }
 
-.notifications_sidebar_scrollable viewport > box > .last .notification {
+.notifications_sidebar_scrollable viewport > box > box > .last .notification {
     border-radius: 6px 6px 14px 14px;
 }
 
-.notifications_sidebar_scrollable viewport > box > .margin_bottom .notification {
+.notifications_sidebar_scrollable viewport > box > box > .margin_bottom .notification {
     margin-bottom: 10px;
 }
 
-.notifications_sidebar_scrollable viewport > box > .first.last .notification {
+.notifications_sidebar_scrollable viewport > box > box > .first.last .notification {
     border-radius: 14px;
 }
 
@@ -1764,7 +1768,7 @@ switch:checked:active slider {
     margin-left: 0px;
     min-width: 44px;
     min-height: 44px;
-    border-radius: 100%
+    border-radius: 100%;
 }
 
 /* -----------------------------------------------------
