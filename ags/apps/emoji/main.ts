@@ -2,30 +2,22 @@
 
 import { RegularWindow } from "apps/window";
 import { MaterialIcon } from "icons";
-import Gtk from "gi://Gtk?version=3.0";
 import { Variable as VType } from "types/variable";
-const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
+const hyprland = await Service.import("hyprland");
 
 const jsonData = Utils.readFile(`${App.configDir}/assets/emoji.json`);
-const hyprland = await Service.import("hyprland");
 let current_window;
 const current_page = Variable("recent");
 
-const RECENT_EMOJI_FILE = Gio.File.new_for_path(
-    GLib.build_filenamev([GLib.get_home_dir(), ".cache", "recent_emoji.json"])
-);
+const RECENT_EMOJI_FILE = GLib.build_filenamev([GLib.get_home_dir(), ".cache", "recent_emoji.json"]);
+
 const recent = Variable(readRecentEmoji());
 
 function readRecentEmoji() {
     try {
-        if (!RECENT_EMOJI_FILE.query_exists(null)) {
-            return {};
-        }
-        const [, contents] = RECENT_EMOJI_FILE.load_contents(null);
-        return JSON.parse(decoder.decode(contents));
+        const data = Utils.readFile(RECENT_EMOJI_FILE);
+        return JSON.parse(data);
     } catch (error) {
         return {};
     }
@@ -33,13 +25,7 @@ function readRecentEmoji() {
 
 function writeRecentEmoji(recent: any) {
     const data = JSON.stringify(recent, null, 2);
-    RECENT_EMOJI_FILE.replace_contents(
-        encoder.encode(data),
-        null,
-        false,
-        Gio.FileCreateFlags.REPLACE_DESTINATION,
-        null
-    );
+    Utils.writeFile(data, RECENT_EMOJI_FILE);
 }
 
 function addRecentEmoji(name: string, emoji: string) {
@@ -138,6 +124,7 @@ function RecentPage() {
                         label: emoji,
                         attribute: { emoji: emoji },
                         on_clicked: (self) => {
+                            addRecentEmoji(emojiKey, emoji);
                             Utils.execAsync(`wl-copy ${self.attribute.emoji}`).catch(print);
                             current_window.hide();
                         },
@@ -183,6 +170,7 @@ function SearchPage(search: VType<string>) {
                             label: emoji,
                             attribute: { emoji: emoji },
                             on_clicked: (self) => {
+                                addRecentEmoji(emojiKey, emoji);
                                 Utils.execAsync(`wl-copy ${self.attribute.emoji}`).catch(print);
                                 current_window.hide();
                             },

@@ -6,7 +6,7 @@ import config from "services/configuration";
 import { type ThemeJson } from "variables";
 import { custom_theme } from "variables";
 
-const config_version = "1";
+const config_version = "2";
 const themes_folder = `${App.configDir}/themes`;
 const get_themes_cmd = `python -OOO ${App.configDir}/scripts/themes.py -a ${themes_folder}`;
 let _themes = Utils.exec(get_themes_cmd);

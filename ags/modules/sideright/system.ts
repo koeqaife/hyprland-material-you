@@ -48,13 +48,13 @@ const usage_default = {
 
 const usage = Variable(usage_default);
 Utils.interval(1000, async () => {
-    Utils.idle(() => {
-        if (sideright?.visible) {
+    if (sideright?.visible) {
+        Utils.idle(() => {
             SystemInfo().then((result) => {
                 usage.setValue(result);
             });
-        }
-    });
+        });
+    }
 });
 
 const Usage = (name: string, var_name: keyof InfoType, class_name: string | undefined) => {
