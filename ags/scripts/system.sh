@@ -31,7 +31,7 @@ get_kernel() {
 }
 
 get_gpu() {
-    lshw -C display | grep "product" | awk -F ': ' '{print $2}'
+    lshw -C display | grep "product" | awk -F ': ' '{print $2}' | awk '{printf "%s%s", separator, $0; separator=", "} END{print ""}'
 }
 
 get_hostname() {

@@ -163,6 +163,7 @@ const NotificationReveal = (notification: NotificationType, visible = false, dis
     let box: Box<any, BoxAttrs>;
 
     const destroyWithAnims = () => {
+        if (box.attribute.destroying) return;
         box.attribute.destroying = true;
         secondRevealer.reveal_child = false;
         timeout(transition_duration, () => {
@@ -232,6 +233,7 @@ export function NotificationPopups(
             current.toggleClassName("first", is_first);
             current.toggleClassName("middle", !is_first && !is_last);
         }
+        list.notify("children");
     }
 
     function onNotified(_: any, id: number) {

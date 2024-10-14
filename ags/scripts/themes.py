@@ -9,7 +9,7 @@ from itertools import islice
 
 
 # HERE'S ConfigVersion FOR THEMES
-CONFIG_VERSION = "1"
+CONFIG_VERSION = "2"
 
 parser = argparse.ArgumentParser()
 group = parser.add_mutually_exclusive_group(required=True)

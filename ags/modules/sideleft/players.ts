@@ -103,7 +103,6 @@ function Player(player: MprisPlayer) {
         on_clicked: () => player.playPause(),
         visible: player.bind("can_play"),
         child: MaterialIcon(
-            // @ts-expect-error
             player.bind("play_back_status").transform((s) => {
                 switch (s) {
                     case "Playing":

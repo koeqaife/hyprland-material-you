@@ -47,6 +47,7 @@ const NotificationReveal = (notification: NotificationType, visible = false, dis
     let box: Box<any, BoxAttrs>;
 
     const destroyWithAnims = () => {
+        if (box.attribute.destroying) return;
         box.attribute.destroying = true;
         secondRevealer.reveal_child = false;
         Utils.timeout(transition_duration, () => {
@@ -103,7 +104,26 @@ export function NotificationsBox({ exclude = [], include = [] }: NotificationsBo
         child: Widget.Scrollable({
             class_name: "notifications_sidebar_scrollable",
             hscroll: "never",
-            child: popups,
+            child: Widget.Box({
+                vertical: true,
+                children: [
+                    popups,
+                    Widget.Revealer({
+                        child: Widget.Label({
+                            label: "No notifications",
+                            class_name: "no_notifications"
+                        }),
+                        reveal_child: true,
+                        transition: "slide_down"
+                    })
+                ],
+                setup: (self) => {
+                    popups.connect("notify::children", () => {
+                        type RevealerType = ReturnType<typeof Widget.Revealer>;
+                        (self.children[1] as RevealerType).reveal_child = popups.children.length == 0;
+                    });
+                }
+            }),
             hexpand: true
         })
     });
