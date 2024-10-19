@@ -11,6 +11,7 @@ const ComboBoxText = Widget.subclass<typeof Gtk.ComboBoxText, Gtk.ComboBoxText.C
 
 const color_schemes = {
     "TonalSpot (Recommended)": "tonalSpot",
+    "Custom (custom.py)": "custom",
     Expressive: "expressive",
     FruitSalad: "fruitSalad",
     Monochrome: "monochrome",
