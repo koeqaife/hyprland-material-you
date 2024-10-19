@@ -10,7 +10,8 @@ FILES_TO_RESTORE=(
     "./hypr/hypridle.conf"
     "./electron-flags.conf"
     "./ags/README.md"
-    "./ags/tsconfig.json"
+    "./ags/tsconfig.json",
+    "./material-colors/custom.py"
 )
 
 ask_continue() {
@@ -30,7 +31,7 @@ ask_continue() {
 }
 
 install_microtex() {
-    cd ~/dotfiles/setup/MicroTex/
+    cd $HOME/dotfiles/setup/MicroTex/
     makepkg -si
 }
 
@@ -56,6 +57,7 @@ copy_files() {
     "$HOME/dotfiles/setup/copy.sh"
 }
 
+cd $HOME/dotfiles
 git ls-files -v | grep '^S' | awk '{print $2}' | xargs git update-index --no-skip-worktree
 restore_files
 skip_worktree
