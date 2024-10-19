@@ -20,13 +20,12 @@ update_json_value() {
 
 toggle() {
     local color_scheme=$(get_json_value "color-scheme")
-    local generation_scheme=$(get_json_value "generation-scheme")
 
     if [ "$color_scheme" == "dark" ]; then
-        python -O $GENERATOR -R --color-scheme light --scheme $generation_scheme
+        python -O $GENERATOR -R --color-scheme light
         update_json_value "color-scheme" "light"
     elif [ "$color_scheme" == "light" ]; then
-        python -O $GENERATOR -R --color-scheme dark --scheme $generation_scheme
+        python -O $GENERATOR -R --color-scheme dark
         update_json_value "color-scheme" "dark"
     else
         echo "Unknown color scheme: $color_scheme"
@@ -35,8 +34,7 @@ toggle() {
 
 set() {
     local new_scheme=$1
-    local generation_scheme=$(get_json_value "generation-scheme")
-    python -O $GENERATOR -R --color-scheme $new_scheme --scheme $generation_scheme
+    python -O $GENERATOR -R --color-scheme $new_scheme
     update_json_value "color-scheme" $new_scheme
 }
 
