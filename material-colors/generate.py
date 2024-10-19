@@ -18,6 +18,7 @@ from materialyoucolor.scheme.scheme_vibrant import SchemeVibrant  # type: ignore
 from materialyoucolor.scheme.scheme_neutral import SchemeNeutral  # type: ignore # noqa
 from materialyoucolor.scheme.scheme_fidelity import SchemeFidelity  # type: ignore # noqa
 from materialyoucolor.scheme.scheme_content import SchemeContent  # type: ignore # noqa
+from custom import SchemeCustom  # type: ignore
 import hashlib
 import pickle
 import numpy as np
@@ -33,7 +34,8 @@ schemes = {
     "vibrant": SchemeVibrant,
     "neutral": SchemeNeutral,
     "fidelity": SchemeFidelity,
-    "content": SchemeContent
+    "content": SchemeContent,
+    "custom": SchemeCustom
 }
 
 
@@ -70,11 +72,14 @@ class Color():
 
 class ColorsCache:
     def __init__(
-        self, colors: DynamicScheme | dict, wallpaper: str, original_color: int
+        self, colors: DynamicScheme | dict, wallpaper: str,
+        original_color: int, contrast_level: int, scheme_name: str
     ) -> None:
         self.colors: dict[str, str] = {}
         self.wallpaper = wallpaper
         self.original_color = original_color
+        self.contrast_level = contrast_level
+        self.scheme_name = scheme_name
         if isinstance(colors, DynamicScheme):
             for color in vars(MaterialDynamicColors).keys():
                 color_name = getattr(MaterialDynamicColors, color)
@@ -90,7 +95,9 @@ def colors_dict(cache: ColorsCache):
     dict = {
         "wallpaper": cache.wallpaper,
         "colors": cache.colors,
-        "original_color": cache.original_color
+        "original_color": cache.original_color,
+        "contrast_level": cache.contrast_level,
+        "scheme_name": cache.scheme_name
     }
     return dict
 
@@ -101,7 +108,12 @@ def get_cache_object(object: dict | str):
     colors = object["colors"]
     wallpaper = object["wallpaper"]
     original_color = object["original_color"]
-    return ColorsCache(colors, wallpaper, original_color)
+    contrast_level = object.get("contrast_level", 0)
+    scheme_name = object.get("scheme_name", "tonalSpot")
+    return ColorsCache(
+        colors, wallpaper, original_color,
+        contrast_level, scheme_name
+    )
 
 
 def get_file_list(folder_path):
@@ -323,8 +335,10 @@ def process_image(image_path, quality=2, num_colors=128):
 
 def main(
     color_scheme: str, image_path: str, use_color: int | None = None,
-    scheme: DynamicScheme = schemes["tonalSpot"]
+    scheme_name: str | None = None, contrast_level: int = 0
 ):
+    scheme_name = scheme_name or "tonalSpot"
+    scheme = schemes[scheme_name]
     is_dark = True if color_scheme == "dark" else False
     if use_color is None:
         color = process_image(image_path, 4, 1024)
@@ -335,7 +349,7 @@ def main(
     scheme = scheme(
         Hct.from_int(color),
         is_dark,
-        0.0,
+        contrast_level
     )
     # for color in vars(MaterialDynamicColors).keys():
     #     color_name = getattr(MaterialDynamicColors, color)
@@ -343,7 +357,9 @@ def main(
     #         print(color, rgb_to_hex(color_name.get_hct(scheme).to_rgba()))
 
     with open(join(cache_path, "colors.json"), 'w') as f:
-        object = ColorsCache(scheme, image_path, color)
+        object = ColorsCache(
+            scheme, image_path, color, contrast_level, scheme_name
+        )
         json.dump(colors_dict(object), f, indent=2)
 
     generate_templates(
@@ -383,7 +399,7 @@ def _argparse() -> tuple[bool, bool, str, str, str, str]:
         help="Color scheme variant"
     )
     parser.add_argument(
-        '--scheme', type=str, default="tonalSpot",
+        '--scheme', type=str, default="",
         choices=list(schemes.keys()), help="Scheme for color generation"
     )
 
@@ -404,34 +420,43 @@ def _argparse() -> tuple[bool, bool, str, str, str, str]:
 def _main():
     (
         restore_palette, use_last_used_wallpaper, image,
-        color_scheme, use_color, _scheme
+        color_scheme, use_color, scheme
     ) = _argparse()
-    scheme = schemes[_scheme]
+    if not scheme:
+        scheme = None
     if use_color is not None:
         try:
             with open(join(cache_path, "colors.json")) as f:
                 content = get_cache_object(f.read())
             main(
                 color_scheme, image_path=content.wallpaper,
-                use_color=int(use_color.lstrip('#'), 16), scheme=scheme
+                use_color=int(use_color.lstrip('#'), 16), scheme_name=scheme
             )
         except Exception:
             main(
                 color_scheme, image_path="/dev/null",
-                use_color=int(use_color.lstrip('#'), 16), scheme=scheme
+                use_color=int(use_color.lstrip('#'), 16), scheme_name=scheme
             )
 
     elif restore_palette:
         with open(join(cache_path, "colors.json")) as f:
             content = get_cache_object(f.read())
         main(
-            color_scheme, image_path=content.wallpaper,
-            use_color=content.original_color, scheme=scheme
+            color_scheme,
+            image_path=content.wallpaper,
+            use_color=content.original_color,
+            scheme_name=scheme or content.scheme_name,
+            contrast_level=content.contrast_level
         )
     elif use_last_used_wallpaper:
         with open(join(cache_path, "colors.json")) as f:
-            content = get_cache_object(f.read()).wallpaper
-        main(color_scheme, image_path=content, scheme=scheme)
+            content = get_cache_object(f.read())
+        main(
+            color_scheme,
+            image_path=content.wallpaper,
+            scheme_name=scheme or content.scheme_name,
+            contrast_level=content.contrast_level
+        )
     else:
         if os.path.isdir(image):
             files = [
@@ -440,7 +465,7 @@ def _main():
             ]
             if files:
                 image = join(image, random.choice(files))
-        main(color_scheme, image_path=image, scheme=scheme)
+        main(color_scheme, image_path=image, scheme_name=scheme)
 
 
 if __name__ == "__main__":
