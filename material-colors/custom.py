@@ -5,7 +5,7 @@ from materialyoucolor.utils.math_utils import sanitize_degrees_double  # type: i
 
 """
 This file is just an example, you can change anything you want here.
-Do not rename the class SchemeCustom!!!
+!!! Do not rename the class SchemeCustom !!!
 """
 
 
@@ -18,7 +18,7 @@ class SchemeCustom(DynamicScheme):
                 contrast_level=contrast_level,
                 is_dark=is_dark,
                 primary_palette=TonalPalette.from_hue_and_chroma(
-                    source_color_hct.hue, 45
+                    source_color_hct.hue, 48
                 ),
                 secondary_palette=TonalPalette.from_hue_and_chroma(
                     sanitize_degrees_double(source_color_hct.hue + 10), 15
