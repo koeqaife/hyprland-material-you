@@ -192,7 +192,7 @@ async def main():
              if custom_color != "none"
              else None
          )),
-        scheme=GENERATOR.schemes[generation_scheme]
+        scheme_name=generation_scheme
     )
 
     # -----------------------------------------------------
