@@ -27,7 +27,7 @@ const AppItem = (repopulate: () => void) => (app: Application) => {
                 })
             ]
         }),
-        on_primary_click_release: (self) => {
+        on_clicked: (self) => {
             clickCount++;
             if (clickCount === 2) {
                 App.closeWindow(WINDOW_NAME);
