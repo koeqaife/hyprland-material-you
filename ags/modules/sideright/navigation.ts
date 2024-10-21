@@ -43,7 +43,7 @@ function Button({ page, label, icon }: ButtonType) {
 }
 
 export function Navigation() {
-    const messages_apps = ["discord", "materialgram", "Telegram Desktop"];
+    const messages_apps = ["discord", "materialgram", "telegram", "ayugram", "whatsapp"];
     let stack = Widget.Stack({
         children: {
             Messages: NotificationsBox({ include: messages_apps }),
