@@ -13,6 +13,7 @@ type ConfigType = {
     hide_applauncher_button: boolean;
     hide_media_button: boolean;
     workspaces_to_the_left: boolean;
+    show_beta: boolean;
 };
 
 export const default_config: ConfigType = {
@@ -25,7 +26,8 @@ export const default_config: ConfigType = {
     current_theme: null,
     hide_applauncher_button: false,
     hide_media_button: false,
-    workspaces_to_the_left: false
+    workspaces_to_the_left: false,
+    show_beta: false
 };
 
 Utils.exec(["mkdir", "-p", `${GLib.get_home_dir()}/.config/ags_config/`]);
