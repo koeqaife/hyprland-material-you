@@ -272,7 +272,7 @@ function SysTray() {
                     if (!item.id) return undefined;
                     if (item.id.trim() != "nm-applet" && item.id.trim() != "blueman") {
                         return Widget.Button({
-                            child: Widget.Icon({ icon: item.bind("icon") }),
+                            child: Widget.Icon({ icon: item.bind("icon"), size: 16 }),
                             on_primary_click_release: (_, event) => item.activate(event),
                             on_secondary_click_release: (_, event) => item.openMenu(event),
                             tooltip_markup: item.bind("tooltip_markup")
@@ -361,7 +361,9 @@ function Bluetooth() {
         },
         child: MaterialIcon("bluetooth_disabled", "16px")
     }).hook(bluetooth, (self) => {
-        if (bluetooth.enabled) {
+        if (bluetooth.connected_devices.length > 0) {
+            self.child.label = "bluetooth_connected";
+        } else if (bluetooth.enabled) {
             self.child.label = "bluetooth";
         } else {
             self.child.label = "bluetooth_disabled";
@@ -471,7 +473,7 @@ function TaskBar() {
                         workspace: client.workspace,
                         pid: client.pid
                     },
-                    child: Widget.Icon({ icon }),
+                    child: Widget.Icon({ icon, size: 16 }),
                     tooltip_markup: client.title,
                     on_clicked: () => focus(client)
                 });
@@ -493,7 +495,7 @@ function TaskBar() {
     });
 }
 
-function volumeIndicator() {
+function VolumeIndicator() {
     return Widget.EventBox({
         on_scroll_up: () => (audio.speaker.volume += 0.01),
         on_scroll_down: () => (audio.speaker.volume -= 0.01),
@@ -519,11 +521,24 @@ function volumeIndicator() {
     });
 }
 
+const OpenClipHist = () =>
+    Widget.Button({
+        class_name: "bar_cliphist",
+        on_clicked: (self) => App.toggleWindow("cliphist"),
+        child: MaterialIcon("content_paste", "16px"),
+        visible: !config.config.hide_cliphist_button,
+        setup: (self) => {
+            self.hook(config, () => {
+                self.set_visible(!config.config.hide_cliphist_button);
+            });
+        }
+    });
+
 const Applets = () =>
     Widget.Box({
         class_name: "bar_applets",
         spacing: 5,
-        children: [volumeIndicator(), Bluetooth(), Wifi()]
+        children: [VolumeIndicator(), Bluetooth(), Wifi(), OpenClipHist()]
     });
 
 const Dot = () =>
