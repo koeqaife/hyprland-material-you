@@ -361,7 +361,9 @@ function Bluetooth() {
         },
         child: MaterialIcon("bluetooth_disabled", "16px")
     }).hook(bluetooth, (self) => {
-        if (bluetooth.enabled) {
+        if (bluetooth.connected_devices.length > 0) {
+            self.child.label = "bluetooth_connected";
+        } else if (bluetooth.enabled) {
             self.child.label = "bluetooth";
         } else {
             self.child.label = "bluetooth_disabled";
