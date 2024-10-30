@@ -1,11 +1,14 @@
+@use "sass:color";
+
 @import url(https://capnkitten.github.io/BetterDiscord/Themes/Material-Discord/css/source.css);
 @import "<output-folder>/colors.scss";
 
+
 $color-scheme: <color-scheme>;
 
-$hue: round(hue($primary));
-$saturation: round(saturation($primary));
-$lightness: round(lightness($primary));
+$hue: round(color.channel($primary, "hue", $space: hsl));
+$saturation: round(color.channel($primary, "saturation", $space: hsl));
+$lightness: round(color.channel($primary, "lightness", $space: hsl));
 
 * {
     transition: color 0.2s ease-in-out;
