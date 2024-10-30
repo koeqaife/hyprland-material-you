@@ -383,6 +383,11 @@ export function Appearance() {
                 () => ToggleConfigVar("hide_media_button"),
                 config.config.hide_media_button,
                 "Always hide media button"
+            ),
+            SwitchRow(
+                () => ToggleConfigVar("hide_cliphist_button"),
+                config.config.hide_cliphist_button,
+                "Hide clipboard history button on bar"
             )
         ]
     });
