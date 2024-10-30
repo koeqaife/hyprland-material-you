@@ -272,7 +272,7 @@ function SysTray() {
                     if (!item.id) return undefined;
                     if (item.id.trim() != "nm-applet" && item.id.trim() != "blueman") {
                         return Widget.Button({
-                            child: Widget.Icon({ icon: item.bind("icon") }),
+                            child: Widget.Icon({ icon: item.bind("icon"), size: 16 }),
                             on_primary_click_release: (_, event) => item.activate(event),
                             on_secondary_click_release: (_, event) => item.openMenu(event),
                             tooltip_markup: item.bind("tooltip_markup")
@@ -473,7 +473,7 @@ function TaskBar() {
                         workspace: client.workspace,
                         pid: client.pid
                     },
-                    child: Widget.Icon({ icon }),
+                    child: Widget.Icon({ icon, size: 16 }),
                     tooltip_markup: client.title,
                     on_clicked: () => focus(client)
                 });
