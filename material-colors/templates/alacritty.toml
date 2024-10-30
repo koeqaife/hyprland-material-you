@@ -1,3 +1,4 @@
+[general]
 import = [
     "<output-folder>/alacritty-<color-scheme>.toml"
 ]
