@@ -495,7 +495,7 @@ function TaskBar() {
     });
 }
 
-function volumeIndicator() {
+function VolumeIndicator() {
     return Widget.EventBox({
         on_scroll_up: () => (audio.speaker.volume += 0.01),
         on_scroll_down: () => (audio.speaker.volume -= 0.01),
@@ -521,11 +521,24 @@ function volumeIndicator() {
     });
 }
 
+const OpenClipHist = () =>
+    Widget.Button({
+        class_name: "bar_cliphist",
+        on_clicked: (self) => App.toggleWindow("cliphist"),
+        child: MaterialIcon("content_paste", "16px"),
+        visible: !config.config.hide_cliphist_button,
+        setup: (self) => {
+            self.hook(config, () => {
+                self.set_visible(!config.config.hide_cliphist_button);
+            });
+        }
+    });
+
 const Applets = () =>
     Widget.Box({
         class_name: "bar_applets",
         spacing: 5,
-        children: [volumeIndicator(), Bluetooth(), Wifi()]
+        children: [VolumeIndicator(), Bluetooth(), Wifi(), OpenClipHist()]
     });
 
 const Dot = () =>
