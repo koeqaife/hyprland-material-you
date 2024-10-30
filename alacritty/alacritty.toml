@@ -1,3 +1,4 @@
+[general]
 import = [
     "~/.cache/material/alacritty.toml"
 ]
