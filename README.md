@@ -26,7 +26,7 @@ Here are some key features:
 sudo pacman -Syu
 sudo pacman -S git
 cd ~
-git clone https://github.com/koeqaife/hyprland-material-you.git
+git clone --depth=1 https://github.com/koeqaife/hyprland-material-you.git
 mv hyprland-material-you dotfiles
 cd dotfiles
 ./install.sh
