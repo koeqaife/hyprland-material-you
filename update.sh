@@ -30,9 +30,16 @@ perform_update() {
         fi
     done
 
-    echo ":: Performing full repository update..."
+    echo ":: Performing repository update..."
     git fetch origin
-    git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)
+
+    CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+    if ! git diff --exit-code HEAD origin/$CURRENT_BRANCH >/dev/null; then
+        echo ":: History rewrite detected, performing hard reset..."
+    fi
+
+    git reset --hard origin/$CURRENT_BRANCH
 
     echo ":: Running post-update script..."
     "$HOME/dotfiles/setup/after_update.sh"
