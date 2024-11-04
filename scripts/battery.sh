@@ -16,55 +16,70 @@ fi
 
 source "$BAT_PATH/uevent"
 
-info() {
-    cat "$BAT_PATH/uevent"
+declare -A battery_icons_charging=(
+    [100]="battery_charging_full"
+    [90]="battery_charging_90"
+    [80]="battery_charging_80"
+    [70]="battery_charging_80"
+    [60]="battery_charging_60"
+    [50]="battery_charging_50"
+    [40]="battery_charging_30"
+    [30]="battery_charging_30"
+    [20]="battery_charging_20"
+    [10]="battery_charging_20"
+    [0]="battery_charging_20"
+)
+
+declare -A battery_icons=(
+    [100]="battery_full"
+    [90]="battery_6_bar"
+    [80]="battery_5_bar"
+    [70]="battery_5_bar"
+    [60]="battery_4_bar"
+    [50]="battery_3_bar"
+    [40]="battery_2_bar"
+    [30]="battery_2_bar"
+    [20]="battery_1_bar"
+    [10]="battery_1_bar"
+    [0]="battery_alert"
+)
+
+get_closest_battery_icon() {
+    local level="$1"
+    local charging="$2"
+    local -n icons_array
+
+    if [ "$charging" = "true" ]; then
+        icons_array=battery_icons_charging
+    else
+        icons_array=battery_icons
+    fi
+
+    local levels=($(for key in "${!icons_array[@]}"; do echo "$key"; done | sort -nr))
+
+    for threshold in "${levels[@]}"; do
+        if [ "$level" -ge "$threshold" ]; then
+            echo "${icons_array[$threshold]}"
+            return
+        fi
+    done
+
+    echo "${icons_array[${levels[-1]}]}"
 }
 
 icon() {
-    local battery_charging="󰂄 "
-    local battery_alert="󰂃 "
-    local battery_100="󰁹 "
-    local battery_90="󰂂 "
-    local battery_80="󰂁 "
-    local battery_70="󰂀 "
-    local battery_60="󰁿 "
-    local battery_50="󰁾 "
-    local battery_40="󰁽 "
-    local battery_30="󰁼 "
-    local battery_20="󰁻 "
-    local battery_10="󰁺 "
-    local battery_0="󰂎 "
+    local capacity="$POWER_SUPPLY_CAPACITY"
+    local charging="false"
 
-    if [ "$POWER_SUPPLY_CAPACITY" -le 9 ]; then
-        icon="battery_0"
-    elif [ "$POWER_SUPPLY_CAPACITY" -le 19 ]; then
-        icon="battery_10"
-    elif [ "$POWER_SUPPLY_CAPACITY" -le 29 ]; then
-        icon="battery_20"
-    elif [ "$POWER_SUPPLY_CAPACITY" -le 39 ]; then
-        icon="battery_30"
-    elif [ "$POWER_SUPPLY_CAPACITY" -le 49 ]; then
-        icon="battery_40"
-    elif [ "$POWER_SUPPLY_CAPACITY" -le 59 ]; then
-        icon="battery_50"
-    elif [ "$POWER_SUPPLY_CAPACITY" -le 69 ]; then
-        icon="battery_60"
-    elif [ "$POWER_SUPPLY_CAPACITY" -le 79 ]; then
-        icon="battery_70"
-    elif [ "$POWER_SUPPLY_CAPACITY" -le 89 ]; then
-        icon="battery_80"
-    elif [ "$POWER_SUPPLY_CAPACITY" -le 99 ]; then
-        icon="battery_90"
-    else
-        icon="battery_100"
+    if [ "$POWER_SUPPLY_STATUS" = "Charging" ]; then
+        charging="true"
     fi
 
-    case $POWER_SUPPLY_STATUS in
-        Charging) icon="battery_charging";;
-        Full) icon="battery_100";;
-    esac
+    get_closest_battery_icon "$capacity" "$charging"
+}
 
-    echo "${!icon} "
+info() {
+    cat "$BAT_PATH/uevent"
 }
 
 status() {
@@ -72,8 +87,11 @@ status() {
 }
 
 case $1 in
-    info) info;;
-    icon) icon;;
-    status) status;;
-    *) echo "Usage: $0 {info|icon|status}"; exit 1;;
+info) info ;;
+icon) icon ;;
+status) status ;;
+*)
+    echo "Usage: $0 {info|icon|status}"
+    exit 1
+    ;;
 esac
