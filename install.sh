@@ -82,6 +82,11 @@ install_microtex() {
     execute_command makepkg -si
 }
 
+install_agsv1() {
+    cd ~/dotfiles/setup/agsv1/
+    execute_command makepkg -si
+}
+
 install_packages() {
     echo ":: Installing packages"
     sleep 1
@@ -90,7 +95,7 @@ install_packages() {
         hyprland hyprshot hyprcursor hypridle hyprlang hyprpaper hyprpicker hyprlock \
         hyprutils hyprwayland-scanner xdg-dbus-proxy xdg-desktop-portal \
         xdg-desktop-portal-gtk xdg-desktop-portal-hyprland xdg-user-dirs \
-        xdg-utils libxdg-basedir python-pyxdg aylurs-gtk-shell swww gtk3 gtk4 \
+        xdg-utils libxdg-basedir python-pyxdg swww gtk3 gtk4 \
         adw-gtk3 adw-gtk-theme libdbusmenu-gtk3 python-pip python-pillow sddm \
         sddm-theme-corners-git nm-connection-editor network-manager-applet \
         networkmanager gnome-bluetooth-3.0 wl-gammarelay-rs bluez bluez-libs bluez-utils \
@@ -103,6 +108,7 @@ install_packages() {
         fontconfig dart-sass ttf-meslo-nerd-font-powerlevel10k cpio meson cmake \
         python-materialyoucolor-git gtksourceview3 gtksourceviewmm cairomm \
         gtkmm3 tinyxml2 python-requests python-numpy
+    install_agsv1
 }
 
 setup_yay() {
@@ -264,7 +270,7 @@ update_user_dirs() {
 misc_tasks() {
     echo ":: Misc"
     hyprctl reload
-    ags --init
+    agsv1 --init
     execute_command python $HOME/dotfiles/hypr/scripts/wallpaper.py -R
 }
 
