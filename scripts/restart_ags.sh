@@ -1,4 +1,4 @@
 #!/bin/bash
-killall ags
+killall agsv1
 sleep 1
-hyprctl dispatch exec ags
+hyprctl dispatch exec agsv1
