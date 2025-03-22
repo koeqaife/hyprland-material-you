@@ -21,6 +21,7 @@ async function notifyUser(index) {
 async function battery_notification() {
     const percent = battery.percent;
     const charging = battery.charging;
+    if (percent == 0) return;
     if (charging) {
         last_warning = 101;
         return;
@@ -40,6 +41,7 @@ async function battery_notification() {
 
 export async function start_battery_warning_service() {
     Utils.timeout(1, () => {
+        if (!battery.available) return;
         battery_notification().catch(print);
         battery.connect("changed", () => battery_notification().catch(print));
     });
