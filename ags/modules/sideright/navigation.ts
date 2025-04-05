@@ -85,8 +85,13 @@ export function Navigation() {
         ],
         setup: (self) => {
             self.hook(shown, () => {
-                for (const button of self.children) {
-                    button.toggleClassName("active", button.attribute.page == shown.value);
+                try {
+                    for (const button of self.children) {
+                        if (!button.attribute || !button.attribute.page) continue;
+                        button.toggleClassName("active", button.attribute.page == shown.value);
+                    }
+                } catch (e) {
+                    print("Error while reloading buttons:", e);
                 }
             });
         }

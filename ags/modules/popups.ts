@@ -116,16 +116,22 @@ const backlight_popup = () =>
 const volume_popup = () =>
     default_popup(
         MaterialIcon("volume_off", "20px").hook(audio.speaker, (self) => {
-            const vol = audio.speaker.volume * 100;
-            const icon = [
-                [101, "sound_detection_loud_sound"],
-                [67, "volume_up"],
-                [34, "volume_down"],
-                [1, "volume_mute"],
-                [0, "volume_off"]
-            ].find(([threshold]) => Number(threshold) <= vol)?.[1];
-            if (audio.speaker.is_muted) self.label = "volume_off";
-            else self.label = String(icon!);
+            try {
+                const vol = audio.speaker.volume * 100;
+                const icon = [
+                    [101, "sound_detection_loud_sound"],
+                    [67, "volume_up"],
+                    [34, "volume_down"],
+                    [1, "volume_mute"],
+                    [0, "volume_off"]
+                ].find(([threshold]) => Number(threshold) <= vol)?.[1];
+                if (!icon) self.label = "volume_off";
+                else if (audio.speaker.is_muted) self.label = "volume_off";
+                else self.label = String(icon!);
+            } catch (e) {
+                self.label = "volume_off";
+                print("Error while setting volume icon:", e);
+            }
         }),
         audio.speaker.bind("volume").as((volume) => Math.floor(volume * 100)),
         (self) => {

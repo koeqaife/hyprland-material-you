@@ -93,7 +93,14 @@ const theme_list = () => {
         },
         setup: (self) => {
             self.hook(themes, () => {
-                box.children = [_default, ...themes.value.filter((value) => !value.hide).map((value) => theme(value))];
+                try {
+                    box.children = [
+                        _default,
+                        ...themes.value.filter((value) => !value.hide).map((value) => theme(value))
+                    ];
+                } catch (e) {
+                    print("Error while reloading themes:", e);
+                }
             });
         }
     });

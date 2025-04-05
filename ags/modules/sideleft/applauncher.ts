@@ -123,14 +123,22 @@ export const Applauncher = () => {
             ],
             setup: (self) => {
                 self.hook(shown, () => {
-                    if (shown.value == "apps") entry.grab_focus();
+                    try {
+                        if (shown.value == "apps") entry.grab_focus();
+                    } catch (e) {
+                        print("Error while reloading applications:", e);
+                    }
                 });
                 self.hook(App, (_, windowName, visible) => {
                     if (windowName !== WINDOW_NAME) return;
 
-                    if (visible) {
-                        entry.text = "";
-                        entry.grab_focus();
+                    try {
+                        if (visible) {
+                            entry.text = "";
+                            entry.grab_focus();
+                        }
+                    } catch (e) {
+                        print("Error while setting application popup:", e);
                     }
                 });
             }

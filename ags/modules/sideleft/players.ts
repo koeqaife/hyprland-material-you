@@ -56,8 +56,13 @@ function Player(player: MprisPlayer) {
         visible: player.bind("length").as((l) => l > 0),
         setup: (self) => {
             function update() {
-                const value = player.position / player.length;
-                self.value = value > 0 ? value : 0;
+                try {
+                    const value = player.position / player.length;
+                    self.value = value > 0 ? value : 0;
+                } catch (e) {
+                    self.value = 0;
+                    print("Error while setting position slider:", e);
+                }
             }
             self.hook(player, update);
             self.hook(player, update, "position");
