@@ -161,25 +161,29 @@ function DeviceList() {
         vertical: true,
         attribute: {
             updateDeviceList: (self) => {
-                let devices = bluetooth.devices || [];
+                try {
+                    let devices = bluetooth.devices || [];
 
-                devices = devices.filter((device) => device.name !== null);
+                    devices = devices.filter((device) => device.name !== null);
 
-                devices.forEach((device) => {
-                    const existing_deice = self.children.find(
-                        (child) => child.attribute.address === device.address && device.name !== null
+                    devices.forEach((device) => {
+                        const existing_deice = self.children.find(
+                            (child) => child.attribute.address === device.address && device.name !== null
+                        );
+
+                        if (existing_deice) {
+                            existing_deice.attribute.update(device);
+                        } else if (existing_deice?.name !== null) {
+                            self.pack_start(DeviceItem(device), false, false, 0);
+                        }
+                    });
+
+                    self.children = self.children.filter((child: any) =>
+                        devices.find((ap) => ap.address === child.attribute.address)
                     );
-
-                    if (existing_deice) {
-                        existing_deice.attribute.update(device);
-                    } else if (existing_deice?.name !== null) {
-                        self.pack_start(DeviceItem(device), false, false, 0);
-                    }
-                });
-
-                self.children = self.children.filter((child: any) =>
-                    devices.find((ap) => ap.address === child.attribute.address)
-                );
+                } catch (e) {
+                    print("Error while reloading devices:", e);
+                }
             }
         },
         className: "device_list",

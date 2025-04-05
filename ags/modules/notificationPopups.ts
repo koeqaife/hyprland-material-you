@@ -267,14 +267,18 @@ export function NotificationPopups(
     }
 
     function onDismissed(_: any, id: number) {
-        const original = list.children.find((n) => n.attribute.id === id);
-        if (!original) return;
-        original.attribute.count--;
-        if (original.attribute.count <= 0) {
-            original.attribute.destroyWithAnims();
+        try {
+            const original = list.children.find((n) => n.attribute.id === id);
+            if (!original) return;
+            original.attribute.count--;
+            if (original.attribute.count <= 0) {
+                original.attribute.destroyWithAnims();
+            }
+            onChange();
+            original.connect("destroy", () => onChange());
+        } catch (e) {
+            print("Error while dismissing notification:", e);
         }
-        onChange();
-        original.connect("destroy", () => onChange());
     }
 
     list.hook(notifications, onNotified, "notified").hook(notifications, onDismissed, dismiss ? "dismissed" : "closed");

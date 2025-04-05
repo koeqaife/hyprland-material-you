@@ -58,45 +58,50 @@ function getCurrentDateAndTime() {
 Utils.interval(1000, getCurrentDateAndTime);
 
 function getIconNameFromClass(windowClass: string) {
-    let formattedClass = windowClass.replace(/\s+/g, "-").toLowerCase();
-    let homeDir = GLib.get_home_dir();
-    let systemDataDirs = GLib.get_system_data_dirs().map((dir) => dir + "/applications");
-    let dataDirs = systemDataDirs.concat([homeDir + "/.local/share/applications"]);
-    let icon: string | undefined;
+    try {
+        let formattedClass = windowClass.replace(/\s+/g, "-").toLowerCase();
+        let homeDir = GLib.get_home_dir();
+        let systemDataDirs = GLib.get_system_data_dirs().map((dir) => dir + "/applications");
+        let dataDirs = systemDataDirs.concat([homeDir + "/.local/share/applications"]);
+        let icon: string | undefined;
 
-    for (let dir of dataDirs) {
-        let applicationsGFile = Gio.File.new_for_path(dir);
+        for (let dir of dataDirs) {
+            let applicationsGFile = Gio.File.new_for_path(dir);
 
-        let enumerator: FileEnumerator;
-        try {
-            enumerator = applicationsGFile.enumerate_children(
-                "standard::name,standard::type",
-                Gio.FileQueryInfoFlags.NONE,
-                null
-            );
-        } catch (e) {
-            continue;
-        }
+            let enumerator: FileEnumerator;
+            try {
+                enumerator = applicationsGFile.enumerate_children(
+                    "standard::name,standard::type",
+                    Gio.FileQueryInfoFlags.NONE,
+                    null
+                );
+            } catch (e) {
+                continue;
+            }
 
-        let fileInfo: FileInfo | null;
-        while ((fileInfo = enumerator.next_file(null)) !== null) {
-            let desktopFile = fileInfo.get_name();
-            if (desktopFile.endsWith(".desktop")) {
-                let fileContents = GLib.file_get_contents(dir + "/" + desktopFile);
-                let matches = /Icon=(\S+)/.exec(decoder.decode(fileContents[1]));
-                if (matches && matches[1]) {
-                    if (desktopFile.toLowerCase().includes(formattedClass)) {
-                        icon = matches[1];
-                        break;
+            let fileInfo: FileInfo | null;
+            while ((fileInfo = enumerator.next_file(null)) !== null) {
+                let desktopFile = fileInfo.get_name();
+                if (desktopFile.endsWith(".desktop")) {
+                    let fileContents = GLib.file_get_contents(dir + "/" + desktopFile);
+                    let matches = /Icon=(\S+)/.exec(decoder.decode(fileContents[1]));
+                    if (matches && matches[1]) {
+                        if (desktopFile.toLowerCase().includes(formattedClass)) {
+                            icon = matches[1];
+                            break;
+                        }
                     }
                 }
             }
-        }
 
-        enumerator.close(null);
-        if (icon) break;
+            enumerator.close(null);
+            if (icon) break;
+        }
+        return Utils.lookUpIcon(icon) ? icon : "image-missing";
+    } catch (e) {
+        print("Error getting icon name from class:", e);
+        return "image-missing";
     }
-    return Utils.lookUpIcon(icon) ? icon : "image-missing";
 }
 
 const dispatch = (ws: string) => hyprland.messageAsync(`dispatch workspace ${ws}`).catch(print);
@@ -245,15 +250,23 @@ function BatteryLabel() {
         tooltip_text: battery.bind("percent").as((p) => `Battery: ${p > 0 ? p : 0}%`),
         setup: (self) => {
             self.hook(battery, () => {
-                self.children[0].label = getClosestBatteryLevel(battery.percent, battery.charging);
-                self.visible = (battery.percent < 100 && battery.available) || config.config.always_show_battery;
-                self.toggleClassName("critical", battery.percent < 15);
+                try {
+                    self.children[0].label = getClosestBatteryLevel(battery.percent, battery.charging);
+                    self.visible = (battery.percent < 100 && battery.available) || config.config.always_show_battery;
+                    self.toggleClassName("critical", battery.percent < 15);
+                } catch (e) {
+                    print("Error updating battery icon:", e);
+                }
             });
             self.hook(config, () => {
-                if (config.config.always_show_battery) {
-                    self.visible = true;
-                } else {
-                    self.visible = battery.percent < 100 && battery.available;
+                try {
+                    if (config.config.always_show_battery) {
+                        self.visible = true;
+                    } else {
+                        self.visible = battery.percent < 100 && battery.available;
+                    }
+                } catch (e) {
+                    print("Error updating battery icon visible:", e);
                 }
             });
         }
@@ -266,23 +279,32 @@ function SysTray() {
         spacing: 5,
         setup: (self) => {
             self.hook(systemtray, () => {
-                const items = systemtray.items;
-                // @ts-expect-error
-                self.children = items.map((item) => {
-                    if (!item.id) return undefined;
-                    if (item.id.trim() != "nm-applet" && item.id.trim() != "blueman") {
-                        return Widget.Button({
-                            child: Widget.Icon({ icon: item.bind("icon"), size: 16 }),
-                            on_primary_click_release: (_, event) => item.activate(event),
-                            on_secondary_click_release: (_, event) => item.openMenu(event),
-                            tooltip_markup: item.bind("tooltip_markup")
-                        });
-                    } else {
-                        return undefined;
+                try {
+                    if (!systemtray || !systemtray.items) {
+                        print("Systemtray or items is undefined");
+                        return;
                     }
-                });
-                if (self.children.length > 0) self.visible = true;
-                else self.visible = false;
+                    const items = systemtray.items;
+                    // @ts-expect-error
+                    self.children = items.map((item) => {
+                        if (!item.id) return undefined;
+                        if (item.id.trim() != "nm-applet" && item.id.trim() != "blueman") {
+                            return Widget.Button({
+                                child: Widget.Icon({ icon: item.bind("icon"), size: 16 }),
+                                on_primary_click_release: (_, event) => item.activate(event),
+                                on_secondary_click_release: (_, event) => item.openMenu(event),
+                                tooltip_markup: item.bind("tooltip_markup")
+                            });
+                        } else {
+                            return undefined;
+                        }
+                    });
+                    if (self.children.length > 0) self.visible = true;
+                    else self.visible = false;
+                } catch (e) {
+                    print("Could not update system tray:", e);
+                    self.visible = false;
+                }
             });
         }
     });
@@ -297,8 +319,12 @@ function AppLauncher() {
         child: MaterialIcon("search"),
         setup: (self) => {
             self.hook(config, () => {
-                if (config.config.hide_applauncher_button != !self.is_visible())
-                    self.set_visible(!config.config.hide_applauncher_button);
+                try {
+                    if (config.config.hide_applauncher_button != !self.is_visible())
+                        self.set_visible(!config.config.hide_applauncher_button);
+                } catch (e) {
+                    print("Error updating app launcher button visibility:", e);
+                }
             });
         }
     });
@@ -335,12 +361,16 @@ function Wifi() {
         child: MaterialIcon("signal_wifi_off", "16px"),
         tooltip_text: "Disabled"
     }).hook(network, (self) => {
-        if (network.wifi.enabled) {
-            self.tooltip_text = network.wifi.ssid || "Unknown";
-            self.child.label = MATERIAL_SYMBOL_SIGNAL_STRENGTH[network.wifi.icon_name] || "signal_wifi_off";
-        } else {
-            self.tooltip_text = "Disabled";
-            self.child.label = "signal_wifi_off";
+        try {
+            if (network.wifi.enabled) {
+                self.tooltip_text = network.wifi.ssid || "Unknown";
+                self.child.label = MATERIAL_SYMBOL_SIGNAL_STRENGTH[network.wifi.icon_name] || "signal_wifi_off";
+            } else {
+                self.tooltip_text = "Disabled";
+                self.child.label = "signal_wifi_off";
+            }
+        } catch (e) {
+            print("Error updating wifi icon:", e);
         }
     });
 }
@@ -361,12 +391,16 @@ function Bluetooth() {
         },
         child: MaterialIcon("bluetooth_disabled", "16px")
     }).hook(bluetooth, (self) => {
-        if (bluetooth.connected_devices.length > 0) {
-            self.child.label = "bluetooth_connected";
-        } else if (bluetooth.enabled) {
-            self.child.label = "bluetooth";
-        } else {
-            self.child.label = "bluetooth_disabled";
+        try {
+            if (bluetooth.connected_devices.length > 0) {
+                self.child.label = "bluetooth_connected";
+            } else if (bluetooth.enabled) {
+                self.child.label = "bluetooth";
+            } else {
+                self.child.label = "bluetooth_disabled";
+            }
+        } catch (e) {
+            print("Error updating bluetooth icon:", e);
         }
     });
 }
@@ -386,19 +420,27 @@ function MediaPlayer() {
         tooltip_text: "Unknown"
     })
         .hook(mpris, (self) => {
-            if (mpris.players.length > 0) {
-                self.visible = !config.config.hide_media_button && true;
-                metadata = mpris.players[0]?.metadata;
-                if (metadata) self.tooltip_text = `${metadata["xesam:artist"]} - ${metadata["xesam:title"]}`;
-            } else {
-                self.visible = false;
-                self.tooltip_text = "Unknown";
+            try {
+                if (mpris.players.length > 0) {
+                    self.visible = !config.config.hide_media_button && true;
+                    metadata = mpris.players[0]?.metadata;
+                    if (metadata) self.tooltip_text = `${metadata["xesam:artist"]} - ${metadata["xesam:title"]}`;
+                } else {
+                    self.visible = false;
+                    self.tooltip_text = "Unknown";
+                }
+            } catch (e) {
+                print("Error updating media player icon:", e);
             }
         })
         .hook(config, (self) => {
-            if (mpris.players.length > 0) {
-                if (config.config.hide_media_button != !self.is_visible())
-                    self.set_visible(!config.config.hide_media_button);
+            try {
+                if (mpris.players.length > 0) {
+                    if (config.config.hide_media_button != !self.is_visible())
+                        self.set_visible(!config.config.hide_media_button);
+                }
+            } catch (e) {
+                print("Error updating media player button visibility:", e);
             }
         });
 
@@ -488,8 +530,13 @@ function TaskBar() {
         spacing: 5,
         setup: (self) => {
             self.hook(hyprland, () => {
-                self.children = Clients(hyprland.clients);
-                self.visible = self.children.length > 0;
+                try {
+                    self.children = Clients(hyprland.clients);
+                    self.visible = self.children.length > 0;
+                } catch (e) {
+                    print("Could not update taskbar:", e);
+                    self.visible = false;
+                }
             });
         }
     });
@@ -505,17 +552,21 @@ function VolumeIndicator() {
             on_middle_click_release: () => Utils.execAsync("pavucontrol").catch(print),
             on_secondary_click_release: () => (audio.speaker.is_muted = !audio.speaker.is_muted),
             child: MaterialIcon("volume_off", "16px").hook(audio.speaker, (self) => {
-                const vol = audio.speaker.volume * 100;
-                const icon = [
-                    [101, "sound_detection_loud_sound"],
-                    [67, "volume_up"],
-                    [34, "volume_down"],
-                    [1, "volume_mute"],
-                    [0, "volume_off"]
-                ].find(([threshold]) => Number(threshold) <= vol)?.[1];
-                if (audio.speaker.is_muted) self.label = "volume_off";
-                else self.label = String(icon!);
-                self.tooltip_text = `Volume ${Math.floor(vol)}%`;
+                try {
+                    const vol = audio.speaker.volume * 100;
+                    const icon = [
+                        [101, "sound_detection_loud_sound"],
+                        [67, "volume_up"],
+                        [34, "volume_down"],
+                        [1, "volume_mute"],
+                        [0, "volume_off"]
+                    ].find(([threshold]) => Number(threshold) <= vol)?.[1];
+                    if (audio.speaker.is_muted) self.label = "volume_off";
+                    else self.label = String(icon!);
+                    self.tooltip_text = `Volume ${Math.floor(vol)}%`;
+                } catch (e) {
+                    print("Error updating volume icon:", e);
+                }
             })
         })
     });
@@ -529,7 +580,11 @@ const OpenClipHist = () =>
         visible: !config.config.hide_cliphist_button,
         setup: (self) => {
             self.hook(config, () => {
-                self.set_visible(!config.config.hide_cliphist_button);
+                try {
+                    self.set_visible(!config.config.hide_cliphist_button);
+                } catch (e) {
+                    print("Error updating cliphist button visibility:", e);
+                }
             });
         }
     });

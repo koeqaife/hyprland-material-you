@@ -38,7 +38,13 @@ class BrightnessService extends Service {
     }
 
     async #onChange() {
-        this.#screenValue = Number(await Utils.readFileAsync(this.#brightness_file)) / this.#max;
+        try {
+            this.#screenValue = Number(await Utils.readFileAsync(this.#brightness_file)) / this.#max;
+
+        } catch (e) {
+            this.#screenValue = 0;
+            print("Backlight service error:", e);
+        }
 
         this.emit("changed");
         this.notify("screen-value");

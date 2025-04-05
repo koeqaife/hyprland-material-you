@@ -43,11 +43,16 @@ const IconButton = (
 ) =>
     Widget.Button({
         child: MaterialIcon(icon, size).hook(stream, (self) => {
-            const vol = stream.volume * 100;
-            const icon = icons.find(([threshold]) => Number(threshold) <= vol)?.[1];
-            if (stream.is_muted) self.label = off;
-            else self.label = String(icon!);
-            self.tooltip_text = `${Math.floor(stream.volume * 100)}%`;
+            try {
+                const vol = stream.volume * 100;
+                const icon = icons.find(([threshold]) => Number(threshold) <= vol)?.[1];
+                if (stream.is_muted) self.label = off;
+                else self.label = String(icon!);
+                self.tooltip_text = `${Math.floor(stream.volume * 100)}%`;
+            } catch (e) {
+                self.label = off;
+                print("Error while setting volume icon:", e);
+            }
         }),
         on_clicked: on_clicked
     });
@@ -66,9 +71,15 @@ const Slider = (stream: Stream) =>
         },
         setup: (self) => {
             self.hook(stream, () => {
-                self.max = stream.volume > 1 ? 150 : 100;
-                self.value = stream.volume * 100;
-                self.tooltip_text = `${Math.floor(stream.volume * 100)}%`;
+                try {
+                    self.max = stream.volume > 1 ? 150 : 100;
+                    self.value = stream.volume * 100;
+                    self.tooltip_text = `${Math.floor(stream.volume * 100)}%`;
+                } catch (e) {
+                    self.value = 0;
+                    self.tooltip_text = "0%";
+                    print("Error while setting volume slider:", e);
+                }
             });
         }
     });
@@ -174,9 +185,13 @@ const Audio = () => {
         ],
         setup: (self) => {
             self.hook(cur_page, () => {
-                self.children.forEach((widget) => {
-                    widget.toggleClassName("active", widget.attribute.page == cur_page.value);
-                });
+                try {
+                    self.children.forEach((widget) => {
+                        widget.toggleClassName("active", widget.attribute.page == cur_page.value);
+                    });
+                } catch (e) {
+                    print("Error while setting tabs:", e);
+                }
             });
         }
     });
@@ -184,43 +199,47 @@ const Audio = () => {
     const apps = Widget.Box({ vertical: true, children: [] as ReturnType<typeof app>[] });
 
     function update() {
-        const speaker_ids = audio.speakers.map((s) => s.id);
-        const app_ids = audio.apps.map((s) => s.id);
-        const microphone_ids = audio.microphones.map((s) => s.id);
+        try {
+            const speaker_ids = audio.speakers.map((s) => s.id);
+            const app_ids = audio.apps.map((s) => s.id);
+            const microphone_ids = audio.microphones.map((s) => s.id);
 
-        speakers.children
-            .filter(
-                (widget) =>
-                    !speaker_ids.includes(widget.attribute.stream.id) &&
-                    !microphone_ids.includes(widget.attribute.stream.id)
-            )
-            .forEach((widget) => widget.destroy());
+            speakers.children
+                .filter(
+                    (widget) =>
+                        !speaker_ids.includes(widget.attribute.stream.id) &&
+                        !microphone_ids.includes(widget.attribute.stream.id)
+                )
+                .forEach((widget) => widget.destroy());
 
-        apps.children
-            .filter((widget) => !app_ids.includes(widget.attribute.stream.id))
-            .forEach((widget) => widget.destroy());
+            apps.children
+                .filter((widget) => !app_ids.includes(widget.attribute.stream.id))
+                .forEach((widget) => widget.destroy());
 
-        audio.speakers.forEach((s) => {
-            if (!speakers.children.some((v) => v.attribute.stream.id == s.id)) {
-                speakers.pack_start(Speaker(s, icons.speaker, off_icons.speaker), false, false, 0);
-            }
-        });
+            audio.speakers.forEach((s) => {
+                if (!speakers.children.some((v) => v.attribute.stream.id == s.id)) {
+                    speakers.pack_start(Speaker(s, icons.speaker, off_icons.speaker), false, false, 0);
+                }
+            });
 
-        audio.microphones.forEach((s) => {
-            if (!speakers.children.some((v) => v.attribute.stream.id == s.id)) {
-                const _icons =
-                    s.icon_name == "audio-headset-analog-usb"
-                        ? { off: off_icons.headset_mic, default: icons.headset_mic }
-                        : { off: off_icons.microphone, default: icons.microphone };
-                speakers.pack_start(Speaker(s, _icons.default, _icons.off), false, false, 0);
-            }
-        });
+            audio.microphones.forEach((s) => {
+                if (!speakers.children.some((v) => v.attribute.stream.id == s.id)) {
+                    const _icons =
+                        s.icon_name == "audio-headset-analog-usb"
+                            ? { off: off_icons.headset_mic, default: icons.headset_mic }
+                            : { off: off_icons.microphone, default: icons.microphone };
+                    speakers.pack_start(Speaker(s, _icons.default, _icons.off), false, false, 0);
+                }
+            });
 
-        audio.apps.forEach((s) => {
-            if (!apps.children.some((v) => v.attribute.stream.id == s.id)) {
-                apps.pack_start(app(s), false, false, 0);
-            }
-        });
+            audio.apps.forEach((s) => {
+                if (!apps.children.some((v) => v.attribute.stream.id == s.id)) {
+                    apps.pack_start(app(s), false, false, 0);
+                }
+            });
+        } catch (e) {
+            print("Error while updating audio streams:", e);
+        }
     }
 
     update();
@@ -248,7 +267,11 @@ const Audio = () => {
         setup: (self) => {
             self.hook(App, (_, windowName, visible) => {
                 if (windowName !== WINDOW_NAME) return;
-                if (visible) update();
+                try {
+                    if (visible) update();
+                } catch (e) {
+                    print("Error while setting audio popup:", e);
+                }
             });
         }
     });
