@@ -18,9 +18,15 @@ Here are some key features:
 
 > Discord: <https://discord.gg/nCK3sh8mNU>
 
+I'm creating v2 version for this dotfiles, so for any spoilers go to discord server.
+
 ## To install
 
 ### Installation
+
+**⚠️ Known Issues:** 
+- Ags crashes -> can be fixed with downgrading gjs to 1.82.1
+- Agsv1 isn't compiling -> I can't help with that, wait until v2
 
 ```sh
 sudo pacman -Syu
