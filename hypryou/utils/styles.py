@@ -1,0 +1,71 @@
+from repository import gtk, gdk
+import subprocess
+from config import styles_output, main_scss, HOME
+from src.variables import Globals
+from utils.logger import logger
+
+
+def apply_css() -> None:
+    compile_scss()
+
+    logger.debug("Creating css provider")
+    provider = gtk.CssProvider()
+
+    logger.debug("Loading css")
+    provider.load_from_path(styles_output)
+
+    gtk.StyleContext.add_provider_for_display(
+        gdk.Display.get_default(),
+        provider,
+        gtk.STYLE_PROVIDER_PRIORITY_USER
+    )
+
+    Globals.css_provider = provider
+
+
+def reload_css() -> None:
+    compile_scss()
+    logger.debug("Reloading css")
+    Globals.css_provider.load_from_path(styles_output)
+    logger.debug("Reloading css done")
+
+
+def compile_scss() -> None:
+    logger.debug("Compiling scss")
+    command = [
+        'sass',
+        f'--load-path={HOME}/.cache/material',
+        main_scss,
+        styles_output
+    ]
+
+    subprocess.run(command, check=True)
+
+
+def toggle_css_class(
+    widget: gtk.Widget,
+    css_class: str,
+    condition: bool | None = None
+) -> None:
+    widget_css_names = widget.get_css_classes()
+
+    if condition is None:
+        if css_class in widget_css_names:
+            widget.remove_css_class(css_class)
+        else:
+            widget.add_css_class(css_class)
+    else:
+        if css_class in widget_css_names and not condition:
+            widget.remove_css_class(css_class)
+        if css_class not in widget_css_names and condition:
+            widget.add_css_class(css_class)
+
+
+def widget_apply_css(widget: gtk.Widget, css: str) -> None:
+    provider = gtk.CssProvider()
+    provider.load_from_data(css.encode("utf-8"))
+
+    widget.get_style_context().add_provider(
+        provider,
+        gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+    )

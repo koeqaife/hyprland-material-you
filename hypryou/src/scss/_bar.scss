@@ -1,0 +1,171 @@
+@use "colors" as *;
+@use "sass:color";
+
+window.bar {
+    background-color: $surface;
+    border: none;
+    box-shadow: none;
+
+    .modules-left,
+    .modules-center,
+    .modules-right {
+        padding-top: 0.375rem;
+        padding-bottom: 0.375rem;
+        margin-left: 0.75rem;
+        margin-right: 0.75rem;
+        & :last-child {
+            margin-right: 0;
+        }
+        & :first-child {
+            margin-left: 0;
+        }
+        > * {
+            border-radius: 100px;
+            margin-left: 0.313rem;
+            margin-right: 0.313rem;
+        }
+    }
+
+    .bar-applet {
+        background-color: $surfaceContainerLow;
+        padding: 0.125rem 0.625rem 0.125rem 0.625rem;
+
+        color: $onSurface;
+    }
+
+    .clock {
+        font-weight: bold;
+        font-feature-settings: "tnum";
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .workspaces {
+        font-style: normal;
+        font-size: 1rem;
+        color: $onSurface;
+        background: $surfaceContainerLow;
+        padding: 0.25rem;
+
+        .workspace {
+            margin-right: 0.188rem;
+            min-height: 1.625rem;
+            min-width: 1.625rem;
+            border-radius: 1rem;
+            border: 0;
+            transition: background-color 0.35s ease-in-out;
+
+            &:last-child {
+                margin-right: 0;
+            }
+
+            label {
+                color: $onSurface;
+                transition: color 0.35s ease-in-out;
+                font-size: 1rem;
+                font-weight: 600;
+            }
+
+            &:hover {
+                background-color: color.mix($onSurface, $surface, 15%);
+            }
+
+            &.empty label {
+                color: $onSurfaceVariant;
+                opacity: 0.6;
+            }
+
+            &.active {
+                background: $secondaryContainer;
+                label {
+                    color: $onSecondaryContainer;
+                }
+            }
+        }
+    }
+
+    .applets .applet {
+        margin-right: 0.188rem;
+        &:last-child {
+            margin-right: 0;
+        }
+        label {
+            color: $onSurface;
+            font-size: 1.063rem;
+            font-variation-settings: "opsz" 20;
+            font-weight: 500;
+        }
+    }
+
+    .applets {
+        margin-left: 0.125rem;
+        border-top-left-radius: 1.563rem;
+        border-bottom-left-radius: 1.563rem;
+    }
+
+    .open-tray {
+        margin-right: 0.125rem;
+        border-top-right-radius: 1.563rem;
+        border-bottom-right-radius: 1.563rem;
+
+        color: $onSurface;
+        font-size: 1.063rem;
+        font-variation-settings: "opsz" 20;
+        font-weight: 500;
+    }
+
+    .mpris-player {
+        padding: 0.125rem 0.25rem 0.125rem 0.25rem;
+        label {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .image {
+            min-height: 24px;
+            min-width: 24px;
+            border-radius: 10px;
+            margin-right: 0.375rem;
+            background-position: center;
+            background-size: contain;
+        }
+        .buttons {
+            background-color: $surfaceContainer;
+            border-radius: 100px;
+            margin-left: 0.375rem;
+            padding: 0.063rem;
+            .icon {
+                font-size: 1.125rem;
+                font-weight: 400;
+                font-variation-settings: "opsz" 20;
+                color: $onSecondaryContainer;
+            }
+            button {
+                min-height: 24px;
+                min-width: 24px;
+                &.play-pause {
+                    background-color: $secondaryContainer;
+                    &:hover {
+                        background-color: color.mix($secondaryContainer, $onSurfaceVariant, 92%);
+                    }
+                    &:active {
+                        background-color: color.mix($secondaryContainer, $onSurfaceVariant, 86%);
+                    }
+                    &:not(:first-child) {
+                        margin-left: 0.188rem;
+                    }
+                    &:not(:last-child) {
+                        margin-right: 0.188rem;
+                    }
+                }
+                &:not(.play-pause) {
+                    &:hover {
+                        background-color: color.mix($surfaceContainer, $onSurfaceVariant, 92%);
+                    }
+                    &:active {
+                        background-color: color.mix($surfaceContainer, $onSurfaceVariant, 86%);
+                    }
+                }
+            }
+        }
+    }
+}
