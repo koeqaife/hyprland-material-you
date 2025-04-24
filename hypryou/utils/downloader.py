@@ -78,7 +78,11 @@ class DownloadState:
                 self.on_complete(finalized_path)
 
                 return
-            self.file.write(chunk.get_data())
+            data = chunk.get_data()
+            if not data:
+                logger.warning("Chunk data is None!")
+            else:
+                self.file.write(data)
             self.stream.read_bytes_async(
                 4096, glib.PRIORITY_DEFAULT, None, self.read_chunk, None
             )
@@ -86,8 +90,9 @@ class DownloadState:
             logger.error("Couldn't read file chunk: %s", e, exc_info=e)
             self.stream.close_async(glib.PRIORITY_DEFAULT, None, None, None)
             self.on_complete(None)
-            self.file.close()
-            self.file = None
+            if self.file:
+                self.file.close()
+                self.file = None
 
 
 def download_file_async(
@@ -97,7 +102,11 @@ def download_file_async(
 ) -> None:
     file = gio.File.new_for_uri(url)
 
-    def on_read(fileobj: gio.File, result: gio.AsyncResult, _data: t.Any):
+    def on_read(
+        fileobj: gio.File,
+        result: gio.AsyncResult,
+        _data: t.Any
+    ) -> None:
         try:
             stream = fileobj.read_finish(result)
             state = DownloadState(stream, temp_path, on_complete)

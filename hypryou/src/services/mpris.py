@@ -7,7 +7,7 @@ from src.services.dbus import dbus_proxy, bus, cache_proxy_properties
 from src.services.events import Event
 from src.variables import Globals
 from utils.logger import logger
-from utils import Ref, downloader
+from utils import Ref
 
 MPRIS_PREFIX = "org.mpris.MediaPlayer2."
 
@@ -23,7 +23,7 @@ type PlaybackStatus = t.Literal["Playing", "Paused", "Stopped"]
 
 
 def update_current_player() -> None:
-    last_changed_player: tuple[int, MprisPlayer] | None = None
+    last_changed_player: tuple[float, MprisPlayer] | None = None
 
     for bus_name, player in players.value.items():
         # If found playing player it'll show it
@@ -74,8 +74,11 @@ class MprisMetadata(t.TypedDict, total=False):
 
 
 def to_mpris_metadata(d: dict[str, t.Any]) -> MprisMetadata:
-    converted = {key.replace(':', '_'): value for key, value in d.items()}
-    return MprisMetadata(converted)
+    converted = {
+        key.replace(':', '_'): value
+        for key, value in d.items()
+    }
+    return t.cast(MprisMetadata, converted)
 
 
 class MprisPlayer:
@@ -85,9 +88,10 @@ class MprisPlayer:
         self._bus_path = proxy.get_object_path()
         self._conn = proxy.get_connection()
 
-        self._last_known_position = -1
+        self._last_known_position: float = -1
         self._pos_changed_time = time.monotonic()
         self._playback_status: PlaybackStatus = "Stopped"
+        self._metadata: MprisMetadata | None = None
 
         self._last_changed_time = time.monotonic()
         self.conns = [
@@ -108,7 +112,7 @@ class MprisPlayer:
         signal_args: glib.Variant
     ) -> None:
         if signal_name == "Seeked":
-            args = t.cast(tuple[int], signal_args.unpack())
+            args = t.cast(tuple[float], signal_args.unpack())
             self._last_known_position = args[0] / 1_000_000
             self._pos_changed_time = time.monotonic()
             self._last_changed_time = time.monotonic()
@@ -149,15 +153,6 @@ class MprisPlayer:
         update_current_player()
 
         Globals.events.notify("mpris_player_changed", self._bus_name, None)
-
-    def get_image_async(
-        self,
-        callback: t.Callable[[], None],
-        size: tuple[int, int]
-    ) -> None:
-        downloader.download_image_async(
-            self.metadata["mpris_artUrl"], callback, size, "mpris"
-        )
 
     def prop(self, property_name: str) -> t.Any:
         value = self._proxy.get_cached_property(property_name)
@@ -223,8 +218,8 @@ class MprisPlayer:
         self.call_method("OpenUri", glib.Variant("s", uri))
 
     @property
-    def playback_status(self) -> str:
-        return t.cast(str, self.prop("PlaybackStatus"))
+    def playback_status(self) -> PlaybackStatus:
+        return t.cast(PlaybackStatus, self.prop("PlaybackStatus"))
 
     @property
     def loop_status(self) -> LoopStatus:
@@ -252,8 +247,10 @@ class MprisPlayer:
 
     @property
     def metadata(self) -> MprisMetadata:
-        metadata = t.cast(dict[str, t.Any], self.prop("Metadata"))
-        return to_mpris_metadata(metadata)
+        if not self._metadata:
+            metadata = t.cast(dict[str, t.Any], self.prop("Metadata"))
+            self._metadata = to_mpris_metadata(metadata)
+        return self._metadata
 
     @property
     def volume(self) -> float:
@@ -328,7 +325,8 @@ class MprisPlayer:
             self._cache_properties_finish
         )
 
-    def _cache_properties_finish(self, *args) -> None:
+    def _cache_properties_finish(self, *args: t.Any) -> None:
+        self._metadata = None
         update_current_player()
 
 

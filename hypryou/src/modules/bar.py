@@ -10,7 +10,7 @@ import asyncio
 from time import perf_counter
 import typing as t
 from config import Settings
-from src.services.mpris import current_player
+from src.services.mpris import MprisPlayer, current_player
 import weakref
 
 
@@ -132,7 +132,7 @@ class Clock(gtk.Label):
 
 
 class Player(gtk.Box):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(
             css_classes=("mpris-player", "bar-applet")
         )
@@ -197,7 +197,7 @@ class Player(gtk.Box):
             gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
 
-        self.last_changed = {
+        self.last_changed: dict[str, t.Any] = {
             "artist": None,
             "title": None,
             "artUrl": None,
@@ -218,29 +218,31 @@ class Player(gtk.Box):
         self.add_controller(self.click_gesture)
 
     def next(self, *args: t.Any) -> None:
-        if self.has_player():
-            assert current_player.value
-            current_player.value[1].next()
+        current = self.get_player()
+        if current:
+            current.next()
 
     def previous(self, *args: t.Any) -> None:
-        if self.has_player():
-            assert current_player.value
-            current_player.value[1].previous()
+        current = self.get_player()
+        if current:
+            current.previous()
 
     def play_pause(self, *args: t.Any) -> None:
-        if self.has_player():
-            assert current_player.value
-            current_player.value[1].play_pause()
+        current = self.get_player()
+        if current:
+            current.play_pause()
 
-    def has_player(self) -> bool:
-        return current_player.value and len(current_player.value) == 2
+    def get_player(self) -> MprisPlayer | None:
+        if len(current_player.value) == 2:
+            return current_player.value[1]
+        else:
+            return None
 
     def update_buttons(self) -> None:
-        if not self.has_player():
+        current = self.get_player()
+        if not current:
             self.children[2].set_visible(False)
         else:
-            assert current_player.value
-            current = current_player.value[1]
             last_changed = self.last_changed
 
             playback_status = current.playback_status
@@ -272,11 +274,11 @@ class Player(gtk.Box):
             )
 
     def update_label(self) -> None:
-        if not self.has_player():
+        current = self.get_player()
+        if not current:
             text = "Nothing's playing"
         else:
-            assert current_player.value
-            metadata = current_player.value[1].metadata
+            metadata = current.metadata
 
             artist = metadata["xesam_artist"][0]
             title = metadata["xesam_title"]
@@ -293,7 +295,7 @@ class Player(gtk.Box):
             text = f"{artist} - {title}"
         self.children[1].set_label(text)
 
-    def on_download(self, filepath: str) -> None:
+    def on_download(self, filepath: str | None) -> None:
         if not filepath:
             self.children[0].set_visible(False)
             return
