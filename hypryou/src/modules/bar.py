@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from utils import widget, Ref, downloader
-from utils import toggle_css_class
+from utils import toggle_css_class, escape_markup
 from utils.logger import logger
 from src.variables.clock import date, time
 from src.variables import Globals
@@ -152,8 +152,10 @@ class LastChanged:
 class Player(gtk.Box):
     def __init__(self) -> None:
         super().__init__(
-            css_classes=("mpris-player", "bar-applet")
+            css_classes=("mpris-player", "bar-applet"),
+            halign=gtk.Align.START
         )
+        self.set_size_request(324, -1)
 
         image = gtk.Box(
             css_classes=("image",),
@@ -164,7 +166,9 @@ class Player(gtk.Box):
         label = gtk.Label(
             ellipsize=pango.EllipsizeMode.END,
             max_width_chars=20,
-            halign=gtk.Align.FILL
+            halign=gtk.Align.CENTER,
+            hexpand=True,
+            use_markup=True
         )
 
         btn_box = gtk.Box(
@@ -304,7 +308,11 @@ class Player(gtk.Box):
                 self.last_changed.title = title
                 self.last_changed.artist = artist
 
-                text = f"{artist} - {title}"
+                artist = escape_markup(artist)
+                title = escape_markup(title)
+                # we show title first cuz length of label is limited
+                text = f"{title} <i>- {artist}</i>"
+        self.set_tooltip_markup(text)
         self.children[1].set_label(text)
 
     def on_download(self, filepath: str | None) -> None:
