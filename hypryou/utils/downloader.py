@@ -126,6 +126,8 @@ def download_image_async(
     size: tuple[int, int] | None = None,
     subdir: str = "images"
 ) -> None:
+    if size:
+        subdir = f"{subdir}/{size[0]}x{size[1]}"
     cache_dir = get_cache_dir(url, subdir)
     os.makedirs(cache_dir, exist_ok=True)
 
