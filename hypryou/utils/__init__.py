@@ -7,8 +7,7 @@ import utils.downloader as downloader
 from utils.ref import Ref
 from utils.logger import setup_logger
 from utils.styles import (
-    apply_css, reload_css, compile_scss, toggle_css_class,
-    widget_apply_css
+    apply_css, reload_css, compile_scss, toggle_css_class
 )
 from utils.format import get_formatted_date, get_formatted_time
 
@@ -28,7 +27,6 @@ __all__ = [
     "get_formatted_date",
     "get_formatted_time",
     "toggle_css_class",
-    "widget_apply_css",
     "format",
     "debounce",
     "downloader"

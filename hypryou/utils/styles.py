@@ -59,13 +59,3 @@ def toggle_css_class(
             widget.remove_css_class(css_class)
         if css_class not in widget_css_names and condition:
             widget.add_css_class(css_class)
-
-
-def widget_apply_css(widget: gtk.Widget, css: str) -> None:
-    provider = gtk.CssProvider()
-    provider.load_from_data(css.encode("utf-8"))
-
-    widget.get_style_context().add_provider(
-        provider,
-        gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-    )
