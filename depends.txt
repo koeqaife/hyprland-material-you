@@ -1,0 +1,25 @@
+AUR:
+gtk4-layer-shell
+dart-sass
+
+Sync:
+python
+python-gobject
+gtk4
+libgirepository
+hyprland
+dbus
+dbus-glib
+python-pillow
+
+Versions:
+"Used" means I used this version when I was developing, so these versions are 100% compatible
+- Python: Recommended >= 3.13, Minimum >= 3.12
+- python-gobject: Used 3.52.3-3
+- libgirepository: Used 1.84.0-1
+- dart-sass: Used 1.86.3-1
+- gtk4: Used 1:4.18.4-1
+- gtk4-layer-shell: Used 1.1.1-1
+- dbus: Used 1.16.2-1
+- dbus-glib: Used 0.114-1
+- python-pillow: Used 11.2.1-1
