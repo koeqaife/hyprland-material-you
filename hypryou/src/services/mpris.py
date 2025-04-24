@@ -23,13 +23,14 @@ type PlaybackStatus = t.Literal["Playing", "Paused", "Stopped"]
 
 
 def update_current_player() -> None:
+    print("UPDATE CURRENT")
     last_changed_player: tuple[float, MprisPlayer] | None = None
 
     for bus_name, player in players.value.items():
         # If found playing player it'll show it
         # Basically it'll show the first player in list
         # So if two players are playing it'll show the first who've added
-        if player._playback_status == "Playing":
+        if player.playback_status == "Playing":
             current_player.value = (False, player)
             return
 
@@ -43,7 +44,11 @@ def update_current_player() -> None:
     if last_changed_player:
         # If current_player was last_changed_player it'll be able to change it
         # If not it won't touch it (for example if last player was playing)
-        if not current_player.value or current_player.value[0]:
+        if (
+            not current_player.value
+            or current_player.value[0]
+            or current_player.value[1]._bus_name not in players.value
+        ):
             current_player.value = (True, last_changed_player[1])
 
 
@@ -90,7 +95,7 @@ class MprisPlayer:
 
         self._last_known_position: float = -1
         self._pos_changed_time = time.monotonic()
-        self._playback_status: PlaybackStatus = "Stopped"
+        self._playback_status = self.playback_status
         self._metadata: MprisMetadata | None = None
 
         self._last_changed_time = time.monotonic()
@@ -124,6 +129,8 @@ class MprisPlayer:
     def finalize(self) -> None:
         for conn in self.conns:
             self._proxy.disconnect(conn)
+        if current_player.value and self is current_player.value[1]:
+            current_player.value = ()
 
     def get_bus_name(self) -> str:
         bus_name = self._proxy.get_name()
@@ -385,6 +392,7 @@ class MprisWatcher:
             player.finalize()
             del players.value[name]
             logger.debug("Removed mpris player: %s", name)
+            update_current_player()
 
 
 def start() -> None:

@@ -2,6 +2,7 @@ from utils import widget, Ref, downloader
 from utils import toggle_css_class
 from utils.logger import logger
 from src.variables.clock import date, time
+from src.services.events import Event
 from src.variables import Globals
 from repository import gtk, gdk, layer_shell, pango
 from src.services import hyprland
@@ -242,6 +243,10 @@ class Player(gtk.Box):
         current = self.get_player()
         if not current:
             self.children[2].set_visible(False)
+            self.last_changed["can_go_prev"] = None
+            self.last_changed["can_go_next"] = None
+            self.last_changed["can_pause"] = None
+            self.last_changed["playback_status"] = None
         else:
             last_changed = self.last_changed
 
@@ -277,22 +282,30 @@ class Player(gtk.Box):
         current = self.get_player()
         if not current:
             text = "Nothing's playing"
+            self.last_changed["title"] = None
+            self.last_changed["artist"] = None
         else:
             metadata = current.metadata
 
-            artist = metadata["xesam_artist"][0]
-            title = metadata["xesam_title"]
+            _artist = metadata.get("xesam_artist")
+            title = metadata.get("xesam_title")
 
-            if (
-                artist == self.last_changed["artist"]
-                or title == self.last_changed["title"]
-            ):
-                return
+            if not _artist or not title:
+                text = "Nothing's playing"
+                self.last_changed["title"] = None
+                self.last_changed["artist"] = None
+            else:
+                artist = _artist[0]
+                if (
+                    artist == self.last_changed["artist"]
+                    or title == self.last_changed["title"]
+                ):
+                    return
 
-            self.last_changed["title"] = title
-            self.last_changed["artist"] = artist
+                self.last_changed["title"] = title
+                self.last_changed["artist"] = artist
 
-            text = f"{artist} - {title}"
+                text = f"{artist} - {title}"
         self.children[1].set_label(text)
 
     def on_download(self, filepath: str | None) -> None:
@@ -305,6 +318,7 @@ class Player(gtk.Box):
     def update_image(self) -> None:
         if len(current_player.value) != 2:
             self.children[0].set_visible(False)
+            self.last_changed["artUrl"] = None
         else:
             assert current_player.value
             metadata = current_player.value[1].metadata
@@ -323,32 +337,36 @@ class Player(gtk.Box):
         self.update_label()
         self.update_buttons()
 
+    def _events_debug(self, event: Event) -> None:
+        print(event.data, event.name, event.value)
+        self.on_changed()
+
     def on_changed(self, *args: t.Any) -> None:
-        _current = current_player.value[1] if current_player.value else None
-        if not _current:
+        current = self.get_player()
+        if not current:
             self.update_all()
             if self.last_changed["player_name"] is not None:
                 Globals.events.unwatch(
                     "mpris_player_changed",
-                    self.on_changed,
+                    self._events_debug,
                     self.last_changed["player_name"]
                 )
             self.last_changed["player_name"] = None
             return
 
-        if self.last_changed["player_name"] != _current._bus_name:
+        if self.last_changed["player_name"] != current._bus_name:
             if self.last_changed["player_name"] is not None:
                 Globals.events.unwatch(
                     "mpris_player_changed",
-                    self.on_changed,
+                    self._events_debug,
                     self.last_changed["player_name"]
                 )
             Globals.events.watch(
                 "mpris_player_changed",
-                self.on_changed,
-                _current._bus_name
+                self._events_debug,
+                current._bus_name
             )
-            self.last_changed["player_name"] = _current._bus_name
+            self.last_changed["player_name"] = current._bus_name
 
         self.update_all()
 
