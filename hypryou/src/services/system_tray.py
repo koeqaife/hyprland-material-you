@@ -35,24 +35,6 @@ with open(ITEM_XML_PATH) as f:
     ITEM_XML = f.read()
 
 
-signal_to_prop = {
-    f"New{prop}": prop
-    for prop in [
-        "Title",
-        "Icon",
-        "AttentionIcon",
-        "OverlayIcon",
-        "ToolTip",
-        "Status",
-    ]
-}
-gdk_pixbuf_interp_types = {
-    "hyper": gdk_pixbuf.InterpType.HYPER,
-    "bilinear": gdk_pixbuf.InterpType.BILINEAR,
-    "nearest": gdk_pixbuf.InterpType.NEAREST,
-    "tiles": gdk_pixbuf.InterpType.TILES,
-}
-
 items = Ref[dict[str, "StatusNotifierItem"]]({}, name="tray_items")
 
 
@@ -152,13 +134,15 @@ class StatusNotifierItem:
         signal_name: str,
         signal_args: tuple[str, ...]
     ) -> None:
-        prop = signal_to_prop.get(signal_name)
-        if not prop:
+        if not signal_name.startswith("New"):
             return
+        prop = signal_name.lstrip("New")
 
         if prop == "Icon":
             self._pixbufs.clear()
-            self._cache_proxy_properties(["IconName", "IconPixmap"])
+            self._cache_proxy_properties(
+                ["IconName", "IconPixmap"]
+            )
         elif prop == "Title" or prop == "ToolTip":
             self._cached_name = None
             self._cache_proxy_properties([prop])
@@ -242,32 +226,26 @@ class StatusNotifierItem:
         self,
         width: int,
         height: int,
-        resize_method: t.Literal[
-            "hyper",
-            "bilinear",
-            "nearest",
-            "tiles",
-        ] = "nearest",
+        resize_method: gdk_pixbuf.InterpType = gdk_pixbuf.InterpType.NEAREST,
     ) -> gdk_pixbuf.Pixbuf | None:
-        if pixbuf := self._pixbufs.get((width, height)):
+        if (pixbuf := self._pixbufs.get((width, height))):
             return pixbuf
-        pixmaps: Pixmaps | None = self.prop("IconPixmap")
+
+        pixmaps = self.prop("IconPixmap")
         if not pixmaps:
             return None
 
         nearest_pixmap = min(
             pixmaps,
-            key=lambda x: (x[0] - width) ** 2 + (x[1] - height) ** 2
+            key=lambda x: (x[0] - width) ** 2 + (x[1] - height) ** 2,
         )
 
         data_bytearray = bytearray(nearest_pixmap[2])
+        for i in range(0, len(data_bytearray), 4):
+            data_bytearray[i:i+4] = (
+                data_bytearray[i+1:i+4] + data_bytearray[i:i+1]
+            )
 
-        for i in range(0, 4 * nearest_pixmap[0] * nearest_pixmap[1], 4):
-            alpha = data_bytearray[i]
-            data_bytearray[i] = data_bytearray[i + 1]
-            data_bytearray[i + 1] = data_bytearray[i + 2]
-            data_bytearray[i + 2] = data_bytearray[i + 3]
-            data_bytearray[i + 3] = alpha
         pixbuf = gdk_pixbuf.Pixbuf.new_from_bytes(
             glib.Bytes.new(data_bytearray),
             gdk_pixbuf.Colorspace.RGB,
@@ -277,19 +255,16 @@ class StatusNotifierItem:
             nearest_pixmap[1],
             nearest_pixmap[0] * 4,
         )
-        if pixbuf is None:
+
+        if not pixbuf:
             return None
+
         if width != nearest_pixmap[0] or height != nearest_pixmap[1]:
-            scaled_pixbuf = pixbuf.scale_simple(
+            pixbuf = pixbuf.scale_simple(
                 width,
                 height,
-                (
-                    gdk_pixbuf_interp_types
-                    .get(resize_method.lower(), gdk_pixbuf.InterpType.NEAREST)
-                ),
+                resize_method
             )
-            self._pixbufs[(width, height)] = scaled_pixbuf
-            return scaled_pixbuf
 
         self._pixbufs[(width, height)] = pixbuf
         return pixbuf
@@ -303,31 +278,22 @@ class StatusNotifierItem:
         os.kill(pid, signal.SIGTERM)
 
     def activate(self, x: int, y: int) -> None:
-        self._proxy.call(
-            "Activate",
-            glib.Variant("(ii)", (x, y)),
-            gio.DBusCallFlags.NONE,
-            -1,
-            None,
-            None,
-            None
-        )
+        self.call_method("Activate", glib.Variant("(ii)", (x, y)))
 
     def secondary_activate(self, x: int, y: int) -> None:
-        self._proxy.call(
-            "SecondaryActivate",
-            glib.Variant("(ii)", (x, y)),
-            gio.DBusCallFlags.NONE,
-            -1,
-            None,
-            None,
-            None
-        )
+        self.call_method("SecondaryActivate", glib.Variant("(ii)", (x, y)))
 
     def context_menu(self, x: int, y: int) -> None:
+        self.call_method("ContextMenu", glib.Variant("(ii)", (x, y)))
+
+    def call_method(
+        self,
+        method_name: str,
+        params: glib.Variant
+    ) -> None:
         self._proxy.call(
-            "ContextMenu",
-            glib.Variant("(ii)", (x, y)),
+            method_name,
+            params,
             gio.DBusCallFlags.NONE,
             -1,
             None,
@@ -349,7 +315,7 @@ class StatusNotifierWatcher:
         self.ifaces = self.node_info.interfaces
         self.host_registered = True
 
-    def do_register(self) -> int:
+    def register(self) -> int:
         return gio.bus_own_name(
             BUS_TYPE,
             BUS_WATCHER,
@@ -389,19 +355,19 @@ class StatusNotifierWatcher:
                 conn.register_object(
                     PATH_WATCHER,
                     interface,
-                    self.do_handle_bus_call
+                    self.handle_bus_call
                 )
 
     def add_item(self, item: StatusNotifierItem) -> None:
         items.value[item._bus_name] = item
-        self.do_notify_registered_item(item.identifier)
+        self.notify_registered_item(item.identifier)
         return
 
     def remove_item(self, item: StatusNotifierItem) -> None:
         try:
             item.finalize()
             items.value.pop(item._bus_name, None)
-            self.do_notify_unregistered_item(item.identifier)
+            self.notify_unregistered_item(item.identifier)
         except Exception as e:
             logger.warning(
                 "Can't remove tray item with identifier '%s': %s",
@@ -409,7 +375,7 @@ class StatusNotifierWatcher:
             )
         return
 
-    def do_handle_bus_call(
+    def handle_bus_call(
         self,
         conn: gio.DBusConnection,
         sender: str,
@@ -458,14 +424,14 @@ class StatusNotifierWatcher:
                     glib.Variant("(a{sv})", (all_properties,))
                 )
             case "RegisterStatusNotifierItem":
-                self.do_create_item(
+                self.create_item(
                     sender, params[0] if len(params) >= 1 else ""
                 )
                 invocation.return_value(None)
 
         return conn.flush()
 
-    def do_create_item(self, bus_name: str, bus_path: str) -> None:
+    def create_item(self, bus_name: str, bus_path: str) -> None:
         if (
             bus_name is None
             or bus_path is None
@@ -479,9 +445,9 @@ class StatusNotifierWatcher:
         if not bus_path.startswith("/"):
             bus_path = "/StatusNotifierItem"
 
-        return self.do_acquire_item_proxy(bus_name, bus_path)
+        return self.acquire_item_proxy(bus_name, bus_path)
 
-    def do_acquire_item_proxy(self, bus_name: str, bus_path: str) -> None:
+    def acquire_item_proxy(self, bus_name: str, bus_path: str) -> None:
         return gio.DBusProxy.new_for_bus(
             BUS_TYPE,
             gio.DBusProxyFlags.NONE,
@@ -490,13 +456,13 @@ class StatusNotifierWatcher:
             bus_path,
             BUS_ITEM,
             None,
-            lambda *args: self.do_acquire_item_proxy_finish(
+            lambda *args: self.acquire_item_proxy_finish(
                 bus_name, bus_path, *args
             ),
             None,
         )
 
-    def do_acquire_item_proxy_finish(
+    def acquire_item_proxy_finish(
         self,
         bus_name: str,
         bus_path: str,
@@ -516,28 +482,30 @@ class StatusNotifierWatcher:
         self.add_item(item)
         return
 
-    def do_emit_bus_signal(
+    def emit_bus_signal(
         self,
         signal_name: str,
         params: glib.Variant
     ) -> None:
+        if not self._conn:
+            return
         self._conn.emit_signal(
             None,
             PATH_WATCHER,
             BUS_WATCHER,
             signal_name,
             params,
-        ) if self._conn is not None else None
-        return
+        )
 
-    def do_notify_registered_item(self, identifier: str) -> None:
-        self.do_emit_bus_signal(
-            "StatusNotifierItemRegistered", glib.Variant("(s)", (identifier,))
+    def notify_registered_item(self, identifier: str) -> None:
+        self.emit_bus_signal(
+            "StatusNotifierItemRegistered",
+            glib.Variant("(s)", (identifier,))
         )
         return
 
-    def do_notify_unregistered_item(self, identifier: str) -> None:
-        self.do_emit_bus_signal(
+    def notify_unregistered_item(self, identifier: str) -> None:
+        self.emit_bus_signal(
             "StatusNotifierItemUnregistered",
             glib.Variant("(s)", (identifier,)),
         )
@@ -549,4 +517,4 @@ def start() -> None:
     logger.debug("Starting system_tray dbus")
     events = Globals.events
     watcher = StatusNotifierWatcher()
-    watcher.do_register()
+    watcher.register()
