@@ -102,6 +102,8 @@ class TrayItem(gtk.Box):
         glib.idle_add(self.update_image)
 
     def update_image(self) -> None:
+        if not self.get_visible():
+            return
         item = self._item
         image = self.children[0]
         theme = item.icon_theme

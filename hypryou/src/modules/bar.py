@@ -74,6 +74,7 @@ class Workspaces(gtk.Box):
 
         self._scroll.disconnect(self._scroll_connection)
         self.remove_controller(self._scroll)
+        self._scroll = None  # type: ignore
         hyprland.active_workspace.unwatch(self.update_active)
         hyprland.workspace_ids.unwatch(self.update_empty)
 
@@ -97,8 +98,12 @@ class Workspaces(gtk.Box):
     ) -> None:
         if not new_value:
             return
+        if self._old_active == new_value:
+            return
         if self._old_active:
             toggle_css_class(self.buttons[self._old_active-1], "active", False)
+        if new_value > 10:
+            return
         toggle_css_class(self.buttons[new_value-1], "active", True)
         self._old_active = new_value
 
@@ -303,6 +308,8 @@ class Player(gtk.Box):
         self.children[1].set_label(text)
 
     def on_download(self, filepath: str | None) -> None:
+        if not self.children:
+            return
         if not filepath:
             self.children[0].set_visible(False)
             return
@@ -363,6 +370,9 @@ class Player(gtk.Box):
                 self.last_changed.player_name
             )
         for btn in self.buttons:
+            btn_child = btn.get_child()
+            if isinstance(btn_child, widget.Icon):
+                btn_child.destroy()
             btn.set_child(None)
             self.children[2].remove(btn)
         for child in self.children:
@@ -375,6 +385,8 @@ class Player(gtk.Box):
 
         self.children = None  # type: ignore
         self.buttons = None  # type: ignore
+        self.click_gesture = None  # type: ignore
+        self.image_provider = None  # type: ignore
 
 
 class KeyboardLayout(gtk.Label):
@@ -536,6 +548,9 @@ class Bar(widget.LayerWindow):
         t.cast(t.Any, box.get_start_widget()).destroy()
         t.cast(t.Any, box.get_center_widget()).destroy()
         t.cast(t.Any, box.get_end_widget()).destroy()
+        box.set_start_widget(None)
+        box.set_center_widget(None)
+        box.set_end_widget(None)
         self.set_child(None)
         Settings().unsubscribe("bar_position", self.bar_position)
         self.close()
