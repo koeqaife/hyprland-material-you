@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from utils import widget, Ref, downloader
 from utils import toggle_css_class
 from utils.logger import logger
@@ -131,6 +132,18 @@ class Clock(gtk.Label):
         date.unwatch(self.update_date)
 
 
+@dataclass
+class LastChanged:
+    artist: str | None = None
+    title: str | None = None
+    artUrl: str | None = None
+    player_name: str | None = None
+    playback_status: str | None = None
+    can_go_prev: bool | None = None
+    can_go_next: bool | None = None
+    can_pause: bool | None = None
+
+
 class Player(gtk.Box):
     def __init__(self) -> None:
         super().__init__(
@@ -155,41 +168,30 @@ class Player(gtk.Box):
             halign=gtk.Align.CENTER
         )
 
-        self.play_pause_icon = widget.Icon("pause")
-        self.buttons = (
-            gtk.Button(
-                child=widget.Icon("skip_previous"),
-                css_classes=("previous",)
-            ),
-            gtk.Button(
-                child=self.play_pause_icon,
-                css_classes=("play-pause",)
-            ),
-            gtk.Button(
-                child=widget.Icon("skip_next"),
-                css_classes=("next",)
-            ),
-        )
+        icons = ["skip_previous", "pause", "skip_next"]
+        classes = ["previous", "play-pause", "next"]
+        handlers = [self.previous, self.play_pause, self.next]
+
+        self.buttons: list[gtk.Button] = []
+        self.conns: dict[gtk.Button, int] = {}
+
+        for icon, css_class, handler in zip(icons, classes, handlers):
+            btn = gtk.Button(
+                child=widget.Icon(icon),
+                css_classes=(css_class,)
+            )
+            btn_box.append(btn)
+            self.conns[btn] = btn.connect("clicked", handler)
+            self.buttons.append(btn)
+
         self.children = (
             image,
             label,
             btn_box
         )
-        self.conns = {
-            self.buttons[1]: self.buttons[1].connect(
-                "clicked", self.play_pause
-            ),
-            self.buttons[0]: self.buttons[0].connect(
-                "clicked", self.previous
-            ),
-            self.buttons[2]: self.buttons[2].connect(
-                "clicked", self.next
-            ),
-        }
+
         for child in self.children:
             self.append(child)
-        for btn in self.buttons:
-            btn_box.append(btn)
 
         self.image_provider = gtk.CssProvider()
         image.get_style_context().add_provider(
@@ -197,16 +199,7 @@ class Player(gtk.Box):
             gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
 
-        self.last_changed: dict[str, t.Any] = {
-            "artist": None,
-            "title": None,
-            "artUrl": None,
-            "player_name": None,
-            "playback_status": None,
-            "can_go_prev": None,
-            "can_go_next": None,
-            "can_pause": None
-        }
+        self.last_changed = LastChanged()
         current_player.watch(self.on_changed)
         self.on_changed()
 
@@ -242,10 +235,10 @@ class Player(gtk.Box):
         current = self.get_player()
         if not current:
             self.children[2].set_visible(False)
-            self.last_changed["can_go_prev"] = None
-            self.last_changed["can_go_next"] = None
-            self.last_changed["can_pause"] = None
-            self.last_changed["playback_status"] = None
+            self.last_changed.can_go_prev = None
+            self.last_changed.can_go_next = None
+            self.last_changed.can_pause = None
+            self.last_changed.playback_status = None
         else:
             last_changed = self.last_changed
 
@@ -254,24 +247,26 @@ class Player(gtk.Box):
             can_go_next = current.can_go_next
             can_pause = current.can_pause
 
-            if playback_status != last_changed["playback_status"]:
-                self.play_pause_icon.set_label(
-                    "pause" if playback_status == "Playing"
-                    else "play_arrow"
-                )
-                last_changed["playback_status"] = playback_status
+            if playback_status != last_changed.playback_status:
+                icon = self.buttons[1].get_child()
+                if isinstance(icon, gtk.Label):
+                    icon.set_label(
+                        "pause" if playback_status == "Playing"
+                        else "play_arrow"
+                    )
+                    last_changed.playback_status = playback_status
 
-            if can_go_prev != last_changed["can_go_prev"]:
+            if can_go_prev != last_changed.can_go_prev:
                 self.buttons[0].set_visible(can_go_prev)
-                last_changed["can_go_prev"] = can_go_prev
+                last_changed.can_go_prev = can_go_prev
 
-            if can_go_next != last_changed["can_go_next"]:
+            if can_go_next != last_changed.can_go_next:
                 self.buttons[2].set_visible(can_go_next)
-                last_changed["can_go_next"] = can_go_next
+                last_changed.can_go_next = can_go_next
 
-            if can_pause != last_changed["can_pause"]:
+            if can_pause != last_changed.can_pause:
                 self.buttons[1].set_visible(can_pause)
-                last_changed["can_pause"] = can_pause
+                last_changed.can_pause = can_pause
 
             self.children[2].set_visible(
                 can_pause or can_go_next or can_go_prev
@@ -281,28 +276,28 @@ class Player(gtk.Box):
         current = self.get_player()
         if not current:
             text = "Nothing's playing"
-            self.last_changed["title"] = None
-            self.last_changed["artist"] = None
+            self.last_changed.title = None
+            self.last_changed.artist = None
         else:
             metadata = current.metadata
 
-            _artist = metadata.get("xesam_artist")
+            xesam_artist = metadata.get("xesam_artist")
+            artist = xesam_artist[0] if xesam_artist else None
             title = metadata.get("xesam_title")
 
-            if not _artist or not title:
+            if not artist or not title:
                 text = "Nothing's playing"
-                self.last_changed["title"] = None
-                self.last_changed["artist"] = None
+                self.last_changed.title = None
+                self.last_changed.artist = None
             else:
-                artist = _artist[0]
                 if (
-                    artist == self.last_changed["artist"]
-                    or title == self.last_changed["title"]
+                    artist == self.last_changed.artist
+                    or title == self.last_changed.title
                 ):
                     return
 
-                self.last_changed["title"] = title
-                self.last_changed["artist"] = artist
+                self.last_changed.title = title
+                self.last_changed.artist = artist
 
                 text = f"{artist} - {title}"
         self.children[1].set_label(text)
@@ -317,16 +312,16 @@ class Player(gtk.Box):
     def update_image(self) -> None:
         if len(current_player.value) != 2:
             self.children[0].set_visible(False)
-            self.last_changed["artUrl"] = None
+            self.last_changed.artUrl = None
         else:
             assert current_player.value
             metadata = current_player.value[1].metadata
             art_url = metadata.get("mpris_artUrl")
-            if not art_url or art_url == self.last_changed["artUrl"]:
+            if not art_url or art_url == self.last_changed.artUrl:
                 return
             self.children[0].set_visible(True)
 
-            self.last_changed["artUrl"] = art_url
+            self.last_changed.artUrl = art_url
             downloader.download_image_async(
                 art_url, self.on_download, (24, 24), "arts"
             )
@@ -336,42 +331,36 @@ class Player(gtk.Box):
         self.update_label()
         self.update_buttons()
 
+    def update_watcher(self, new_name: str | None) -> None:
+        old_name = self.last_changed.player_name
+        if old_name != new_name:
+            if old_name is not None:
+                Globals.events.unwatch(
+                    "mpris_player_changed", self.on_changed, old_name
+                )
+            if new_name is not None:
+                Globals.events.watch(
+                    "mpris_player_changed", self.on_changed, new_name
+                )
+            self.last_changed.player_name = new_name
+
     def on_changed(self, *args: t.Any) -> None:
         current = self.get_player()
+        self.update_watcher(current._bus_name if current else None)
+
         if not current:
             self.update_all()
-            if self.last_changed["player_name"] is not None:
-                Globals.events.unwatch(
-                    "mpris_player_changed",
-                    self.on_changed,
-                    self.last_changed["player_name"]
-                )
-            self.last_changed["player_name"] = None
             return
-
-        if self.last_changed["player_name"] != current._bus_name:
-            if self.last_changed["player_name"] is not None:
-                Globals.events.unwatch(
-                    "mpris_player_changed",
-                    self.on_changed,
-                    self.last_changed["player_name"]
-                )
-            Globals.events.watch(
-                "mpris_player_changed",
-                self.on_changed,
-                current._bus_name
-            )
-            self.last_changed["player_name"] = current._bus_name
 
         self.update_all()
 
     def destroy(self) -> None:
         current_player.unwatch(self.on_changed)
-        if self.last_changed["player_name"] is not None:
+        if self.last_changed.player_name is not None:
             Globals.events.unwatch(
                 "mpris_player_changed",
                 self.on_changed,
-                self.last_changed["player_name"]
+                self.last_changed.player_name
             )
         for btn in self.buttons:
             btn.set_child(None)
