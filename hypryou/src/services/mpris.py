@@ -23,7 +23,6 @@ type PlaybackStatus = t.Literal["Playing", "Paused", "Stopped"]
 
 
 def update_current_player() -> None:
-    print("UPDATE CURRENT")
     last_changed_player: tuple[float, MprisPlayer] | None = None
 
     for bus_name, player in players.value.items():

@@ -2,7 +2,6 @@ from utils import widget, Ref, downloader
 from utils import toggle_css_class
 from utils.logger import logger
 from src.variables.clock import date, time
-from src.services.events import Event
 from src.variables import Globals
 from repository import gtk, gdk, layer_shell, pango
 from src.services import hyprland
@@ -337,10 +336,6 @@ class Player(gtk.Box):
         self.update_label()
         self.update_buttons()
 
-    def _events_debug(self, event: Event) -> None:
-        print(event.data, event.name, event.value)
-        self.on_changed()
-
     def on_changed(self, *args: t.Any) -> None:
         current = self.get_player()
         if not current:
@@ -348,7 +343,7 @@ class Player(gtk.Box):
             if self.last_changed["player_name"] is not None:
                 Globals.events.unwatch(
                     "mpris_player_changed",
-                    self._events_debug,
+                    self.on_changed,
                     self.last_changed["player_name"]
                 )
             self.last_changed["player_name"] = None
@@ -358,12 +353,12 @@ class Player(gtk.Box):
             if self.last_changed["player_name"] is not None:
                 Globals.events.unwatch(
                     "mpris_player_changed",
-                    self._events_debug,
+                    self.on_changed,
                     self.last_changed["player_name"]
                 )
             Globals.events.watch(
                 "mpris_player_changed",
-                self._events_debug,
+                self.on_changed,
                 current._bus_name
             )
             self.last_changed["player_name"] = current._bus_name
