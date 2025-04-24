@@ -7,9 +7,16 @@ import utils.downloader as downloader
 from utils.ref import Ref
 from utils.logger import setup_logger
 from utils.styles import (
-    apply_css, reload_css, compile_scss, toggle_css_class
+    apply_css,
+    reload_css,
+    compile_scss,
+    toggle_css_class
 )
-from utils.format import get_formatted_date, get_formatted_time
+from utils.format import (
+    get_formatted_date,
+    get_formatted_time,
+    escape_markup
+)
 
 import typing as t
 import asyncio
@@ -29,7 +36,8 @@ __all__ = [
     "toggle_css_class",
     "format",
     "debounce",
-    "downloader"
+    "downloader",
+    "escape_markup"
 ]
 
 

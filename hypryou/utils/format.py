@@ -38,3 +38,15 @@ def get_formatted_time(
         return f"{hours}:{minutes} {period}"
     else:
         return f"{hours:02d}:{minutes}"
+
+
+def escape_markup(text: str) -> str:
+    escape_dict = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&apos;'
+    }
+
+    return ''.join(escape_dict.get(c, c) for c in text)
