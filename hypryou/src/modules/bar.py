@@ -12,6 +12,7 @@ from time import perf_counter
 import typing as t
 from config import Settings
 from src.services.mpris import MprisPlayer, current_player
+from src.services.events import Event
 import weakref
 
 
@@ -460,7 +461,8 @@ class OpenTray(gtk.Button):
         self.conn_id = self.connect("clicked", self.on_clicked)
 
     def on_clicked(self, *args: t.Any) -> None:
-        Globals.events.notify("toggle_window", "tray", None)
+        event = Event(None, "tray", "toggle_window")
+        Globals.events.notify(event)
 
     def destroy(self) -> None:
         self.disconnect(self.conn_id)

@@ -5,7 +5,7 @@ from repository import gio, glib
 import typing as t
 from src.services.dbus import dbus_proxy, bus, cache_proxy_properties
 from src.services.dbus import ServiceABC
-from src.services.events import Event
+from src.services.events import NameOwnerChanged, MprisPlayerChanged
 from src.variables import Globals
 from utils.logger import logger
 from utils import Ref
@@ -119,9 +119,13 @@ class MprisPlayer:
             self._pos_changed_time = time.monotonic()
             self._last_changed_time = time.monotonic()
             update_current_player()
-            Globals.events.notify("mpris_player_changed", self._bus_name, {
-                "time": self.position
-            })
+
+            event = MprisPlayerChanged(
+                {"time": self.position},
+                self._bus_name,
+                "mpris_player_changed"
+            )
+            Globals.events.notify(event)
 
     def finalize(self) -> None:
         for conn in self.conns:
@@ -156,7 +160,10 @@ class MprisPlayer:
         self._last_changed_time = time.monotonic()
         update_current_player()
 
-        Globals.events.notify("mpris_player_changed", self._bus_name, None)
+        event = MprisPlayerChanged(
+            None, self._bus_name, "mpris_player_changed"
+        )
+        Globals.events.notify(event)
 
     def prop(self, property_name: str) -> t.Any:
         value = self._proxy.get_cached_property(property_name)
@@ -337,16 +344,13 @@ class MprisPlayer:
 class MprisWatcher:
     def __init__(self) -> None:
         Globals.events.watch(
-            "dbus_signal",
-            self.on_name_owner_changed,
-            "name_owner_changed"
+            "name_owner_changed",
+            self.on_name_owner_changed
         )
 
-    def on_name_owner_changed(self, event: Event) -> None:
-        name, old_owner, new_owner = t.cast(
-            tuple[str, str, str],
-            event.data
-        )
+    def on_name_owner_changed(self, event: NameOwnerChanged) -> None:
+        name, old_owner, new_owner = event.data
+
         if name.startswith(MPRIS_PREFIX):
             if old_owner != "" and new_owner == "":  # Disappeared
                 self.remove_player(name)
@@ -393,7 +397,7 @@ class MprisWatcher:
 
 
 class Service(ServiceABC):
-    def start() -> None:
+    def start(self) -> None:
         logger.debug("Starting mpris watcher")
         watcher = MprisWatcher()
         watcher.scan_existing_players()

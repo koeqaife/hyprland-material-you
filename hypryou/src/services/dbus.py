@@ -1,7 +1,7 @@
 import abc
 from repository import gio, glib
 from src.variables import Globals
-from src.services.events import EventsBus
+from src.services.events import EventsBus, NameOwnerChanged
 from utils.logger import logger
 import typing as t
 
@@ -36,11 +36,12 @@ def on_name_owner_changed(
         "NameOwnerChanged: %s, '%s' -> '%s'",
         name, old_owner, new_owner
     )
-    events.notify(
-        "dbus_signal",
-        "name_owner_changed",
-        (name, old_owner, new_owner)
+    event = NameOwnerChanged(
+        (name, old_owner, new_owner),
+        name,
+        "name_owner_changed"
     )
+    events.notify(event)
 
 
 def subscribe_signals(connection: gio.DBusConnection) -> int:
@@ -127,7 +128,7 @@ class ServiceABC(abc.ABC):
 
 
 class Service(ServiceABC):
-    def start() -> None:
+    def start(self) -> None:
         global events
         events = Globals.events
         subscribe_signals(bus)

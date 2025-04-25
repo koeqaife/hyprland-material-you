@@ -87,7 +87,12 @@ class HyprlandClient:
                 continue
             event, data = decoded.split(">>", 1)
             args: list[str] = data.split(",") if data else []
-            self._events.notify("hyprland", event, args)
+            new_event = Event(
+                args,
+                event,
+                "hyprland"
+            )
+            self._events.notify(new_event)
 
     async def raw(self, command: str) -> str:
         reader, writer = await asyncio.open_unix_connection(

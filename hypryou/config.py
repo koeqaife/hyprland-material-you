@@ -74,7 +74,12 @@ class Settings:
     def set(self, name: str, value: t.Any) -> None:
         self._values[name] = value
         self.sync()
-        self._events.notify("settings_changed", name, value)
+        event = Event(
+            value,
+            name,
+            "settings_changed"
+        )
+        self._events.notify(event)
 
     def get(self, name: str) -> t.Any:
         if name in self._values:

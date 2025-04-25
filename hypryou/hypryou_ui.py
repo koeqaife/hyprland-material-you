@@ -45,7 +45,7 @@ class HyprYou(gtk.Application):
     async def start_app(self) -> None:
         await hyprland.init()
         for service in dbus_services:
-            service.start()
+            service().start()
 
         self.tasks = [
             asyncio.create_task(cli.serve()),

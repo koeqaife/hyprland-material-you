@@ -6,7 +6,9 @@ from repository import gio, glib, gtk, gdk_pixbuf
 from config import CONFIG_DIR
 from utils.logger import logger
 from src.variables import Globals
-from src.services.events import EventsBus, Event
+from src.services.events import (
+    EventsBus, Event, NameOwnerChanged, TrayItemChanged
+)
 from src.services.dbus import BUS_TYPE, dbus_proxy, cache_proxy_properties
 from src.services.dbus import ServiceABC
 import typing as t
@@ -126,7 +128,11 @@ class StatusNotifierItem:
         if "Icon" in changed_properties:
             self._pixbufs.clear()
         self._cache_proxy_properties(list(changed_properties.keys()))
-        events.notify("tray_item_changed", self.identifier, None)
+
+        event = TrayItemChanged(
+            None, self.identifier, "tray_item_changed"
+        )
+        events.notify(event)
 
     def on_dbus_signal(
         self,
@@ -149,10 +155,15 @@ class StatusNotifierItem:
             self._cache_proxy_properties([prop])
         else:
             self._cache_proxy_properties([prop])
-        events.notify("tray_item_changed", self.identifier, {
-            "signal": signal_name,
-            "prop": prop.lower()
-        })
+        event = Event(
+            {
+                "signal": signal_name,
+                "prop": prop.lower()
+            },
+            self.identifier,
+            "tray_item_changed"
+        )
+        events.notify(event)
 
     def prop(self, property_name: str) -> t.Any:
         value = self._proxy.get_cached_property(property_name)
@@ -330,7 +341,7 @@ class StatusNotifierWatcher:
 
     def on_name_owner_changed(
         self,
-        event: Event
+        event: NameOwnerChanged
     ) -> None:
         name, old_owner, new_owner = event.data
         if name in items.value and new_owner == "":
@@ -345,9 +356,8 @@ class StatusNotifierWatcher:
     ) -> None:
         logger.debug("System tray bus acquired")
         events.watch(
-            "dbus_signal",
-            self.on_name_owner_changed,
-            "name_owner_changed"
+            "name_owner_changed",
+            self.on_name_owner_changed
         )
         self._conn = conn
         for interface in self.ifaces:
@@ -514,7 +524,7 @@ class StatusNotifierWatcher:
 
 
 class Service(ServiceABC):
-    def start() -> None:
+    def start(self) -> None:
         global events
         logger.debug("Starting system_tray dbus")
         events = Globals.events

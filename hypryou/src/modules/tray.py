@@ -3,7 +3,7 @@ from utils.logger import logger
 from repository import gtk, layer_shell, gdk, glib
 from src.variables import Globals
 from src.services.system_tray import StatusNotifierItem, items
-from src.services.events import Event
+from src.services.events import TrayItemChanged, Event
 from config import hyprland_gap
 import weakref
 
@@ -64,7 +64,7 @@ class TrayItem(gtk.Box):
         )
         # weakref.finalize(self, lambda: logger.debug("TrayWidget finalized"))
 
-    def on_changed(self, event: Event) -> None:
+    def on_changed(self, event: TrayItemChanged) -> None:
         if event.data:
             to_change = {
                 "icon": self.idle_update_image,
