@@ -38,7 +38,7 @@ def on_name_owner_changed(
     )
     event = NameOwnerChanged(
         (name, old_owner, new_owner),
-        name,
+        "global",
         "name_owner_changed"
     )
     events.notify(event)
