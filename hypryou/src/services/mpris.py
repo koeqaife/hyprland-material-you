@@ -4,6 +4,7 @@ import time
 from repository import gio, glib
 import typing as t
 from src.services.dbus import dbus_proxy, bus, cache_proxy_properties
+from src.services.dbus import ServiceABC
 from src.services.events import Event
 from src.variables import Globals
 from utils.logger import logger
@@ -391,7 +392,8 @@ class MprisWatcher:
             update_current_player()
 
 
-def start() -> None:
-    logger.debug("Starting mpris watcher")
-    watcher = MprisWatcher()
-    watcher.scan_existing_players()
+class Service(ServiceABC):
+    def start() -> None:
+        logger.debug("Starting mpris watcher")
+        watcher = MprisWatcher()
+        watcher.scan_existing_players()

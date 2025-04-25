@@ -8,6 +8,7 @@ from utils.logger import logger
 from src.variables import Globals
 from src.services.events import EventsBus, Event
 from src.services.dbus import BUS_TYPE, dbus_proxy, cache_proxy_properties
+from src.services.dbus import ServiceABC
 import typing as t
 from utils import Ref
 
@@ -512,9 +513,10 @@ class StatusNotifierWatcher:
         return
 
 
-def start() -> None:
-    global events
-    logger.debug("Starting system_tray dbus")
-    events = Globals.events
-    watcher = StatusNotifierWatcher()
-    watcher.register()
+class Service(ServiceABC):
+    def start() -> None:
+        global events
+        logger.debug("Starting system_tray dbus")
+        events = Globals.events
+        watcher = StatusNotifierWatcher()
+        watcher.register()

@@ -1,3 +1,4 @@
+import abc
 from repository import gio, glib
 from src.variables import Globals
 from src.services.events import EventsBus
@@ -120,7 +121,13 @@ def cache_proxy_properties_finish(
         callback()
 
 
-def start() -> None:
-    global events
-    events = Globals.events
-    subscribe_signals(bus)
+class ServiceABC(abc.ABC):
+    def start(self) -> None:
+        ...
+
+
+class Service(ServiceABC):
+    def start() -> None:
+        global events
+        events = Globals.events
+        subscribe_signals(bus)

@@ -28,6 +28,11 @@ from src.modules.tray import TrayWindow
 
 START = time.perf_counter()
 
+dbus_services = (
+    dbus.Service, system_tray.Service,
+    mpris.Service
+)
+
 
 class HyprYou(gtk.Application):
     def do_activate(self) -> None:
@@ -39,9 +44,8 @@ class HyprYou(gtk.Application):
 
     async def start_app(self) -> None:
         await hyprland.init()
-        dbus.start()
-        system_tray.start()
-        mpris.start()
+        for service in dbus_services:
+            service.start()
 
         self.tasks = [
             asyncio.create_task(cli.serve()),
