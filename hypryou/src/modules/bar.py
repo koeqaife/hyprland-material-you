@@ -153,9 +153,9 @@ class Player(gtk.Box):
     def __init__(self) -> None:
         super().__init__(
             css_classes=("mpris-player", "bar-applet"),
-            halign=gtk.Align.START
+            halign=gtk.Align.START,
+            valign=gtk.Align.CENTER
         )
-        self.set_size_request(324, -1)
 
         image = gtk.Box(
             css_classes=("image",),
@@ -290,9 +290,9 @@ class Player(gtk.Box):
         else:
             metadata = current.metadata
 
-            xesam_artist = metadata.get("xesam_artist")
+            xesam_artist = metadata.get("xesam:artist")
             artist = xesam_artist[0] if xesam_artist else None
-            title = metadata.get("xesam_title")
+            title = metadata.get("xesam:title")
 
             if not artist or not title:
                 text = "Nothing's playing"
@@ -331,7 +331,7 @@ class Player(gtk.Box):
         else:
             assert current_player.value
             metadata = current_player.value[1].metadata
-            art_url = metadata.get("mpris_artUrl")
+            art_url = metadata.get("mpris:artUrl")
             if not art_url or art_url == self.last_changed.artUrl:
                 return
             self.children[0].set_visible(True)

@@ -51,38 +51,35 @@ def update_current_player() -> None:
             current_player.value = (True, last_changed_player[1])
 
 
-class MprisMetadata(t.TypedDict, total=False):
-    mpris_trackid: str
-    mpris_length: int
-    xesam_title: str
-    xesam_artist: list[str]
-    xesam_album: str
-    xesam_album_artist: t.Optional[str]
-    xesam_genre: list[str]
+MprisMetadata = t.TypedDict(
+    "MprisMetadata",
+    {
+        "xesam:album": str,
+        "xesam:albumArtist": list[str],
+        "xesam:artist": list[str],
+        "xesam:asText": str,
+        "xesam:audioBPM": int,
+        "xesam:autoRating": float,
+        "xesam:comment": list[str],
+        "xesam:composer": list[str],
+        "xesam:discNumber": int,
+        "xesam:genre": list[str],
+        "xesam:lyricist": list[str],
+        "xesam:title": str,
+        "xesam:trackNumber": int,
+        "xesam:url": str,
+        "xesam:useCount": int,
+        "xesam:userRating": float,
 
-    xesam_composer: t.Optional[list[str]]
-    xesam_conductor: t.Optional[list[str]]
-    xesam_track_number: t.Optional[int]
-    xesam_disc_number: t.Optional[int]
-    xesam_date: t.Optional[str]
-    xesam_url: t.Optional[str]
-    xesam_lyrics: t.Optional[str]
-    xesam_media_type: t.Optional[str]
-    xesam_rating: t.Optional[float]
-
-    mpris_artUrl: t.Optional[str]
-    mpris_shuffle: t.Optional[bool]
-    mpris_loopStatus: t.Optional[str]
-    mpris_volume: t.Optional[float]
-    mpris_playback_status: t.Optional[str]
+        "mpris:artUrl": str,
+        "mpris:length": bool,
+        "mpris:trackid": str
+    }
+)
 
 
 def to_mpris_metadata(d: dict[str, t.Any]) -> MprisMetadata:
-    converted = {
-        key.replace(':', '_'): value
-        for key, value in d.items()
-    }
-    return t.cast(MprisMetadata, converted)
+    return t.cast(MprisMetadata, d)
 
 
 class MprisPlayer:
