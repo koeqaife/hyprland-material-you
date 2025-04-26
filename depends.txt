@@ -11,6 +11,7 @@ hyprland
 dbus
 dbus-glib
 python-pillow
+cairo
 
 Versions:
 "Used" means I used this version when I was developing, so these versions are 100% compatible
@@ -23,3 +24,4 @@ Versions:
 - dbus: Used 1.16.2-1
 - dbus-glib: Used 0.114-1
 - python-pillow: Used 11.2.1-1
+- cairo: Used 1.18.4-1
