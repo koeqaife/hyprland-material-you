@@ -23,7 +23,7 @@ from src.services import cli
 from src.services import events
 
 # Modules
-from src.modules.bar import Bar
+from src.modules.bar import Bar, Corner
 from src.modules.tray import TrayWindow
 
 START = time.perf_counter()
@@ -38,6 +38,7 @@ class HyprYou(gtk.Application):
     def do_activate(self) -> None:
         utils.apply_css()
         self.windows: dict[gdk.Monitor, list[gtk.ApplicationWindow]] = {}
+        self.corners: dict[gdk.Monitor, list[Corner]] = {}
 
         self.hold()
         asyncio.create_task(self.start_app())
@@ -86,6 +87,17 @@ class HyprYou(gtk.Application):
                 self.windows[monitor].clear()
                 del self.windows[monitor]
 
+        for monitor in list(self.corners.keys()):
+            if monitor not in monitors:
+                logger.debug(
+                    "Removing corners for monitor: %s",
+                    monitor.get_model()
+                )
+                for corner in self.corners[monitor]:
+                    corner.destroy_window()
+                self.corners[monitor].clear()
+                del self.corners[monitor]
+
         for monitor in list(monitors):  # type: ignore[assignment]
             if monitor not in self.windows:
                 logger.debug(
@@ -93,9 +105,14 @@ class HyprYou(gtk.Application):
                     monitor.get_model()
                 )
                 windows: list[gtk.ApplicationWindow] = [
-                    Bar(self, monitor)
+                    Bar(self, monitor),
+                ]
+                corners = [
+                    Corner(self, monitor, "left"),
+                    Corner(self, monitor, "right")
                 ]
                 self.windows[monitor] = windows
+                self.corners[monitor] = corners
                 for window in windows:
                     window.present()
 

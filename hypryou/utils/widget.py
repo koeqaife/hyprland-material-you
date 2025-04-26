@@ -1,6 +1,8 @@
 from repository import gtk, layer_shell, gdk
 from utils.ref import Ref
 import typing as t
+import cairo
+from math import pi
 
 
 __all__ = [
@@ -116,3 +118,51 @@ class Icon(gtk.Label):
     def destroy(self) -> None:
         if isinstance(self.icon, Ref):
             self.icon.unwatch(self.update)
+
+
+class RoundedCorner(gtk.DrawingArea):
+    def __init__(
+        self,
+        place: str,
+        radius: int = 32,
+        **props
+    ) -> None:
+        super().__init__(**props)
+        self.radius = radius
+        self.place = place
+        self.set_draw_func(self.on_draw)
+        self.set_content_height(radius)
+        self.set_content_width(radius)
+        self.add_css_class("corner")
+
+    def on_draw(
+        self,
+        widget: t.Self,
+        cr: cairo.Context,
+        width: int,
+        height: int
+    ) -> bool:
+        radius = self.radius
+        style_context = widget.get_style_context()
+        color = style_context.get_color()
+
+        r, g, b, a = color.red, color.green, color.blue, color.alpha
+
+        if self.place == "top-left":
+            cr.arc(radius, radius, radius, pi, 1.5 * pi)
+            cr.line_to(0, 0)
+        elif self.place == "top-right":
+            cr.arc(0, radius, radius, 1.5 * pi, 2 * pi)
+            cr.line_to(radius, 0)
+        elif self.place == "bottom-left":
+            cr.arc(radius, 0, radius, 0.5 * pi, pi)
+            cr.line_to(0, radius)
+        elif self.place == "bottom-right":
+            cr.arc(0, 0, radius, 0, 0.5 * pi)
+            cr.line_to(radius, radius)
+
+        cr.close_path()
+        cr.set_source_rgba(r, g, b, a)
+        cr.fill()
+
+        return False

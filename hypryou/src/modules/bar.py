@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+
+import cairo
 from utils import widget, Ref, downloader
 from utils import toggle_css_class, escape_markup
 from utils.logger import logger
@@ -14,6 +16,9 @@ from config import Settings
 from src.services.mpris import MprisPlayer, current_player
 from src.services.events import Event
 import weakref
+
+
+dummy_region = cairo.Region()
 
 
 class WorkspaceButton(gtk.Button):
@@ -343,6 +348,7 @@ class Player(gtk.Box):
             )
 
     def update_all(self) -> None:
+        logger.debug("update all")
         self.update_image()
         self.update_label()
         self.update_buttons()
@@ -565,3 +571,83 @@ class Bar(widget.LayerWindow):
         Settings().unsubscribe("bar_position", self.bar_position)
         self.close()
         super().destroy()
+
+
+class Corner:
+    def __init__(
+        self,
+        application: gtk.Application,
+        monitor: gdk.Monitor,
+        position: t.Literal["left", "right"]
+    ) -> None:
+        self.position = position
+        self.settings = Settings()
+        self.application = application
+        self.monitor = monitor
+
+        self.window: widget.LayerWindow | None = None
+        self.corner: widget.RoundedCorner | None = None
+
+        self.settings.subscribe("bar_position", self.update_anchor, False)
+        self.settings.subscribe("corners", self.update_visible, True)
+
+    def create_window(self) -> None:
+        is_on_top = self.settings.get("bar_position") == "top"
+        is_on_left = self.position == "left"
+        corner_position = "top" if is_on_top else "bottom"
+
+        self.window = widget.LayerWindow(
+            application=self.application,
+            monitor=self.monitor,
+            anchors={
+                "top": is_on_top,
+                "bottom": not is_on_top,
+                "left": is_on_left,
+                "right": not is_on_left
+            },
+            css_classes=("transparent",)
+        )
+
+        self.corner = widget.RoundedCorner(
+            f"{corner_position}-{self.position}"
+        )
+        self.window.set_child(self.corner)
+
+        self.application.add_window(self.window)
+
+        self.window.present()
+        surface = self.window.get_surface()
+        if surface:
+            surface.set_input_region(dummy_region)
+
+    def destroy_window(self) -> None:
+        if self.window:
+            self.window.destroy()
+            self.window = None
+        if self.corner:
+            self.corner = None
+
+    def update_visible(self, value: bool) -> None:
+        if value:
+            self.create_window()
+        else:
+            self.destroy_window()
+
+    def update_anchor(self, value: str) -> None:
+        if not self.corner:
+            return
+        is_on_top = value == "top"
+
+        layer_shell.set_anchor(
+            self,
+            layer_shell.Edge.TOP,
+            is_on_top
+        )
+        layer_shell.set_anchor(
+            self,
+            layer_shell.Edge.BOTTOM,
+            not is_on_top
+        )
+
+        corner_position = "top" if is_on_top else "bottom"
+        self.corner.place = f"{corner_position}-{self.position}"
