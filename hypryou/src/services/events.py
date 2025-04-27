@@ -15,7 +15,8 @@ type EventName = t.Literal[
     "name_owner_changed", "tray_item_changed",
     "mpris_player_changed", "hyprland",
     "toggle_window", "global",
-    "settings_changed"
+    "settings_changed", "notification_replaced",
+    "notification_dismissed"
 ]
 
 
@@ -76,7 +77,7 @@ class EventsBus:
         # this log is commented due to spam in console
         # logger.debug(
         #     "Event '%s' with value '%s' notified watchers",
-        #     event, value
+        #     name, value
         # )
         for watcher in self._watchers[name][value]:
             watcher(event)

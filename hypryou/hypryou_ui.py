@@ -21,16 +21,18 @@ from src.services import mpris
 from src.services import system_tray
 from src.services import cli
 from src.services import events
+from src.services import notifications
 
 # Modules
 from src.modules.bar import Bar, Corner
 from src.modules.tray import TrayWindow
+from src.modules.notifications.popups import Notifications
 
 START = time.perf_counter()
 
 dbus_services = (
     dbus.Service, system_tray.Service,
-    mpris.Service
+    mpris.Service, notifications.Service
 )
 
 
@@ -98,7 +100,7 @@ class HyprYou(gtk.Application):
                 self.corners[monitor].clear()
                 del self.corners[monitor]
 
-        for monitor in list(monitors):  # type: ignore[assignment]
+        for i, monitor in enumerate(list(monitors)):  # type: ignore[assignment]  # noqa
             if monitor not in self.windows:
                 logger.debug(
                     "Adding windows for monitor: %s",
@@ -106,6 +108,7 @@ class HyprYou(gtk.Application):
                 )
                 windows: list[gtk.ApplicationWindow] = [
                     Bar(self, monitor),
+                    Notifications(self, monitor, i)
                 ]
                 corners = [
                     Corner(self, monitor, "left"),
