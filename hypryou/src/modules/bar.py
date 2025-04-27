@@ -348,7 +348,6 @@ class Player(gtk.Box):
             )
 
     def update_all(self) -> None:
-        logger.debug("update all")
         self.update_image()
         self.update_label()
         self.update_buttons()
