@@ -7,6 +7,7 @@ import typing as t
 import json
 from src.variables import Globals
 from src.services.events import Event, Watcher
+import config
 
 active_workspace = Ref(0, name="workspace", delayed_init=True)
 active_layout = Ref("en", name="active_layout", delayed_init=True)
@@ -217,12 +218,32 @@ async def init() -> None:
     workspace_ids.value = set(_active_workspaces)
     workspace_ids.ready()
 
-    logger.debug("Creating watchers")
+    logger.debug("Creating hyprland watchers")
     client.watch("workspacev2", EventCallbacks.on_workspacev2)
     client.watch("focusedmonv2", EventCallbacks.on_focusedmonv2)
     client.watch("createworkspacev2", EventCallbacks.on_createworkspacev2)
     client.watch("destroyworkspacev2", EventCallbacks.on_destroyworkspacev2)
     client.watch("activelayout", EventCallbacks.on_activelayout)
+
+    gaps_out_query = await client.query("getoption general:gaps_out")
+    rounding_query = await client.query("getoption decoration:rounding")
+
+    try:
+        if isinstance(gaps_out_query, dict):
+            if gaps_out_query.get("int"):
+                config.hyprland_gap = int(gaps_out_query["int"])
+            elif gaps_out_query.get("custom"):
+                config.hyprland_gap = int(gaps_out_query["custom"].split()[0])
+
+        if isinstance(rounding_query, dict) and rounding_query.get("int"):
+            config.hyprland_rounding = rounding_query["int"]
+    except Exception as e:
+        logger.error(
+            "Error while parsing gaps_out or rounding: %s",
+            e, exc_info=e
+        )
+        config.hyprland_gap = 0
+        config.hyprland_rounding = 0
 
 
 async def connect() -> None:
