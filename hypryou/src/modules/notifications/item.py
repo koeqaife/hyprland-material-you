@@ -92,6 +92,7 @@ class NotificationItem(gtk.Box):
         )
         self.image = gtk.Image(
             css_classes=("body-image",),
+            valign=gtk.Align.START,
         )
         self.text_box = gtk.Box(
             orientation=gtk.Orientation.VERTICAL
