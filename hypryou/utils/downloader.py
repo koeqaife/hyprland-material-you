@@ -3,7 +3,7 @@ import typing as t
 import uuid
 
 from repository import gio, glib
-from PIL import Image
+from PIL import Image, ImageFilter
 from config import APP_CACHE_PATH
 from utils.logger import logger
 import threading
@@ -19,18 +19,44 @@ def get_cache_dir(url: str, subdir: str) -> str:
     return os.path.join(APP_CACHE_PATH, subdir, name)
 
 
-def handle_local_file(url: str, callback: Callback) -> bool:
-    if url.startswith("file://"):
-        path = gio.File.new_for_uri(url).get_path()
-        callback(path)
-        return True
-    return False
+def resize_image(
+    filepath: str,
+    size: tuple[int, int],
+    with_unsharp: bool = True
+) -> str:
+    target_w, target_h = size
 
-
-def resize_image(filepath: str, size: tuple[int, int]) -> str:
     with Image.open(filepath) as img:
-        img.thumbnail(size, Image.Resampling.LANCZOS)
-        img.save(filepath, quality=95)
+        src_w, src_h = img.size
+        tgt_ratio = target_w / target_h
+        src_ratio = src_w / src_h
+
+        if src_ratio > tgt_ratio:
+            new_w = int(src_h * tgt_ratio)
+            new_h = src_h
+            left = (src_w - new_w) // 2
+            top = 0
+        else:
+            new_w = src_w
+            new_h = int(src_w / tgt_ratio)
+            left = 0
+            top = (src_h - new_h) // 2
+
+        right = left + new_w
+        bottom = top + new_h
+
+        cropped = img.crop((left, top, right, bottom))
+
+        resized = cropped.resize(size, Image.Resampling.LANCZOS)
+
+        if with_unsharp:
+            sharpened = resized.filter(
+                ImageFilter.UnsharpMask(radius=1, percent=5, threshold=3)
+            )
+            sharpened.save(filepath, quality=95)
+        else:
+            resized.save(filepath, quality=95)
+
     return filepath
 
 
@@ -76,7 +102,6 @@ class DownloadState:
                     glib.PRIORITY_DEFAULT, None, None, None
                 )
                 self.on_complete(finalized_path)
-
                 return
             data = chunk.get_data()
             if not data:
@@ -126,6 +151,7 @@ def download_image_async(
     size: tuple[int, int] | None = None,
     subdir: str = "images"
 ) -> None:
+    print(url)
     if size:
         subdir = f"{subdir}/{size[0]}x{size[1]}"
     cache_dir = get_cache_dir(url, subdir)
@@ -136,7 +162,10 @@ def download_image_async(
             callback(os.path.join(cache_dir, fname))
             return
 
-    if handle_local_file(url, callback):
+    if url.startswith("file://"):
+        path = gio.File.new_for_uri(url).get_path()
+        path = resize_image(path, size)
+        callback(path)
         return
 
     temp_path = os.path.join(cache_dir, "temp")
