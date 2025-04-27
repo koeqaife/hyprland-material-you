@@ -533,6 +533,7 @@ class Bar(widget.LayerWindow):
             application,
             height=1,
             anchors={
+                "top": True,
                 "left": True,
                 "right": True
             },
