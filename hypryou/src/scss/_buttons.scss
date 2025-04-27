@@ -3,56 +3,68 @@
 
 button.outlined {
     border-radius: 100px;
-    min-height: 2.188rem;
+    min-height: 2rem;
     border: 1px solid $outline;
     padding-left: 1.25rem;
     padding-right: 1.25rem;
 
     label {
-        font-size: 0.75rem;
+        font-size: 1rem;
         font-weight: 500;
         color: $primary;
+    }
+    &:hover {
+        background-color: color.mix(transparent, $onSurfaceVariant, 92%);
+    }
+    &:active {
+        background-color: color.mix(transparent, $onSurfaceVariant, 90%);
     }
 }
 
 button.attention {
     border-radius: 100px;
-    min-height: 2.188rem;
+    min-height: 2rem;
     padding-left: 1.25rem;
     padding-right: 1.25rem;
     background-color: $error;
 
     label {
-        font-size: 0.75rem;
+        font-size: 1rem;
         font-weight: 500;
         color: $onError;
+    }
+    &:hover {
+        background-color: color.mix($error, $inverseOnSurface, 82%);
+    }
+    &:active {
+        background-color: color.mix($error, $inverseOnSurface, 75%);
     }
 }
 
 button.attention-outlined {
     border-radius: 100px;
-    min-height: 2.188rem;
+    min-height: 2rem;
     border: 1px solid $error;
     padding-left: 1.25rem;
     padding-right: 1.25rem;
 
     label {
-        font-size: 0.75rem;
+        font-size: 1rem;
         font-weight: 500;
         color: $error;
     }
     &:hover {
-        background-color: color.mix($background, $onSurfaceVariant, 82%);
+        background-color: color.mix(transparent, $onSurfaceVariant, 92%);
     }
     &:active {
-        background-color: color.mix($background, $onSurfaceVariant, 75%);
+        background-color: color.mix(transparent, $onSurfaceVariant, 90%);
     }
 }
 
 button.icon-outlined {
     border-radius: 100px;
-    min-height: 2.188rem;
-    min-width: 2.188rem;
+    min-height: 2rem;
+    min-width: 2rem;
     border: 1px solid $outline;
 
     label {
@@ -62,9 +74,47 @@ button.icon-outlined {
     }
 
     &:hover {
-        background-color: color.mix($background, $onSurfaceVariant, 82%);
+        background-color: color.mix(transparent, $onSurfaceVariant, 92%);
     }
     &:active {
-        background-color: color.mix($background, $onSurfaceVariant, 75%);
+        background-color: color.mix(transparent, $onSurfaceVariant, 90%);
+    }
+}
+
+button.icon-outlined-attention {
+    border-radius: 100px;
+    min-height: 2rem;
+    min-width: 2rem;
+    border: 1px solid $error;
+
+    label {
+        font-size: 1.125rem;
+        font-weight: 500;
+        color: $error;
+    }
+
+    &:hover {
+        background-color: color.mix(transparent, $onSurfaceVariant, 92%);
+    }
+    &:active {
+        background-color: color.mix(transparent, $onSurfaceVariant, 90%);
+    }
+}
+
+button.icon-default {
+    min-height: 2rem;
+    min-width: 2rem;
+
+    label {
+        font-size: 1.125rem;
+        font-weight: 500;
+        color: $onSurface;
+    }
+
+    &:hover {
+        background-color: color.mix(transparent, $onSurfaceVariant, 92%);
+    }
+    &:active {
+        background-color: color.mix(transparent, $onSurfaceVariant, 90%);
     }
 }
