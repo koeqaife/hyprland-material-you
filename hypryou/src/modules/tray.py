@@ -42,7 +42,6 @@ class TrayItem(gtk.Box):
             gtk.Label(),
             btn_box
         )
-        self.children[0].set_size_request(32, 32)
         self.update_label()
         self.idle_update_image()
         for child in self.children:

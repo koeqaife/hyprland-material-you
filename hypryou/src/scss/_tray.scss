@@ -3,8 +3,8 @@
 @use "sass:color";
 
 window.tray {
-    min-width: 400px;
-    min-height: 400px;
+    min-width: 25rem;
+    min-height: 25rem;
     background-color: $background;
     border-radius: $hyprlandRadius;
     border: 1px solid $outlineVariant;
@@ -16,6 +16,9 @@ window.tray {
     .tray-item {
         image {
             margin-right: 8px;
+            min-height: 1.5rem;
+            min-width: 1.5rem;
+            font-size: 2rem;
         }
         label {
             font-size: 1rem;
