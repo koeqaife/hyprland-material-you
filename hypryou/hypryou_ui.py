@@ -116,8 +116,7 @@ class HyprYou(gtk.Application):
                 ]
                 self.windows[monitor] = windows
                 self.corners[monitor] = corners
-                for window in windows:
-                    window.present()
+                windows[0].present()
 
 
 def init() -> None:
