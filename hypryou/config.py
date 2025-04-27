@@ -64,16 +64,33 @@ class Settings:
                 with open(settings_path, 'w') as f:
                     f.write("{}")
 
-    def sync(self) -> None:
+    def save(self) -> None:
         with open(settings_path, 'w') as f:
             json.dump(self._values, f)
+
+    def sync(self) -> None:
+        old_values = self._values.copy()
+        try:
+            with open(settings_path, 'r') as f:
+                self._values = json.load(f)
+        except FileNotFoundError:
+            with open(settings_path, 'w') as f:
+                f.write("{}")
+        for key, value in self._values.items():
+            if key not in old_values or old_values[key] != value:
+                event = Event(
+                    value,
+                    key,
+                    "settings_changed"
+                )
+                self._events.notify(event)
 
     def reset(self, name: str) -> None:
         self.set(name, default_settings[name])
 
     def set(self, name: str, value: t.Any) -> None:
         self._values[name] = value
-        self.sync()
+        self.save()
         event = Event(
             value,
             name,
