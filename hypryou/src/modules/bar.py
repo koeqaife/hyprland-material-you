@@ -6,7 +6,7 @@ from utils import toggle_css_class, escape_markup
 from utils.logger import logger
 from src.variables.clock import date, time
 from src.variables import Globals
-from repository import gtk, gdk, layer_shell, pango
+from repository import gtk, gdk, pango
 from src.services import hyprland
 from utils import format
 import asyncio
@@ -540,7 +540,6 @@ class Bar(widget.LayerWindow):
             monitor=monitor,
             css_classes=("bar",)
         )
-        Settings().subscribe("bar_position", self.bar_position)
 
         self.center_box = gtk.CenterBox(
             start_widget=ModulesLeft(),
@@ -552,12 +551,6 @@ class Bar(widget.LayerWindow):
         self.present()
         weakref.finalize(self, lambda: logger.debug("Bar finalized"))
 
-    def bar_position(self, new: t.Literal["top", "bottom"]) -> None:
-        if new not in ("top", "bottom"):
-            new = "top"
-        layer_shell.set_anchor(self, layer_shell.Edge.TOP, new == "top")
-        layer_shell.set_anchor(self, layer_shell.Edge.BOTTOM, new == "bottom")
-
     def destroy(self) -> None:
         box = self.center_box
         t.cast(t.Any, box.get_start_widget()).destroy()
@@ -567,7 +560,6 @@ class Bar(widget.LayerWindow):
         box.set_center_widget(None)
         box.set_end_widget(None)
         self.set_child(None)
-        Settings().unsubscribe("bar_position", self.bar_position)
         self.close()
         super().destroy()
 
@@ -587,20 +579,16 @@ class Corner:
         self.window: widget.LayerWindow | None = None
         self.corner: widget.RoundedCorner | None = None
 
-        self.settings.subscribe("bar_position", self.update_anchor, False)
         self.settings.subscribe("corners", self.update_visible, True)
 
     def create_window(self) -> None:
-        is_on_top = self.settings.get("bar_position") == "top"
         is_on_left = self.position == "left"
-        corner_position = "top" if is_on_top else "bottom"
 
         self.window = widget.LayerWindow(
             application=self.application,
             monitor=self.monitor,
             anchors={
-                "top": is_on_top,
-                "bottom": not is_on_top,
+                "top": True,
                 "left": is_on_left,
                 "right": not is_on_left
             },
@@ -608,7 +596,7 @@ class Corner:
         )
 
         self.corner = widget.RoundedCorner(
-            f"{corner_position}-{self.position}"
+            f"top-{self.position}"
         )
         self.window.set_child(self.corner)
 
@@ -631,23 +619,3 @@ class Corner:
             self.create_window()
         else:
             self.destroy_window()
-
-    def update_anchor(self, value: str) -> None:
-        if not self.corner:
-            return
-        is_on_top = value == "top"
-
-        layer_shell.set_anchor(
-            self.window,
-            layer_shell.Edge.TOP,
-            is_on_top
-        )
-        layer_shell.set_anchor(
-            self.window,
-            layer_shell.Edge.BOTTOM,
-            not is_on_top
-        )
-
-        corner_position = "top" if is_on_top else "bottom"
-        self.corner.place = f"{corner_position}-{self.position}"
-        self.corner.queue_draw()
