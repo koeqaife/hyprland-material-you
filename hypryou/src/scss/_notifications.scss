@@ -3,7 +3,7 @@
 @use "sass:color";
 
 box.notification {
-    border-radius: $hyprlandRadius;
+    border-radius: $hyprlandRounding;
     background-color: $surfaceContainer;
     min-width: 26.563rem;
     padding: 0.5rem;

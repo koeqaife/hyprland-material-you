@@ -6,7 +6,7 @@ window.tray {
     min-width: 25rem;
     min-height: 25rem;
     background-color: $background;
-    border-radius: $hyprlandRadius;
+    border-radius: $hyprlandRounding;
     border: 1px solid $outlineVariant;
 
     .tray-widget {
@@ -29,7 +29,7 @@ window.tray {
         padding: 0.375rem;
         padding-left: 0.75rem;
         padding-right: 0.75rem;
-        border-radius: $hyprlandRadius - 8px;
+        border-radius: $hyprlandRounding - 8px;
 
         &:hover {
             background-color: color.mix($surfaceContainer, $onSurfaceVariant, 95%);
