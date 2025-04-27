@@ -38,7 +38,6 @@ dbus_services = (
 
 class HyprYou(gtk.Application):
     def do_activate(self) -> None:
-        utils.apply_css()
         self.windows: dict[gdk.Monitor, list[gtk.ApplicationWindow]] = {}
         self.corners: dict[gdk.Monitor, list[Corner]] = {}
 
@@ -47,6 +46,9 @@ class HyprYou(gtk.Application):
 
     async def start_app(self) -> None:
         await hyprland.init()
+
+        utils.apply_css()
+
         for service in dbus_services:
             service().start()
 
