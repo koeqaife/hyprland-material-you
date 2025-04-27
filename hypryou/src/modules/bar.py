@@ -638,15 +638,16 @@ class Corner:
         is_on_top = value == "top"
 
         layer_shell.set_anchor(
-            self,
+            self.window,
             layer_shell.Edge.TOP,
             is_on_top
         )
         layer_shell.set_anchor(
-            self,
+            self.window,
             layer_shell.Edge.BOTTOM,
             not is_on_top
         )
 
         corner_position = "top" if is_on_top else "bottom"
         self.corner.place = f"{corner_position}-{self.position}"
+        self.corner.queue_draw()
