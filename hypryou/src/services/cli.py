@@ -3,11 +3,38 @@ import asyncio
 from config import socket_path
 from utils.logger import logger
 import socket
+from config import Settings
+from src.variables import Globals
+from src.services.events import Event
+from utils import apply_css
+
+
+class CliRequest:
+    def __init__(self):
+        pass
+
+    def do_ping(self, args: str) -> str:
+        return "pong"
+
+    def do_exit(self, args: str) -> str:
+        exit(0)
+
+    def do_sync_settings(self, args: str) -> str:
+        Settings().sync()
+        return "ok"
+
+    def do_toggle_window(self, args: str) -> str:
+        event = Event(None, args, "toggle_window")
+        Globals.events.notify(event)
+        return "ok"
+
+    def do_reload_css(self, args: str) -> str:
+        apply_css()
+        return "ok"
 
 
 async def handle_client(
-    reader: asyncio.StreamReader,
-    writer: asyncio.StreamWriter
+    reader: asyncio.StreamReader, writer: asyncio.StreamWriter
 ) -> None:
     try:
         data = await reader.read(1024)
@@ -23,7 +50,7 @@ async def handle_client(
         ConnectionResetError,
         ConnectionRefusedError,
         ConnectionError,
-        ConnectionAbortedError
+        ConnectionAbortedError,
     ) as e:
         logger.debug("Cli command connection was closed with error: %s", e)
         if writer:
@@ -31,8 +58,13 @@ async def handle_client(
 
 
 async def handle_request(data: str) -> str:
-    if data == "ping":
-        return "pong"
+    command, args = data.split(" ", 1) if " " in data else (data, "")
+    attr = "do_" + command
+    request = CliRequest()
+    if hasattr(request, attr):
+        method = getattr(request, attr)
+        if callable(method):
+            return method(args)
     return "unknown request"
 
 
