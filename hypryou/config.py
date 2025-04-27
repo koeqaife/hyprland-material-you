@@ -20,6 +20,7 @@ hyprland_gap = 14
 hyprland_rounding = 20
 
 styles_output = pjoin(TEMP_PATH, "style.css")
+scss_variables = pjoin(TEMP_PATH, "_variables.scss")
 main_scss = pjoin(CONFIG_DIR, "src", "scss", "main.scss")
 colors_file = pjoin(HOME, ".cache", "material", "colors.css")
 config_path = pjoin(HOME, ".config", "hypryou")
