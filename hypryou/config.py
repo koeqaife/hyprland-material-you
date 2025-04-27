@@ -17,6 +17,7 @@ CONFIG_DIR = os.path.dirname(os.path.abspath(sys.argv[0]))
 TEMP_PATH = "/tmp/hypryou/"
 
 hyprland_gap = 14
+hyprland_rounding = 20
 
 styles_output = pjoin(TEMP_PATH, "style.css")
 main_scss = pjoin(CONFIG_DIR, "src", "scss", "main.scss")
@@ -30,7 +31,6 @@ socket_path = pjoin(
 
 default_settings: dict[str, t.Any] = {
     "time_format": "24",
-    "bar_position": "top",
     "always_show_battery": False,
     "corners": False
 }
