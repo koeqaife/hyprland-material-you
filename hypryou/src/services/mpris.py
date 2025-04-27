@@ -79,10 +79,6 @@ MprisMetadata = t.TypedDict(
 )
 
 
-def to_mpris_metadata(d: dict[str, t.Any]) -> MprisMetadata:
-    return t.cast(MprisMetadata, d)
-
-
 class MprisPlayer:
     def __init__(self, proxy: gio.DBusProxy):
         self._proxy: gio.DBusProxy = proxy
@@ -93,7 +89,6 @@ class MprisPlayer:
         self._last_known_position: float = -1
         self._pos_changed_time = time.monotonic()
         self._playback_status = self.playback_status
-        self._metadata: MprisMetadata | None = None
 
         self._last_changed_time = time.monotonic()
         self.conns = [
@@ -258,10 +253,7 @@ class MprisPlayer:
 
     @property
     def metadata(self) -> MprisMetadata:
-        if not self._metadata:
-            metadata = t.cast(dict[str, t.Any], self.prop("Metadata"))
-            self._metadata = to_mpris_metadata(metadata)
-        return self._metadata
+        return t.cast(MprisMetadata, self.prop("Metadata"))
 
     @property
     def volume(self) -> float:
