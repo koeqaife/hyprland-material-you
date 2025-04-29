@@ -2,7 +2,7 @@ from repository import gtk, gdk
 import subprocess
 from config import (
     styles_output, main_scss, HOME,
-    scss_variables, hyprland_gap, hyprland_rounding,
+    scss_variables, HyprlandVars,
     TEMP_PATH
 )
 from src.variables import Globals
@@ -36,8 +36,8 @@ def reload_css() -> None:
 
 def generate_scss_variables() -> None:
     variables = {
-        "hyprlandRounding": f"{hyprland_rounding}px",
-        "hyprlandGap": f"{hyprland_gap}px",
+        "hyprlandRounding": f"{HyprlandVars.rounding}px",
+        "hyprlandGap": f"{HyprlandVars.gap}px",
     }
     with open(scss_variables, 'w') as f:
         for key, value in variables.items():

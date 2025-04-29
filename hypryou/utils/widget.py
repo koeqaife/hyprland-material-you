@@ -3,7 +3,7 @@ from utils.ref import Ref
 import typing as t
 import cairo
 from math import pi
-import config
+from config import HyprlandVars
 
 
 __all__ = [
@@ -129,7 +129,7 @@ class RoundedCorner(gtk.DrawingArea):
         **props: t.Any
     ) -> None:
         if radius is None:
-            radius = config.hyprland_gap + config.hyprland_rounding
+            radius = HyprlandVars.gap + HyprlandVars.rounding
         super().__init__(**props)
         self.radius = radius
         self.place = place

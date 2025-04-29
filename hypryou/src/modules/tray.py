@@ -4,7 +4,7 @@ from repository import gtk, layer_shell, gdk, glib
 from src.variables import Globals
 from src.services.system_tray import StatusNotifierItem, items
 from src.services.events import TrayItemChanged, Event
-from config import hyprland_gap
+from config import HyprlandVars
 import weakref
 
 # It's so cool that when tray isn't opened there isn't any load to CPU
@@ -192,8 +192,8 @@ class TrayWindow(widget.LayerWindow):
                 "right": True
             },
             margins={
-                "top": hyprland_gap,
-                "right": hyprland_gap
+                "top": HyprlandVars.gap,
+                "right": HyprlandVars.gap
             },
             css_classes=("tray",),
             keymode=layer_shell.KeyboardMode.ON_DEMAND,

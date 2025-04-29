@@ -16,9 +16,6 @@ APP_CACHE_PATH = pjoin(CACHE_PATH, "hypryou")
 CONFIG_DIR = os.path.dirname(os.path.abspath(sys.argv[0]))
 TEMP_PATH = "/tmp/hypryou/"
 
-hyprland_gap = 14
-hyprland_rounding = 20
-
 styles_output = pjoin(TEMP_PATH, "style.css")
 scss_variables = pjoin(TEMP_PATH, "_variables.scss")
 main_scss = pjoin(CONFIG_DIR, "src", "scss", "main.scss")
@@ -42,6 +39,11 @@ os.makedirs(TEMP_PATH, exist_ok=True)
 
 
 type Wrappers = dict[t.Callable[[t.Any], None], Watcher]
+
+
+class HyprlandVars:
+    gap = 14
+    rounding = 20
 
 
 class Settings:

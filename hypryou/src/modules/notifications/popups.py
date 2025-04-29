@@ -4,7 +4,7 @@ from src.services.notifications import popups
 from src.modules.notifications.item import NotificationItem
 from src.modules.notifications.item import NotificationRevealer
 import typing as t
-from config import hyprland_gap
+from config import HyprlandVars
 
 T = t.TypeVar("T")
 
@@ -98,8 +98,8 @@ class Notifications(widget.LayerWindow):
                 "right": True
             },
             margins={
-                "top": hyprland_gap,
-                "right": hyprland_gap
+                "top": HyprlandVars.gap,
+                "right": HyprlandVars.gap
             },
             css_classes=("notifications", "transparent"),
             name=f"notifications{monitor_id}",

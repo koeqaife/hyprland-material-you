@@ -7,7 +7,7 @@ import typing as t
 import json
 from src.variables import Globals
 from src.services.events import Event, Watcher
-import config
+from config import HyprlandVars
 
 active_workspace = Ref(0, name="workspace", delayed_init=True)
 active_layout = Ref("en", name="active_layout", delayed_init=True)
@@ -231,19 +231,17 @@ async def init() -> None:
     try:
         if isinstance(gaps_out_query, dict):
             if gaps_out_query.get("int"):
-                config.hyprland_gap = int(gaps_out_query["int"])
+                HyprlandVars.gap = int(gaps_out_query["int"])
             elif gaps_out_query.get("custom"):
-                config.hyprland_gap = int(gaps_out_query["custom"].split()[0])
+                HyprlandVars.gap = int(gaps_out_query["custom"].split()[0])
 
         if isinstance(rounding_query, dict) and rounding_query.get("int"):
-            config.hyprland_rounding = rounding_query["int"]
+            HyprlandVars.rounding = rounding_query["int"]
     except Exception as e:
         logger.error(
             "Error while parsing gaps_out or rounding: %s",
             e, exc_info=e
         )
-        config.hyprland_gap = 0
-        config.hyprland_rounding = 0
 
 
 async def connect() -> None:
