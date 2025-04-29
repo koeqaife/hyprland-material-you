@@ -66,6 +66,7 @@ button.icon-outlined {
     min-height: 2rem;
     min-width: 2rem;
     border: 1px solid $outline;
+    border-radius: 50%;
 
     label {
         font-size: 1.125rem;
@@ -86,6 +87,7 @@ button.icon-outlined-attention {
     min-height: 2rem;
     min-width: 2rem;
     border: 1px solid $error;
+    border-radius: 50%;
 
     label {
         font-size: 1.125rem;
@@ -116,5 +118,26 @@ button.icon-default {
     }
     &:active {
         background-color: color.mix(transparent, $onSurfaceVariant, 90%);
+    }
+}
+
+button.icon-tonal {
+    padding: 0;
+    min-height: 2rem;
+    min-width: 2rem;
+    background-color: $secondaryContainer;
+    border-radius: 50%;
+
+    label {
+        font-size: 1.125rem;
+        font-weight: 500;
+        color: $onSecondaryContainer;
+    }
+
+    &:hover {
+        background-color: color.mix($secondaryContainer, $onSurfaceVariant, 88%);
+    }
+    &:active {
+        background-color: color.mix($secondaryContainer, $onSurfaceVariant, 80%);
     }
 }
