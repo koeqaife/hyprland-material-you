@@ -155,10 +155,11 @@ def download_image_async(
         subdir = f"{subdir}/{size[0]}x{size[1]}"
     cache_dir = get_cache_dir(url, subdir)
 
-    for fname in os.listdir(cache_dir):
-        if fname.startswith("image."):
-            callback(os.path.join(cache_dir, fname))
-            return
+    if os.path.exists(cache_dir):
+        for fname in os.listdir(cache_dir):
+            if fname.startswith("image."):
+                callback(os.path.join(cache_dir, fname))
+                return
 
     if url.startswith("file://"):
         path = gio.File.new_for_uri(url).get_path()
