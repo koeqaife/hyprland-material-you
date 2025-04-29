@@ -1,10 +1,12 @@
 from utils import Ref, get_formatted_date, get_formatted_time
+from utils import get_full_date
 from config import Settings
 import datetime
 import asyncio
 
 time = Ref("00:00", name="time")
 date = Ref("1997-01-01", name="date")
+full_date = Ref("...", name="full_date")
 
 
 async def clock_task() -> None:
@@ -24,6 +26,7 @@ async def clock_task() -> None:
 
         time.value = get_formatted_time(_date, is_12_hour)
         date.value = get_formatted_date(_date)
+        full_date.value = get_full_date(_date)
 
     settings.subscribe("time_format", settings_update)
 

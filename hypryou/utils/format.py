@@ -40,6 +40,12 @@ def get_formatted_time(
         return f"{hours:02d}:{minutes}"
 
 
+def get_full_date(
+    date: datetime.datetime
+) -> str:
+    return date.strftime('%A, %d %b %Y')
+
+
 def escape_markup(text: str) -> str:
     escape_dict = {
         '&': '&amp;',

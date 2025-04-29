@@ -15,7 +15,8 @@ from utils.styles import (
 from utils.format import (
     get_formatted_date,
     get_formatted_time,
-    escape_markup
+    escape_markup,
+    get_full_date
 )
 
 import typing as t
@@ -33,6 +34,7 @@ __all__ = [
     "compile_scss",
     "get_formatted_date",
     "get_formatted_time",
+    "get_full_date",
     "toggle_css_class",
     "format",
     "debounce",
