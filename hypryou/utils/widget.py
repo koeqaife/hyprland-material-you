@@ -126,7 +126,7 @@ class RoundedCorner(gtk.DrawingArea):
         self,
         place: str,
         radius: int | None = None,
-        **props
+        **props: t.Any
     ) -> None:
         if radius is None:
             radius = config.hyprland_gap + config.hyprland_rounding
@@ -141,10 +141,10 @@ class RoundedCorner(gtk.DrawingArea):
     def on_draw(
         self,
         widget: t.Self,
-        cr: cairo.Context,
+        cr: cairo.Context,  # type: ignore[type-arg]
         width: int,
         height: int
-    ) -> bool:
+    ) -> None:
         radius = self.radius
         style_context = widget.get_style_context()
         color = style_context.get_color()
@@ -167,5 +167,3 @@ class RoundedCorner(gtk.DrawingArea):
         cr.close_path()
         cr.set_source_rgba(r, g, b, a)
         cr.fill()
-
-        return False

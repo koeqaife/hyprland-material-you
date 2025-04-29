@@ -32,28 +32,28 @@ class MprisPlayerChangedData(t.TypedDict):
 @dataclass
 class Event:
     data: t.Any
-    value: str = "global"
+    value: t.Hashable = "global"
     name: EventName = "global"
 
 
 @dataclass
 class TrayItemChanged(Event):
     data: TrayItemChangedData | None
-    value: str = "global"
+    value: t.Hashable = "global"
     name = "tray_item_changed"
 
 
 @dataclass
 class NameOwnerChanged(Event):
     data: tuple[str, str, str]
-    value: str = "global"
+    value: t.Hashable = "global"
     name = "name_owner_changed"
 
 
 @dataclass
 class MprisPlayerChanged(Event):
     data: MprisPlayerChangedData | None
-    value: str
+    value: t.Hashable
     name = "mpris_player_changed"
 
 
@@ -62,7 +62,7 @@ type Watcher = t.Callable[[t.Any], None]
 
 class EventsBus:
     def __init__(self) -> None:
-        self._watchers: dict[str, dict[str, list[Watcher]]] = {}
+        self._watchers: dict[str, dict[t.Hashable, list[Watcher]]] = {}
 
     def notify(
         self, event: Event
@@ -89,7 +89,7 @@ class EventsBus:
         self,
         event_name: EventName,
         callback: Watcher,
-        value: str | t.Literal["global"] = "global",
+        value: t.Hashable | t.Literal["global"] = "global",
     ) -> None:
         logger.debug(
             "Event '%s' with value '%s' got new watcher",
@@ -105,7 +105,7 @@ class EventsBus:
         self,
         event_name: EventName,
         callback: Watcher,
-        value: str | t.Literal["global"] = "global"
+        value: t.Hashable | t.Literal["global"] = "global"
     ) -> None:
         logger.debug(
             "Event '%s' with value '%s' removed watcher",

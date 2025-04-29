@@ -82,7 +82,7 @@ class NotificationItem(gtk.Box):
         self.info_box.append(self.separator)
         self.info_box.append(self.time)
         self.header_box.append(self.info_box)
-        if show_dismiss:
+        if self.dismiss:
             self.header_box.append(self.dismiss)
         self.header_box.append(self.close)
 
@@ -153,7 +153,7 @@ class NotificationItem(gtk.Box):
 
     def update_values(self, *args: t.Any) -> None:
         settings = Settings()
-        icon_theme = gtk.IconTheme.get_for_display(gdk.Display().get_default())
+        icon_theme = gtk.IconTheme.get_for_display(gdk.Display.get_default())
 
         if icon_theme.has_icon(self.item.app_icon):
             texture = icon_theme.lookup_icon(

@@ -92,7 +92,7 @@ class NotificationUrgency(int, Enum):
     CRITICAL = 2
 
 
-type ImageData = tuple[int, int, int, bool, int, int, t.ByteString]
+type ImageData = tuple[int, int, int, bool, int, int, int]
 type Category = t.Literal[
     "call",
     "call.ended",
@@ -196,13 +196,15 @@ class Notification:
         self.summary = kwargs["summary"]
         self.body = kwargs["body"]
         self.actions = parse_actions(kwargs["actions"])
-        self.urgency: NotificationUrgency = kwargs["hints"].get("urgency", 1)
+        self.urgency: NotificationUrgency = (
+            kwargs["hints"].get("urgency", NotificationUrgency.NORMAL)
+        )
         self.hints = kwargs["hints"]
         self.time = time.time()
 
 
 class NotificationsWatcher:
-    def __init__(self):
+    def __init__(self) -> None:
         self.conn: gio.DBusConnection
         self.node_info = gio.DBusNodeInfo.new_for_xml(WATCHER_XML)
         self.ifaces = self.node_info.interfaces

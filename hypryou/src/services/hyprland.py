@@ -106,7 +106,7 @@ class HyprlandClient:
         await writer.wait_closed()
         return data.decode().strip()
 
-    async def query(self, command: HyprlandQueryType) -> t.Any:
+    async def query(self, command: HyprlandQueryType | str) -> t.Any:
         raw_result = await self.raw(f"j/{command}")
         try:
             return json.loads(raw_result)

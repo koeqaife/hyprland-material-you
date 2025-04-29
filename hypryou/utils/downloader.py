@@ -154,7 +154,6 @@ def download_image_async(
     if size:
         subdir = f"{subdir}/{size[0]}x{size[1]}"
     cache_dir = get_cache_dir(url, subdir)
-    os.makedirs(cache_dir, exist_ok=True)
 
     for fname in os.listdir(cache_dir):
         if fname.startswith("image."):
@@ -163,6 +162,13 @@ def download_image_async(
 
     if url.startswith("file://"):
         path = gio.File.new_for_uri(url).get_path()
+        if not path:
+            callback(None)
+            return
+        if not size:
+            callback(path)
+            return
+
         path = resize_image(path, size)
         callback(path)
         return
@@ -186,4 +192,5 @@ def download_image_async(
             cb(path)
 
     logger.debug("Downloading new image")
+    os.makedirs(cache_dir, exist_ok=True)
     download_file_async(url, temp_path, finish)

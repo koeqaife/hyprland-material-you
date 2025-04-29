@@ -10,7 +10,7 @@ from utils import apply_css
 
 
 class CliRequest:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     def do_ping(self, args: str) -> str:
@@ -64,7 +64,7 @@ async def handle_request(data: str) -> str:
     if hasattr(request, attr):
         method = getattr(request, attr)
         if callable(method):
-            return method(args)
+            return str(method(args))
     return "unknown request"
 
 

@@ -606,7 +606,7 @@ class Corner:
         self.window.present()
         surface = self.window.get_surface()
         if surface:
-            surface.set_input_region(dummy_region)
+            surface.set_input_region(dummy_region)  # type: ignore[arg-type]
 
     def destroy_window(self) -> None:
         if self.window:
