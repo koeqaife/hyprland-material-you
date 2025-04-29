@@ -27,8 +27,7 @@ class NotificationPopups(gtk.Box):
         self.window = window
         super().__init__(
             css_classes=("notification-popups",),
-            orientation=gtk.Orientation.VERTICAL,
-            spacing=8
+            orientation=gtk.Orientation.VERTICAL
         )
 
         self.items: dict[int, NotificationRevealer] = {}

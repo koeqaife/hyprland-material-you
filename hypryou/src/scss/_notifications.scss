@@ -106,6 +106,12 @@ box.notification-revealer-box {
     background: #22222201;
 }
 
+box.notification-popups {
+    > :not(:last-child) box.notification {
+        margin-bottom: 8px;
+    }
+}
+
 window.notifications {
     min-width: 26.563rem;
     transition: none;
