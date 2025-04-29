@@ -38,6 +38,7 @@ default_settings: dict[str, t.Any] = {
 
 os.makedirs(config_path, exist_ok=True)
 os.makedirs(APP_CACHE_PATH, exist_ok=True)
+os.makedirs(TEMP_PATH, exist_ok=True)
 
 
 type Wrappers = dict[t.Callable[[t.Any], None], Watcher]
