@@ -27,6 +27,7 @@ from src.services import notifications
 from src.modules.bar import Bar, Corner
 from src.modules.tray import TrayWindow
 from src.modules.notifications.popups import Notifications
+from src.modules.sidebar.window import Sidebar
 
 START = time.perf_counter()
 
@@ -64,6 +65,7 @@ class HyprYou(gtk.Application):
 
         self.update_monitors()
         self.add_window(TrayWindow(self))
+        self.add_window(Sidebar(self))
 
         logger.info(
             "Started in " +

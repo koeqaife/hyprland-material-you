@@ -1,0 +1,89 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "sass:color";
+
+window.sidebar {
+    border: none;
+    background-color: $background;
+    min-width: 28.125rem;
+
+    .info-box {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        margin-bottom: 0.75rem;
+        .date-label {
+            color: $onSurface;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .username-label {
+            color: $onSurfaceVariant;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+    }
+
+    .management-box {
+        padding: 0.75rem;
+        background-color: $surfaceContainerLowest;
+    }
+
+    .management-button {
+        border-radius: 1.5rem;
+        background-color: $surfaceContainer;
+        padding: 1rem;
+        .label,
+        .state {
+            font-weight: 500;
+        }
+
+        .label {
+            color: $onSurface;
+            font-size: 1rem;
+        }
+
+        .state {
+            color: $onSurfaceVariant;
+            font-size: 0.875rem;
+        }
+
+        .icon {
+            font-weight: 500;
+            font-size: 1.125rem;
+            font-variation-settings: "opsz" 20;
+            margin-right: 0.375rem;
+        }
+
+        &:hover {
+            background-color: color.mix($surfaceContainer, $onSurfaceVariant, 92%);
+        }
+
+        &:active {
+            background-color: color.mix($surfaceContainer, $onSurfaceVariant, 85%);
+        }
+
+        &.activated {
+            background-color: $secondary;
+            label {
+                color: $onSecondary;
+            }
+            &:hover {
+                background-color: color.mix($secondary, $inverseOnSurface, 92%);
+            }
+            &:active {
+                background-color: color.mix($secondary, $inverseOnSurface, 85%);
+            }
+        }
+
+        &:first-child {
+            margin-right: 0.188rem;
+        }
+        &:last-child {
+            margin-left: 0.188rem;
+        }
+    }
+
+    .management-line:not(:last-child) {
+        margin-bottom: 0.375rem;
+    }
+}

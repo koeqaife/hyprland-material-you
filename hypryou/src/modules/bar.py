@@ -460,13 +460,32 @@ class OpenTray(gtk.Button):
     def __init__(self) -> None:
         super().__init__(
             css_classes=("open-tray", "bar-applet"),
-            child=widget.Icon("notes"),
+            child=widget.Icon("browse"),
             tooltip_text="System tray"
         )
         self.conn_id = self.connect("clicked", self.on_clicked)
 
     def on_clicked(self, *args: t.Any) -> None:
         event = Event(None, "tray", "toggle_window")
+        Globals.events.notify(event)
+
+    def destroy(self) -> None:
+        self.disconnect(self.conn_id)
+
+
+class OpenSidebar(gtk.Button):
+    def __init__(self) -> None:
+        super().__init__(
+            css_classes=("open-sidebar", "icon-tonal"),
+            child=widget.Icon("space_dashboard"),
+            tooltip_text="Sidebar",
+            halign=gtk.Align.CENTER,
+            valign=gtk.Align.CENTER
+        )
+        self.conn_id = self.connect("clicked", self.on_clicked)
+
+    def on_clicked(self, *args: t.Any) -> None:
+        event = Event(None, "sidebar", "toggle_window")
         Globals.events.notify(event)
 
     def destroy(self) -> None:
@@ -516,7 +535,8 @@ class ModulesRight(gtk.Box):
             KeyboardLayout(),
             OpenTray(),
             Applets(),
-            Clock()
+            Clock(),
+            OpenSidebar()
         )
         for child in self.children:
             self.append(child)
