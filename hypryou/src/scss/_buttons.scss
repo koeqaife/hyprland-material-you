@@ -66,7 +66,7 @@ button.icon-outlined {
     min-height: 2rem;
     min-width: 2rem;
     border: 1px solid $outline;
-    border-radius: 50%;
+    border-radius: 2rem;
 
     label {
         font-size: 1.125rem;
@@ -87,7 +87,7 @@ button.icon-outlined-attention {
     min-height: 2rem;
     min-width: 2rem;
     border: 1px solid $error;
-    border-radius: 50%;
+    border-radius: 2rem;
 
     label {
         font-size: 1.125rem;
@@ -106,6 +106,7 @@ button.icon-outlined-attention {
 button.icon-default {
     min-height: 2rem;
     min-width: 2rem;
+    border-radius: 2rem;
 
     label {
         font-size: 1.125rem;
@@ -126,7 +127,7 @@ button.icon-tonal {
     min-height: 2rem;
     min-width: 2rem;
     background-color: $secondaryContainer;
-    border-radius: 50%;
+    border-radius: 2rem;
 
     label {
         font-size: 1.125rem;
