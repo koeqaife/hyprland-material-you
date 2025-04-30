@@ -21,6 +21,7 @@ class NotificationItem(gtk.Box):
             css_classes=("notification",),
             orientation=gtk.Orientation.VERTICAL,
             halign=gtk.Align.END,
+            valign=gtk.Align.START
         )
 
         self.conns: dict[gtk.Widget, int] = {}
@@ -252,7 +253,8 @@ class NotificationRevealer(gtk.Box):
         self.destroy_lock = False
 
         super().__init__(
-            css_classes=("notification-revealer-box",)
+            css_classes=("notification-revealer-box",),
+            valign=gtk.Align.START
         )
         self.append(self.first_revealer)
 
