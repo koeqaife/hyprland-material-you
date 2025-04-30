@@ -5,6 +5,7 @@ from src.modules.notifications.item import NotificationItem
 from src.modules.notifications.item import NotificationRevealer
 import typing as t
 from config import HyprlandVars
+from src.variables import Globals
 
 T = t.TypeVar("T")
 
@@ -47,7 +48,7 @@ class NotificationPopups(gtk.Box):
         self.update_window_state()
 
     def update_window_state(self) -> None:
-        if len(self.items) == 0:
+        if len(self.items) == 0 or Globals.sidebar_opened:
             self.window.hide()
         else:
             self.window.show()
