@@ -106,7 +106,7 @@ box.notification-revealer-box {
     background: #22222201;
 }
 
-box.notification-popups {
+box.notification-popups, box.notifications {
     > :not(:last-child) box.notification {
         margin-bottom: 8px;
     }
