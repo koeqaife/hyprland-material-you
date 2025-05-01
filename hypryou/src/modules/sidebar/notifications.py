@@ -80,13 +80,17 @@ class Notifications(gtk.ScrolledWindow):
 
     def freeze(self) -> None:
         if not self.freezed:
+            for item in self.items.values():
+                item[1].self_destroy()
+                item[0].remove(item[1])
+            self.items.clear()
             notifications.unwatch(self.on_change)
             self.freezed = True
 
     def unfreeze(self) -> None:
         if self.freezed:
             notifications.watch(self.on_change)
-            self.freezed = True
+            self.freezed = False
             self.on_change()
 
     def update_no_notifications(self) -> None:

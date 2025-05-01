@@ -51,19 +51,22 @@ class Sidebar(widget.LayerWindow):
 
     def _toggle(self, _: Event) -> None:
         if self.is_visible():
+            if self._child:
+                self._child.notifications.freeze()
             self.hide()
         else:
+            if self._child:
+                self._child.notifications.unfreeze()
             self.present()
 
     def on_show(self) -> None:
         if not self._child:
             self._child = SidebarBox()
             self.set_child(self._child)
-        self._child.notifications.unfreeze()
+            self._child.notifications.unfreeze()
         Globals.sidebar_opened = True
 
     def on_hide(self) -> None:
-        self._child.notifications.freeze()
         Globals.sidebar_opened = False
 
     def destroy(self) -> None:
