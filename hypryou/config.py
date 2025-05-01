@@ -16,10 +16,10 @@ APP_CACHE_PATH = pjoin(CACHE_PATH, "hypryou")
 CONFIG_DIR = os.path.dirname(os.path.abspath(sys.argv[0]))
 TEMP_PATH = "/tmp/hypryou/"
 
-styles_output = pjoin(TEMP_PATH, "style.css")
+color_templates = pjoin(APP_CACHE_PATH, "colors")
+styles_output = pjoin(APP_CACHE_PATH, "style.css")
 scss_variables = pjoin(TEMP_PATH, "_variables.scss")
 main_scss = pjoin(CONFIG_DIR, "src", "scss", "main.scss")
-colors_file = pjoin(HOME, ".cache", "material", "colors.css")
 config_path = pjoin(HOME, ".config", "hypryou")
 settings_path = pjoin(config_path, "settings.json")
 socket_path = pjoin(
@@ -34,6 +34,7 @@ default_settings: dict[str, t.Any] = {
 }
 
 os.makedirs(config_path, exist_ok=True)
+os.makedirs(color_templates, exist_ok=True)
 os.makedirs(APP_CACHE_PATH, exist_ok=True)
 os.makedirs(TEMP_PATH, exist_ok=True)
 

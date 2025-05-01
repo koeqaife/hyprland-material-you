@@ -1,6 +1,9 @@
+import functools
 import os
 import json
 from PIL import Image
+import concurrent
+import concurrent.futures
 from materialyoucolor.quantize import QuantizeCelebi  # type: ignore
 from materialyoucolor.score.score import Score  # type: ignore
 from materialyoucolor.hct import Hct  # type: ignore
@@ -13,7 +16,10 @@ import pickle
 import numpy as np
 import re
 import typing as t
-from config import APP_CACHE_PATH, CONFIG_DIR
+from config import color_templates, CONFIG_DIR
+from utils.logger import logger
+from utils.styles import apply_css
+from utils.ref import Ref
 
 
 # I dropped support of color schemes
@@ -22,8 +28,16 @@ from config import APP_CACHE_PATH, CONFIG_DIR
 
 join = os.path.join
 
+_executor: t.Final[concurrent.futures.ProcessPoolExecutor] = (
+    concurrent.futures.ProcessPoolExecutor()
+)
+
 TEMPLATES_DIR = join(CONFIG_DIR, "assets", "templates")
-CACHE_PATH = join(APP_CACHE_PATH, "colors")
+CACHE_PATH = color_templates
+
+colors_json = join(CACHE_PATH, "colors.json")
+
+dark_mode = Ref(True, name="dark_mode")
 
 
 type IntFloat = int | float
@@ -39,12 +53,13 @@ def rgba_to_rgb(rgba: RGBA) -> str:
     return f'{rgba[0]}, {rgba[1]}, {rgba[2]}'
 
 
-def get_color(scheme: DynamicScheme, color: str) -> DynamicColor:
-    color = getattr(MaterialDynamicColors, color)
+def get_color(scheme: DynamicScheme, color_name: str) -> DynamicColor | None:
+    color = getattr(scheme, color_name)
+    print(scheme, color)
     if isinstance(color, DynamicColor):
         return color
     else:
-        raise TypeError(f"Attribute '{color}' in scheme isn't a color")
+        return None
 
 
 class Color():
@@ -76,6 +91,8 @@ class ColorsCache:
         if isinstance(colors, DynamicScheme):
             for color_name in vars(MaterialDynamicColors).keys():
                 color = get_color(colors, color_name)
+                if color is None:
+                    return
                 self.colors[str(color)] = rgb_to_hex(
                     color.get_hct(colors).to_rgba()
                 )
@@ -354,7 +371,7 @@ def process_image(
 
 
 @t.overload
-def generate_colors(
+def generate_colors_sync(
     image_path: str,
     use_color: t.Literal[None] = None,
     is_dark: bool = True,
@@ -364,7 +381,7 @@ def generate_colors(
 
 
 @t.overload
-def generate_colors(
+def generate_colors_sync(
     image_path: t.Literal[None],
     use_color: int,
     is_dark: bool = True,
@@ -373,7 +390,7 @@ def generate_colors(
     ...
 
 
-def generate_colors(
+def generate_colors_sync(
     image_path: str | None = None,
     use_color: int | None = None,
     is_dark: bool = True,
@@ -392,7 +409,7 @@ def generate_colors(
         contrast_level
     )
 
-    with open(join(CACHE_PATH, "colors.json"), 'w') as f:
+    with open(colors_json, 'w') as f:
         object = ColorsCache(
             scheme, image_path, color, contrast_level, is_dark
         )
@@ -403,41 +420,139 @@ def generate_colors(
     )
 
 
-def generate_by_last_wallpaper() -> None:
+def default_on_complete() -> None:
+    apply_css()
+    sync()
+
+
+def generate_colors(
+    image_path: str | None = None,
+    use_color: int | None = None,
+    is_dark: bool = True,
+    contrast_level: int = 0,
+    on_complete: t.Callable[[], None] | None = None
+) -> None:
+    def _callback(future: concurrent.futures.Future) -> None:
+        try:
+            future.result()
+        except Exception as e:
+            logger.error("Couldn't generate colors: %s", e, exc_info=e)
+        default_on_complete()
+        if on_complete:
+            on_complete()
+
+    future = _executor.submit(
+        functools.partial(
+            generate_colors_sync,
+            image_path=image_path,
+            use_color=use_color,
+            is_dark=is_dark,
+            contrast_level=contrast_level
+        )
+    )
+    future.add_done_callback(_callback)
+
+
+def generate_by_wallpaper(
+    image_path: str,
+    on_complete: t.Callable[[], None] | None = None
+) -> None:
     try:
-        with open(join(CACHE_PATH, "colors.json")) as f:
+        with open(colors_json) as f:
+            content = get_cache_object(f.read())
+        generate_colors(
+            image_path,
+            None,
+            content.is_dark,
+            contrast_level=content.contrast_level,
+            on_complete=on_complete
+        )
+    except FileNotFoundError:
+        generate_colors(
+            image_path,
+            None,
+            True,
+            0,
+            on_complete=on_complete
+        )
+
+
+def generate_by_color(
+    color: int,
+    on_complete: t.Callable[[], None] | None = None
+) -> None:
+    try:
+        with open(colors_json) as f:
+            content = get_cache_object(f.read())
+        generate_colors(
+            None,
+            color,
+            content.is_dark,
+            contrast_level=content.contrast_level,
+            on_complete=on_complete
+        )
+    except FileNotFoundError:
+        generate_colors(
+            None,
+            color,
+            True,
+            0,
+            on_complete=on_complete
+        )
+
+
+def generate_by_last_wallpaper(
+    on_complete: t.Callable[[], None] | None = None
+) -> None:
+    try:
+        with open() as f:
             content = get_cache_object(f.read())
         assert content.wallpaper is not None
         generate_colors(
             content.wallpaper,
             None,
             content.is_dark,
-            contrast_level=content.contrast_level
+            contrast_level=content.contrast_level,
+            on_complete=on_complete
         )
     except (FileNotFoundError, AssertionError):
         generate_colors(
             None,
             0x0000FF,
             True,
-            0
+            0,
+            on_complete=on_complete
         )
 
 
-def restore_palette() -> None:
+def restore_palette(
+    on_complete: t.Callable[[], None] | None = None
+) -> None:
     try:
-        with open(join(CACHE_PATH, "colors.json")) as f:
+        with open(colors_json) as f:
             content = get_cache_object(f.read())
         assert content.original_color is not None
         generate_colors(
             content.wallpaper,
             content.original_color,
             content.is_dark,
-            content.contrast_level
+            content.contrast_level,
+            on_complete=on_complete
         )
     except (FileNotFoundError, AssertionError):
         generate_colors(
             None,
             0x0000FF,
             True,
-            0
+            0,
+            on_complete=on_complete
         )
+
+
+def sync() -> None:
+    try:
+        with open(colors_json) as f:
+            content = get_cache_object(f.read())
+        dark_mode.value = content.is_dark
+    except FileNotFoundError:
+        restore_palette()

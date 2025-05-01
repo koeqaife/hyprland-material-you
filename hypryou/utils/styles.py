@@ -1,9 +1,9 @@
 from repository import gtk, gdk
 import subprocess
 from config import (
-    styles_output, main_scss, HOME,
+    styles_output, main_scss,
     scss_variables, HyprlandVars,
-    TEMP_PATH
+    TEMP_PATH, color_templates
 )
 from src.variables import Globals
 from utils.logger import logger
@@ -49,7 +49,7 @@ def compile_scss() -> None:
     generate_scss_variables()
     command = [
         'sass',
-        f'--load-path={HOME}/.cache/material',
+        f'--load-path={color_templates}',
         f'--load-path={TEMP_PATH}',
         main_scss,
         styles_output
