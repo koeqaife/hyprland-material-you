@@ -92,7 +92,6 @@ class Internet(int, Enum):
     @staticmethod
     def from_device(device: nm.Device) -> "Internet":
         if device is None or device.get_active_connection() is None:
-            print(device, device.get_active_connection(), "AW")
             return Internet.DISCONNECTED
 
         conn = device.get_active_connection()
