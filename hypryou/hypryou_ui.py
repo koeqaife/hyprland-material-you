@@ -22,6 +22,7 @@ from src.services import system_tray
 from src.services import cli
 from src.services import events
 from src.services import notifications
+from src.services import network
 
 # Modules
 from src.modules.bar import Bar, Corner
@@ -47,6 +48,7 @@ class HyprYou(gtk.Application):
 
     async def start_app(self) -> None:
         await hyprland.init()
+        network.get_network()
 
         try:
             utils.apply_css()

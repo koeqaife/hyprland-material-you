@@ -1,31 +1,28 @@
-from repository import gtk, pango
+from repository import gtk, pango, gdk
 from utils import widget, Ref, toggle_css_class
 import typing as t
 from src.variables.clock import full_date
+from src.services.network import get_network, Primary
 import os
 
 
 # TODO: Make buttons work
 
 
-class ManagementButton(gtk.Button):
+class ManagementButton(gtk.Box):
     def __init__(
         self,
         icon: str | Ref[str],
         label: str,
         state: str,
-        id: str,
         activated: bool,
-        on_click: t.Callable[[str], None] | None = None,
-        on_right_click: t.Callable[[str], None] | None = None
+        on_click: t.Callable[[], None] | None = None,
+        on_right_click: t.Callable[[], None] | None = None
     ) -> None:
-        self.box = gtk.Box()
         super().__init__(
-            css_classes=("management-button",),
-            child=self.box
+            css_classes=("management-button",)
         )
         toggle_css_class(self, "activated", activated)
-        self.id = id
         self.icon = widget.Icon(icon)
         self.label = gtk.Label(
             label=label,
@@ -47,13 +44,44 @@ class ManagementButton(gtk.Button):
 
         self.text_box.append(self.label)
         self.text_box.append(self.state)
-        self.box.append(self.icon)
-        self.box.append(self.text_box)
+        self.append(self.icon)
+        self.append(self.text_box)
         if self.arrow:
-            self.box.append(self.arrow)
+            self.append(self.arrow)
+
+        self.click_gesture = gtk.GestureClick.new()
+        self.click_gesture.set_button(0)
+        self.gesture_conn = (
+            self.click_gesture.connect("released", self.on_click_released)
+        )
+        self.add_controller(self.click_gesture)
+
+        self.on_click = on_click
+        self.on_right_click = on_right_click
+
+    def on_click_released(
+        self,
+        gesture: gtk.GestureClick,
+        n_press: int,
+        x: int,
+        y: int
+    ) -> None:
+        print("A")
+        button_number = gesture.get_current_button()
+        if button_number == gdk.BUTTON_PRIMARY:
+            if self.on_click:
+                print("LEFT")
+                self.on_click()
+        elif button_number == gdk.BUTTON_SECONDARY:
+            if self.on_right_click:
+                print("RIGHT")
+                self.on_right_click()
+
+    def set_activated(self, value: bool) -> None:
+        toggle_css_class(self, "activated", value)
 
     def destroy(self) -> None:
-        ...
+        self.icon.destroy()
 
 
 class InfoBox(gtk.Box):
@@ -104,25 +132,55 @@ class ManagementLine(gtk.Box):
         self.second_child.destroy()
 
 
+class InternetButton(ManagementButton):
+    def __init__(self) -> None:
+        network = get_network()
+        super().__init__(
+            network.icon,
+            "Internet",
+            "UNKNOWN",
+            False,
+            self.toggle_wifi,
+            on_right_click=lambda: None
+        )
+        self.on_update()
+        network.watch("primary-changed", self.on_update)
+        network.watch("state", self.on_update)
+        if network.wifi:
+            network.wifi.watch("access-point-changed", self.on_update)
+
+    def toggle_wifi(self) -> None:
+        network = get_network()
+        if network.wifi:
+            network.wifi.enabled = not network.wifi.enabled
+
+    def on_update(self) -> None:
+        network = get_network()
+        if network.primary == Primary.WIFI and network.wifi:
+            wifi = network.wifi
+            if wifi.enabled:
+                self.set_activated(True)
+                active_ap = wifi.active_access_point
+                if active_ap:
+                    self.state.set_label(active_ap.ssid)
+                else:
+                    self.state.set_label("Disconnected")
+            else:
+                self.set_activated(False)
+                self.state.set_label("Off")
+
+
 class ManagementFirstPage(gtk.Box):
     def __init__(self) -> None:
         super().__init__(
             orientation=gtk.Orientation.VERTICAL
         )
 
-        self.internet = ManagementButton(
-            "signal_wifi_4_bar",
-            "Internet",
-            "UNKNOWN_WIFI_NAME",
-            "internet",
-            True,
-            on_right_click=lambda: None
-        )
+        self.internet = InternetButton()
         self.bluetooth = ManagementButton(
             "bluetooth",
             "Bluetooth",
             "Off",
-            "bluetooth",
             False,
             on_right_click=lambda: None
         )
@@ -130,28 +188,24 @@ class ManagementFirstPage(gtk.Box):
             "contrast",
             "Dark Mode",
             "On",
-            "dark_mode",
             True
         )
         self.dnd = ManagementButton(
             "do_not_disturb_off",
             "Do Not Disturb",
             "Off",
-            "dnd",
             False
         )
         self.idle_inhibitor = ManagementButton(
             "schedule",
             "Idle Inhibitor",
             "Off",
-            "idle_inhibitor",
             False
         )
         self.night_light = ManagementButton(
             "nightlight",
             "Night Light",
             "Off",
-            "night_light",
             False
         )
         self.lines = (

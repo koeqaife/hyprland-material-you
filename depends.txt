@@ -12,6 +12,7 @@ dbus
 dbus-glib
 python-pillow
 cairo
+libnm
 
 Versions:
 "Used" means I used this version when I was developing, so these versions are 100% compatible
@@ -25,3 +26,4 @@ Versions:
 - dbus-glib: Used 0.114-1
 - python-pillow: Used 11.2.1-1
 - cairo: Used 1.18.4-1
+- libnm: Used 1.52.0-1

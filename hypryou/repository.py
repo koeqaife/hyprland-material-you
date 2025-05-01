@@ -9,10 +9,11 @@ from gi.repository import Gsk as gsk
 from gi.repository import GdkPixbuf as gdk_pixbuf
 from gi.repository import GObject as gobject
 from gi.repository import Pango as pango
+from gi.repository import NM as nm
 
 __all__ = [
     "versions", "gtk", "layer_shell",
     "gdk", "gio", "glib", "gsk",
     "gdk_pixbuf", "gobject",
-    "pango"
+    "pango", "nm"
 ]

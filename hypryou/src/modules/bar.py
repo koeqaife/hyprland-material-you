@@ -16,6 +16,7 @@ from config import Settings
 from src.services.mpris import MprisPlayer, current_player
 from src.services.events import Event
 import weakref
+from src.services.network import get_network
 
 
 dummy_region = cairo.Region()
@@ -426,13 +427,14 @@ class Applet(gtk.Button):
         icon: str | Ref[str],
         on_click: t.Callable[[str], None]
     ) -> None:
-        _icon = widget.Icon(icon)
+        self._icon = widget.Icon(icon)
         super().__init__(
-            child=_icon,
+            child=self._icon,
             css_classes=("applet",)
         )
 
     def destroy(self) -> None:
+        self._icon.destroy()
         self.set_child(None)
 
 
@@ -441,10 +443,11 @@ class Applets(gtk.Box):
         super().__init__(
             css_classes=("applets", "bar-applet")
         )
+
         self.children = (
             Applet("audio", "volume_up", lambda x: None),
             Applet("bluetooth", "bluetooth", lambda x: None),
-            Applet("wifi", "network_wifi_3_bar", lambda x: None),
+            Applet("wifi", get_network().icon, lambda x: None),
             Applet("cliphist", "content_paste", lambda x: None),
         )
         for child in self.children:
