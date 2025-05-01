@@ -188,9 +188,16 @@ class NotificationItem(gtk.Box):
                 self.actions_box.append(button)
                 self.action_buttons.append(button)
 
-        pixbuf = self.item.get_pixbuf()
-        if pixbuf:
-            self.image.set_from_pixbuf(pixbuf)
+        icon = self.item.get_icon()
+        if isinstance(icon, str):
+            texture = icon_theme.lookup_icon(
+                icon, None, 64, 1,
+                gtk.TextDirection.LTR,
+                gtk.IconLookupFlags.FORCE_SYMBOLIC
+            )
+            self.image.set_from_paintable(texture)
+        elif icon:
+            self.image.set_from_pixbuf(icon)
             self.image.set_visible(True)
         else:
             self.image.set_visible(False)

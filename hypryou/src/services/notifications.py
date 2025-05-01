@@ -5,7 +5,7 @@ import heapq
 import time
 from config import CONFIG_DIR
 import os
-from repository import glib, gio, gdk_pixbuf
+from repository import glib, gio, gdk_pixbuf, gtk, gdk
 from utils import Ref
 from utils.logger import logger
 from src.services.dbus import BUS_TYPE, ServiceABC
@@ -175,14 +175,19 @@ class Notification:
     def action(self, action: str) -> None:
         self.watcher.signal_action_invoked(self.id, action)
 
-    def get_pixbuf(self) -> gdk_pixbuf.Pixbuf | None:
-        if self.hints.get("image-data") or self.hints.get("image_data"):
+    def get_icon(self) -> gdk_pixbuf.Pixbuf | str | None:
+        if "image-data" in self.hints.keys():
             return get_pixbuf_from_data(self.hints["image-data"])
-        elif self.hints.get("image-path") or self.hints.get("image_path"):
-            return gdk_pixbuf.Pixbuf.new_from_file(
-                self.hints["image-path"]
-            )
-        elif self.hints.get("icon_data"):
+        elif "image-path" in self.hints.keys():
+            path_or_icon = self.hints["image-path"]
+            if os.path.isfile(path_or_icon):
+                return gdk_pixbuf.Pixbuf.new_from_file(path_or_icon)
+
+            display = gdk.Display.get_default()
+            icon_theme = gtk.IconTheme.get_for_display(display)
+            if icon_theme.has_icon(path_or_icon):
+                return path_or_icon
+        elif "icon_data" in self.hints.keys():
             return get_pixbuf_from_data(self.hints["icon_data"])
         else:
             return None
