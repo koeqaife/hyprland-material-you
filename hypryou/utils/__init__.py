@@ -3,6 +3,7 @@ import utils.ref as ref
 import utils.widget as widget
 import utils.format as format
 import utils.downloader as downloader
+import utils.colors as colors
 
 from utils.ref import Ref
 from utils.logger import setup_logger
@@ -39,7 +40,8 @@ __all__ = [
     "format",
     "debounce",
     "downloader",
-    "escape_markup"
+    "escape_markup",
+    "colors"
 ]
 
 
