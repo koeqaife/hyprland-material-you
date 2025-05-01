@@ -28,8 +28,8 @@ from utils.ref import Ref
 
 join = os.path.join
 
-_executor: t.Final[concurrent.futures.ProcessPoolExecutor] = (
-    concurrent.futures.ProcessPoolExecutor()
+executor = (
+    concurrent.futures.ProcessPoolExecutor(max_workers=2)
 )
 
 TEMPLATES_DIR = join(CONFIG_DIR, "assets", "templates")
@@ -423,6 +423,7 @@ def generate_colors_sync(
 def default_on_complete() -> None:
     apply_css()
     sync()
+    executor.shutdown(wait=True)
 
 
 def generate_colors(
@@ -441,7 +442,7 @@ def generate_colors(
         if on_complete:
             on_complete()
 
-    future = _executor.submit(
+    future = executor.submit(
         functools.partial(
             generate_colors_sync,
             image_path=image_path,

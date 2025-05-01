@@ -48,7 +48,10 @@ class HyprYou(gtk.Application):
     async def start_app(self) -> None:
         await hyprland.init()
 
-        utils.colors.restore_palette()
+        try:
+            utils.apply_css()
+        except Exception:
+            utils.colors.restore_palette()
 
         for service in dbus_services:
             service().start()
