@@ -307,7 +307,7 @@ class Player(gtk.Box):
             else:
                 if (
                     artist == self.last_changed.artist
-                    or title == self.last_changed.title
+                    and title == self.last_changed.title
                 ):
                     return
 
