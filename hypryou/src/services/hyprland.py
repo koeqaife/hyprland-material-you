@@ -5,9 +5,8 @@ from utils.ref import Ref
 from utils.logger import logger
 import typing as t
 import json
-from src.variables import Globals
-from src.services.events import Event, Watcher
 from config import HyprlandVars
+from utils.service import Signals
 
 active_workspace = Ref(0, name="workspace", delayed_init=True)
 active_layout = Ref("en", name="active_layout", delayed_init=True)
@@ -36,8 +35,9 @@ HyprlandQueryType = t.Literal[
 ]
 
 
-class HyprlandClient:
+class HyprlandClient(Signals):
     def __init__(self) -> None:
+        super().__init__()
         runtime_dir = os.environ.get("XDG_RUNTIME_DIR", "/run/user/1000")
         instance = os.environ["HYPRLAND_INSTANCE_SIGNATURE"]
 
@@ -45,35 +45,8 @@ class HyprlandClient:
         self.socket_path_events = f"{instance_path}/.socket2.sock"
         self.socket_path_query = f"{instance_path}/.socket.sock"
 
-        self._events = Globals.events
-        self._wrappers: dict[t.Callable[..., None], Watcher] = {}
         self.reader: StreamReader | None = None
         self.writer: StreamWriter | None = None
-
-    def _wrapper(self, callback: t.Callable[[t.Any], None]) -> Watcher:
-        if callback not in self._wrappers:
-            def func(event: Event) -> None:
-                assert isinstance(event.data, list)
-                callback(*event.data)
-            self._wrappers[callback] = func
-            return func
-        else:
-            return self._wrappers[callback]
-
-    def watch(
-        self,
-        event: str,
-        callback: t.Callable[..., None]
-    ) -> None:
-        self._events.watch("hyprland", self._wrapper(callback), event)
-
-    def unwatch(
-        self,
-        event: str,
-        callback: t.Callable[..., None]
-    ) -> None:
-        self._events.unwatch("hyprland", self._wrapper(callback), event)
-        del self._wrappers[callback]
 
     async def connect(self) -> None:
         self.reader, self.writer = await asyncio.open_unix_connection(
@@ -88,12 +61,7 @@ class HyprlandClient:
                 continue
             event, data = decoded.split(">>", 1)
             args: list[str] = data.split(",") if data else []
-            new_event = Event(
-                args,
-                event,
-                "hyprland"
-            )
-            self._events.notify(new_event)
+            self.notify(event, *args)
 
     async def raw(self, command: str) -> str:
         reader, writer = await asyncio.open_unix_connection(
