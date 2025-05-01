@@ -66,15 +66,12 @@ class ManagementButton(gtk.Box):
         x: int,
         y: int
     ) -> None:
-        print("A")
         button_number = gesture.get_current_button()
         if button_number == gdk.BUTTON_PRIMARY:
             if self.on_click:
-                print("LEFT")
                 self.on_click()
         elif button_number == gdk.BUTTON_SECONDARY:
             if self.on_right_click:
-                print("RIGHT")
                 self.on_right_click()
 
     def set_activated(self, value: bool) -> None:
@@ -152,6 +149,8 @@ class InternetButton(ManagementButton):
     def toggle_wifi(self) -> None:
         network = get_network()
         if network.wifi:
+            if not network.wifi.enabled:
+                self.state.set_label("Connecting")
             network.wifi.enabled = not network.wifi.enabled
 
     def on_update(self) -> None:
