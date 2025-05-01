@@ -148,7 +148,7 @@ class InternetButton(ManagementButton):
 
     def toggle_wifi(self) -> None:
         network = get_network()
-        if network.wifi:
+        if network.primary == Primary.WIFI and network.wifi:
             if not network.wifi.enabled:
                 self.state.set_label("Connecting")
             network.wifi.enabled = not network.wifi.enabled
@@ -167,6 +167,12 @@ class InternetButton(ManagementButton):
             else:
                 self.set_activated(False)
                 self.state.set_label("Off")
+        elif network.primary == Primary.ETHERNET:
+            self.state.set_label("Ethernet")
+            self.set_activated(True)
+        else:
+            self.state.set_label("Unavailable")
+            self.set_activated(False)
 
 
 class ManagementFirstPage(gtk.Box):
