@@ -76,8 +76,18 @@ class Notifications(gtk.ScrolledWindow):
         for child in self.children:
             self.box.append(child)
 
-        notifications.watch(self.on_change)
-        self.on_change()
+        self.freezed = True
+
+    def freeze(self) -> None:
+        if not self.freezed:
+            notifications.unwatch(self.on_change)
+            self.freezed = True
+
+    def unfreeze(self) -> None:
+        if self.freezed:
+            notifications.watch(self.on_change)
+            self.freezed = True
+            self.on_change()
 
     def update_no_notifications(self) -> None:
         if len(self.items) > 0:
