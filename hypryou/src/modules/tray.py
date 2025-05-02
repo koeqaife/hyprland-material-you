@@ -153,7 +153,9 @@ class TrayBox(gtk.ScrolledWindow):
         self.items: dict[str, TrayItem] = {}
         super().__init__(
             child=self.box,
-            css_classes=("tray-widget",)
+            css_classes=("tray-widget",),
+            vscrollbar_policy=gtk.PolicyType.AUTOMATIC,
+            hscrollbar_policy=gtk.PolicyType.NEVER
         )
         items.watch(self.update_items)
         self.update_items(items.value)
