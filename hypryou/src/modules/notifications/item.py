@@ -156,10 +156,9 @@ class NotificationItem(gtk.Box):
     def update_values(self, *args: t.Any) -> None:
         settings = Settings()
         app_icon = self.item.get_app_icon()
+        display = gdk.Display.get_default()
+        icon_theme = gtk.IconTheme.get_for_display(display)
         if app_icon:
-            display = gdk.Display.get_default()
-            icon_theme = gtk.IconTheme.get_for_display(display)
-
             if isinstance(app_icon, str) and icon_theme.has_icon(app_icon):
                 texture = icon_theme.lookup_icon(
                     app_icon, None, 24, 1,
