@@ -7,7 +7,7 @@ window.tray {
     min-height: 25rem;
     background-color: $background;
     border-radius: $hyprlandRounding;
-    border: none;
+    border: 1px solid color.mix($outlineVariant, transparent, 25%);
 
     .tray-widget {
         padding: 8px;

@@ -6,6 +6,7 @@ window.sidebar {
     border: none;
     background-color: $surfaceContainerLowest;
     min-width: 29.125rem;
+    border-left: 1px solid color.mix($outlineVariant, transparent, 25%);
 
     .info-box {
         padding-left: 0.75rem;
