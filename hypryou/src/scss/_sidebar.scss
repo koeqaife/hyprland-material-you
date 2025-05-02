@@ -91,12 +91,6 @@ window.sidebar {
         padding-right: 0.75rem;
 
         button {
-            &:focus {
-                border-color: $primary;
-                label {
-                    color: $primary;
-                }
-            }
             &:not(:last-child) {
                 margin-right: 0.375rem;
             }
