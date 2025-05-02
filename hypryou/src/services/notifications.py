@@ -12,6 +12,7 @@ from src.services.dbus import BUS_TYPE, ServiceABC
 import typing as t
 from src.variables import Globals
 from src.services.events import Event
+from pathlib import Path
 
 WATCHER_XML_PATH = os.path.join(
     CONFIG_DIR, "assets", "dbus", "org.freedesktop.Notifications.xml"
@@ -143,6 +144,22 @@ Hints = t.TypedDict(
 )
 
 
+def locate_desktop_file(desktop_id: str) -> Path | None:
+    search_paths = os.environ.get(
+        "XDG_DATA_DIRS", "/usr/local/share:/usr/share"
+    ).split(":")
+    user_path = os.environ.get(
+        "XDG_DATA_HOME", str(Path.home() / ".local/share")
+    )
+    search_paths.insert(0, user_path)
+
+    for base in search_paths:
+        path = Path(base) / "applications" / f"{desktop_id}.desktop"
+        if path.exists():
+            return path
+    return None
+
+
 class Notification:
     def __init__(
         self,
@@ -152,6 +169,7 @@ class Notification:
     ) -> None:
         self.id = id
         self.watcher = watcher
+        self.cached_app_icon: tuple[str, str | None] | None = None
         self.set_values(**kwargs)
 
     def close(self, reason: NotificationClosedReason) -> None:
@@ -174,6 +192,35 @@ class Notification:
 
     def action(self, action: str) -> None:
         self.watcher.signal_action_invoked(self.id, action)
+
+    def get_icon_from_desktop_entry(self) -> gio.Icon | None:
+        desktop_entry = self.hints.get("desktop-entry")
+        if not isinstance(desktop_entry, str):
+            return None
+
+        if self.cached_app_icon and self.cached_app_icon[0] == desktop_entry:
+            return self.cached_app_icon[1]
+
+        path = locate_desktop_file(desktop_entry)
+        if not path:
+            return None
+
+        try:
+            app_info = gio.DesktopAppInfo.new_from_filename(str(path))
+        except TypeError:
+            return None
+        if not app_info:
+            return None
+
+        icon = app_info.get_icon()
+        self.cached_app_icon = (desktop_entry, icon)
+        return icon
+
+    def get_app_icon(self) -> str | gio.Icon | None:
+        if self.app_icon:
+            return self.app_icon
+
+        return self.get_icon_from_desktop_entry()
 
     def get_icon(self) -> gdk_pixbuf.Pixbuf | str | None:
         if "image-data" in self.hints.keys():

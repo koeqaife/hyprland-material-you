@@ -1,4 +1,4 @@
-from repository import gtk, glib, pango, gdk
+from repository import gtk, glib, pango, gdk, gio
 from src.services.notifications import Notification, NotificationClosedReason
 from utils import widget
 from src.variables import Globals
@@ -40,6 +40,7 @@ class NotificationItem(gtk.Box):
             halign=gtk.Align.START,
             height_request=24,
             width_request=24,
+            icon_name="application-x-executable-symbolic"
         )
         self.app_title = gtk.Label(
             css_classes=("app-title",),
@@ -154,20 +155,27 @@ class NotificationItem(gtk.Box):
 
     def update_values(self, *args: t.Any) -> None:
         settings = Settings()
-        icon_theme = gtk.IconTheme.get_for_display(gdk.Display.get_default())
+        app_icon = self.item.get_app_icon()
+        if app_icon:
+            display = gdk.Display.get_default()
+            icon_theme = gtk.IconTheme.get_for_display(display)
 
-        if icon_theme.has_icon(self.item.app_icon):
-            texture = icon_theme.lookup_icon(
-                self.item.app_icon, None, 24, 1,
-                gtk.TextDirection.LTR,
-                gtk.IconLookupFlags.FORCE_SYMBOLIC
-            )
-            if texture:
-                self.app_icon.set_from_paintable(texture)
-        else:
-            self.app_icon.set_from_icon_name(
-                "application-x-executable-symbolic",
-            )
+            if isinstance(app_icon, str) and icon_theme.has_icon(app_icon):
+                texture = icon_theme.lookup_icon(
+                    app_icon, None, 24, 1,
+                    gtk.TextDirection.LTR,
+                    gtk.IconLookupFlags.FORCE_SYMBOLIC
+                )
+                if texture:
+                    self.app_icon.set_from_paintable(texture)
+            elif isinstance(app_icon, gio.Icon):
+                texture = icon_theme.lookup_by_gicon(
+                    app_icon, 24, 1,
+                    gtk.TextDirection.LTR,
+                    gtk.IconLookupFlags.FORCE_SYMBOLIC
+                )
+                if texture:
+                    self.app_icon.set_from_paintable(texture)
 
         actions = self.item.actions
         for button in self.action_buttons:
