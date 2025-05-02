@@ -46,7 +46,7 @@ class ActionButton(gtk.Button):
 class Actions(gtk.Box):
     def __init__(self) -> None:
         super().__init__(
-            css_classes=("actions",),
+            css_classes=("action-buttons",),
             hexpand=True
         )
         self.color_picker = ActionButton(
