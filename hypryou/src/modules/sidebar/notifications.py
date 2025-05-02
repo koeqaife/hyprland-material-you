@@ -15,6 +15,8 @@ try:
 except Exception:
     messengers = []
 
+message_prefixes = ("im", "call", "email")
+
 
 def diff_keys(
     old: dict[T, t.Any],
@@ -102,6 +104,11 @@ class Notifications(gtk.ScrolledWindow):
     def get_box_for(self, item: NotificationItem) -> gtk.Box:
         if item.item.urgency == NotificationUrgency.CRITICAL:
             return self.critical
+
+        category = item.item.hints.get("category")
+        if category is not None:
+            if any(category.startswith(prefix) for prefix in message_prefixes):
+                return self.messages
 
         if any(m in item.item.app_name.lower() for m in messengers):
             return self.messages
