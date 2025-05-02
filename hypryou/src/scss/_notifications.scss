@@ -117,4 +117,7 @@ window.notifications {
     min-width: 26.563rem;
     transition: none;
     padding-bottom: 2px;
+    box.notification {
+        border: 1px solid color.mix($outlineVariant, transparent, 25%);
+    }
 }
