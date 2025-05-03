@@ -185,11 +185,12 @@ class MprisPlayer:
         method_name: str,
         parameters: glib.Variant | None = None
     ) -> None:
-        self._proxy.call_sync(
+        self._proxy.call(
             method_name,
             parameters,
             gio.DBusCallFlags.NONE,
             -1,
+            None,
             None
         )
 
