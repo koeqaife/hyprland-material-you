@@ -49,6 +49,7 @@ class HyprYou(gtk.Application):
         await hyprland.init()
 
         try:
+            utils.colors.sync()
             utils.apply_css()
         except Exception:
             utils.colors.restore_palette()
