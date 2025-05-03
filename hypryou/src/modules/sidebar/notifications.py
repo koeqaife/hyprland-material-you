@@ -79,6 +79,7 @@ class Notifications(gtk.ScrolledWindow):
             self.box.append(child)
 
         self.freezed = True
+        self.handler_id = -1
 
     def freeze(self) -> None:
         if not self.freezed:
@@ -86,12 +87,13 @@ class Notifications(gtk.ScrolledWindow):
                 item[1].self_destroy()
                 item[0].remove(item[1])
             self.items.clear()
-            notifications.unwatch(self.on_change)
+            if self.handler_id != -1:
+                notifications.unwatch(self.handler_id)
             self.freezed = True
 
     def unfreeze(self) -> None:
         if self.freezed:
-            notifications.watch(self.on_change)
+            self.handler_id = notifications.watch(self.on_change)
             self.freezed = False
             self.on_change()
 
@@ -116,7 +118,8 @@ class Notifications(gtk.ScrolledWindow):
         return self.other
 
     def destroy(self) -> None:
-        notifications.unwatch(self.on_change)
+        if self.handler_id != -1:
+            notifications.unwatch(self.handler_id)
         for item in self.items.values():
             item[1].self_destroy()
             item[0].remove(item[1])

@@ -2,6 +2,7 @@ import asyncio
 import typing as t
 from collections.abc import MutableSequence, MutableSet
 from utils.logger import logger
+from utils.service import Signals
 
 # I wanted to make weakref for watchers
 # but it's to difficult for me heh
@@ -168,7 +169,7 @@ class ReactiveDict(dict[K, V], t.Generic[K, V]):
             self._ref._trigger_watchers()
 
 
-class Ref(t.Generic[T]):
+class Ref(Signals, t.Generic[T]):
     def __init__(
         self,
         value: T,
@@ -176,10 +177,9 @@ class Ref(t.Generic[T]):
         delayed_init: bool = False,
         deep: bool = False
     ) -> None:
+        super().__init__()
         self.deep = deep
         self.is_ready = not delayed_init
-        self._watchers: list[t.Callable[[T], None]] = []
-        self._once_watchers: list[t.Callable[[T], None]] = []
 
         self._value = self._wrap_if_mutable(value)
 
@@ -241,12 +241,7 @@ class Ref(t.Generic[T]):
         if not self.is_ready:
             return
 
-        for callback in self._watchers:
-            callback(self.value)
-
-        for callback in self._once_watchers:
-            callback(self.value)
-        self._once_watchers.clear()
+        self.notify("changed", self.value)
 
         if log:
             logger.debug(
@@ -277,13 +272,13 @@ class Ref(t.Generic[T]):
             self._value = new_value
             self._trigger_watchers(log=False)
 
-    def watch(self, callback: t.Callable[[T], None]) -> None:
+    def watch(self, callback: t.Callable[[T], None]) -> int:
         logger.debug("Ref '%s' create watcher", self.name)
-        self._watchers.append(callback)
+        return super().watch("changed", callback)
 
-    def unwatch(self, callback: t.Callable[[T], None]) -> None:
+    def unwatch(self, handler_id: int) -> None:
         logger.debug("Ref '%s' remove watcher", self.name)
-        self._watchers.remove(callback)
+        super().unwatch("changed", handler_id)
 
     def ready(self) -> None:
         self.is_ready = True

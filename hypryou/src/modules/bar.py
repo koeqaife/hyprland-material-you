@@ -8,6 +8,8 @@ from src.variables.clock import date, time
 from src.variables import Globals
 from repository import gtk, gdk, pango
 from src.services import hyprland
+from src.services.hyprland import active_workspace, workspace_ids
+from src.services.hyprland import active_layout
 from utils import format
 import asyncio
 from time import perf_counter
@@ -58,11 +60,13 @@ class Workspaces(gtk.Box):
         for button in self.buttons:
             self.append(button)
 
-        self.update_active(hyprland.active_workspace.value)
-        self.update_empty(hyprland.workspace_ids.value)
+        self.update_active(active_workspace.value)
+        self.update_empty(workspace_ids.value)
 
-        hyprland.active_workspace.watch(self.update_active)
-        hyprland.workspace_ids.watch(self.update_empty)
+        self.ref_handlers: dict[Ref[t.Any], int] = {
+            active_workspace: active_workspace.watch(self.update_active),
+            workspace_ids: workspace_ids.watch(self.update_empty)
+        }
 
         self._last_scroll = 0.0
         self._scroll = gtk.EventControllerScroll.new(
@@ -82,8 +86,8 @@ class Workspaces(gtk.Box):
         self._scroll.disconnect(self._scroll_connection)
         self.remove_controller(self._scroll)
         self._scroll = None  # type: ignore
-        hyprland.active_workspace.unwatch(self.update_active)
-        hyprland.workspace_ids.unwatch(self.update_empty)
+        for ref, handler_id in self.ref_handlers.items():
+            ref.unwatch(handler_id)
 
     def on_scroll(
         self,
@@ -130,8 +134,10 @@ class Clock(gtk.Label):
             tooltip_text=date.value
         )
 
-        time.watch(self.update_time)
-        date.watch(self.update_date)
+        self.ref_handlers = {
+            time: time.watch(self.update_time),
+            date: date.watch(self.update_date)
+        }
 
     def update_time(self, new: str) -> None:
         self.set_label(new)
@@ -140,8 +146,8 @@ class Clock(gtk.Label):
         self.set_tooltip_text(new)
 
     def destroy(self) -> None:
-        time.unwatch(self.update_time)
-        date.unwatch(self.update_date)
+        for ref, handler_id in self.ref_handlers.items():
+            ref.unwatch(handler_id)
 
 
 @dataclass
@@ -408,14 +414,14 @@ class KeyboardLayout(gtk.Label):
             css_classes=("keyboard-layout", "bar-applet")
         )
 
-        self.update_layout(hyprland.active_layout.value)
-        hyprland.active_layout.watch(self.update_layout)
+        self.update_layout(active_layout.value)
+        self.handler_id = active_layout.watch(self.update_layout)
 
     def update_layout(self, new_layout: str) -> None:
         self.set_label(format.get_layout_tag(new_layout))
 
     def destroy(self) -> None:
-        hyprland.active_layout.unwatch(self.update_layout)
+        active_layout.unwatch(self.handler_id)
 
 
 class Applet(gtk.Button):

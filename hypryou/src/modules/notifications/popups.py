@@ -32,10 +32,10 @@ class NotificationPopups(gtk.Box):
         )
 
         self.items: dict[int, NotificationRevealer] = {}
-        popups.watch(self.on_change)
+        self.handler_id = popups.watch(self.on_change)
 
     def destroy(self) -> None:
-        popups.unwatch(self.on_change)
+        popups.unwatch(self.handler_id)
         for item in self.items.values():
             item.self_destroy()
         self.items.clear()

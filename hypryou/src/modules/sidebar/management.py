@@ -102,7 +102,7 @@ class InfoBox(gtk.Box):
             label=os.getenv("USER")
         )
         self.date.set_label(full_date.value)
-        full_date.watch(self.on_date_update)
+        self.handler_id = full_date.watch(self.on_date_update)
 
         self.append(self.date)
         self.append(self.username)
@@ -111,7 +111,7 @@ class InfoBox(gtk.Box):
         self.date.set_label(new_value)
 
     def destroy(self) -> None:
-        full_date.unwatch(self.on_date_update)
+        full_date.unwatch(self.handler_id)
 
 
 class ManagementLine(gtk.Box):

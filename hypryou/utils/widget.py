@@ -111,14 +111,14 @@ class Icon(gtk.Label):
             self.set_label(icon)
         elif isinstance(icon, Ref):
             self.set_label(icon.value)
-            icon.watch(self.update)
+            self.handler_id = icon.watch(self.update)
 
     def update(self, value: str) -> None:
         self.set_label(value)
 
     def destroy(self) -> None:
         if isinstance(self.icon, Ref):
-            self.icon.unwatch(self.update)
+            self.icon.unwatch(self.handler_id)
 
 
 class RoundedCorner(gtk.DrawingArea):

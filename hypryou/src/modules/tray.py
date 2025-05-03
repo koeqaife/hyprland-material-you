@@ -149,7 +149,7 @@ class TrayBox(gtk.ScrolledWindow):
             vscrollbar_policy=gtk.PolicyType.AUTOMATIC,
             hscrollbar_policy=gtk.PolicyType.NEVER
         )
-        items.watch(self.update_items)
+        self.handler_id = items.watch(self.update_items)
         self.update_items(items.value)
         weakref.finalize(self, lambda: logger.debug("TrayBox finalized"))
 
@@ -174,7 +174,7 @@ class TrayBox(gtk.ScrolledWindow):
             self.box.remove(item)
         self.items.clear()
         self.set_child(None)
-        items.unwatch(self.update_items)
+        items.unwatch(self.handler_id)
 
 
 class TrayWindow(widget.LayerWindow):
