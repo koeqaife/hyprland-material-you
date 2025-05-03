@@ -1,6 +1,7 @@
 import functools
 import os
 import json
+import threading
 from PIL import Image
 import concurrent
 import concurrent.futures
@@ -35,6 +36,7 @@ CACHE_PATH = color_templates
 colors_json = join(CACHE_PATH, "colors.json")
 
 dark_mode = Ref(True, name="dark_mode")
+task_lock = threading.Lock()
 
 
 type IntFloat = int | float
@@ -433,21 +435,32 @@ def generate_colors(
             future.result()
         except Exception as e:
             logger.error("Couldn't generate colors: %s", e, exc_info=e)
+
         default_on_complete()
         if on_complete:
             on_complete()
 
-    with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(
-            functools.partial(
-                generate_colors_sync,
-                image_path=image_path,
-                use_color=use_color,
-                is_dark=is_dark,
-                contrast_level=contrast_level
-            )
+    if task_lock.acquire(blocking=False):
+        try:
+            with concurrent.futures.ProcessPoolExecutor(max_workers=1) as (
+                executor
+            ):
+                future = executor.submit(
+                    functools.partial(
+                        generate_colors_sync,
+                        image_path=image_path,
+                        use_color=use_color,
+                        is_dark=is_dark,
+                        contrast_level=contrast_level
+                    )
+                )
+                future.add_done_callback(_callback)
+        finally:
+            task_lock.release()
+    else:
+        logger.warning(
+            "Another task is already running, skipping the new task."
         )
-        future.add_done_callback(_callback)
 
 
 def generate_by_wallpaper(
