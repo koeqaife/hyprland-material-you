@@ -4,15 +4,17 @@ MAX_RETRIES=5
 RETRY_COUNT=0
 RETRY_TIMEOUT=10
 
-LAST_FAILURE_TIME=0
+START_TIME=0
 
 while true; do
     CURRENT_TIME=$(date +%s)
 
-    if (( CURRENT_TIME - LAST_FAILURE_TIME > RETRY_TIMEOUT )); then
+    if (( CURRENT_TIME - START_TIME > RETRY_TIMEOUT )); then
         RETRY_COUNT=0
     fi
     
+    START_TIME=$(date +%s)
+
     python hypryou_ui.py
     EXIT_CODE=$?
 
@@ -21,7 +23,6 @@ while true; do
     fi
 
     ((RETRY_COUNT++))
-    LAST_FAILURE_TIME=$(date +%s)
 
     if (( RETRY_COUNT >= MAX_RETRIES )); then
         # TODO: Open some window with crash info
@@ -29,6 +30,6 @@ while true; do
         exit 1
     fi
 
-    echo "App exited with $EXIT_CODE, retrying..."
+    echo "App exited with $EXIT_CODE, retrying ($RETRY_COUNT/$MAX_RETRIES)..."
     sleep 1
 done
