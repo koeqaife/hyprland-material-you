@@ -22,6 +22,11 @@ while true; do
         exit 0
     fi
 
+    if [[ $EXIT_CODE -eq 100 ]]; then
+        echo "App asked for reload (exit code: $EXIT_CODE)"
+        continue
+    fi
+
     ((RETRY_COUNT++))
 
     if (( RETRY_COUNT >= MAX_RETRIES )); then

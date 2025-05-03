@@ -16,6 +16,9 @@ class CliRequest:
     def do_ping(self, args: str) -> str:
         return "pong"
 
+    def do_reload(self, args: str) -> str:
+        exit(100)
+
     def do_exit(self, args: str) -> str:
         exit(0)
 
