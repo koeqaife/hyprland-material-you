@@ -6,7 +6,6 @@ from utils.logger import logger
 from repository import glib
 
 # I don't wanna use GObject for signals in objects so I decided to do this code
-# TODO: Move all code from EventBus to Signals
 
 Callback = t.Callable[..., None]
 Wrapper = t.Callable[..., bool | None]

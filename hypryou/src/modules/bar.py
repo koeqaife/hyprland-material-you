@@ -149,7 +149,6 @@ class LastChanged:
     artist: str | None = None
     title: str | None = None
     artUrl: str | None = None
-    player_name: str | None = None
     playback_status: str | None = None
     can_go_prev: bool | None = None
     can_go_next: bool | None = None
@@ -163,6 +162,8 @@ class Player(gtk.Box):
             halign=gtk.Align.START,
             valign=gtk.Align.CENTER
         )
+
+        self.player_handlers: dict[MprisPlayer, int] = {}
 
         image = gtk.Box(
             css_classes=("image",),
@@ -353,22 +354,22 @@ class Player(gtk.Box):
         self.update_label()
         self.update_buttons()
 
-    def update_watcher(self, new_name: str | None) -> None:
-        old_name = self.last_changed.player_name
-        if old_name != new_name:
-            if old_name is not None:
-                Globals.events.unwatch(
-                    "mpris_player_changed", self.on_changed, old_name
-                )
-            if new_name is not None:
-                Globals.events.watch(
-                    "mpris_player_changed", self.on_changed, new_name
-                )
-            self.last_changed.player_name = new_name
+    def update_watcher(self) -> None:
+        current = self.get_player()
+        if not current:
+            return
+
+        for player, handler in self.player_handlers.items():
+            if player is not current:
+                player.unwatch("changed", handler)
+
+        if current not in self.player_handlers.keys():
+            handler_id = current.watch("changed", self.on_changed)
+            self.player_handlers[current] = handler_id
 
     def on_changed(self, *args: t.Any) -> None:
         current = self.get_player()
-        self.update_watcher(current._bus_name if current else None)
+        self.update_watcher()
 
         if not current:
             self.update_all()
@@ -378,12 +379,9 @@ class Player(gtk.Box):
 
     def destroy(self) -> None:
         current_player.unwatch(self.on_changed)
-        if self.last_changed.player_name is not None:
-            Globals.events.unwatch(
-                "mpris_player_changed",
-                self.on_changed,
-                self.last_changed.player_name
-            )
+        for player, handler in self.player_handlers.items():
+            player.unwatch("changed", handler)
+
         for btn in self.buttons:
             btn_child = btn.get_child()
             if isinstance(btn_child, widget.Icon):
@@ -603,7 +601,7 @@ class Corner:
         self.window: widget.LayerWindow | None = None
         self.corner: widget.RoundedCorner | None = None
 
-        self.settings.subscribe("corners", self.update_visible, True)
+        self.settings.watch("corners", self.update_visible, True)
 
     def create_window(self) -> None:
         is_on_left = self.position == "left"

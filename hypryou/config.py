@@ -2,9 +2,8 @@ import os
 from os.path import join as pjoin
 import json
 import typing as t
-from src.variables import Globals
-from src.services.events import Event, Watcher
 import sys
+from utils.service import Signals
 
 T = t.TypeVar('T')
 
@@ -39,15 +38,12 @@ os.makedirs(APP_CACHE_PATH, exist_ok=True)
 os.makedirs(TEMP_PATH, exist_ok=True)
 
 
-type Wrappers = dict[t.Callable[[t.Any], None], Watcher]
-
-
 class HyprlandVars:
     gap = 14
     rounding = 20
 
 
-class Settings:
+class Settings(Signals):
     _instance: t.Optional['Settings'] = None
 
     def __new__(cls) -> 'Settings':
@@ -57,11 +53,9 @@ class Settings:
 
     def __init__(self) -> None:
         if not hasattr(self, '_initialized'):
+            super().__init__()
             self._initialized = True
             self._values = {}
-            self._events = Globals.events
-            self._wrappers: Wrappers = {}
-
             try:
                 with open(settings_path, 'r') as f:
                     self._values = json.load(f)
@@ -83,12 +77,7 @@ class Settings:
                 f.write("{}")
         for key, value in self._values.items():
             if key not in old_values or old_values[key] != value:
-                event = Event(
-                    value,
-                    key,
-                    "settings_changed"
-                )
-                self._events.notify(event)
+                self.notify(f"changed::{key}", value)
 
     def reset(self, name: str) -> None:
         self.set(name, default_settings[name])
@@ -96,12 +85,7 @@ class Settings:
     def set(self, name: str, value: t.Any) -> None:
         self._values[name] = value
         self.save()
-        event = Event(
-            value,
-            name,
-            "settings_changed"
-        )
-        self._events.notify(event)
+        self.notify(f"changed::{name}", value)
 
     def get(self, name: str) -> t.Any:
         if name in self._values:
@@ -123,28 +107,19 @@ class Settings:
         elif value == second:
             self.set(name, first)
 
-    def _wrapper(self, callback: t.Callable[[t.Any], None]) -> Watcher:
-        if callback not in self._wrappers:
-            def func(event: Event) -> None:
-                callback(event.data)
-            self._wrappers[callback] = func
-            return func
-        else:
-            return self._wrappers[callback]
-
-    def subscribe(
+    def watch(
         self, name: str,
         callback: t.Callable[[t.Any], None],
-        init_call: bool = True
+        init_call: bool = True,
+        **kwargs: t.Any
     ) -> None:
         if init_call:
             callback(self.get(name))
-        self._events.watch("settings_changed", self._wrapper(callback), name)
+        super().watch(f"changed::{name}", callback, **kwargs)
 
-    def unsubscribe(
-        self, name: str,
-        callback: t.Callable[[t.Any], None]
+    def unwatch(
+        self, name: str, handler_id: int
     ) -> None:
-        wrapper = self._wrapper(callback)
-        self._events.unwatch("settings_changed", wrapper, name)
-        del self._wrappers[callback]
+        super().unwatch(
+            f"changed::{name}", handler_id
+        )

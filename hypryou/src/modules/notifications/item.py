@@ -1,7 +1,7 @@
 from repository import gtk, glib, pango, gdk, gio
 from src.services.notifications import Notification, NotificationClosedReason
 from utils import widget
-from src.variables import Globals
+# from src.variables import Globals
 import typing as t
 from utils import get_formatted_time, toggle_css_class
 from config import Settings
@@ -134,11 +134,7 @@ class NotificationItem(gtk.Box):
             if child:
                 self.append(child)
 
-        Globals.events.watch(
-            "notification_replaced",
-            self.update_values,
-            self.item.id
-        )
+        self.handler_id = item.watch("changed", self.update_values)
         self.update_values()
 
     def on_action(self, action: str) -> None:
@@ -225,11 +221,7 @@ class NotificationItem(gtk.Box):
         toggle_css_class(self, "critical", self.item.urgency == 2)
 
     def destroy(self) -> None:
-        Globals.events.unwatch(
-            "notification_replaced",
-            self.update_values,
-            self.item.id
-        )
+        self.item.unwatch(self.handler_id)
         for _widget, conn in self.conns.items():
             _widget.disconnect(conn)
         for child in self.children:

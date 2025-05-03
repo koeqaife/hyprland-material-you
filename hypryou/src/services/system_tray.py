@@ -5,14 +5,13 @@ import os
 from repository import gio, glib, gtk, gdk_pixbuf
 from config import CONFIG_DIR
 from utils.logger import logger
-from src.variables import Globals
-from src.services.events import (
-    EventsBus, Event, NameOwnerChanged, TrayItemChanged
-)
 from src.services.dbus import BUS_TYPE, dbus_proxy, cache_proxy_properties
 from src.services.dbus import ServiceABC
+from src.services.events import NameOwnerChanged
+from src.variables import Globals
 import typing as t
 from utils import Ref
+from utils.service import Signals
 
 # it won't reproduce the all possibilities of tray
 # I'll just use it as for running background services
@@ -20,7 +19,6 @@ from utils import Ref
 # only actions like activate, secondary activate and quit
 
 
-events: EventsBus
 WATCHER_XML_PATH = os.path.join(
     CONFIG_DIR, "assets", "dbus", "org.kde.StatusNotifierWatcher.xml"
 )
@@ -70,11 +68,12 @@ def get_pid(bus_name: str) -> int:
     return pid
 
 
-class StatusNotifierItem:
+class StatusNotifierItem(Signals):
     def __init__(
         self,
         proxy: gio.DBusProxy
     ) -> None:
+        super().__init__()
         self._proxy = proxy
         self._conn = proxy.get_connection()
         self._bus_name = self.get_bus_name()
@@ -129,10 +128,7 @@ class StatusNotifierItem:
             self._pixbufs.clear()
         self._cache_proxy_properties(list(changed_properties.keys()))
 
-        event = TrayItemChanged(
-            None, self.identifier, "tray_item_changed"
-        )
-        events.notify(event)
+        self.notify("changed")
 
     def on_dbus_signal(
         self,
@@ -155,15 +151,13 @@ class StatusNotifierItem:
             self._cache_proxy_properties([prop])
         else:
             self._cache_proxy_properties([prop])
-        event = Event(
+        self.notify(
+            "changed",
             {
                 "signal": signal_name,
                 "prop": prop.lower()
-            },
-            self.identifier,
-            "tray_item_changed"
+            }
         )
-        events.notify(event)
 
     def prop(self, property_name: str) -> t.Any:
         value = self._proxy.get_cached_property(property_name)
@@ -355,7 +349,7 @@ class StatusNotifierWatcher:
         self, conn: gio.DBusConnection, name: str, user_data: object = None
     ) -> None:
         logger.debug("System tray bus acquired")
-        events.watch(
+        Globals.events.watch(
             "name_owner_changed",
             self.on_name_owner_changed
         )
@@ -525,9 +519,7 @@ class StatusNotifierWatcher:
 
 class Service(ServiceABC):
     def start(self) -> None:
-        global events
         logger.debug("Starting system_tray dbus")
-        events = Globals.events
         watcher = StatusNotifierWatcher()
         watcher.register()
 

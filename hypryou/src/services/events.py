@@ -12,21 +12,9 @@ logger = logging.getLogger("hypryou")
 
 
 type EventName = t.Literal[
-    "name_owner_changed", "tray_item_changed",
-    "mpris_player_changed", "hyprland",
-    "toggle_window", "global",
-    "settings_changed", "notification_replaced",
-    "notification_dismissed"
+    "name_owner_changed",
+    "toggle_window", "global"
 ]
-
-
-class TrayItemChangedData(t.TypedDict):
-    prop: str
-    signal_name: str
-
-
-class MprisPlayerChangedData(t.TypedDict):
-    time: float
 
 
 @dataclass
@@ -37,24 +25,10 @@ class Event:
 
 
 @dataclass
-class TrayItemChanged(Event):
-    data: TrayItemChangedData | None
-    value: t.Hashable = "global"
-    name = "tray_item_changed"
-
-
-@dataclass
 class NameOwnerChanged(Event):
     data: tuple[str, str, str]
     value: t.Hashable = "global"
     name = "name_owner_changed"
-
-
-@dataclass
-class MprisPlayerChanged(Event):
-    data: MprisPlayerChangedData | None
-    value: t.Hashable
-    name = "mpris_player_changed"
 
 
 type Watcher = t.Callable[[t.Any], None]

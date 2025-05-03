@@ -3,7 +3,7 @@ from utils.logger import logger
 from repository import gtk, layer_shell, gdk, glib
 from src.variables import Globals
 from src.services.system_tray import StatusNotifierItem, items
-from src.services.events import TrayItemChanged, Event
+from src.services.events import Event
 from config import HyprlandVars
 import weakref
 
@@ -56,20 +56,16 @@ class TrayItem(gtk.Box):
         self.quit_conn = self.quit_btn.connect("clicked", self.quit)
         self.update_visible()
 
-        Globals.events.watch(
-            "tray_item_changed",
-            self.on_changed,
-            item.identifier
-        )
+        self.handler_id = self._item.watch("changed", self.on_changed)
         # weakref.finalize(self, lambda: logger.debug("TrayWidget finalized"))
 
-    def on_changed(self, event: TrayItemChanged) -> None:
-        if event.data:
+    def on_changed(self, data: dict | None = None) -> None:
+        if data:
             to_change = {
                 "icon": self.idle_update_image,
                 "title": self.update_label,
                 "tooltip": self.update_label
-            }.get(event.data["prop"])
+            }.get(data["prop"])
             if to_change:
                 to_change()
         else:
@@ -133,11 +129,7 @@ class TrayItem(gtk.Box):
         self.click_gesture.disconnect(self.gesture_conn)
         self.remove_controller(self.click_gesture)
         self.quit_btn.disconnect(self.quit_conn)
-        Globals.events.unwatch(
-            "tray_item_changed",
-            self.on_changed,
-            self._item.identifier
-        )
+        self._item.unwatch("changed", self.handler_id)
 
 
 class TrayBox(gtk.ScrolledWindow):

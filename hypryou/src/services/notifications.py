@@ -10,9 +10,9 @@ from utils import Ref
 from utils.logger import logger
 from src.services.dbus import BUS_TYPE, ServiceABC
 import typing as t
-from src.variables import Globals
-from src.services.events import Event
 from pathlib import Path
+from utils.service import Signals
+
 
 WATCHER_XML_PATH = os.path.join(
     CONFIG_DIR, "assets", "dbus", "org.freedesktop.Notifications.xml"
@@ -160,7 +160,7 @@ def locate_desktop_file(desktop_id: str) -> Path | None:
     return None
 
 
-class Notification:
+class Notification(Signals):
     def __init__(
         self,
         id: int,
@@ -243,6 +243,7 @@ class Notification:
         self,
         **kwargs: t.Unpack[NotificationArgs]
     ) -> None:
+        notify = hasattr(self, "hints")
         self.app_name = kwargs["app_name"]
         self.app_icon = kwargs["app_icon"]
         self.summary = kwargs["summary"]
@@ -253,6 +254,9 @@ class Notification:
         )
         self.hints = kwargs["hints"]
         self.time = time.time()
+
+        if notify:
+            self.notify("changed")
 
 
 class NotificationsWatcher:
@@ -374,12 +378,6 @@ class NotificationsWatcher:
                 )
                 self._reschedule_timer()
 
-            event = Event(
-                None,
-                replaces_id,
-                "notification_replaced"
-            )
-            Globals.events.notify(event)
             return replaces_id
 
         new_id = generate_new_id()

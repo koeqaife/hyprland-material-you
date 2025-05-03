@@ -28,7 +28,7 @@ async def clock_task() -> None:
         date.value = get_formatted_date(_date)
         full_date.value = get_full_date(_date)
 
-    settings.subscribe("time_format", settings_update)
+    settings.watch("time_format", settings_update)
 
     while True:
         now = datetime.datetime.now()

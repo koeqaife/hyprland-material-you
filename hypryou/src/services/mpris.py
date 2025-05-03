@@ -5,10 +5,11 @@ from repository import gio, glib
 import typing as t
 from src.services.dbus import dbus_proxy, bus, cache_proxy_properties
 from src.services.dbus import ServiceABC
-from src.services.events import NameOwnerChanged, MprisPlayerChanged
+from src.services.events import NameOwnerChanged
 from src.variables import Globals
 from utils.logger import logger
 from utils import Ref
+from utils.service import Signals
 
 MPRIS_PREFIX = "org.mpris.MediaPlayer2."
 
@@ -79,8 +80,9 @@ MprisMetadata = t.TypedDict(
 )
 
 
-class MprisPlayer:
+class MprisPlayer(Signals):
     def __init__(self, proxy: gio.DBusProxy):
+        super().__init__()
         self._proxy: gio.DBusProxy = proxy
         self._bus_name = self.get_bus_name()
         self._bus_path = proxy.get_object_path()
@@ -115,12 +117,7 @@ class MprisPlayer:
             self._last_changed_time = time.monotonic()
             update_current_player()
 
-            event = MprisPlayerChanged(
-                {"time": self.position},
-                self._bus_name,
-                "mpris_player_changed"
-            )
-            Globals.events.notify(event)
+            self.notify("seeked", self.position)
 
     def finalize(self) -> None:
         for conn in self.conns:
@@ -155,10 +152,7 @@ class MprisPlayer:
         self._last_changed_time = time.monotonic()
         update_current_player()
 
-        event = MprisPlayerChanged(
-            None, self._bus_name, "mpris_player_changed"
-        )
-        Globals.events.notify(event)
+        self.notify("changed")
 
     def prop(self, property_name: str) -> t.Any:
         value = self._proxy.get_cached_property(property_name)
