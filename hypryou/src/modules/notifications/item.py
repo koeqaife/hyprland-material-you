@@ -221,7 +221,7 @@ class NotificationItem(gtk.Box):
         toggle_css_class(self, "critical", self.item.urgency == 2)
 
     def destroy(self) -> None:
-        self.item.unwatch(self.handler_id)
+        self.item.unwatch("changed", self.handler_id)
         for _widget, conn in self.conns.items():
             _widget.disconnect(conn)
         for child in self.children:

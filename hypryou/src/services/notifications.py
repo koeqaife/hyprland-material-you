@@ -167,6 +167,7 @@ class Notification(Signals):
         watcher: NotificationsWatcher,
         **kwargs: t.Unpack[NotificationArgs]
     ) -> None:
+        super().__init__()
         self.id = id
         self.watcher = watcher
         self.cached_app_icon: tuple[str, str | None] | None = None
