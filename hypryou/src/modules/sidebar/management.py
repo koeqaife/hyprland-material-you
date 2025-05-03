@@ -5,6 +5,7 @@ from src.variables.clock import full_date
 from src.services.network import get_network, Primary
 import os
 from utils import colors
+from src.services.idle_inhibitor import inhibited, get_inhibitor
 
 
 # TODO: Make buttons work
@@ -222,6 +223,13 @@ def toggle_dark_mode(self: ToggleButton, value: bool) -> None:
     colors.set_dark_mode(value)
 
 
+def toggle_inhibitor(self: ToggleButton, value: bool) -> None:
+    if value:
+        get_inhibitor().inhibit()
+    else:
+        get_inhibitor().un_inhibit()
+
+
 class ManagementFirstPage(gtk.Box):
     def __init__(self) -> None:
         super().__init__(
@@ -248,11 +256,11 @@ class ManagementFirstPage(gtk.Box):
             "Off",
             False
         )
-        self.idle_inhibitor = ManagementButton(
+        self.idle_inhibitor = ToggleButton(
             "schedule",
             "Idle Inhibitor",
-            "Off",
-            False
+            inhibited,
+            toggle_inhibitor
         )
         self.night_light = ManagementButton(
             "nightlight",
