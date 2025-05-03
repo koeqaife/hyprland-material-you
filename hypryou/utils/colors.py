@@ -28,9 +28,6 @@ from utils.ref import Ref
 
 join = os.path.join
 
-executor = (
-    concurrent.futures.ProcessPoolExecutor(max_workers=2)
-)
 
 TEMPLATES_DIR = join(CONFIG_DIR, "assets", "templates")
 CACHE_PATH = color_templates
@@ -55,7 +52,6 @@ def rgba_to_rgb(rgba: RGBA) -> str:
 
 def get_color(scheme: DynamicScheme, color_name: str) -> DynamicColor | None:
     color = getattr(scheme, color_name)
-    print(scheme, color)
     if isinstance(color, DynamicColor):
         return color
     else:
@@ -423,7 +419,6 @@ def generate_colors_sync(
 def default_on_complete() -> None:
     apply_css()
     sync()
-    executor.shutdown(wait=True)
 
 
 def generate_colors(
@@ -442,16 +437,17 @@ def generate_colors(
         if on_complete:
             on_complete()
 
-    future = executor.submit(
-        functools.partial(
-            generate_colors_sync,
-            image_path=image_path,
-            use_color=use_color,
-            is_dark=is_dark,
-            contrast_level=contrast_level
+    with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(
+            functools.partial(
+                generate_colors_sync,
+                image_path=image_path,
+                use_color=use_color,
+                is_dark=is_dark,
+                contrast_level=contrast_level
+            )
         )
-    )
-    future.add_done_callback(_callback)
+        future.add_done_callback(_callback)
 
 
 def generate_by_wallpaper(
@@ -545,6 +541,30 @@ def restore_palette(
             None,
             0x0000FF,
             True,
+            0,
+            on_complete=on_complete
+        )
+
+
+def set_dark_mode(
+    is_dark: bool,
+    on_complete: t.Callable[[], None] | None = None
+) -> None:
+    try:
+        with open(colors_json) as f:
+            content = get_cache_object(f.read())
+        generate_colors(
+            content.wallpaper,
+            content.original_color,
+            is_dark,
+            content.contrast_level,
+            on_complete=on_complete
+        )
+    except (FileNotFoundError, AssertionError):
+        generate_colors(
+            None,
+            0x0000FF,
+            is_dark,
             0,
             on_complete=on_complete
         )
