@@ -530,3 +530,6 @@ class Service(ServiceABC):
         events = Globals.events
         watcher = StatusNotifierWatcher()
         watcher.register()
+
+    def on_close(self) -> None:
+        pass

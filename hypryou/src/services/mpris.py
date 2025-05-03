@@ -393,3 +393,6 @@ class Service(ServiceABC):
         logger.debug("Starting mpris watcher")
         watcher = MprisWatcher()
         watcher.scan_existing_players()
+
+    def on_close(self) -> None:
+        pass

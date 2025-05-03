@@ -495,3 +495,6 @@ class Service(ServiceABC):
     def start(self) -> None:
         watcher = NotificationsWatcher()
         watcher.register()
+
+    def on_close(self) -> None:
+        pass

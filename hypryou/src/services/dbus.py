@@ -126,9 +126,15 @@ class ServiceABC(abc.ABC):
     def start(self) -> None:
         ...
 
+    def on_close(self) -> None:
+        ...
+
 
 class Service(ServiceABC):
     def start(self) -> None:
         global events
         events = Globals.events
         subscribe_signals(bus)
+
+    def on_close(self) -> None:
+        pass
