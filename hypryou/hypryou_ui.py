@@ -22,6 +22,7 @@ from src.services import system_tray
 from src.services import cli
 from src.services import events
 from src.services import notifications
+from src.services import idle_inhibitor
 
 # Modules
 from src.modules.bar import Bar, Corner
@@ -32,8 +33,11 @@ from src.modules.sidebar.window import Sidebar
 START = time.perf_counter()
 
 dbus_services = (
-    dbus.Service, system_tray.Service,
-    mpris.Service, notifications.Service
+    dbus.Service(),
+    system_tray.Service(),
+    mpris.Service(),
+    notifications.Service(),
+    idle_inhibitor.Service()
 )
 
 
@@ -55,7 +59,7 @@ class HyprYou(gtk.Application):
             utils.colors.restore_palette()
 
         for service in dbus_services:
-            service().start()
+            service.start()
 
         self.tasks = [
             asyncio.create_task(cli.serve()),
@@ -156,3 +160,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         logger.warning("Bye!")
         exit(0)
+    finally:
+        for service in dbus_services:
+            service.on_close()
