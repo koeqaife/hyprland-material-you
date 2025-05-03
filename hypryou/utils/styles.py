@@ -28,6 +28,9 @@ def apply_css() -> None:
 
 
 def reload_css() -> None:
+    if not hasattr(Globals, "css_provider"):
+        return apply_css()
+
     compile_scss()
     logger.debug("Reloading css")
     Globals.css_provider.load_from_path(styles_output)
