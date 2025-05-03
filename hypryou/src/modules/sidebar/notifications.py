@@ -4,7 +4,8 @@ from src.modules.notifications.item import NotificationItem
 from src.modules.notifications.item import NotificationRevealer
 import typing as t
 import json
-from config import CONFIG_DIR, pjoin
+from config import CONFIG_DIR
+from os.path import join as pjoin
 
 T = t.TypeVar("T")
 

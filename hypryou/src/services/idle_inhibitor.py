@@ -10,7 +10,7 @@ inhibited = Ref(False, name="inhibited")
 
 
 class IdleInhibitor:
-    def __init__(self):
+    def __init__(self) -> None:
         self._proxy = gio.DBusProxy.new_sync(
             bus,
             gio.DBusProxyFlags.NONE,
@@ -102,4 +102,5 @@ class Service(ServiceABC):
         _instance = IdleInhibitor()
 
     def on_close(self) -> None:
-        _instance.un_inhibit_sync()
+        if _instance is not None:
+            _instance.un_inhibit_sync()

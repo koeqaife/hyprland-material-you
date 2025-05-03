@@ -169,7 +169,7 @@ class ReactiveDict(dict[K, V], t.Generic[K, V]):
             self._ref._trigger_watchers()
 
 
-class Ref(Signals, t.Generic[T]):
+class Ref(t.Generic[T]):
     def __init__(
         self,
         value: T,
@@ -177,7 +177,7 @@ class Ref(Signals, t.Generic[T]):
         delayed_init: bool = False,
         deep: bool = False
     ) -> None:
-        super().__init__()
+        self._signals = Signals()
         self.deep = deep
         self.is_ready = not delayed_init
 
@@ -241,7 +241,7 @@ class Ref(Signals, t.Generic[T]):
         if not self.is_ready:
             return
 
-        self.notify("changed", self.value)
+        self._signals.notify("changed", self.value)
 
         if log:
             logger.debug(
@@ -272,13 +272,13 @@ class Ref(Signals, t.Generic[T]):
             self._value = new_value
             self._trigger_watchers(log=False)
 
-    def watch(self, callback: t.Callable[[T], None]) -> int:
+    def watch(self, callback: t.Callable[[T], None], **kwargs: t.Any) -> int:
         logger.debug("Ref '%s' create watcher", self.name)
-        return super().watch("changed", callback)
+        return self._signals.watch("changed", callback, **kwargs)
 
     def unwatch(self, handler_id: int) -> None:
         logger.debug("Ref '%s' remove watcher", self.name)
-        super().unwatch("changed", handler_id)
+        self._signals.unwatch("changed", handler_id)
 
     def ready(self) -> None:
         self.is_ready = True

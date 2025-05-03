@@ -430,7 +430,7 @@ def generate_colors(
     contrast_level: int = 0,
     on_complete: t.Callable[[], None] | None = None
 ) -> None:
-    def _callback(future: concurrent.futures.Future) -> None:
+    def _callback(future: concurrent.futures.Future[None]) -> None:
         try:
             future.result()
         except Exception as e:
@@ -515,7 +515,7 @@ def generate_by_last_wallpaper(
     on_complete: t.Callable[[], None] | None = None
 ) -> None:
     try:
-        with open() as f:
+        with open(colors_json) as f:
             content = get_cache_object(f.read())
         assert content.wallpaper is not None
         generate_colors(

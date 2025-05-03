@@ -43,7 +43,7 @@ class HyprlandVars:
     rounding = 20
 
 
-class Settings(Signals):
+class Settings:
     _instance: t.Optional['Settings'] = None
 
     def __new__(cls) -> 'Settings':
@@ -53,7 +53,7 @@ class Settings(Signals):
 
     def __init__(self) -> None:
         if not hasattr(self, '_initialized'):
-            super().__init__()
+            self._signals = Signals()
             self._initialized = True
             self._values = {}
             try:
@@ -77,7 +77,7 @@ class Settings(Signals):
                 f.write("{}")
         for key, value in self._values.items():
             if key not in old_values or old_values[key] != value:
-                self.notify(f"changed::{key}", value)
+                self._signals.notify(f"changed::{key}", value)
 
     def reset(self, name: str) -> None:
         self.set(name, default_settings[name])
@@ -85,7 +85,7 @@ class Settings(Signals):
     def set(self, name: str, value: t.Any) -> None:
         self._values[name] = value
         self.save()
-        self.notify(f"changed::{name}", value)
+        self._signals.notify(f"changed::{name}", value)
 
     def get(self, name: str) -> t.Any:
         if name in self._values:
@@ -115,11 +115,11 @@ class Settings(Signals):
     ) -> int:
         if init_call:
             callback(self.get(name))
-        return super().watch(f"changed::{name}", callback, **kwargs)
+        return self._signals.watch(f"changed::{name}", callback, **kwargs)
 
     def unwatch(
         self, name: str, handler_id: int
     ) -> None:
-        super().unwatch(
+        self._signals.unwatch(
             f"changed::{name}", handler_id
         )

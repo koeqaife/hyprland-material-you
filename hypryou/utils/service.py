@@ -29,7 +29,7 @@ class Signals:
             if isinstance(callback, types.MethodType):
                 ref = weakref.WeakMethod(callback)
 
-                def wrapper(*args: t.Any) -> bool:
+                def wrapper(*args: t.Any) -> bool | None:
                     func = ref()
                     if func is not None:
                         func(*args)

@@ -99,7 +99,7 @@ class InfoBox(gtk.Box):
         self.username = gtk.Label(
             css_classes=("username-label",),
             halign=gtk.Align.END,
-            label=os.getenv("USER")
+            label=os.getenv("USER", "Unknown user")
         )
         self.date.set_label(full_date.value)
         self.handler_id = full_date.watch(self.on_date_update)
@@ -186,7 +186,7 @@ class ToggleButton(ManagementButton):
         icon: str | Ref[str],
         label: str,
         activated: bool | Ref[bool],
-        toggle: t.Callable[[t.Self, bool], None] | None = None,
+        toggle: t.Callable[["ToggleButton", bool], None] | None = None,
         on_right_click: t.Callable[[], None] | None = None
     ) -> None:
         _activated = (
@@ -208,7 +208,8 @@ class ToggleButton(ManagementButton):
             activated.watch(self.on_update)
 
     def toggle(self) -> None:
-        self.toggle_action(self, not self.activated)
+        if self.toggle_action:
+            self.toggle_action(self, not self.activated)
 
     def on_update(self, *args: bool) -> None:
         if self.activated_ref.value:

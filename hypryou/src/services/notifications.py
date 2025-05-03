@@ -170,7 +170,7 @@ class Notification(Signals):
         super().__init__()
         self.id = id
         self.watcher = watcher
-        self.cached_app_icon: tuple[str, str | None] | None = None
+        self.cached_app_icon: tuple[str, gio.Icon | str | None] | None = None
         self.set_values(**kwargs)
 
     def close(self, reason: NotificationClosedReason) -> None:
@@ -194,7 +194,7 @@ class Notification(Signals):
     def action(self, action: str) -> None:
         self.watcher.signal_action_invoked(self.id, action)
 
-    def get_icon_from_desktop_entry(self) -> gio.Icon | None:
+    def get_icon_from_desktop_entry(self) -> str | gio.Icon | None:
         desktop_entry = self.hints.get("desktop-entry")
         if not isinstance(desktop_entry, str):
             return None
@@ -237,8 +237,8 @@ class Notification(Signals):
                 return path_or_icon
         elif "icon_data" in self.hints.keys():
             return get_pixbuf_from_data(self.hints["icon_data"])
-        else:
-            return None
+
+        return None
 
     def set_values(
         self,

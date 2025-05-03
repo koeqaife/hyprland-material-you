@@ -131,7 +131,7 @@ class AccessPoint(Signals):
         self.ap.disconnect(self.handler)
 
     def strength_changed(self, *_: t.Any) -> None:
-        self.strength: int = self.ap.get_strength()
+        self.strength = self.ap.get_strength()
         self.notify("changed")
 
 
@@ -174,11 +174,11 @@ class Wifi(Signals):
             "notify::active-access-point", self.on_active_access_point
         )
 
-    def on_access_point_added(self, _, ap: nm.AccessPoint) -> None:
+    def on_access_point_added(self, _: t.Any, ap: nm.AccessPoint) -> None:
         self.access_points[ap.get_bssid()] = AccessPoint(ap)
         self.notify("access-points")
 
-    def on_access_point_removed(self, _, ap: nm.AccessPoint) -> None:
+    def on_access_point_removed(self, _: t.Any, ap: nm.AccessPoint) -> None:
         bssid = ap.get_bssid()
         if bssid in self.access_points:
             self.access_points[bssid].dispose()
@@ -222,7 +222,7 @@ class Wifi(Signals):
             self.ap_handler = ap.watch("changed", self.on_access_point_changed)
             self.notify("access-point-changed")
 
-    def get_icon(self) -> None:
+    def get_icon(self) -> str:
         if not self.enabled:
             return "signal_wifi_off"
 
@@ -270,7 +270,9 @@ class Wifi(Signals):
         if ip4config is None:
             return False
 
-        return ip4config.get_method() == nm.SETTING_IP4_CONFIG_METHOD_SHARED
+        return bool(
+            ip4config.get_method() == nm.SETTING_IP4_CONFIG_METHOD_SHARED
+        )
 
     def scan(self) -> None:
         self.device.request_scan_async(
@@ -279,7 +281,7 @@ class Wifi(Signals):
 
     @property
     def enabled(self) -> bool:
-        return self.client.wireless_get_enabled()
+        return bool(self.client.wireless_get_enabled())
 
     @enabled.setter
     def enabled(self, new_value: bool) -> None:

@@ -6,6 +6,7 @@ from src.services.system_tray import StatusNotifierItem, items
 from src.services.events import Event
 from config import HyprlandVars
 import weakref
+import typing as t
 
 # It's so cool that when tray isn't opened there isn't any load to CPU
 # Cause it's not listening to any updates of items
@@ -59,7 +60,7 @@ class TrayItem(gtk.Box):
         self.handler_id = self._item.watch("changed", self.on_changed)
         # weakref.finalize(self, lambda: logger.debug("TrayWidget finalized"))
 
-    def on_changed(self, data: dict | None = None) -> None:
+    def on_changed(self, data: dict[str, t.Any] | None = None) -> None:
         if data:
             to_change = {
                 "icon": self.idle_update_image,

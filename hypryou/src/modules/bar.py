@@ -384,7 +384,6 @@ class Player(gtk.Box):
         self.update_all()
 
     def destroy(self) -> None:
-        current_player.unwatch(self.on_changed)
         for player, handler in self.player_handlers.items():
             player.unwatch("changed", handler)
 
