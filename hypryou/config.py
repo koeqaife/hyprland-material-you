@@ -112,10 +112,10 @@ class Settings(Signals):
         callback: t.Callable[[t.Any], None],
         init_call: bool = True,
         **kwargs: t.Any
-    ) -> None:
+    ) -> int:
         if init_call:
             callback(self.get(name))
-        super().watch(f"changed::{name}", callback, **kwargs)
+        return super().watch(f"changed::{name}", callback, **kwargs)
 
     def unwatch(
         self, name: str, handler_id: int
