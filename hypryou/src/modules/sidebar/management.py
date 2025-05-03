@@ -4,6 +4,7 @@ import typing as t
 from src.variables.clock import full_date
 from src.services.network import get_network, Primary
 import os
+from utils import colors
 
 
 # TODO: Make buttons work
@@ -59,6 +60,8 @@ class ManagementButton(gtk.Box):
         self.on_click = on_click
         self.on_right_click = on_right_click
 
+        self.activated = activated
+
     def on_click_released(
         self,
         gesture: gtk.GestureClick,
@@ -76,6 +79,7 @@ class ManagementButton(gtk.Box):
 
     def set_activated(self, value: bool) -> None:
         toggle_css_class(self, "activated", value)
+        self.activated = value
 
     def destroy(self) -> None:
         self.icon.destroy()
@@ -175,6 +179,49 @@ class InternetButton(ManagementButton):
             self.set_activated(False)
 
 
+class ToggleButton(ManagementButton):
+    def __init__(
+        self,
+        icon: str | Ref[str],
+        label: str,
+        activated: bool | Ref[bool],
+        toggle: t.Callable[[t.Self, bool], None] | None = None,
+        on_right_click: t.Callable[[], None] | None = None
+    ) -> None:
+        _activated = (
+            activated.value if isinstance(activated, Ref)
+            else activated
+        )
+        super().__init__(
+            icon,
+            label,
+            "...",
+            _activated,
+            self.toggle,
+            on_right_click
+        )
+        self.toggle_action = toggle
+        if isinstance(activated, Ref):
+            self.activated_ref = activated
+            self.on_update()
+            activated.watch(self.on_update)
+
+    def toggle(self) -> None:
+        self.toggle_action(self, not self.activated)
+
+    def on_update(self, *args: bool) -> None:
+        if self.activated_ref.value:
+            self.state.set_label("On")
+            self.set_activated(True)
+        else:
+            self.state.set_label("Off")
+            self.set_activated(False)
+
+
+def toggle_dark_mode(self: ToggleButton, value: bool) -> None:
+    colors.set_dark_mode(value)
+
+
 class ManagementFirstPage(gtk.Box):
     def __init__(self) -> None:
         super().__init__(
@@ -189,11 +236,11 @@ class ManagementFirstPage(gtk.Box):
             False,
             on_right_click=lambda: None
         )
-        self.dark_mode = ManagementButton(
+        self.dark_mode = ToggleButton(
             "contrast",
             "Dark Mode",
-            "On",
-            True
+            colors.dark_mode,
+            toggle_dark_mode
         )
         self.dnd = ManagementButton(
             "do_not_disturb_off",
