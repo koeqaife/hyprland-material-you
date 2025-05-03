@@ -19,7 +19,7 @@ import re
 import typing as t
 from config import color_templates, CONFIG_DIR
 from utils.logger import logger
-from utils.styles import apply_css
+from utils.styles import reload_css
 from utils.ref import Ref
 
 
@@ -419,7 +419,7 @@ def generate_colors_sync(
 
 
 def default_on_complete() -> None:
-    apply_css()
+    reload_css()
     sync()
 
 
