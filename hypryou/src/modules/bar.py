@@ -365,22 +365,17 @@ class Player(gtk.Box):
         if not current:
             return
 
-        for player, handler in self.player_handlers.items():
+        for player, handler in list(self.player_handlers.items()):
             if player is not current:
                 player.unwatch("changed", handler)
+                del self.player_handlers[player]
 
         if current not in self.player_handlers.keys():
             handler_id = current.watch("changed", self.on_changed)
             self.player_handlers[current] = handler_id
 
     def on_changed(self, *args: t.Any) -> None:
-        current = self.get_player()
         self.update_watcher()
-
-        if not current:
-            self.update_all()
-            return
-
         self.update_all()
 
     def destroy(self) -> None:
