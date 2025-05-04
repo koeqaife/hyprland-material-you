@@ -295,7 +295,7 @@ class Network(Signals):
         self.wired_device: nm.DeviceEthernet | None
         self.wifi: Wifi | None = None
 
-        self.icon = Ref("signal_wifi_statusbar_not_connected")
+        self.icon = Ref("signal_wifi_statusbar_not_connected", "wifi_icon")
 
         self.client: nm.Client
         self.primary = Primary.UNKNOWN
