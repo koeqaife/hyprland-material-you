@@ -21,6 +21,8 @@ from config import color_templates, CONFIG_DIR
 from utils.logger import logger
 from utils.styles import reload_css
 from utils.ref import Ref
+from repository import gio
+from config import Settings
 
 
 # I dropped support of color schemes
@@ -368,6 +370,20 @@ def process_image(
     return color
 
 
+def update_settings() -> None:
+    settings = Settings()
+    interface = gio.Settings.new("org.gnome.desktop.interface")
+
+    if not dark_mode.value:
+        interface.set_string("gtk-theme", "adw-gtk3")
+        interface.set_string("color-scheme", "prefer-light")
+        interface.set_string("icon-theme", settings.get("light_icons"))
+    else:
+        interface.set_string("gtk-theme", "adw-gtk3-dark")
+        interface.set_string("color-scheme", "prefer-dark")
+        interface.set_string("icon-theme", settings.get("dark_icons"))
+
+
 @t.overload
 def generate_colors_sync(
     image_path: str,
@@ -421,6 +437,7 @@ def generate_colors_sync(
 def default_on_complete() -> None:
     reload_css()
     sync()
+    update_settings()
 
 
 def generate_colors(

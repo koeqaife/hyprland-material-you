@@ -29,7 +29,9 @@ socket_path = pjoin(
 default_settings: dict[str, t.Any] = {
     "time_format": "24",
     "always_show_battery": False,
-    "corners": False
+    "corners": False,
+    "dark_icons": "Tela-nord-dark",
+    "light_icons": "Tela-nord-light"
 }
 
 os.makedirs(config_path, exist_ok=True)
