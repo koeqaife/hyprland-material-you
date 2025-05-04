@@ -1,5 +1,9 @@
 @use "colors" as *;
 
+* {
+    transition: all 0.2s ease-in-out;
+}
+
 window {
     font-family: "Product Sans", Roboto, "Font Awesome 6 Free", Helvetica, Arial, sans-serif;
     font-size: 16px;
@@ -31,7 +35,6 @@ tooltip label {
 
 .material-icon,
 .material-icon * {
-    all: unset;
     font-family: "Material Symbols Rounded", "MaterialSymbolsRounded";
 }
 

@@ -112,10 +112,12 @@ window.bar {
         border-top-right-radius: 1.563rem;
         border-bottom-right-radius: 1.563rem;
 
-        color: $onSurface;
-        font-size: 1.063rem;
-        font-variation-settings: "opsz" 20;
-        font-weight: 500;
+        label {
+            color: $onSurface;
+            font-size: 1.063rem;
+            font-variation-settings: "opsz" 20;
+            font-weight: 500;
+        }
     }
 
     .mpris-player {
@@ -146,6 +148,7 @@ window.bar {
                 color: $onSecondaryContainer;
             }
             button {
+                border-radius: 1.5rem;
                 min-height: 1.5rem;
                 min-width: 1.5rem;
                 &.play-pause {
