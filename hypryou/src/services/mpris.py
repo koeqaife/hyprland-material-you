@@ -27,6 +27,9 @@ type PlaybackStatus = t.Literal["Playing", "Paused", "Stopped"]
 def update_current_player() -> None:
     last_changed_player: tuple[float, MprisPlayer] | None = None
 
+    if not players.value:
+        current_player.value = ()
+
     for bus_name, player in players.value.items():
         # If found playing player it'll show it
         # Basically it'll show the first player in list
