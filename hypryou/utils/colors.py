@@ -21,7 +21,7 @@ from config import color_templates, CONFIG_DIR
 from utils.logger import logger
 from utils.styles import reload_css
 from utils.ref import Ref
-from repository import gio
+from repository import gio, glib
 from config import Settings
 
 
@@ -30,6 +30,7 @@ from config import Settings
 
 
 join = os.path.join
+gsettings = gio.Settings.new("org.gnome.desktop.interface")
 
 
 TEMPLATES_DIR = join(CONFIG_DIR, "assets", "templates")
@@ -372,16 +373,15 @@ def process_image(
 
 def update_settings() -> None:
     settings = Settings()
-    interface = gio.Settings.new("org.gnome.desktop.interface")
 
     if not dark_mode.value:
-        interface.set_string("gtk-theme", "adw-gtk3")
-        interface.set_string("color-scheme", "prefer-light")
-        interface.set_string("icon-theme", settings.get("light_icons"))
+        gsettings.set_string("gtk-theme", "adw-gtk3")
+        gsettings.set_string("color-scheme", "prefer-light")
+        gsettings.set_string("icon-theme", settings.get("light_icons"))
     else:
-        interface.set_string("gtk-theme", "adw-gtk3-dark")
-        interface.set_string("color-scheme", "prefer-dark")
-        interface.set_string("icon-theme", settings.get("dark_icons"))
+        gsettings.set_string("gtk-theme", "adw-gtk3-dark")
+        gsettings.set_string("color-scheme", "prefer-dark")
+        gsettings.set_string("icon-theme", settings.get("dark_icons"))
 
 
 @t.overload
@@ -453,7 +453,7 @@ def generate_colors(
         except Exception as e:
             logger.error("Couldn't generate colors: %s", e, exc_info=e)
 
-        default_on_complete()
+        glib.idle_add(default_on_complete)
         if on_complete:
             on_complete()
 
