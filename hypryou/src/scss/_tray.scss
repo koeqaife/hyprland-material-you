@@ -20,9 +20,10 @@ window.tray {
             min-width: 1.5rem;
             font-size: 2rem;
         }
-        label {
+        .app-label {
             font-size: 1rem;
             font-weight: 500;
+            color: $onSurface;
         }
         padding: 0.25rem;
         background-color: $surfaceContainer;

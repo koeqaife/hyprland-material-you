@@ -40,7 +40,9 @@ class TrayItem(gtk.Box):
 
         self.children = (
             gtk.Image(),
-            gtk.Label(),
+            gtk.Label(
+                css_classes=("app-label",)
+            ),
             btn_box
         )
         self.update_label()
