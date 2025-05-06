@@ -10,6 +10,7 @@ from utils.service import Signals
 
 active_workspace = Ref(0, name="workspace", delayed_init=True)
 active_layout = Ref("en", name="active_layout", delayed_init=True)
+show_layout = Ref(False, name="show_layout", delayed_init=True)
 
 workspace_ids = Ref[set[int]](
     set(),
@@ -108,6 +109,8 @@ class EventCallbacks:
         keyboard_name: str,
         layout_name: str
     ) -> None:
+        if layout_name != active_layout.value:
+            show_layout.value = True
         active_layout.value = layout_name
 
     @staticmethod
@@ -141,7 +144,12 @@ class Keyboard(t.TypedDict):
     main: bool
 
 
-async def get_active_layout(client: HyprlandClient) -> str:
+def get_layouts(keyboard: Keyboard) -> list[str]:
+    return keyboard["layout"].strip().strip(",").split(",")
+
+
+async def get_active_layout(client: HyprlandClient) -> tuple[bool, str]:
+    show_layout = False
     devices = await client.query("devices")
     keyboards: list[Keyboard] = devices.get("keyboards")
     assert isinstance(keyboards, list), (
@@ -154,9 +162,12 @@ async def get_active_layout(client: HyprlandClient) -> str:
 
     for keyboard in keyboards:
         if keyboard["main"]:
-            return keyboard["active_keymap"]
+            show_layout = len(get_layouts(keyboard)) > 1
+            return show_layout, keyboard["active_keymap"]
 
-    return keyboards[-1]["active_keymap"]
+    keyboard = keyboards[-1]
+    show_layout = len(get_layouts(keyboard)) > 1
+    return show_layout, keyboard["active_keymap"]
 
 
 async def get_active_workspaces(client: HyprlandClient) -> list[int]:
@@ -179,8 +190,9 @@ async def init() -> None:
     active_workspace.value = int(_active_workspace["id"])
     active_workspace.ready()
 
-    active_layout.value = await get_active_layout(client)
+    show_layout.value, active_layout.value = await get_active_layout(client)
     active_layout.ready()
+    show_layout.ready()
 
     _active_workspaces = await get_active_workspaces(client)
     workspace_ids.value = set(_active_workspaces)

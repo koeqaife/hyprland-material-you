@@ -10,7 +10,7 @@ from src.variables import Globals
 from repository import gtk, gdk, pango
 from src.services import hyprland
 from src.services.hyprland import active_workspace, workspace_ids
-from src.services.hyprland import active_layout
+from src.services.hyprland import active_layout, show_layout
 from utils import format
 import asyncio
 from time import perf_counter
@@ -410,13 +410,22 @@ class KeyboardLayout(gtk.Label):
         )
 
         self.update_layout(active_layout.value)
-        self.handler_id = active_layout.watch(self.update_layout)
+        self.set_visible(show_layout.value)
+
+        self.handlers: dict[Ref[t.Any], int] = {
+            show_layout: show_layout.watch(self.update_visible),
+            active_layout: active_layout.watch(self.update_layout)
+        }
+
+    def update_visible(self, new_value: bool) -> None:
+        self.set_visible(new_value)
 
     def update_layout(self, new_layout: str) -> None:
         self.set_label(format.get_layout_tag(new_layout))
 
     def destroy(self) -> None:
-        active_layout.unwatch(self.handler_id)
+        for ref, handler_id in self.handlers.items():
+            ref.unwatch(handler_id)
 
 
 class Applet(gtk.Button):
