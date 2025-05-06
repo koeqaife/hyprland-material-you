@@ -1,3 +1,4 @@
+import subprocess
 from dataclasses import dataclass
 
 import cairo
@@ -423,7 +424,8 @@ class Applet(gtk.Button):
         self,
         name: str,
         icon: str | Ref[str],
-        on_click: t.Callable[[str], None]
+        on_click: t.Callable[[], None],
+        on_wheel_click: t.Callable[[], None] | None = None
     ) -> None:
         self._icon = widget.Icon(icon)
         super().__init__(
@@ -431,9 +433,34 @@ class Applet(gtk.Button):
             css_classes=("applet",)
         )
 
+        self.click_gesture = gtk.GestureClick.new()
+        self.click_gesture.set_button(0)
+        self.gesture_conn = (
+            self.click_gesture.connect("released", self.on_click_released)
+        )
+        self.add_controller(self.click_gesture)
+
+        self.on_click = on_click
+        self.on_wheel_click = on_wheel_click
+
+    def on_click_released(
+        self,
+        gesture: gtk.GestureClick,
+        n_press: int,
+        x: int,
+        y: int
+    ) -> None:
+        button_number = gesture.get_current_button()
+        if button_number == gdk.BUTTON_PRIMARY:
+            self.on_click()
+        elif button_number == gdk.BUTTON_MIDDLE:
+            self.on_wheel_click()
+
     def destroy(self) -> None:
         self._icon.destroy()
         self.set_child(None)
+        self.click_gesture.disconnect(self.gesture_conn)
+        self.remove_controller(self.click_gesture)
 
 
 class Applets(gtk.Box):
@@ -443,13 +470,16 @@ class Applets(gtk.Box):
         )
 
         self.children = (
-            Applet("audio", "volume_up", lambda x: None),
-            Applet("bluetooth", "bluetooth", lambda x: None),
-            Applet("wifi", get_network().icon, lambda x: None),
-            Applet("cliphist", "content_paste", lambda x: None),
+            Applet("audio", "volume_up", lambda: None, self.open_pavucontrol),
+            Applet("bluetooth", "bluetooth", lambda: None),
+            Applet("wifi", get_network().icon, lambda: None),
+            Applet("cliphist", "content_paste", lambda: None),
         )
         for child in self.children:
             self.append(child)
+
+    def open_pavucontrol(self) -> None:
+        subprocess.Popen(["pavucontrol"])
 
     def destroy(self) -> None:
         for child in self.children:
