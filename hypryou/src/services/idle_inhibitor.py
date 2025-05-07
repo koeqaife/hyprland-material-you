@@ -4,7 +4,7 @@ from src.services.dbus import bus
 from repository import gio, glib
 from utils import Ref
 from utils.logger import logger
-from src.services.dbus import ServiceABC
+from utils.service import Service
 
 inhibited = Ref(False, name="inhibited")
 
@@ -95,7 +95,7 @@ def get_inhibitor() -> IdleInhibitor:
     return _instance
 
 
-class Service(ServiceABC):
+class IdleInhibitorService(Service):
     def start(self) -> None:
         global _instance
         logger.debug("Starting idle inhibitor proxy")

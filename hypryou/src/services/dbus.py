@@ -1,9 +1,9 @@
-import abc
 from repository import gio, glib
 from src.variables import Globals
 from src.services.events import EventsBus, NameOwnerChanged
 from utils.logger import logger
 import typing as t
+from utils.service import Service
 
 events: EventsBus
 BUS_TYPE = gio.BusType.SESSION
@@ -122,19 +122,8 @@ def cache_proxy_properties_finish(
         callback()
 
 
-class ServiceABC(abc.ABC):
-    def start(self) -> None:
-        ...
-
-    def on_close(self) -> None:
-        ...
-
-
-class Service(ServiceABC):
+class DBusService(Service):
     def start(self) -> None:
         global events
         events = Globals.events
         subscribe_signals(bus)
-
-    def on_close(self) -> None:
-        pass

@@ -8,10 +8,10 @@ import os
 from repository import glib, gio, gdk_pixbuf, gtk, gdk
 from utils import Ref
 from utils.logger import logger
-from src.services.dbus import BUS_TYPE, ServiceABC
+from src.services.dbus import BUS_TYPE
 import typing as t
 from pathlib import Path
-from utils.service import Signals
+from utils.service import Signals, Service
 
 
 WATCHER_XML_PATH = os.path.join(
@@ -490,10 +490,7 @@ class ExpiryManager:
         return expired
 
 
-class Service(ServiceABC):
+class NotificationsService(Service):
     def start(self) -> None:
         watcher = NotificationsWatcher()
         watcher.register()
-
-    def on_close(self) -> None:
-        pass

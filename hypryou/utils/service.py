@@ -98,3 +98,31 @@ class Signals:
     def clear(self, signal_name: str) -> None:
         with self._lock:
             self._signals.pop(signal_name, None)
+
+
+class Service:
+    def __init__(self) -> None:
+        ...
+
+    def app_init(self) -> None:
+        ...
+
+    def start(self) -> None:
+        ...
+
+    def on_close(self) -> None:
+        ...
+
+
+class AsyncService:
+    def __init__(self):
+        ...
+
+    async def app_init(self) -> None:
+        ...
+
+    async def start(self) -> None:
+        ...
+
+    def on_close(self) -> None:
+        ...

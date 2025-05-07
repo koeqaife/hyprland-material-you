@@ -4,12 +4,11 @@ import time
 from repository import gio, glib
 import typing as t
 from src.services.dbus import dbus_proxy, bus, cache_proxy_properties
-from src.services.dbus import ServiceABC
 from src.services.events import NameOwnerChanged
 from src.variables import Globals
 from utils.logger import logger
 from utils import Ref
-from utils.service import Signals
+from utils.service import Signals, Service
 
 MPRIS_PREFIX = "org.mpris.MediaPlayer2."
 
@@ -386,11 +385,8 @@ class MprisWatcher:
             update_current_player()
 
 
-class Service(ServiceABC):
+class MprisService(Service):
     def start(self) -> None:
         logger.debug("Starting mpris watcher")
         watcher = MprisWatcher()
         watcher.scan_existing_players()
-
-    def on_close(self) -> None:
-        pass

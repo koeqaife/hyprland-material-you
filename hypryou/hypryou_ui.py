@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from repository import gtk, gdk, gio
+from repository import gtk, gdk, gio, glib
 import time
 import typing as t
 import logging
@@ -15,14 +15,17 @@ from gi.events import GLibEventLoopPolicy  # type: ignore[import-untyped]
 import asyncio
 
 # Services
-from src.services import dbus
-from src.services import hyprland
-from src.services import mpris
-from src.services import system_tray
-from src.services import cli
+from utils.service import AsyncService, Service
+
+from src.services.dbus import DBusService
+from src.services.hyprland import HyprlandService
+from src.services.mpris import MprisService
+from src.services.system_tray import TrayService
+from src.services.cli import CliService, is_socket_exists
+from src.services.notifications import NotificationsService
+from src.services.idle_inhibitor import IdleInhibitorService
+
 from src.services import events
-from src.services import notifications
-from src.services import idle_inhibitor
 
 # Modules
 from src.modules.bar import Bar, Corner
@@ -32,12 +35,14 @@ from src.modules.sidebar.window import Sidebar
 
 START = time.perf_counter()
 
-dbus_services = (
-    dbus.Service(),
-    system_tray.Service(),
-    mpris.Service(),
-    notifications.Service(),
-    idle_inhibitor.Service()
+services: tuple[AsyncService | Service, ...] = (
+    DBusService(),
+    HyprlandService(),
+    NotificationsService(),
+    TrayService(),
+    MprisService(),
+    CliService(),
+    IdleInhibitorService()
 )
 
 
@@ -49,8 +54,32 @@ class HyprYou(gtk.Application):
         self.hold()
         asyncio.create_task(self.start_app())
 
+    async def init_services(self) -> None:
+        for service in services:
+            if isinstance(service, AsyncService):
+                await service.app_init()
+            elif isinstance(service, Service):
+                service.app_init()
+            else:
+                logger.critical(
+                    "Unknown type of service: %s; Couldn't init.",
+                    service
+                )
+
+    async def start_services(self) -> None:
+        for service in services:
+            if isinstance(service, AsyncService):
+                self.tasks.append(asyncio.create_task(service.start()))
+            elif isinstance(service, Service):
+                glib.idle_add(service.start)
+            else:
+                logger.warning(
+                    "Unknown type of service: %s; Couldn't start.",
+                    service
+                )
+
     async def start_app(self) -> None:
-        await hyprland.init()
+        await self.init_services()
 
         try:
             utils.colors.sync()
@@ -58,14 +87,10 @@ class HyprYou(gtk.Application):
         except Exception:
             utils.colors.restore_palette()
 
-        for service in dbus_services:
-            service.start()
-
         self.tasks = [
-            asyncio.create_task(cli.serve()),
-            asyncio.create_task(hyprland.connect()),
             asyncio.create_task(clock_task())
         ]
+        await self.start_services()
 
         self.display: gdk.Display = gdk.Display.get_default()
         self.monitors = self.display.get_monitors()
@@ -133,7 +158,7 @@ class HyprYou(gtk.Application):
 
 def init() -> None:
     utils.setup_logger(logging.DEBUG if DEBUG else logging.INFO)
-    if cli.is_socket_exists():
+    if is_socket_exists():
         logger.critical(
             "Other HyprYou is running on the same hyprland instance!"
         )
@@ -161,5 +186,5 @@ if __name__ == "__main__":
         logger.warning("Bye!")
         exit(0)
     finally:
-        for service in dbus_services:
+        for service in services:
             service.on_close()

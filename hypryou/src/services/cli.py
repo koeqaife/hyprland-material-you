@@ -7,6 +7,7 @@ from config import Settings
 from src.variables import Globals
 from src.services.events import Event
 from utils import apply_css
+from utils.service import AsyncService
 
 
 class CliRequest:
@@ -92,16 +93,29 @@ def create_socket_directory() -> None:
         logger.debug(f"Created directory for socket at {socket_dir}")
 
 
-async def serve() -> None:
-    if os.path.exists(socket_path):
-        os.remove(socket_path)
+class CliService(AsyncService):
+    def __init__(self) -> None:
+        self.server: asyncio.Server | None = None
 
-    create_socket_directory()
-    server = await asyncio.start_unix_server(handle_client, path=socket_path)
-    logger.debug("Listening socket on %s", socket_path)
+    async def start(self) -> None:
+        if os.path.exists(socket_path):
+            os.remove(socket_path)
 
-    try:
-        async with server:
-            await server.serve_forever()
-    finally:
-        os.remove(socket_path)
+        create_socket_directory()
+        self.server = await asyncio.start_unix_server(
+            handle_client, path=socket_path
+        )
+        logger.debug("Listening socket on %s", socket_path)
+
+        try:
+            async with self.server:
+                await self.server.serve_forever()
+        finally:
+            os.remove(socket_path)
+
+    def on_close(self) -> None:
+        if self.server:
+            try:
+                self.server.close()
+            except Exception as e:
+                logger.critical("Couldn't close unix-socket.", exc_info=e)

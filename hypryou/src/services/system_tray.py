@@ -6,12 +6,11 @@ from repository import gio, glib, gtk, gdk_pixbuf
 from config import CONFIG_DIR
 from utils.logger import logger
 from src.services.dbus import BUS_TYPE, dbus_proxy, cache_proxy_properties
-from src.services.dbus import ServiceABC
 from src.services.events import NameOwnerChanged
 from src.variables import Globals
 import typing as t
 from utils import Ref
-from utils.service import Signals
+from utils.service import Signals, Service
 
 # it won't reproduce the all possibilities of tray
 # I'll just use it as for running background services
@@ -517,7 +516,7 @@ class StatusNotifierWatcher:
         return
 
 
-class Service(ServiceABC):
+class TrayService(Service):
     def start(self) -> None:
         logger.debug("Starting system_tray dbus")
         watcher = StatusNotifierWatcher()

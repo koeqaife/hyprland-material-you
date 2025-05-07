@@ -6,7 +6,7 @@ from utils.logger import logger
 import typing as t
 import json
 from config import HyprlandVars
-from utils.service import Signals
+from utils.service import Signals, AsyncService
 
 active_workspace = Ref(0, name="workspace", delayed_init=True)
 active_layout = Ref("en", name="active_layout", delayed_init=True)
@@ -224,7 +224,11 @@ async def init() -> None:
         )
 
 
-async def connect() -> None:
-    global client
-    logger.debug("Connecting to hyprland")
-    await client.connect()
+class HyprlandService(AsyncService):
+    async def app_init(self):
+        await init()
+
+    async def start(self) -> None:
+        global client
+        logger.debug("Connecting to hyprland")
+        await client.connect()
