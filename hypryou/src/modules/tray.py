@@ -138,13 +138,22 @@ class TrayItem(gtk.Box):
 class TrayBox(gtk.ScrolledWindow):
     def __init__(self) -> None:
         self.box = gtk.Box(
+            orientation=gtk.Orientation.VERTICAL
+        )
+        self.list = gtk.Box(
             orientation=gtk.Orientation.VERTICAL,
             spacing=8
         )
-        self.no_items_label = gtk.Label(
+        self.no_items_label = gtk.Revealer(
+            child=gtk.Label(label="There isn't any tray items"),
+            transition_duration=250,
+            transition_type=gtk.RevealerTransitionType.SLIDE_DOWN,
             css_classes=("no-items",),
-            label="There isn't any tray items"
         )
+
+        self.box.append(self.no_items_label)
+        self.box.append(self.list)
+
         self.items: dict[str, TrayItem] = {}
         super().__init__(
             child=self.box,
@@ -163,18 +172,22 @@ class TrayBox(gtk.ScrolledWindow):
             if item not in existing_items:
                 tray_widget = TrayItem(items.value[item])
                 self.items[item] = tray_widget
-                self.box.append(tray_widget)
+                self.list.append(tray_widget)
 
         for item in existing_items:
             if item not in tray_items:
                 self.items[item].destroy()
-                self.box.remove(self.items[item])
+                self.list.remove(self.items[item])
                 del self.items[item]
+
+        self.no_items_label.set_reveal_child(len(self.items) == 0)
 
     def destroy(self) -> None:
         for key, item in self.items.items():
             item.destroy()
-            self.box.remove(item)
+            self.list.remove(item)
+
+        self.box.remove(self.no_items_label)
         self.items.clear()
         self.set_child(None)
         items.unwatch(self.handler_id)

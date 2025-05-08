@@ -9,6 +9,10 @@ window.tray {
     border-radius: $hyprlandRounding;
     border: 1px solid color.mix($outlineVariant, transparent, 25%);
 
+    .no-items label {
+        color: $onSurfaceVariant;
+    }
+
     .tray-widget {
         padding: 8px;
     }
