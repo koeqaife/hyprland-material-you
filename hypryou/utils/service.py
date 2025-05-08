@@ -66,19 +66,22 @@ class Signals:
             if signal_name in self._blocked:
                 return
 
-            new_callbacks: dict[int, Wrapper] = {}
-            for handler_id in sorted(self._signals.get(signal_name, {})):
+            signal_callbacks = self._signals.get(signal_name)
+            if signal_callbacks is None:
+                return
+
+            for handler_id in sorted(signal_callbacks):
                 cb = self._signals[signal_name][handler_id]
                 try:
                     result = cb(*args)
-                    if result is None or result is True:
-                        new_callbacks[handler_id] = cb
+                    if result not in (None, True):
+                        del self._signals[signal_name][handler_id]
                 except Exception as e:
                     logger.error(
                         "Error while calling callback: %s",
                         e, exc_info=e
                     )
-            self._signals[signal_name] = new_callbacks
+                    del self._signals[signal_name][handler_id]
 
     def notify(self, signal_name: str, *args: t.Any) -> None:
         glib.idle_add(self.notify_sync, signal_name, *args)
