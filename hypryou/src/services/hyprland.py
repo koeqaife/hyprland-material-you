@@ -93,12 +93,14 @@ class HyprlandClient(Signals):
                     reader.read(4096),
                     timeout=timeout
                 )
-            except asyncio.TimeoutError:
+            except asyncio.TimeoutError as e:
                 writer.close()
                 await writer.wait_closed()
-                raise TimeoutError(
-                    f"Timeout waiting for response to command: {command!r}"
+                logger.error(
+                    f"Timeout waiting for response to command: {command!r}",
+                    exc_info=e
                 )
+                return ""
         else:
             try:
                 await asyncio.wait_for(reader.read(1), timeout=timeout)
