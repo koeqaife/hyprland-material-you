@@ -8,7 +8,11 @@ from utils import colors
 from src.services.idle_inhibitor import inhibited, get_inhibitor
 from src.services.notifications import dnd
 
-
+dnd_icon = Ref("do_not_disturb_off", name="dnd_icon")
+dnd_icon.bind(
+    dnd,
+    lambda bool: "do_not_disturb_on" if bool else "do_not_disturb_off"
+)
 # TODO: Make buttons work
 
 
@@ -257,7 +261,7 @@ class ManagementFirstPage(gtk.Box):
             toggle_dark_mode
         )
         self.dnd = ToggleButton(
-            "do_not_disturb_off",
+            dnd_icon,
             "Do Not Disturb",
             dnd,
             toggle_dnd
