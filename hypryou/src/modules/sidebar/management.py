@@ -7,6 +7,7 @@ import os
 from utils import colors
 from src.services.idle_inhibitor import inhibited, get_inhibitor
 from src.services.notifications import dnd
+from src.services.hyprland import night_light
 
 dnd_icon = Ref("do_not_disturb_off", name="dnd_icon")
 dnd_icon.bind(
@@ -240,6 +241,10 @@ def toggle_dnd(self: ToggleButton, value: bool) -> None:
     dnd.value = value
 
 
+def toggle_night_light(self: ToggleButton, value: bool) -> None:
+    night_light.value = value
+
+
 class ManagementFirstPage(gtk.Box):
     def __init__(self) -> None:
         super().__init__(
@@ -272,11 +277,11 @@ class ManagementFirstPage(gtk.Box):
             inhibited,
             toggle_inhibitor
         )
-        self.night_light = ManagementButton(
+        self.night_light = ToggleButton(
             "nightlight",
             "Night Light",
-            "Off",
-            False
+            night_light,
+            toggle_night_light
         )
         self.lines = (
             ManagementLine(self.internet, self.bluetooth),

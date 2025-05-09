@@ -1,4 +1,5 @@
 import asyncio
+from enum import Enum
 import os
 from asyncio import StreamReader, StreamWriter
 from utils.ref import Ref
@@ -11,6 +12,7 @@ from utils.service import Signals, AsyncService
 active_workspace = Ref(0, name="workspace", delayed_init=True)
 active_layout = Ref("en", name="active_layout", delayed_init=True)
 show_layout = Ref(False, name="show_layout", delayed_init=True)
+night_light = Ref(False, name="night_light", delayed_init=True)
 
 workspace_ids = Ref[set[int]](
     set(),
@@ -36,6 +38,11 @@ HyprlandQueryType = t.Literal[
 ]
 
 
+class SocketType(int, Enum):
+    HYPRLAND = 0
+    HYPRSUNSET = 1
+
+
 class HyprlandClient(Signals):
     def __init__(self) -> None:
         super().__init__()
@@ -44,7 +51,10 @@ class HyprlandClient(Signals):
 
         instance_path = f"{runtime_dir}/hypr/{instance}"
         self.socket_path_events = f"{instance_path}/.socket2.sock"
-        self.socket_path_query = f"{instance_path}/.socket.sock"
+        self.sockets = {
+            SocketType.HYPRLAND: f"{instance_path}/.socket.sock",
+            SocketType.HYPRSUNSET: f"{instance_path}/.hyprsunset.sock"
+        }
 
         self.reader: StreamReader | None = None
         self.writer: StreamWriter | None = None
@@ -64,13 +74,37 @@ class HyprlandClient(Signals):
             args: list[str] = data.split(",") if data else []
             self.notify(event, *args)
 
-    async def raw(self, command: str) -> str:
+    async def raw(
+        self,
+        command: str,
+        socket_type: SocketType = SocketType.HYPRLAND,
+        timeout: float = 2.0,
+        wait_response: bool = True
+    ) -> str:
         reader, writer = await asyncio.open_unix_connection(
-            self.socket_path_query
+            self.sockets[socket_type]
         )
         writer.write(command.encode("utf-8"))
         await writer.drain()
-        data = await reader.read()
+        data = b""
+        if wait_response:
+            try:
+                data = await asyncio.wait_for(
+                    reader.read(4096),
+                    timeout=timeout
+                )
+            except asyncio.TimeoutError:
+                writer.close()
+                await writer.wait_closed()
+                raise TimeoutError(
+                    f"Timeout waiting for response to command: {command!r}"
+                )
+        else:
+            try:
+                await asyncio.wait_for(reader.read(1), timeout=timeout)
+            except asyncio.TimeoutError:
+                pass
+
         writer.close()
         await writer.wait_closed()
         return data.decode().strip()
@@ -181,6 +215,17 @@ async def get_active_workspaces(client: HyprlandClient) -> list[int]:
     return workspace_ids
 
 
+def change_night_light(value: bool) -> None:
+    if value:
+        asyncio.create_task(
+            client.raw("temperature 3500", SocketType.HYPRSUNSET, 2.0, False)
+        )
+    else:
+        asyncio.create_task(
+            client.raw("temperature 6500", SocketType.HYPRSUNSET, 2.0, False)
+        )
+
+
 async def init() -> None:
     global client
     client = HyprlandClient()
@@ -197,6 +242,19 @@ async def init() -> None:
     _active_workspaces = await get_active_workspaces(client)
     workspace_ids.value = set(_active_workspaces)
     workspace_ids.ready()
+
+    try:
+        _temperature = await client.raw(
+            "temperature", SocketType.HYPRSUNSET, 2.0, True
+        )
+        if not _temperature.isdigit():
+            logger.error("Invalid answer from hyprsunset: %s", _temperature)
+        else:
+            night_light.value = int(_temperature) < 6000
+            night_light.watch(change_night_light)
+            night_light.ready()
+    except ConnectionRefusedError as e:
+        logger.error("Couldn't connect to hyprsunset", exc_info=e)
 
     logger.debug("Creating hyprland watchers")
     client.watch("workspacev2", EventCallbacks.on_workspacev2)
