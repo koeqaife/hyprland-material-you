@@ -6,6 +6,8 @@ RETRY_TIMEOUT=10
 
 START_TIME=0
 
+python utils_cy/setup.py build_ext --build-lib utils_cy --build-temp utils_cy/build
+
 while true; do
     CURRENT_TIME=$(date +%s)
 
@@ -15,7 +17,7 @@ while true; do
     
     START_TIME=$(date +%s)
 
-    python hypryou_ui.py
+    python -OO hypryou_ui.py
     EXIT_CODE=$?
 
     if [[ $EXIT_CODE -eq 0 ]]; then

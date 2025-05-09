@@ -24,6 +24,7 @@ from src.services.system_tray import TrayService
 from src.services.cli import CliService, is_socket_exists
 from src.services.notifications import NotificationsService
 from src.services.idle_inhibitor import IdleInhibitorService
+from src.services.apps import AppsService
 
 from src.services import events
 
@@ -32,6 +33,7 @@ from src.modules.bar import Bar, Corner
 from src.modules.tray import TrayWindow
 from src.modules.notifications.popups import Notifications
 from src.modules.sidebar.window import Sidebar
+from src.modules.apps_menu import AppsWindow
 
 START = time.perf_counter()
 
@@ -42,7 +44,8 @@ services: tuple[AsyncService | Service, ...] = (
     TrayService(),
     MprisService(),
     CliService(),
-    IdleInhibitorService()
+    AppsService(),
+    IdleInhibitorService(),
 )
 
 
@@ -99,6 +102,7 @@ class HyprYou(gtk.Application):
         self.update_monitors()
         self.add_window(TrayWindow(self))
         self.add_window(Sidebar(self))
+        self.add_window(AppsWindow(self))
 
         logger.info(
             "Started in " +

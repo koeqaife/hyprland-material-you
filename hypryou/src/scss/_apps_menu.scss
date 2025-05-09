@@ -1,0 +1,71 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "sass:color";
+
+window.apps-menu {
+    min-width: 31.25rem;
+    min-height: 43.75rem;
+    background-color: $background;
+    border-radius: $hyprlandRounding;
+    border: 1px solid color.mix($outlineVariant, transparent, 25%);
+
+    .apps-list {
+        padding: 8px;
+    }
+
+    .app-item {
+        outline-offset: -1px;
+        transition: all 0.25s ease-in;
+        .icon {
+            margin-right: 0.5rem;
+            min-height: 2rem;
+            min-width: 2rem;
+            font-size: 2rem;
+            color: $onSurface;
+        }
+        .label {
+            font-size: 1rem;
+            font-weight: 500;
+            color: $onSurface;
+        }
+        background-color: $surfaceContainer;
+        padding: 0.5rem;
+        border-radius: $hyprlandRounding - 8px;
+
+        &:hover {
+            background-color: color.mix($surfaceContainer, $onSurfaceVariant, 95%);
+        }
+        &:active {
+            background-color: color.mix($surfaceContainer, $onSurfaceVariant, 88%);
+        }
+        &:focus-within {
+            background-color: color.mix($surfaceContainer, $onSurfaceVariant, 88%);
+            outline: none;
+        }
+    }
+
+    .app-item-revealer:not(:last-child) .app-item {
+        margin-bottom: 8px;
+    }
+
+    .app-item-revealer {
+        &.highest .app-item {
+            outline: 1px solid $primary;
+        }
+    }
+
+    .search {
+        margin: 8px;
+        margin-bottom: 0px;
+        outline: none;
+        border-radius: 2.75rem;
+        background: $surfaceContainerHigh;
+        color: $onSurface;
+        min-height: 2.75rem;
+
+        placeholder {
+            opacity: 1;
+            color: $onSurfaceVariant;
+        }
+    }
+}

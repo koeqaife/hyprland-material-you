@@ -532,12 +532,32 @@ class OpenSidebar(gtk.Button):
         self.disconnect(self.conn_id)
 
 
+class OpenAppsMenu(gtk.Button):
+    def __init__(self) -> None:
+        super().__init__(
+            css_classes=("open-apps-menu", "icon-tonal"),
+            child=widget.Icon("search"),
+            tooltip_text="Apps Menu",
+            halign=gtk.Align.CENTER,
+            valign=gtk.Align.CENTER
+        )
+        self.conn_id = self.connect("clicked", self.on_clicked)
+
+    def on_clicked(self, *args: t.Any) -> None:
+        event = Event(None, "apps_menu", "toggle_window")
+        Globals.events.notify(event)
+
+    def destroy(self) -> None:
+        self.disconnect(self.conn_id)
+
+
 class ModulesLeft(gtk.Box):
     def __init__(self) -> None:
         super().__init__(
             css_classes=("modules-left",)
         )
         self.children = (
+            OpenAppsMenu(),
             Player(),
         )
         for child in self.children:
