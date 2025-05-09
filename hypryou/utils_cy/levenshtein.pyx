@@ -1,4 +1,5 @@
 from libc.stdlib cimport malloc, free
+from cpython.unicode cimport PyUnicode_AsUTF8String
 
 cdef inline int min3(int a, int b, int c) nogil:
     return a if a < b and a < c else b if b < c else c
@@ -26,8 +27,14 @@ cpdef int levenshtein_distance(str s1, str s2):
         s1, s2 = s2, s1
         len1, len2 = len2, len1
 
+    cdef bytes b1 = PyUnicode_AsUTF8String(s1)
+    cdef bytes b2 = PyUnicode_AsUTF8String(s2)
+    cdef const char* cs1 = b1
+    cdef const char* cs2 = b2
+
     cdef int *prev = <int *>malloc((len2 + 1) * sizeof(int))
     cdef int *curr = <int *>malloc((len2 + 1) * sizeof(int))
+    cdef int *tmp_ptr
 
     with nogil:
         for j in range(len2 + 1):
@@ -36,7 +43,7 @@ cpdef int levenshtein_distance(str s1, str s2):
         for i in range(1, len1 + 1):
             curr[0] = i
             for j in range(1, len2 + 1):
-                cost = 0 if s1[i - 1] == s2[j - 1] else 1
+                cost = 0 if cs1[i - 1] == cs2[j - 1] else 1
 
                 tmp = prev[j] + 1
                 if curr[j - 1] + 1 < tmp:
