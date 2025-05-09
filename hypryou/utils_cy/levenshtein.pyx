@@ -15,40 +15,45 @@ cdef inline int max2(int a, int b) nogil:
 cpdef int levenshtein_distance(str s1, str s2):
     cdef int len1 = len(s1)
     cdef int len2 = len(s2)
-    cdef int i, j
+    cdef int i, j, cost, tmp
 
     if len1 == 0:
         return len2
     if len2 == 0:
         return len1
 
-    cdef int **matrix = <int**>malloc((len1 + 1) * sizeof(int*))
-    for i in range(len1 + 1):
-        matrix[i] = <int*>malloc((len2 + 1) * sizeof(int))
+    if len2 > len1:
+        s1, s2 = s2, s1
+        len1, len2 = len2, len1
+
+    cdef int *prev = <int *>malloc((len2 + 1) * sizeof(int))
+    cdef int *curr = <int *>malloc((len2 + 1) * sizeof(int))
+
+    with nogil:
         for j in range(len2 + 1):
-            matrix[i][j] = 0
+            prev[j] = j
 
-    for i in range(len1 + 1):
-        matrix[i][0] = i
-    for j in range(len2 + 1):
-        matrix[0][j] = j
+        for i in range(1, len1 + 1):
+            curr[0] = i
+            for j in range(1, len2 + 1):
+                cost = 0 if s1[i - 1] == s2[j - 1] else 1
 
-    for i in range(1, len1 + 1):
-        for j in range(1, len2 + 1):
-            cost = 0 if s1[i - 1] == s2[j - 1] else 1
-            matrix[i][j] = min3(
-                matrix[i - 1][j] + 1,
-                matrix[i][j - 1] + 1,
-                matrix[i - 1][j - 1] + cost
-            )
+                tmp = prev[j] + 1
+                if curr[j - 1] + 1 < tmp:
+                    tmp = curr[j - 1] + 1
+                if prev[j - 1] + cost < tmp:
+                    tmp = prev[j - 1] + cost
 
-    cdef int result = matrix[len1][len2]
+                curr[j] = tmp
 
-    for i in range(len1 + 1):
-        free(matrix[i])
-    free(matrix)
+            tmp_ptr = prev
+            prev = curr
+            curr = tmp_ptr
 
-    return result
+    tmp = prev[len2]
+    free(prev)
+    free(curr)
+    return tmp
 
 cdef float partial_ratio(str short_s, str long_s):
     cdef int len_s = len(short_s)
