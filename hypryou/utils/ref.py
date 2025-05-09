@@ -12,6 +12,7 @@ __all__ = [
 ]
 
 T = t.TypeVar("T")
+U = t.TypeVar("U")
 L = t.TypeVar("L")
 K = t.TypeVar("K")
 V = t.TypeVar("V")
@@ -282,3 +283,14 @@ class Ref(t.Generic[T]):
 
     def ready(self) -> None:
         self.is_ready = True
+
+    def unbind(self, ref: "Ref[T]", handler_id: int):
+        """Basically helper function. ref.unwatch() can be used as well"""
+        ref.unwatch(handler_id)
+
+    def bind(self, ref: "Ref[U]", transform: t.Callable[[U], T]) -> int:
+        def on_changed(new_value: T) -> None:
+            self.value = transform(new_value)
+
+        handler_id = ref.watch(on_changed)
+        return handler_id
