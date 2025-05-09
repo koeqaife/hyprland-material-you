@@ -45,6 +45,7 @@ _next_id = 300
 
 notifications = Ref[dict[int, "Notification"]]({}, name="notifications")
 popups = Ref[dict[int, "Notification"]]({}, name="notif_popups")
+dnd = Ref(False, name="do_not_disturb")
 
 
 def parse_actions(actions: list[str]) -> list[tuple[str, str]]:
@@ -368,8 +369,13 @@ class NotificationsWatcher:
                 "Got new notification from '%s'; Replacing %s",
                 app_name, replaces_id
             )
-            notifications.value[replaces_id].set_values(**kwargs)
-            popups.value[replaces_id] = notifications.value[replaces_id]
+            notification = notifications.value[replaces_id]
+            notification.set_values(**kwargs)
+            if (
+                not dnd.value
+                or notification.urgency == NotificationUrgency.CRITICAL
+            ):
+                popups.value[replaces_id] = notification
 
             if expire_timeout > 0:
                 self.expiry_manager.schedule(
@@ -388,7 +394,11 @@ class NotificationsWatcher:
         )
         notification = Notification(new_id, self, **kwargs)
         notifications.value[new_id] = notification
-        popups.value[new_id] = notification
+        if (
+            not dnd.value
+            or notification.urgency == NotificationUrgency.CRITICAL
+        ):
+            popups.value[new_id] = notification
 
         if expire_timeout > 0:
             self.expiry_manager.schedule(

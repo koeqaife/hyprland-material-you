@@ -6,6 +6,7 @@ from src.services.network import get_network, Primary
 import os
 from utils import colors
 from src.services.idle_inhibitor import inhibited, get_inhibitor
+from src.services.notifications import dnd
 
 
 # TODO: Make buttons work
@@ -231,6 +232,10 @@ def toggle_inhibitor(self: ToggleButton, value: bool) -> None:
         get_inhibitor().un_inhibit()
 
 
+def toggle_dnd(self: ToggleButton, value: bool) -> None:
+    dnd.value = value
+
+
 class ManagementFirstPage(gtk.Box):
     def __init__(self) -> None:
         super().__init__(
@@ -251,11 +256,11 @@ class ManagementFirstPage(gtk.Box):
             colors.dark_mode,
             toggle_dark_mode
         )
-        self.dnd = ManagementButton(
+        self.dnd = ToggleButton(
             "do_not_disturb_off",
             "Do Not Disturb",
-            "Off",
-            False
+            dnd,
+            toggle_dnd
         )
         self.idle_inhibitor = ToggleButton(
             "schedule",
