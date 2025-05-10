@@ -79,33 +79,31 @@ class HyprlandClient(Signals):
         command: str,
         socket_type: SocketType = SocketType.HYPRLAND,
         timeout: float = 2.0,
-        wait_response: bool = True
     ) -> str:
         reader, writer = await asyncio.open_unix_connection(
             self.sockets[socket_type]
         )
         writer.write(command.encode("utf-8"))
+        writer.write_eof()
         await writer.drain()
         data = b""
-        if wait_response:
-            try:
-                data = await asyncio.wait_for(
-                    reader.read(4096),
-                    timeout=timeout
-                )
-            except asyncio.TimeoutError as e:
+        try:
+            data = await asyncio.wait_for(
+                reader.read(),
+                timeout=timeout
+            )
+        except asyncio.TimeoutError as e:
+            writer.close()
+            await writer.wait_closed()
+            logger.error(
+                f"Timeout waiting for response to command: {command!r}",
+                exc_info=e
+            )
+            return ""
+        finally:
+            if not writer.is_closing():
                 writer.close()
                 await writer.wait_closed()
-                logger.error(
-                    f"Timeout waiting for response to command: {command!r}",
-                    exc_info=e
-                )
-                return ""
-        else:
-            try:
-                await asyncio.wait_for(reader.read(1), timeout=timeout)
-            except asyncio.TimeoutError:
-                pass
 
         writer.close()
         await writer.wait_closed()
@@ -220,11 +218,11 @@ async def get_active_workspaces(client: HyprlandClient) -> list[int]:
 def change_night_light(value: bool) -> None:
     if value:
         asyncio.create_task(
-            client.raw("temperature 3500", SocketType.HYPRSUNSET, 2.0, False)
+            client.raw("temperature 3500", SocketType.HYPRSUNSET, 2.0)
         )
     else:
         asyncio.create_task(
-            client.raw("temperature 6500", SocketType.HYPRSUNSET, 2.0, False)
+            client.raw("temperature 6500", SocketType.HYPRSUNSET, 2.0)
         )
 
 
@@ -247,7 +245,7 @@ async def init() -> None:
 
     try:
         _temperature = await client.raw(
-            "temperature", SocketType.HYPRSUNSET, 2.0, True
+            "temperature", SocketType.HYPRSUNSET, 2.0
         )
         if not _temperature.isdigit():
             logger.error("Invalid answer from hyprsunset: %s", _temperature)
