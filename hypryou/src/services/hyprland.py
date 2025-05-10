@@ -255,7 +255,7 @@ async def init() -> None:
             night_light.value = int(_temperature) < 6000
             night_light.watch(change_night_light)
             night_light.ready()
-    except ConnectionRefusedError as e:
+    except (ConnectionRefusedError, FileNotFoundError) as e:
         logger.error("Couldn't connect to hyprsunset", exc_info=e)
 
     logger.debug("Creating hyprland watchers")
