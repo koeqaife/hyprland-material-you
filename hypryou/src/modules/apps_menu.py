@@ -1,5 +1,5 @@
 from functools import lru_cache
-from repository import gtk, gdk, layer_shell, glib
+from repository import gtk, gdk, layer_shell, glib, pango
 from src.services.apps import Application, apps, reload as apps_reload
 from utils import widget, sync_debounce, toggle_css_class
 from utils.logger import logger
@@ -37,7 +37,8 @@ class AppItem(gtk.Revealer):
         )
         self.button = gtk.Button(
             css_classes=("app-item",),
-            child=self.box
+            child=self.box,
+            tooltip_text=f"{item.name}\n{item.description}"
         )
         super().__init__(
             css_classes=("app-item-revealer",),
@@ -52,7 +53,8 @@ class AppItem(gtk.Revealer):
         )
         self.label = gtk.Label(
             css_classes=("label",),
-            label=item.name
+            label=item.name,
+            ellipsize=pango.EllipsizeMode.END
         )
 
         texture = cache_icon(item.icon)
