@@ -56,3 +56,10 @@ def escape_markup(text: str) -> str:
     }
 
     return ''.join(escape_dict.get(c, c) for c in text)
+
+
+def format_seconds(seconds: float | int) -> str:
+    total_seconds = round(seconds)
+    minutes = total_seconds // 60
+    remaining_seconds = total_seconds % 60
+    return f"{minutes}:{remaining_seconds:02}"

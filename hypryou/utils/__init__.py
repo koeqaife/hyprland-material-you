@@ -19,7 +19,8 @@ from utils.format import (
     get_formatted_date,
     get_formatted_time,
     escape_markup,
-    get_full_date
+    get_full_date,
+    format_seconds
 )
 
 import typing as t
@@ -43,7 +44,8 @@ __all__ = [
     "debounce",
     "downloader",
     "escape_markup",
-    "colors"
+    "colors",
+    "format_seconds"
 ]
 
 
