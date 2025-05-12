@@ -68,7 +68,7 @@ class AppItem(gtk.Revealer):
 
         self.on_click_handler = self.button.connect("clicked", self.on_click)
 
-    @sync_debounce(750, 1)
+    @sync_debounce(750, 1, immediate=True)
     def on_click(self, *args: t.Any) -> None:
         self.launch()
 
