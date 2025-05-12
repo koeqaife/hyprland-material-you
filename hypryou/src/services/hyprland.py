@@ -251,6 +251,7 @@ async def init() -> None:
             logger.error("Invalid answer from hyprsunset: %s", _temperature)
         else:
             night_light.value = int(_temperature) < 6000
+            change_night_light(night_light.value)
             night_light.watch(change_night_light)
             night_light.ready()
     except (ConnectionRefusedError, FileNotFoundError) as e:
