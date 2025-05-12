@@ -9,6 +9,9 @@ from config import APP_CACHE_PATH, CACHE_PATH
 from os.path import join as pjoin
 import os.path as path
 import json
+import shlex
+import subprocess
+import os
 
 apps = Ref[list["Application"]]([], name="applications", delayed_init=True)
 frequents = Ref[dict[str, int]]({}, name="app_frequents", delayed_init=True)
@@ -16,6 +19,22 @@ FOUND_THRESHOLD = 0.4
 
 APP_FREQUENCY = pjoin(APP_CACHE_PATH, "apps-frequency.json")
 LEGACY_APP_FREQUENCY = pjoin(CACHE_PATH, "ags", "apps", "apps_frequency.json")
+
+
+def launch_detached(exec: str) -> None:
+    placeholders = ("%u", "%U", "%f", "%F", "%i", "%c", "%k", "%%")
+    for placeholder in placeholders:
+        exec = exec.replace(placeholder, "")
+
+    cmd = shlex.split(exec)
+
+    subprocess.Popen(
+        cmd,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        preexec_fn=os.setsid
+    )
 
 
 class Application:
@@ -43,7 +62,7 @@ class Application:
 
     def launch(self) -> None:
         increase_frequency(self.entry)
-        self.app_info.launch()
+        launch_detached(self.exec)
 
     def match(self, pattern: str) -> bool:
         scores = []
