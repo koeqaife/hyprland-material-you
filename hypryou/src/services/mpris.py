@@ -76,7 +76,7 @@ MprisMetadata = t.TypedDict(
         "xesam:userRating": float,
 
         "mpris:artUrl": str,
-        "mpris:length": bool,
+        "mpris:length": int,
         "mpris:trackid": str
     }
 )
@@ -316,6 +316,12 @@ class MprisPlayer(Signals):
     @property
     def can_control(self) -> bool:
         return t.cast(bool, self.prop("CanControl"))
+
+    @property
+    def length(self) -> float | None:
+        mpris_length = self.metadata.get("mpris:length")
+        if mpris_length is not None:
+            return mpris_length / 1_000_000
 
     def _cache_properties(self, changed: list[str] | None = None) -> None:
         cache_proxy_properties(
