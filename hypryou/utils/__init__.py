@@ -108,7 +108,7 @@ def sync_debounce(
                     call_func
                 )
             else:
-                n_times += 0
+                n_times = 0
                 timeout_id = None
                 func(*last_args, **last_kwargs)
 
