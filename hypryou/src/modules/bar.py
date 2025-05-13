@@ -228,11 +228,29 @@ class Player(gtk.Box):
         self.on_changed()
 
         self.click_gesture = gtk.GestureClick.new()
-        self.click_gesture.set_button(gdk.BUTTON_SECONDARY)
+        self.click_gesture.set_button(0)
         self.gesture_conn = (
-            self.click_gesture.connect("released", self.play_pause)
+            self.click_gesture.connect("released", self.on_click_released)
         )
         self.add_controller(self.click_gesture)
+
+    def on_click_released(
+        self,
+        gesture: gtk.GestureClick,
+        n_press: int,
+        x: int,
+        y: int
+    ) -> None:
+        button_number = gesture.get_current_button()
+        if button_number == gdk.BUTTON_PRIMARY:
+            event = Event(
+                None,
+                "players",
+                "toggle_window"
+            )
+            Globals.events.notify(event)
+        elif button_number == gdk.BUTTON_SECONDARY:
+            self.play_pause()
 
     def next(self, *args: t.Any) -> None:
         current = self.get_player()

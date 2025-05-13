@@ -1,0 +1,133 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "sass:color";
+
+window.players {
+    min-width: 25rem;
+    min-height: 25rem;
+    background-color: $background;
+    border-radius: $hyprlandRounding;
+    border: 1px solid color.mix($outlineVariant, transparent, 25%);
+
+    .players-box {
+        padding: 8px;
+    }
+
+    .mpris-player {
+        background-color: $surfaceContainer;
+        border-radius: $hyprlandRounding - 8px;
+        min-width: 20.25rem;
+        padding: 10px;
+        outline-offset: -1px;
+        .label {
+            font-size: 1rem;
+            font-weight: 500;
+            color: $onSurface;
+        }
+        .artists {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: $onSurfaceVariant;
+        }
+        .image {
+            min-height: 4rem;
+            min-width: 4rem;
+            border-radius: $hyprlandRounding - 16px;
+            margin-right: 1rem;
+            background-position: center;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        .player {
+            background-color: $surfaceContainerHigh;
+            color: $onSurface;
+            font-size: 0.8rem;
+            border-radius: 0.8rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .position-label {
+            color: $onSurface;
+            font-size: 0.875rem;
+        }
+
+        scale {
+            margin: 0;
+            padding: 0;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            margin-top: 0.5rem;
+            trough {
+                background-color: $secondaryContainer;
+                min-height: 0.188rem;
+            }
+            highlight {
+                background-color: $primary;
+            }
+
+            &:not(:disabled) {
+                slider {
+                    background-color: $primary;
+                    min-width: 0.7rem;
+                    min-height: 0.7rem;
+                    margin: -0.25rem;
+                    border-radius: 1.125rem;
+                }
+            }
+
+            &:disabled {
+                opacity: 1;
+                filter: none;
+                slider {
+                    min-height: 0;
+                    min-width: 0;
+                    margin: 0;
+                    background-color: transparent;
+                }
+            }
+        }
+
+        &.is-current {
+            outline: 1px solid $secondary;
+        }
+
+        .actions {
+            border-radius: 100px;
+            padding: 0.063rem;
+            .icon {
+                font-size: 1.125rem;
+                font-weight: 400;
+                font-variation-settings: "opsz" 20;
+                color: $onSecondaryContainer;
+            }
+            button {
+                border-radius: 1.5rem;
+                min-height: 1.5rem;
+                min-width: 1.5rem;
+                &.play-pause {
+                    background-color: $secondaryContainer;
+                    &:hover {
+                        background-color: color.mix($secondaryContainer, $onSurfaceVariant, 92%);
+                    }
+                    &:active {
+                        background-color: color.mix($secondaryContainer, $onSurfaceVariant, 86%);
+                    }
+                    &:not(:first-child) {
+                        margin-left: 0.188rem;
+                    }
+                    &:not(:last-child) {
+                        margin-right: 0.188rem;
+                    }
+                }
+                &:not(.play-pause) {
+                    &:hover {
+                        background-color: color.mix($surfaceContainer, $onSurfaceVariant, 92%);
+                    }
+                    &:active {
+                        background-color: color.mix($surfaceContainer, $onSurfaceVariant, 86%);
+                    }
+                }
+            }
+        }
+    }
+}

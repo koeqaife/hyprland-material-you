@@ -34,6 +34,7 @@ from src.modules.tray import TrayWindow
 from src.modules.notifications.popups import Notifications
 from src.modules.sidebar.window import Sidebar
 from src.modules.apps_menu import AppsWindow
+from src.modules.players import PlayersWindow
 
 START = time.perf_counter()
 
@@ -103,6 +104,7 @@ class HyprYou(gtk.Application):
         self.add_window(TrayWindow(self))
         self.add_window(Sidebar(self))
         self.add_window(AppsWindow(self))
+        self.add_window(PlayersWindow(self))
 
         logger.info(
             "Started in " +
