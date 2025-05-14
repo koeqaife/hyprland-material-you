@@ -65,25 +65,20 @@ window.players {
                 background-color: $primary;
             }
 
-            &:not(:disabled) {
-                slider {
-                    background-color: $primary;
-                    min-width: 0.7rem;
-                    min-height: 0.7rem;
-                    margin: -0.25rem;
-                    border-radius: 1.125rem;
-                }
+            slider {
+                min-height: 0;
+                min-width: 0;
+                margin: 0;
+                background-color: transparent;
+            }
+
+            &:not(:disabled):hover trough {
+                background-color: color.mix($secondaryContainer, $onSurface, 90%);
             }
 
             &:disabled {
                 opacity: 1;
                 filter: none;
-                slider {
-                    min-height: 0;
-                    min-width: 0;
-                    margin: 0;
-                    background-color: transparent;
-                }
             }
         }
 
@@ -93,7 +88,6 @@ window.players {
 
         .actions {
             border-radius: 100px;
-            padding: 0.063rem;
             .icon {
                 font-size: 1.125rem;
                 font-weight: 400;
