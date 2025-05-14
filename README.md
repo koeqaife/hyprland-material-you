@@ -18,8 +18,8 @@ Here are some key features:
 
 > Discord: <https://discord.gg/nCK3sh8mNU>
 
-I'm creating v2 version for this dotfiles, so for any spoilers go to discord server.
-I' doing everything **for free**, and you know, for me it's kinda difficult to find time and do this config, so please, if you can donate or if you want donate you can check my ko-fi.
+I'm creating v2 version for this dotfiles, so for any spoilers go to discord server.  
+I'm doing everything **for free**, and you know, for me it's kinda difficult to find time and do this config, so please, if you can donate or if you want donate you can check my ko-fi.  
 https://ko-fi.com/koeqaife
 
 ## To install
