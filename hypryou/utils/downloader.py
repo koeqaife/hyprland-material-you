@@ -179,6 +179,8 @@ def download_image_async(
         callback(temp_path)
         return
 
+    temp_path = os.path.join(cache_dir, "temp")
+
     with _download_mutex:
         if url in _download_locks:
             _download_locks[url].append(callback)
