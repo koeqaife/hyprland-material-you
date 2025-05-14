@@ -46,7 +46,8 @@ class Player(gtk.Box):
         self.text_box = gtk.Box(
             css_classes=("text-box",),
             orientation=gtk.Orientation.VERTICAL,
-            hexpand=True
+            hexpand=True,
+            valign=gtk.Align.END
         )
 
         self.info_box.append(self.image)
@@ -61,12 +62,14 @@ class Player(gtk.Box):
         self.title = gtk.Label(
             css_classes=("title",),
             ellipsize=pango.EllipsizeMode.END,
-            halign=gtk.Align.START
+            halign=gtk.Align.START,
+            valign=gtk.Align.CENTER
         )
         self.artists = gtk.Label(
             css_classes=("artists",),
             ellipsize=pango.EllipsizeMode.END,
-            halign=gtk.Align.START
+            halign=gtk.Align.START,
+            valign=gtk.Align.CENTER
         )
         self.text_box.append(self.player)
         self.text_box.append(self.title)
@@ -79,10 +82,6 @@ class Player(gtk.Box):
             step=1
         )
 
-        self.extra_box = gtk.Box(
-            css_classes=("extra-box",),
-            hexpand=True
-        )
         self.current_position = gtk.Label(
             css_classes=("position-label",),
             label="0:00",
@@ -99,9 +98,13 @@ class Player(gtk.Box):
             halign=gtk.Align.END,
             hexpand=True
         )
-        self.extra_box.append(self.current_position)
-        self.extra_box.append(self.actions)
-        self.extra_box.append(self.max_position)
+        self.center_box = gtk.CenterBox(
+            css_classes=("extra-box",),
+            hexpand=True,
+            start_widget=self.current_position,
+            center_widget=self.actions,
+            end_widget=self.max_position
+        )
 
         icons = ["skip_previous", "pause", "skip_next"]
         classes = ["previous", "play-pause", "next"]
@@ -111,7 +114,7 @@ class Player(gtk.Box):
 
         self.append(self.info_box)
         self.append(self.slider)
-        self.append(self.extra_box)
+        self.append(self.center_box)
 
         self.last_changed = LastChanged()
 
