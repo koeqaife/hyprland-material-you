@@ -19,6 +19,8 @@ Here are some key features:
 > Discord: <https://discord.gg/nCK3sh8mNU>
 
 I'm creating v2 version for this dotfiles, so for any spoilers go to discord server.
+I' doing everything **for free**, and you know, for me it's kinda difficult to find time and do this config, so please, if you can donate or if you want donate you can check my ko-fi.
+https://ko-fi.com/koeqaife
 
 ## To install
 
@@ -26,6 +28,7 @@ I'm creating v2 version for this dotfiles, so for any spoilers go to discord ser
 
 **⚠️ Known Issues:** 
 - Ags crashes -> can be fixed with downgrading gjs to 1.82.1
+- Not always installs -> Wait for v2, v1 isn't maintaned anymore
 
 ```sh
 sudo pacman -Syu
@@ -36,8 +39,6 @@ mv hyprland-material-you dotfiles
 cd dotfiles
 ./install.sh
 ```
-
-> I'm not sure if it will work, if you have any problems installing it, post in Issues
 
 ## Screenshots
 
