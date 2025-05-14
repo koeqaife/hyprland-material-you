@@ -7,6 +7,7 @@ from PIL import Image, ImageFilter
 from config import APP_CACHE_PATH
 from utils.logger import logger
 import threading
+import shutil
 
 type Callback = t.Callable[[t.Optional[str]], None]
 
@@ -166,15 +167,17 @@ def download_image_async(
         if not path:
             callback(None)
             return
-        if not size:
-            callback(path)
-            return
 
-        path = resize_image(path, size)
-        callback(path)
+        ext = os.path.splitext(path)[1]
+        temp_path = os.path.join(cache_dir, f"image{ext}")
+        os.makedirs(cache_dir, exist_ok=True)
+        shutil.copy(path, temp_path)
+
+        if size:
+            temp_path = resize_image(temp_path, size)
+
+        callback(temp_path)
         return
-
-    temp_path = os.path.join(cache_dir, "temp")
 
     with _download_mutex:
         if url in _download_locks:
