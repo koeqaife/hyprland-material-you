@@ -121,13 +121,14 @@ class ClipItem(gtk.Revealer):
         self.format = None
 
     def on_click(self, *args: t.Any) -> None:
-        self.show_image = True
-        self.update_widget()
+        if self.is_image:
+            self.show_image = True
+            self.update_widget()
         self.on_activate()
 
     @sync_debounce(750, 1, immediate=True)
     def on_activate(self, *args: t.Any) -> None:
-        self._activate
+        self._activate()
 
     def _activate(self, *args: t.Any) -> None:
         Globals.events.notify(Event(
