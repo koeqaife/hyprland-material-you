@@ -644,7 +644,8 @@ class Bar(widget.LayerWindow):
             },
             exclusive=True,
             monitor=monitor,
-            css_classes=("bar",)
+            css_classes=("bar",),
+            name="bar"
         )
 
         self.center_box = gtk.CenterBox(
@@ -698,7 +699,8 @@ class Corner:
                 "left": is_on_left,
                 "right": not is_on_left
             },
-            css_classes=("transparent",)
+            css_classes=("transparent",),
+            name="corner"
         )
 
         self.corner = widget.RoundedCorner(

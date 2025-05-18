@@ -17,6 +17,15 @@ python-numpy
 cython
 hyprsunset
 
+cliphist
+xdg-dbus-proxy
+xdg-desktop-portal
+xdg-desktop-portal-gtk
+xdg-desktop-portal-hyprland
+xdg-utils
+polkit-gnome
+
+
 Versions:
 "Used" means I used this version when I was developing, so these versions are 100% compatible
 - Python: Recommended >= 3.13, Minimum >= 3.12

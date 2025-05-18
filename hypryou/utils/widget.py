@@ -1,5 +1,6 @@
 from repository import gtk, layer_shell, gdk
 from utils.ref import Ref
+from utils.logger import logger
 import typing as t
 import cairo
 from math import pi
@@ -29,9 +30,10 @@ class LayerWindow(gtk.ApplicationWindow):
         monitor: gdk.Monitor | None = None,
         keymode: layer_shell.KeyboardMode | None = None,
         hide_on_esc: bool = False,
+        name: str | None = None,
         **kwargs: t.Any
     ) -> None:
-        super().__init__(application=application, **kwargs)
+        super().__init__(application=application, name=name, **kwargs)
         if width and height:
             self.set_default_size(width, height)
 
@@ -69,6 +71,11 @@ class LayerWindow(gtk.ApplicationWindow):
             self.key_controller = gtk.EventControllerKey()
             self.key_controller.connect("key-pressed", self.on_key_press)
             self.add_controller(self.key_controller)
+
+        if name:
+            layer_shell.set_namespace(self, name)
+        else:
+            logger.warning(f"No name specified for window: {self}")
 
     def on_key_press(
         self,
