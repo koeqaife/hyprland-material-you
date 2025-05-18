@@ -1,5 +1,13 @@
+from __future__ import annotations
+
 import subprocess
 from pathlib import Path
+from utils import Ref
+import os
+from config import APP_CACHE_PATH
+
+TEMP_PATH = os.path.join(APP_CACHE_PATH, "cliphist")
+items = Ref[dict[str, str]]({}, name="cliphist_items")
 
 
 def get() -> dict[str, str]:
@@ -10,17 +18,38 @@ def get() -> dict[str, str]:
         check=True,
         encoding="utf-8",
     )
-    output = result.stdout.strip()
-    data = {}
 
-    for line in output.splitlines():
-        try:
-            id, content = line.split(maxsplit=1)
-            data[id.strip()] = content.strip()
-        except ValueError:
-            continue
+    lines = result.stdout.strip().splitlines()[:250]
 
-    return data
+    return {
+        id_.strip(): content.strip()
+        for line in lines
+        if (parts := line.split(maxsplit=1)) and len(parts) == 2
+        for id_, content in [parts]
+    }
+
+
+def repopulate() -> None:
+    history = get()
+    history_keys = set(history.keys())
+    existing_keys = set(items.value.keys())
+
+    new_keys = history_keys - existing_keys
+    removed_keys = existing_keys - history_keys
+
+    if not new_keys and not removed_keys:
+        return
+
+    items._signals.block("changed")
+
+    for key in new_keys:
+        items.value[key] = history[key]
+
+    for key in removed_keys:
+        del items.value[key]
+
+    items._signals.unblock("changed")
+    items._signals.notify("changed", items.value)
 
 
 def copy_by_id(item_id: str) -> None:
@@ -38,7 +67,7 @@ def clear() -> None:
 
 
 def save_cache_file(item_id: str) -> str:
-    output_file = Path(f"/tmp/hypryou/cliphist/{item_id}.png")
+    output_file = Path(f"{TEMP_PATH}/{item_id}.png")
     output_file.parent.mkdir(parents=True, exist_ok=True)
 
     if not output_file.exists():

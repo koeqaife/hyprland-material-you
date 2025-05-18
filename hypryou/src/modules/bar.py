@@ -446,7 +446,7 @@ class KeyboardLayout(gtk.Label):
             ref.unwatch(handler_id)
 
 
-class Applet(gtk.Button):
+class Applet(widget.Icon):
     def __init__(
         self,
         name: str,
@@ -454,9 +454,8 @@ class Applet(gtk.Button):
         on_click: t.Callable[[], None],
         on_wheel_click: t.Callable[[], None] | None = None
     ) -> None:
-        self._icon = widget.Icon(icon)
         super().__init__(
-            child=self._icon,
+            icon=icon,
             css_classes=("applet",)
         )
 
@@ -500,10 +499,18 @@ class Applets(gtk.Box):
             Applet("audio", "volume_up", lambda: None, self.open_pavucontrol),
             Applet("bluetooth", "bluetooth", lambda: None),
             Applet("wifi", get_network().icon, lambda: None),
-            Applet("cliphist", "content_paste", lambda: None),
+            Applet("cliphist", "content_paste", self.toggle_cliphist),
         )
         for child in self.children:
             self.append(child)
+
+    def toggle_cliphist(self) -> None:
+        event = Event(
+            None,
+            "cliphist",
+            "toggle_window"
+        )
+        Globals.events.notify(event)
 
     def open_pavucontrol(self) -> None:
         subprocess.Popen(["pavucontrol"])

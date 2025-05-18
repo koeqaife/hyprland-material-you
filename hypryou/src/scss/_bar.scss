@@ -90,14 +90,12 @@ window.bar {
 
     .applets .applet {
         margin-right: 0.188rem;
+        color: $onSurface;
+        font-size: 1.063rem;
+        font-variation-settings: "opsz" 20;
+        font-weight: 500;
         &:last-child {
             margin-right: 0;
-        }
-        label {
-            color: $onSurface;
-            font-size: 1.063rem;
-            font-variation-settings: "opsz" 20;
-            font-weight: 500;
         }
     }
 

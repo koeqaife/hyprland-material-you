@@ -1,6 +1,5 @@
 from repository import glib as _glib
 
-import utils.cliphist as cliphist
 import utils.ref as ref
 import utils.widget as widget
 import utils.format as format
