@@ -1,5 +1,5 @@
 from utils import widget
-from repository import gtk, gdk
+from repository import gtk, gdk, glib
 from src.services.notifications import popups
 from src.modules.notifications.item import NotificationItem
 from src.modules.notifications.item import NotificationRevealer
@@ -77,7 +77,7 @@ class NotificationPopups(gtk.Box):
                     item=item
                 )
                 self.insert_child_after(self.items[key], None)
-                self.items[key].show()
+                glib.idle_add(self.items[key].show)
 
         self.update_window_state()
 
