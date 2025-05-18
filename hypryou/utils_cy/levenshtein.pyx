@@ -122,3 +122,45 @@ cpdef float compute_score(str s1, str s2):
         score = 0.0
 
     return score
+
+
+cpdef float compute_text_match_score(str s1, str s2):
+    if s1 == s2:
+        return 1.0
+
+    cdef int dist = levenshtein_distance(s1, s2)
+    cdef float max_len = max2(len(s1), len(s2))
+    if max_len == 0:
+        return 1.0
+    cdef float full = 1.0 - (dist / max_len)
+
+    cdef float part = 0.0
+    if len(s1) < len(s2):
+        part = partial_ratio(s1, s2)
+    elif len(s2) < len(s1):
+        part = partial_ratio(s2, s1)
+
+    cdef float score = 0.4 * full + 0.6 * part
+
+    cdef int len_diff = abs(len(s1) - len(s2))
+    if len_diff >= 10:
+        score -= 0.02 * len_diff / max_len
+
+    cdef int common_prefix_len = 0
+    cdef int min_len = min(len(s1), len(s2))
+    for i in range(min_len):
+        if s1[i] == s2[i]:
+            common_prefix_len += 1
+        else:
+            break
+    score += 0.01 * common_prefix_len
+
+    if s1 in s2 or s2 in s1:
+        score += 0.2
+
+    if score > 1.0:
+        score = 1.0
+    elif score < 0.0:
+        score = 0.0
+
+    return score
