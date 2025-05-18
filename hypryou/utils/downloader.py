@@ -180,20 +180,21 @@ def download_image_async(
         return
 
     temp_path = os.path.join(cache_dir, "temp")
+    _key = f"{url}{size}"
 
     with _download_mutex:
-        if url in _download_locks:
-            _download_locks[url].append(callback)
+        if _key in _download_locks:
+            _download_locks[_key].append(callback)
             return
         else:
-            _download_locks[url] = [callback]
+            _download_locks[_key] = [callback]
 
     def finish(path: t.Optional[str]) -> None:
         if path and size:
             path = resize_image(path, size)
 
         with _download_mutex:
-            callbacks = _download_locks.pop(url, [])
+            callbacks = _download_locks.pop(_key, [])
         for cb in callbacks:
             cb(path)
 
