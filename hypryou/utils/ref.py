@@ -242,6 +242,9 @@ class Ref(t.Generic[T]):
         if not self.is_ready:
             return
 
+        if "changed" in self._signals._blocked:
+            return
+
         self._signals.notify("changed", self.value)
 
         if log:
