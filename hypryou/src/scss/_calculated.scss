@@ -1,0 +1,12 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "sass:color";
+
+$layerBorderColor: color.mix($outlineVariant, transparent, 25%);
+$background: rgba($background, $layerOpacity);
+$surface: rgba($surface, $layerOpacity);
+$surfaceContainer: rgba($surfaceContainer, $layerOpacity);
+$surfaceContainerHigh: rgba($surfaceContainerHigh, $layerOpacity);
+$surfaceContainerHighest: rgba($surfaceContainerHigh, $layerOpacity);
+$surfaceContainerLow: rgba($surfaceContainerLow, $layerOpacity);
+$surfaceContainerLowest: rgba($surfaceContainerLowest, $layerOpacity);

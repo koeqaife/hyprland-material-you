@@ -1,5 +1,6 @@
 @use "colors" as *;
 @use "variables" as *;
+@use "calculated" as *;
 @use "sass:color";
 
 window.apps-menu {
@@ -7,7 +8,7 @@ window.apps-menu {
     min-height: 43.75rem;
     background-color: $background;
     border-radius: $hyprlandRounding;
-    border: 1px solid color.mix($outlineVariant, transparent, 25%);
+    border: 1px solid $layerBorderColor;
 
     .apps-list {
         padding: 8px;

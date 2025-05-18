@@ -1,4 +1,7 @@
 @use "colors" as *;
+@use "variables" as *;
+@use "calculated" as *;
+@use "sass:color";
 
 * {
     transition: all 0.25s ease-in-out;

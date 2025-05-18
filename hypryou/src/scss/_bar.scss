@@ -1,8 +1,10 @@
 @use "colors" as *;
+@use "variables" as *;
+@use "calculated" as *;
 @use "sass:color";
 
 window.bar {
-    background-color: $surface;
+    background-color: $background;
     border: none;
     box-shadow: none;
 

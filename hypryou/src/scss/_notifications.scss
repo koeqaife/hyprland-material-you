@@ -1,5 +1,6 @@
 @use "colors" as *;
 @use "variables" as *;
+@use "calculated" as *;
 @use "sass:color";
 
 box.notification {
@@ -99,7 +100,8 @@ box.notification {
     }
 }
 
-box.notification-revealer-box, box.notification-revealer {
+box.notification-revealer-box,
+box.notification-revealer {
     min-height: 1px;
     min-width: 1px;
 }
@@ -109,7 +111,8 @@ box.notification-revealer-box {
     background: #22222201;
 }
 
-box.notification-popups, box.notifications {
+box.notification-popups,
+box.notifications {
     > :not(:last-child) box.notification {
         margin-bottom: 8px;
     }
@@ -120,6 +123,8 @@ window.notifications {
     transition: none;
     padding-bottom: 2px;
     box.notification {
-        border: 1px solid color.mix($outlineVariant, transparent, 25%);
+        background-color: $background;
+        border-radius: $hyprlandRounding;
+        border: 1px solid $layerBorderColor;
     }
 }

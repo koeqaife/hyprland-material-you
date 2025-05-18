@@ -31,7 +31,8 @@ default_settings: dict[str, t.Any] = {
     "always_show_battery": False,
     "corners": False,
     "dark_icons": "Tela-nord-dark",
-    "light_icons": "Tela-nord-light"
+    "light_icons": "Tela-nord-light",
+    "opacity": 0.9
 }
 
 os.makedirs(config_path, exist_ok=True)

@@ -3,7 +3,8 @@ import subprocess
 from config import (
     styles_output, main_scss,
     scss_variables, HyprlandVars,
-    TEMP_PATH, color_templates
+    TEMP_PATH, color_templates,
+    Settings
 )
 from src.variables import Globals
 from utils.logger import logger
@@ -41,6 +42,7 @@ def generate_scss_variables() -> None:
     variables = {
         "hyprlandRounding": f"{HyprlandVars.rounding}px",
         "hyprlandGap": f"{HyprlandVars.gap}px",
+        "layerOpacity": f"{Settings().get("opacity")}"
     }
     with open(scss_variables, 'w') as f:
         for key, value in variables.items():

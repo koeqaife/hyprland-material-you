@@ -1,5 +1,6 @@
 @use "colors" as *;
 @use "variables" as *;
+@use "calculated" as *;
 @use "sass:color";
 
 window.players {
@@ -7,7 +8,7 @@ window.players {
     min-height: 25rem;
     background-color: $background;
     border-radius: $hyprlandRounding;
-    border: 1px solid color.mix($outlineVariant, transparent, 25%);
+    border: 1px solid $layerBorderColor;
 
     .players-box {
         padding: 8px;
