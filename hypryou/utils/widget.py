@@ -105,7 +105,8 @@ class Icon(gtk.Label):
         **props: t.Any
     ) -> None:
         super().__init__(**props)
-        self.set_css_classes(["material-icon", "icon"])
+        self.add_css_class("material-icon")
+        self.add_css_class("icon")
         self.icon = icon
         if isinstance(icon, str):
             self.set_label(icon)
