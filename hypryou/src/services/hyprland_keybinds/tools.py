@@ -42,7 +42,7 @@ key_binds = (
         Category.TOOLS
     ),
     KeyBind(
-        (main_mod, "SHIFT_L"),
+        (main_mod, "W"),
         ("exec", "hypryouctl toggle_window sidebar"),
         "Sidebar",
         Category.TOOLS
