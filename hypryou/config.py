@@ -32,7 +32,12 @@ default_settings: dict[str, t.Any] = {
     "corners": False,
     "dark_icons": "Tela-nord-dark",
     "light_icons": "Tela-nord-light",
-    "opacity": 0.9
+    "opacity": 0.9,
+
+    "browser": "firefox",
+    "editor": "code",
+    "files": "nautilus",
+    "terminal": "alacritty"
 }
 
 os.makedirs(config_path, exist_ok=True)
@@ -81,6 +86,7 @@ class Settings:
         for key, value in self._values.items():
             if key not in old_values or old_values[key] != value:
                 self._signals.notify(f"changed::{key}", value)
+                self._signals.notify("changed", key, value)
 
     def reset(self, name: str) -> None:
         self.set(name, default_settings[name])
@@ -89,6 +95,7 @@ class Settings:
         self._values[name] = value
         self.save()
         self._signals.notify(f"changed::{name}", value)
+        self._signals.notify("changed", name, value)
 
     def get(self, name: str) -> t.Any:
         if name in self._values:

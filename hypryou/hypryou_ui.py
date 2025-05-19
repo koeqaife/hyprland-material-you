@@ -25,6 +25,7 @@ from src.services.cli import CliService, is_socket_exists
 from src.services.notifications import NotificationsService
 from src.services.idle_inhibitor import IdleInhibitorService
 from src.services.apps import AppsService
+from src.services.hyprland_config import HyprlandConfigService
 
 from src.services import events
 
@@ -42,6 +43,7 @@ START = time.perf_counter()
 services: tuple[AsyncService | Service, ...] = (
     DBusService(),
     HyprlandService(),
+    HyprlandConfigService(),
     NotificationsService(),
     TrayService(),
     MprisService(),

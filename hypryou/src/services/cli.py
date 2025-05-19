@@ -8,6 +8,21 @@ from src.variables import Globals
 from src.services.events import Event
 from utils import apply_css
 from utils.service import AsyncService
+from src.services.mpris import current_player
+import subprocess
+import shlex
+
+
+def launch_detached(exec: str) -> None:
+    cmd = shlex.split(exec)
+
+    subprocess.Popen(
+        cmd,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        preexec_fn=os.setsid
+    )
 
 
 class CliRequest:
@@ -35,6 +50,29 @@ class CliRequest:
     def do_reload_css(self, args: str) -> str:
         apply_css()
         return "ok"
+
+    def do_player(self, action: str) -> str:
+        if not current_player.value:
+            return "no players"
+        current = current_player.value[1]
+        actions = {
+            "play-pause": current.play_pause,
+            "pause": current.pause,
+            "next": current.next,
+            "previous": current.previous
+        }
+        actions[action]()
+        return "ok"
+
+    def do_apps(self, app: str) -> str:
+        settings = Settings()
+        apps = {
+            "files": settings.get("files"),
+            "editor": settings.get("editor"),
+            "terminal": settings.get("terminal"),
+            "browser": settings.get("browser"),
+        }
+        launch_detached(apps[app])
 
 
 async def handle_client(
