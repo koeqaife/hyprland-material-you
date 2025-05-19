@@ -26,10 +26,11 @@ window.sidebar {
     }
 
     .management-box {
-        padding: 0.75rem;
+        margin: 0.75rem;
     }
 
     .management-button {
+        @include elevation(1);
         border-radius: 1.5rem;
         background-color: $surfaceContainer;
         padding: 1rem;
@@ -101,19 +102,23 @@ window.sidebar {
     }
 
     .notifications-scrollable {
+        @include elevation(1);
         border-top-right-radius: 2rem;
         border-top-left-radius: 2rem;
         margin-top: 0.75rem;
-        padding: 0.75rem;
+        padding-top: 0.75rem;
         background-color: $background;
     }
 
     box.notification {
+        @include elevation(1);
         border-radius: 1.25rem;
+        margin-right: 0.75rem;
+        margin-left: 0.75rem;
     }
 
     .notifications-categories {
-        > box > :last-child {
+        > box > :last-child box.notification {
             margin-bottom: 0.875rem;
         }
     }

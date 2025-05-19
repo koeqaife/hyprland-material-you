@@ -13,12 +13,10 @@ window.tray {
     .no-items label {
         color: $onSurfaceVariant;
     }
-
-    .tray-widget {
-        padding: 8px;
-    }
-
     .tray-item {
+        @include elevation(1);
+        margin-left: 8px;
+        margin-right: 8px;
         image {
             margin-right: 8px;
             min-height: 1.5rem;
@@ -42,6 +40,9 @@ window.tray {
         }
         &:active {
             background-color: color.mix($surfaceContainer, $onSurfaceVariant, 88%);
+        }
+        &:first-child {
+            margin-top: 8px;
         }
     }
 }

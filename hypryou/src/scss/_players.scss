@@ -10,11 +10,10 @@ window.players {
     border-radius: $hyprlandRounding;
     border: 1px solid $layerBorderColor;
 
-    .players-box {
-        padding: 8px;
-    }
-
     .mpris-player {
+        @include elevation(1);
+        margin-left: 8px;
+        margin-right: 8px;
         background-color: $surfaceContainer;
         border-radius: $hyprlandRounding - 8px;
         min-width: 20.25rem;
@@ -123,6 +122,9 @@ window.players {
                     }
                 }
             }
+        }
+        &:first-child {
+            margin-top: 8px;
         }
     }
 }

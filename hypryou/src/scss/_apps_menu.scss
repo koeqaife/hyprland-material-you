@@ -10,11 +10,11 @@ window.apps-menu {
     border-radius: $hyprlandRounding;
     border: 1px solid $layerBorderColor;
 
-    .apps-list {
-        padding: 8px;
-    }
-
     .app-item {
+        @include elevation(1);
+        margin-left: 8px;
+        margin-right: 8px;
+
         outline-offset: -1px;
         transition: all 0.25s ease-in;
         .icon {
@@ -56,8 +56,8 @@ window.apps-menu {
     }
 
     .search {
+        @include elevation(1);
         margin: 8px;
-        margin-bottom: 0px;
         outline: none;
         border-radius: 2.75rem;
         background: $surfaceContainerHigh;
