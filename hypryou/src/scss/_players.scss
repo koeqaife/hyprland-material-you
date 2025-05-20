@@ -21,13 +21,14 @@ window.players {
         outline-offset: -1px;
         .title {
             font-size: 1rem;
-            font-weight: 500;
+            font-weight: 400;
             color: $onSurface;
         }
         .artists {
             font-size: 0.875rem;
-            font-weight: 500;
+            font-weight: 400;
             color: $onSurfaceVariant;
+            font-family: "Google Sans Text";
         }
         .image {
             min-height: 4rem;

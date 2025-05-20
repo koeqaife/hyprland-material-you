@@ -31,6 +31,7 @@ window.bar {
 
     .keyboard-layout {
         font-size: 1rem;
+        font-weight: 400;
     }
 
     .bar-applet {
@@ -41,10 +42,8 @@ window.bar {
     }
 
     .clock {
-        font-weight: bold;
-        font-feature-settings: "tnum";
         font-size: 1rem;
-        font-weight: 600;
+        font-weight: 500;
     }
 
     .workspaces {
@@ -126,7 +125,7 @@ window.bar {
         padding: 0.25rem 0.25rem 0.25rem 0.25rem;
         label {
             font-size: 1rem;
-            font-weight: 500;
+            font-weight: 400;
             transition: none;
         }
         .image {

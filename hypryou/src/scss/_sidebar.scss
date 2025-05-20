@@ -16,12 +16,12 @@ window.sidebar {
         .date-label {
             color: $onSurface;
             font-size: 1rem;
-            font-weight: 500;
+            font-weight: 400;
         }
         .username-label {
             color: $onSurfaceVariant;
             font-size: 1rem;
-            font-weight: 500;
+            font-weight: 300;
         }
     }
 
@@ -31,22 +31,21 @@ window.sidebar {
 
     .management-button {
         @include elevation(1);
-        border-radius: 1.5rem;
+        border-radius: 1.75rem;
         background-color: $surfaceContainer;
         padding: 1rem;
-        .label,
-        .state {
-            font-weight: 500;
-        }
 
         .label {
             color: $onSurface;
             font-size: 1rem;
+            font-weight: 400;
         }
 
         .state {
             color: $onSurfaceVariant;
             font-size: 0.875rem;
+            font-family: "Google Sans Text";
+            font-weight: 300;
         }
 
         .icon {
@@ -125,7 +124,7 @@ window.sidebar {
 
     .no-notifications label {
         color: $onSurfaceVariant;
-        font-weight: 500;
+        font-weight: 400;
         font-size: 1rem;
     }
 }

@@ -19,20 +19,23 @@ box.notification {
         }
         .app-title {
             font-size: 0.875rem;
-            font-weight: 500;
+            font-weight: 300;
             color: $onSurfaceVariant;
+            font-family: "Google Sans Text";
         }
         .separator {
             margin-left: 0.25rem;
             margin-right: 0.25rem;
             font-size: 0.875rem;
-            font-weight: 500;
+            font-weight: 300;
             color: $onSurfaceVariant;
+            font-family: "Google Sans Text";
         }
         .time {
             font-size: 0.875rem;
-            font-weight: 500;
+            font-weight: 300;
             color: $onSurfaceVariant;
+            font-family: "Google Sans Text";
         }
     }
     .body {
@@ -40,8 +43,9 @@ box.notification {
 
         .title {
             font-size: 1.15rem;
-            font-weight: 500;
+            font-weight: 400;
             color: $onSurface;
+            font-family: "Google Sans Display";
         }
         .body-text {
             font-size: 1rem;
