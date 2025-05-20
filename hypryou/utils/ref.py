@@ -176,11 +176,13 @@ class Ref(t.Generic[T]):
         value: T,
         name: str | None = None,
         delayed_init: bool = False,
-        deep: bool = False
+        deep: bool = False,
+        types: tuple[type, ...] | None = None
     ) -> None:
         self._signals = Signals()
         self.deep = deep
         self.is_ready = not delayed_init
+        self.types = types
 
         self._value = self._wrap_if_mutable(value)
 
@@ -267,8 +269,11 @@ class Ref(t.Generic[T]):
         old_value = self._value
         new_value = self._wrap_if_mutable(new_value)
         if old_value != new_value:
-            assert isinstance(old_value, type(new_value)), (
+            assert self.types or isinstance(old_value, type(new_value)), (
                 f"Types do not match: {type(old_value)} != {type(new_value)}"
+            )
+            assert not self.types or isinstance(new_value, self.types), (
+                f"Types do not match: {type(new_value)} not in {self.types}"
             )
             if self.name:
                 logger.debug("Ref '%s' changed value", self.name)
