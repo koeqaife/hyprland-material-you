@@ -1,3 +1,4 @@
+from utils import sync_debounce
 from utils.service import Service
 from utils.logger import logger
 from src.services.hyprland_keybinds import key_binds
@@ -66,7 +67,8 @@ def generate_config() -> None:
         f.write(output)
 
 
-def on_settings_change(key: str, value: str) -> None:
+@sync_debounce(100)
+def on_settings_changed(key: str, value: str) -> None:
     generate_config()
 
 
@@ -78,4 +80,4 @@ class HyprlandConfigService(Service):
         generate_config()
 
     def start(self) -> None:
-        Settings()._signals.watch("changed", on_settings_change)
+        Settings()._signals.watch("changed", on_settings_changed)
