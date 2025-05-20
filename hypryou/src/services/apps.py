@@ -27,13 +27,18 @@ def launch_detached(exec: str) -> None:
         exec = exec.replace(placeholder, "")
 
     cmd = shlex.split(exec)
+    cwd = os.path.expanduser("~")
 
     subprocess.Popen(
         cmd,
         stdin=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
-        preexec_fn=os.setsid
+        preexec_fn=os.setsid,
+        cwd=cwd,
+        shell=True,
+        env=os.environ.copy(),
+        executable="/bin/bash"
     )
 
 
