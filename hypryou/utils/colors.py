@@ -583,7 +583,6 @@ def set_dark_mode(
     try:
         with open(colors_json) as f:
             content = get_cache_object(f.read())
-        print(content.wallpaper, content.original_color)
         generate_colors(
             content.wallpaper,
             content.original_color,
