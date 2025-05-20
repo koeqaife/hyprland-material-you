@@ -425,7 +425,7 @@ def generate_colors_sync(
 
     with open(colors_json, 'w') as f:
         object = ColorsCache(
-            scheme, image_path, color, contrast_level, is_dark
+            scheme, image_path, use_color, contrast_level, is_dark
         )
         json.dump(colors_dict(object), f, indent=2)
 
@@ -583,6 +583,7 @@ def set_dark_mode(
     try:
         with open(colors_json) as f:
             content = get_cache_object(f.read())
+        print(content.wallpaper, content.original_color)
         generate_colors(
             content.wallpaper,
             content.original_color,
