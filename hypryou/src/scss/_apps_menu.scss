@@ -31,7 +31,7 @@ window.apps-menu {
         }
         background-color: $surfaceContainer;
         padding: 0.5rem;
-        border-radius: $hyprlandRounding - 8px;
+        border-radius: max($hyprlandRounding - 8px, 0px);
 
         &:hover {
             background-color: color.mix($surfaceContainer, $onSurfaceVariant, 95%);
