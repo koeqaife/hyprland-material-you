@@ -21,6 +21,7 @@ class WallpapersWidget(gtk.Stack):
     def update_image(self, *args: t.Any) -> None:
         texture = current_wallpaper.value
         new_picture = gtk.Picture.new_for_paintable(texture)
+        new_picture.set_content_fit(gtk.ContentFit.COVER)
 
         self.counter += 1
         self.add_named(new_picture, str(self.counter))
