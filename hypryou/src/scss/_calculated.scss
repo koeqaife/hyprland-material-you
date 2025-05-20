@@ -30,7 +30,6 @@ $layerBorderColor: color.mix($outline, $background, 15%);
     }
     @if $layerOpacity == 1 {
         background-color: $color;
-        @warn "REGULAR"
     } @else {
         $layerDecay: 1 - $layerOpacity;
         $opacity: $layerOpacity * math.pow((1 - $layerDecay), $layer - 1);
