@@ -37,6 +37,7 @@ from src.modules.sidebar.window import Sidebar
 from src.modules.apps_menu import AppsWindow
 from src.modules.players import PlayersWindow
 from src.modules.cliphist import ClipHistoryWindow
+from src.modules.wallpapers import WallpapersWindow
 
 START = time.perf_counter()
 
@@ -155,7 +156,8 @@ class HyprYou(gtk.Application):
                 )
                 windows: list[gtk.ApplicationWindow] = [
                     Bar(self, monitor),
-                    Notifications(self, monitor, i)
+                    Notifications(self, monitor, i),
+                    WallpapersWindow(self, monitor)
                 ]
                 corners = [
                     Corner(self, monitor, "left"),

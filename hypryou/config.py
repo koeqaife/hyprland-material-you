@@ -33,6 +33,7 @@ default_settings: dict[str, t.Any] = {
     "dark_icons": "Tela-nord-dark",
     "light_icons": "Tela-nord-light",
     "opacity": 0.9,
+    "wallpaper": f"{CONFIG_DIR}/assets/default_wallpaper.jpg",
 
     "browser": "firefox",
     "editor": "code",
