@@ -230,9 +230,12 @@ class AppsWindow(widget.LayerWindow):
         weakref.finalize(self, lambda: logger.debug("AppsWindow finalized"))
 
     def update_visible(self, *args: t.Any) -> None:
-        if self.name in opened_windows.value and not self.get_visible():
+        is_opened = self.name in opened_windows.value
+        is_visible = self.get_visible()
+
+        if is_opened and not is_visible:
             self.present()
-        elif self.get_visible():
+        elif not is_opened and is_visible:
             self.hide()
 
     def on_show(self) -> None:
