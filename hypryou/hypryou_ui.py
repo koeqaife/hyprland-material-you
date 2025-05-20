@@ -26,6 +26,7 @@ from src.services.notifications import NotificationsService
 from src.services.idle_inhibitor import IdleInhibitorService
 from src.services.apps import AppsService
 from src.services.hyprland_config import HyprlandConfigService
+from src.services.state import StateService
 
 from src.services import events
 
@@ -42,6 +43,7 @@ from src.modules.wallpapers import WallpapersWindow
 START = time.perf_counter()
 
 services: tuple[AsyncService | Service, ...] = (
+    StateService(),
     DBusService(),
     HyprlandService(),
     HyprlandConfigService(),
