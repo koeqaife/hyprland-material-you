@@ -534,9 +534,9 @@ def generate_by_last_wallpaper(
     try:
         with open(colors_json) as f:
             content = get_cache_object(f.read())
-        assert content.wallpaper is not None
+        wallpaper = Settings().get("wallpaper")
         generate_colors(
-            content.wallpaper,
+            wallpaper,
             None,
             content.is_dark,
             contrast_level=content.contrast_level,
