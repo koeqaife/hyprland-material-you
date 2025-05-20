@@ -6,7 +6,6 @@ from utils import widget, Ref, downloader
 from utils import toggle_css_class, escape_markup
 from utils.logger import logger
 from src.variables.clock import date, time
-from src.variables import Globals
 from repository import gtk, gdk, pango
 from src.services import hyprland
 from src.services.hyprland import active_workspace, workspace_ids
@@ -17,9 +16,9 @@ from time import perf_counter
 import typing as t
 from config import Settings
 from src.services.mpris import MprisPlayer, current_player
-from src.services.events import Event
 import weakref
 from src.services.network import get_network
+from src.services.state import toggle_window
 
 
 dummy_region = cairo.Region()
@@ -243,12 +242,7 @@ class Player(gtk.Box):
     ) -> None:
         button_number = gesture.get_current_button()
         if button_number == gdk.BUTTON_PRIMARY:
-            event = Event(
-                None,
-                "players",
-                "toggle_window"
-            )
-            Globals.events.notify(event)
+            toggle_window("players")
         elif button_number == gdk.BUTTON_SECONDARY:
             self.play_pause()
 
@@ -505,12 +499,7 @@ class Applets(gtk.Box):
             self.append(child)
 
     def toggle_cliphist(self) -> None:
-        event = Event(
-            None,
-            "cliphist",
-            "toggle_window"
-        )
-        Globals.events.notify(event)
+        toggle_window("cliphist")
 
     def open_pavucontrol(self) -> None:
         subprocess.Popen(["pavucontrol"])
@@ -531,8 +520,7 @@ class OpenTray(gtk.Button):
         self.conn_id = self.connect("clicked", self.on_clicked)
 
     def on_clicked(self, *args: t.Any) -> None:
-        event = Event(None, "tray", "toggle_window")
-        Globals.events.notify(event)
+        toggle_window("tray")
 
     def destroy(self) -> None:
         self.disconnect(self.conn_id)
@@ -550,8 +538,7 @@ class OpenSidebar(gtk.Button):
         self.conn_id = self.connect("clicked", self.on_clicked)
 
     def on_clicked(self, *args: t.Any) -> None:
-        event = Event(None, "sidebar", "toggle_window")
-        Globals.events.notify(event)
+        toggle_window("sidebar")
 
     def destroy(self) -> None:
         self.disconnect(self.conn_id)
@@ -569,8 +556,7 @@ class OpenAppsMenu(gtk.Button):
         self.conn_id = self.connect("clicked", self.on_clicked)
 
     def on_clicked(self, *args: t.Any) -> None:
-        event = Event(None, "apps_menu", "toggle_window")
-        Globals.events.notify(event)
+        toggle_window("apps_menu")
 
     def destroy(self) -> None:
         self.disconnect(self.conn_id)

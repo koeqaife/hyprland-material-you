@@ -4,12 +4,11 @@ from src.services.cliphist import copy_by_id
 from utils import widget, sync_debounce, toggle_css_class
 from utils.logger import logger
 from config import HyprlandVars
-from src.variables import Globals
-from src.services.events import Event
 import weakref
 import typing as t
 import re
 from utils_cy.levenshtein import compute_text_match_score
+from src.services.state import opened_windows, close_window
 
 FOUND_THRESHOLD = 0.6
 data_regex = re.compile(
@@ -131,11 +130,7 @@ class ClipItem(gtk.Revealer):
         self._activate()
 
     def _activate(self, *args: t.Any) -> None:
-        Globals.events.notify(Event(
-            None,
-            "cliphist",
-            "toggle_window"
-        ))
+        close_window("cliphist")
         copy_by_id(self.item[0])
 
     def update_search(self, search: str) -> None:
@@ -278,17 +273,21 @@ class ClipHistoryWindow(widget.LayerWindow):
             height=400,
             width=400
         )
+        self.name = "cliphist"
         self._child: ClipHistoryBox | None = None
-        Globals.events.watch("toggle_window", self._toggle, "cliphist")
+
+        self.handler = opened_windows.watch(self.update_visible)
+        self.update_visible()
+
         weakref.finalize(
             self, lambda: logger.debug("ClipHistoryWindow finalized")
         )
 
-    def _toggle(self, _: Event) -> None:
-        if self.is_visible():
-            self.hide()
-        else:
+    def update_visible(self, *args: t.Any) -> None:
+        if self.name in opened_windows.value and not self.get_visible():
             self.present()
+        elif self.get_visible():
+            self.hide()
 
     def on_show(self) -> None:
         glib.idle_add(repopulate)
@@ -306,5 +305,5 @@ class ClipHistoryWindow(widget.LayerWindow):
             self._child.idle_items()
 
     def destroy(self) -> None:
-        Globals.events.unwatch("toggle_window", self._toggle, "apps_menu")
+        opened_windows.unwatch(self.handler)
         super().destroy()

@@ -1,12 +1,12 @@
 from utils import widget
 from utils.logger import logger
 from repository import gtk, layer_shell
-from src.variables import Globals
-from src.services.events import Event
 import weakref
 from src.modules.sidebar.management import ManagementBox
 from src.modules.sidebar.actions import Actions
 from src.modules.sidebar.notifications import Notifications
+from src.services.state import opened_windows
+import typing as t
 
 
 class SidebarBox(gtk.Box):
@@ -45,30 +45,30 @@ class Sidebar(widget.LayerWindow):
             name="sidebar",
             css_classes=("sidebar",)
         )
+        self.name = "sidebar"
         self._child: SidebarBox | None = None
-        Globals.events.watch("toggle_window", self._toggle, "sidebar")
+
+        self.handler = opened_windows.watch(self.update_visible)
+        self.update_visible()
+
         weakref.finalize(self, lambda: logger.debug("Sidebar finalized"))
 
-    def _toggle(self, _: Event) -> None:
-        if self.is_visible():
-            if self._child:
-                self._child.notifications.freeze()
-            self.hide()
-        else:
-            if self._child:
-                self._child.notifications.unfreeze()
+    def update_visible(self, *args: t.Any) -> None:
+        if self.name in opened_windows.value and not self.get_visible():
             self.present()
+        elif self.get_visible():
+            self.hide()
 
     def on_show(self) -> None:
         if not self._child:
             self._child = SidebarBox()
             self.set_child(self._child)
             self._child.notifications.unfreeze()
-        Globals.sidebar_opened = True
 
     def on_hide(self) -> None:
-        Globals.sidebar_opened = False
+        if self._child:
+            self._child.notifications.freeze()
 
     def destroy(self) -> None:
-        Globals.events.unwatch("toggle_window", self._toggle, "sidebar")
+        opened_windows.unwatch(self.handler)
         super().destroy()

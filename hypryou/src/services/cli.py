@@ -4,13 +4,12 @@ from config import socket_path
 from utils.logger import logger
 import socket
 from config import Settings
-from src.variables import Globals
-from src.services.events import Event
 from utils import apply_css
 from utils.service import AsyncService
 from src.services.mpris import current_player
 import subprocess
 import shlex
+from src.services import state
 
 
 def launch_detached(exec: str) -> None:
@@ -47,9 +46,16 @@ class CliRequest:
         Settings().sync()
         return "ok"
 
-    def do_toggle_window(self, args: str) -> str:
-        event = Event(None, args, "toggle_window")
-        Globals.events.notify(event)
+    def do_toggle_window(self, window_name: str) -> str:
+        state.toggle_window(window_name)
+        return "ok"
+
+    def do_close_window(self, window_name: str) -> str:
+        state.close_window(window_name)
+        return "ok"
+
+    def do_open_window(self, window_name: str) -> str:
+        state.open_window(window_name)
         return "ok"
 
     def do_reload_css(self, args: str) -> str:

@@ -4,10 +4,9 @@ from src.services.apps import Application, apps, reload as apps_reload
 from utils import widget, sync_debounce, toggle_css_class
 from utils.logger import logger
 from config import HyprlandVars
-from src.variables import Globals
-from src.services.events import Event
 import weakref
 import typing as t
+from src.services.state import opened_windows, close_window
 
 
 @lru_cache(512)
@@ -73,11 +72,7 @@ class AppItem(gtk.Revealer):
         self.launch()
 
     def launch(self, *args: t.Any) -> None:
-        Globals.events.notify(Event(
-            None,
-            "apps_menu",
-            "toggle_window"
-        ))
+        close_window("apps_menu")
         self.item.launch()
 
     def update_search(self, search: str) -> None:
@@ -226,15 +221,19 @@ class AppsWindow(widget.LayerWindow):
             height=400,
             width=400
         )
+        self.name = "apps_menu"
         self._child: AppsBox | None = None
-        Globals.events.watch("toggle_window", self._toggle, "apps_menu")
+
+        self.handler = opened_windows.watch(self.update_visible)
+        self.update_visible()
+
         weakref.finalize(self, lambda: logger.debug("AppsWindow finalized"))
 
-    def _toggle(self, _: Event) -> None:
-        if self.is_visible():
-            self.hide()
-        else:
+    def update_visible(self, *args: t.Any) -> None:
+        if self.name in opened_windows.value and not self.get_visible():
             self.present()
+        elif self.get_visible():
+            self.hide()
 
     def on_show(self) -> None:
         glib.idle_add(apps_reload)
@@ -249,5 +248,5 @@ class AppsWindow(widget.LayerWindow):
             self._child.entry.set_text("")
 
     def destroy(self) -> None:
-        Globals.events.unwatch("toggle_window", self._toggle, "apps_menu")
+        opened_windows.unwatch(self.handler)
         super().destroy()

@@ -13,4 +13,3 @@ class Globals:
     app: gtk.Application
     css_provider: gtk.CssProvider
     events: EventsBus
-    sidebar_opened: bool = False

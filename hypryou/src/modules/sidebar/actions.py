@@ -2,17 +2,14 @@ from repository import gtk, glib
 from utils import widget, Ref
 import typing as t
 import subprocess
-from src.variables import Globals
-from src.services.events import Event
 from utils.logger import logger
+from src.services.state import close_window
 
 
 def open_hyprpicker(*_: t.Any) -> None:
     def start() -> None:
         subprocess.Popen(["hyprpicker", "-a"])
-    Globals.events.notify(
-        Event(None, "sidebar", "toggle_window")
-    )
+    close_window("sidebar")
     glib.timeout_add(250, start)
 
 

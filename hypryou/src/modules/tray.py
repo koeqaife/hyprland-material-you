@@ -1,12 +1,11 @@
 from utils import widget
 from utils.logger import logger
 from repository import gtk, layer_shell, gdk, glib
-from src.variables import Globals
 from src.services.system_tray import StatusNotifierItem, items
-from src.services.events import Event
 from config import HyprlandVars
 import weakref
 import typing as t
+from src.services.state import opened_windows
 
 # It's so cool that when tray isn't opened there isn't any load to CPU
 # Cause it's not listening to any updates of items
@@ -212,15 +211,19 @@ class TrayWindow(widget.LayerWindow):
             height=400,
             width=400
         )
+        self.name = "tray"
         self._child: TrayBox | None = None
-        Globals.events.watch("toggle_window", self._toggle, "tray")
+
+        self.handler = opened_windows.watch(self.update_visible)
+        self.update_visible()
+
         weakref.finalize(self, lambda: logger.debug("TrayWindow finalized"))
 
-    def _toggle(self, _: Event) -> None:
-        if self.is_visible():
-            self.hide()
-        else:
+    def update_visible(self, *args: t.Any) -> None:
+        if self.name in opened_windows.value and not self.get_visible():
             self.present()
+        elif self.get_visible():
+            self.hide()
 
     def on_show(self) -> None:
         self._child = TrayBox()
@@ -233,5 +236,5 @@ class TrayWindow(widget.LayerWindow):
         self._child = None
 
     def destroy(self) -> None:
-        Globals.events.unwatch("toggle_window", self._toggle, "tray")
+        opened_windows.unwatch(self.handler)
         super().destroy()

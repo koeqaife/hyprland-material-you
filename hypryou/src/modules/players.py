@@ -4,12 +4,11 @@ from utils import format_seconds
 from utils.service import Signals
 from utils.logger import logger
 from repository import gtk, layer_shell, pango, glib, gobject
-from src.variables import Globals
 from src.services.mpris import players, MprisPlayer, current_player
-from src.services.events import Event
 from config import HyprlandVars
 import weakref
 import typing as t
+from src.services.state import opened_windows
 
 type HandlersDict = dict[tuple[Signals, str] | Ref | gobject.GObject, int]
 
@@ -392,15 +391,19 @@ class PlayersWindow(widget.LayerWindow):
             height=400,
             width=400
         )
+        self.name = "players"
         self._child: PlayersBox | None = None
-        Globals.events.watch("toggle_window", self._toggle, "players")
+
+        self.handler = opened_windows.watch(self.update_visible)
+        self.update_visible()
+
         weakref.finalize(self, lambda: logger.debug("PlayersWindow finalized"))
 
-    def _toggle(self, _: Event) -> None:
-        if self.is_visible():
-            self.hide()
-        else:
+    def update_visible(self, *args: t.Any) -> None:
+        if self.name in opened_windows.value and not self.get_visible():
             self.present()
+        elif self.get_visible():
+            self.hide()
 
     def on_show(self) -> None:
         self._child = PlayersBox()
@@ -413,5 +416,5 @@ class PlayersWindow(widget.LayerWindow):
         self._child = None
 
     def destroy(self) -> None:
-        Globals.events.unwatch("toggle_window", self._toggle, "players")
+        opened_windows.unwatch(self.handler)
         super().destroy()
