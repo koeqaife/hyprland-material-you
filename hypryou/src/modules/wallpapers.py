@@ -1,14 +1,13 @@
 from utils import widget
 from utils.logger import logger
-from repository import layer_shell, gtk, gdk, gdk_pixbuf
+from repository import layer_shell, gtk, gdk
 import weakref
-from config import Settings
+from src.services.state import current_wallpaper
 import typing as t
 
 
 class WallpapersWidget(gtk.Stack):
     def __init__(self) -> None:
-        self.settings = Settings()
         super().__init__(
             css_classes=("wallpapers-stack",),
             transition_type=gtk.StackTransitionType.CROSSFADE,
@@ -16,16 +15,12 @@ class WallpapersWidget(gtk.Stack):
         )
         self.old_picture: gtk.Picture | None = None
         self.counter = -1
-        self.handler = self.settings.watch(
-            "wallpaper", self.update_image, True
-        )
+        self.handler = current_wallpaper.watch(self.update_image)
+        self.update_image()
 
     def update_image(self, *args: t.Any) -> None:
-        pixbuf = gdk_pixbuf.Pixbuf.new_from_file(
-            self.settings.get("wallpaper")
-        )
-        self.texture = gdk.Texture.new_for_pixbuf(pixbuf)
-        new_picture = gtk.Picture.new_for_paintable(self.texture)
+        texture = current_wallpaper.value
+        new_picture = gtk.Picture.new_for_paintable(texture)
 
         self.counter += 1
         self.add_named(new_picture, str(self.counter))
@@ -36,7 +31,7 @@ class WallpapersWidget(gtk.Stack):
             self.old_picture = None
 
     def destroy(self) -> None:
-        self.settings.unwatch("wallpaper", self.handler)
+        current_wallpaper.unwatch("wallpaper", self.handler)
 
 
 class WallpapersWindow(widget.LayerWindow):
