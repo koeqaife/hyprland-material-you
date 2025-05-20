@@ -32,7 +32,7 @@ window.players {
         .image {
             min-height: 4rem;
             min-width: 4rem;
-            border-radius: $hyprlandRounding - 16px;
+            border-radius: max($hyprlandRounding - 16px, 4px);
             margin-right: 1rem;
             background-position: center;
             background-size: contain;
