@@ -4,8 +4,8 @@
 @use "sass:color";
 
 box.notification {
+    @include nLayerBackground($surfaceContainer, 1);
     border-radius: $hyprlandRounding;
-    background-color: $surfaceContainer;
     min-width: 26.563rem;
     padding: 0.5rem;
     .header {
@@ -127,7 +127,7 @@ window.notifications {
     transition: none;
     padding-bottom: 2px;
     box.notification {
-        background-color: $background;
+        @include nLayerBackground($background, 1);
         border-radius: $hyprlandRounding;
         border: 1px solid $layerBorderColor;
     }

@@ -4,17 +4,17 @@
 @use "sass:color";
 
 window.players {
+    @include nLayerBackground($background, 1);
     min-width: 25rem;
     min-height: 25rem;
-    background-color: $background;
     border-radius: $hyprlandRounding;
     border: 1px solid $layerBorderColor;
 
     .mpris-player {
         @include elevation(1);
+        @include nLayerBackground($surfaceContainer, 2);
         margin-left: 8px;
         margin-right: 8px;
-        background-color: $surfaceContainer;
         border-radius: $hyprlandRounding - 8px;
         min-width: 20.25rem;
         padding: 10px;
@@ -40,7 +40,7 @@ window.players {
             background-repeat: no-repeat;
         }
         .player {
-            background-color: $surfaceContainerHigh;
+            @include nLayerBackground($surfaceContainerHigh, 3);
             color: $onSurface;
             font-size: 0.8rem;
             border-radius: 0.8rem;

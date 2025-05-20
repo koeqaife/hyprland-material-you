@@ -4,14 +4,15 @@
 @use "sass:color";
 
 window.apps-menu {
+    @include nLayerBackground($background, 1);
     min-width: 31.25rem;
     min-height: 43.75rem;
-    background-color: $background;
     border-radius: $hyprlandRounding;
     border: 1px solid $layerBorderColor;
 
     .app-item {
         @include elevation(1);
+        @include nLayerBackground($surfaceContainer, 2);
         margin-left: 8px;
         margin-right: 8px;
 
@@ -29,7 +30,7 @@ window.apps-menu {
             font-weight: 400;
             color: $onSurface;
         }
-        background-color: $surfaceContainer;
+
         padding: 0.5rem;
         border-radius: max($hyprlandRounding - 8px, 0px);
 
@@ -57,10 +58,10 @@ window.apps-menu {
 
     .search {
         @include elevation(1);
+        @include nLayerBackground($surfaceContainerHigh, 2);
         margin: 8px;
         outline: none;
         border-radius: 2.75rem;
-        background: $surfaceContainerHigh;
         color: $onSurface;
         min-height: 2.75rem;
 

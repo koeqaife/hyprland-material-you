@@ -4,29 +4,30 @@
 @use "sass:color";
 
 window.cliphist {
+    @include nLayerBackground($background, 1);
     min-width: 31.25rem;
     min-height: 35rem;
-    background-color: $background;
     border-radius: $hyprlandRounding;
     border: 1px solid $layerBorderColor;
 
     .cliphist-item {
         @include elevation(1);
+        @include nLayerBackground($surfaceContainer, 2);
         margin-left: 8px;
         margin-right: 8px;
         outline-offset: -1px;
         transition: all 0.25s ease-in;
+
+        padding: 0.5rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        border-radius: max($hyprlandRounding - 8px, 0px);
 
         .label {
             font-size: 1rem;
             font-weight: 400;
             color: $onSurface;
         }
-        background-color: $surfaceContainer;
-        padding: 0.5rem;
-        padding-left: 1rem;
-        padding-right: 1rem;
-        border-radius: max($hyprlandRounding - 8px, 0px);
 
         &:hover {
             background-color: color.mix($surfaceContainer, $onSurfaceVariant, 95%);
@@ -64,10 +65,10 @@ window.cliphist {
 
     .search {
         @include elevation(1);
+        @include nLayerBackground($surfaceContainerHigh, 2);
         margin: 8px;
         outline: none;
         border-radius: 2.75rem;
-        background: $surfaceContainerHigh;
         color: $onSurface;
         min-height: 2.75rem;
 

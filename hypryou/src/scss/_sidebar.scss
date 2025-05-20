@@ -4,8 +4,8 @@
 @use "sass:color";
 
 window.sidebar {
+    @include nLayerBackground($surfaceContainerLowest, 1);
     border: none;
-    background-color: $surfaceContainerLowest;
     min-width: 29.125rem;
     border-left: 1px solid $layerBorderColor;
 
@@ -31,8 +31,8 @@ window.sidebar {
 
     .management-button {
         @include elevation(1);
+        @include nLayerBackground($surfaceContainer, 2);
         border-radius: 1.75rem;
-        background-color: $surfaceContainer;
         padding: 1rem;
 
         .label {
@@ -102,11 +102,11 @@ window.sidebar {
 
     .notifications-scrollable {
         @include elevation(1);
+        @include nLayerBackground($background, 2);
         border-top-right-radius: 2rem;
         border-top-left-radius: 2rem;
         margin-top: 0.75rem;
         padding-top: 0.75rem;
-        background-color: $background;
     }
 
     box.notification {

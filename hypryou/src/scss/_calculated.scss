@@ -1,15 +1,9 @@
 @use "colors" as *;
 @use "variables" as *;
 @use "sass:color";
+@use "sass:math";
 
 $layerBorderColor: color.mix($outline, $background, 15%);
-$background: rgba($background, $layerOpacity);
-$surface: rgba($surface, $layerOpacity);
-$surfaceContainer: rgba($surfaceContainer, $layerOpacity);
-$surfaceContainerHigh: rgba($surfaceContainerHigh, $layerOpacity);
-$surfaceContainerHighest: rgba($surfaceContainerHigh, $layerOpacity);
-$surfaceContainerLow: rgba($surfaceContainerLow, $layerOpacity);
-$surfaceContainerLowest: rgba($surfaceContainerLowest, $layerOpacity);
 
 @mixin elevation($level) {
     @if $level == 0 {
@@ -27,5 +21,20 @@ $surfaceContainerLowest: rgba($surfaceContainerLowest, $layerOpacity);
     } @else {
         @warn "Unsupported elevation level `#{$level}`. Supported levels are 0–5.";
         box-shadow: none;
+    }
+}
+
+@mixin nLayerBackground($color, $layer: 1) {
+    @if $layer < 1 {
+        $layer: 1;
+    }
+    @if $layerOpacity == 1 {
+        background-color: $color;
+        @warn "REGULAR"
+    } @else {
+        $layerDecay: 1 - $layerOpacity;
+        $opacity: $layerOpacity * math.pow((1 - $layerDecay), $layer - 1);
+
+        background-color: rgba($color, $opacity);
     }
 }

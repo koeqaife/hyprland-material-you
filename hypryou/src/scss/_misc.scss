@@ -42,5 +42,5 @@ tooltip label {
 }
 
 .corner {
-    color: $background;
+    color: rgba($background, $layerOpacity);
 }
