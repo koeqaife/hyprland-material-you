@@ -30,8 +30,10 @@ class WallpapersWidget(gtk.Stack):
             self.remove(self.old_picture)
             self.old_picture = None
 
+        self.old_picture = new_picture
+
     def destroy(self) -> None:
-        current_wallpaper.unwatch("wallpaper", self.handler)
+        current_wallpaper.unwatch(self.handler)
 
 
 class WallpapersWindow(widget.LayerWindow):
