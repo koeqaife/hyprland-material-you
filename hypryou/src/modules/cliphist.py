@@ -31,7 +31,7 @@ class ClipItem(gtk.Revealer):
         self.score = -1
         self.item = item
         self.show_image = False
-        self._child: gtk.Image | gtk.Label | None = None
+        self._child: gtk.Box | gtk.Label | None = None
         self.check_is_image()
         self.update_widget()
 
@@ -45,7 +45,7 @@ class ClipItem(gtk.Revealer):
         self.show_image = False
 
     def update_widget(self) -> None:
-        if self.show_image and not isinstance(self._child, gtk.Image):
+        if self.show_image and not isinstance(self._child, gtk.Box):
             file = save_cache_file(self.item[0])
 
             image_widget = gtk.Box(
