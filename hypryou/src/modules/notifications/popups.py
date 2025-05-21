@@ -48,7 +48,7 @@ class NotificationPopups(gtk.Box):
         self.update_window_state()
 
     def update_window_state(self) -> None:
-        if len(self.items) == 0 or "sidebar" in opened_windows.value:
+        if len(self.items) == 0 or opened_windows.is_visible("sidebar"):
             self.window.hide()
         else:
             self.window.show()

@@ -8,7 +8,7 @@ import weakref
 import typing as t
 import re
 from utils_cy.levenshtein import compute_text_match_score
-from src.services.state import opened_windows, close_window
+from src.services.state import close_window
 
 FOUND_THRESHOLD = 0.6
 data_regex = re.compile(
@@ -271,26 +271,15 @@ class ClipHistoryWindow(widget.LayerWindow):
             hide_on_esc=True,
             name="cliphist",
             height=400,
-            width=400
+            width=400,
+            setup_popup=True
         )
         self.name = "cliphist"
         self._child: ClipHistoryBox | None = None
 
-        self.handler = opened_windows.watch(self.update_visible)
-        self.update_visible()
-
         weakref.finalize(
             self, lambda: logger.debug("ClipHistoryWindow finalized")
         )
-
-    def update_visible(self, *args: t.Any) -> None:
-        is_opened = self.name in opened_windows.value
-        is_visible = self.get_visible()
-
-        if is_opened and not is_visible:
-            self.present()
-        elif not is_opened and is_visible:
-            self.hide()
 
     def on_show(self) -> None:
         glib.idle_add(repopulate)
@@ -308,5 +297,4 @@ class ClipHistoryWindow(widget.LayerWindow):
             self._child.idle_items()
 
     def destroy(self) -> None:
-        opened_windows.unwatch(self.handler)
         super().destroy()

@@ -8,7 +8,6 @@ from src.services.mpris import players, MprisPlayer, current_player
 from config import HyprlandVars
 import weakref
 import typing as t
-from src.services.state import opened_windows
 
 type HandlersDict = dict[tuple[Signals, str] | Ref | gobject.GObject, int]
 
@@ -389,24 +388,13 @@ class PlayersWindow(widget.LayerWindow):
             hide_on_esc=True,
             name="players",
             height=400,
-            width=400
+            width=400,
+            setup_popup=True
         )
         self.name = "players"
         self._child: PlayersBox | None = None
 
-        self.handler = opened_windows.watch(self.update_visible)
-        self.update_visible()
-
         weakref.finalize(self, lambda: logger.debug("PlayersWindow finalized"))
-
-    def update_visible(self, *args: t.Any) -> None:
-        is_opened = self.name in opened_windows.value
-        is_visible = self.get_visible()
-
-        if is_opened and not is_visible:
-            self.present()
-        elif not is_opened and is_visible:
-            self.hide()
 
     def on_show(self) -> None:
         self._child = PlayersBox()
@@ -419,5 +407,4 @@ class PlayersWindow(widget.LayerWindow):
         self._child = None
 
     def destroy(self) -> None:
-        opened_windows.unwatch(self.handler)
         super().destroy()

@@ -5,7 +5,6 @@ from src.services.system_tray import StatusNotifierItem, items
 from config import HyprlandVars
 import weakref
 import typing as t
-from src.services.state import opened_windows
 
 # It's so cool that when tray isn't opened there isn't any load to CPU
 # Cause it's not listening to any updates of items
@@ -209,24 +208,13 @@ class TrayWindow(widget.LayerWindow):
             hide_on_esc=True,
             name="tray",
             height=400,
-            width=400
+            width=400,
+            setup_popup=True
         )
         self.name = "tray"
         self._child: TrayBox | None = None
 
-        self.handler = opened_windows.watch(self.update_visible)
-        self.update_visible()
-
         weakref.finalize(self, lambda: logger.debug("TrayWindow finalized"))
-
-    def update_visible(self, *args: t.Any) -> None:
-        is_opened = self.name in opened_windows.value
-        is_visible = self.get_visible()
-
-        if is_opened and not is_visible:
-            self.present()
-        elif not is_opened and is_visible:
-            self.hide()
 
     def on_show(self) -> None:
         self._child = TrayBox()
@@ -239,5 +227,4 @@ class TrayWindow(widget.LayerWindow):
         self._child = None
 
     def destroy(self) -> None:
-        opened_windows.unwatch(self.handler)
         super().destroy()

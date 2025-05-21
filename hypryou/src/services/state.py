@@ -1,12 +1,14 @@
 from config import Settings
-from utils import Ref, reload_css
+from utils.ref import Ref
+from utils.styles import reload_css
 from utils.service import Service
 from utils.colors import generate_by_last_wallpaper
 from repository import gdk, gdk_pixbuf, glib
 import typing as t
 from types import NoneType
+from utils.service import Signals
 
-opened_windows = Ref[list[str]]([], name="opened_windows")
+_opened_windows = Ref[list[str]]([], name="opened_windows")
 current_wallpaper = Ref[gdk.Texture | None](
     None,
     name="wallpaper_texture",
@@ -14,21 +16,51 @@ current_wallpaper = Ref[gdk.Texture | None](
 )
 
 
+class OpenedWindowsWatcher(Signals):
+    def __init__(self):
+        super().__init__()
+        self.old_set: set[str] = set()
+
+    def init(self) -> None:
+        _opened_windows.watch(self.on_changed)
+
+    def is_visible(self, window_name: str) -> None:
+        return window_name in _opened_windows.value
+
+    def on_changed(self, new_value: list[str]) -> None:
+        new_set = set(new_value)
+        added = list(new_set - self.old_set)
+
+        for window_name in added:
+            self.notify(f"opened::{window_name}")
+            self.notify(f"changed::{window_name}", True)
+
+        removed = list(self.old_set - new_set)
+        for window_name in removed:
+            self.notify(f"closed::{window_name}")
+            self.notify(f"changed::{window_name}", False)
+
+        self.old_set = new_set
+
+
+opened_windows = OpenedWindowsWatcher()
+
+
 def open_window(window_name: str) -> None:
-    if window_name not in opened_windows.value:
-        opened_windows.value.append(window_name)
+    if window_name not in _opened_windows.value:
+        _opened_windows.value.append(window_name)
 
 
 def close_window(window_name: str) -> None:
-    if window_name in opened_windows.value:
-        opened_windows.value.remove(window_name)
+    if window_name in _opened_windows.value:
+        _opened_windows.value.remove(window_name)
 
 
 def toggle_window(window_name: str) -> None:
-    if window_name in opened_windows.value:
-        opened_windows.value.remove(window_name)
+    if window_name in _opened_windows.value:
+        _opened_windows.value.remove(window_name)
     else:
-        opened_windows.value.append(window_name)
+        _opened_windows.value.append(window_name)
 
 
 def generate_wallpaper_texture() -> None:
@@ -51,6 +83,7 @@ def on_opacity_changed(new_value: float) -> None:
 
 class StateService(Service):
     def start(self):
+        opened_windows.init()
         settings = Settings()
         settings.watch("wallpaper", on_wallpapers_changed, False)
         settings.watch("opacity", on_opacity_changed, False)

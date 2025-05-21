@@ -6,6 +6,8 @@ import cairo
 from math import pi
 from config import HyprlandVars
 
+import src.services.state as state
+
 
 __all__ = [
     "Edges", "LayerWindow"
@@ -31,9 +33,12 @@ class LayerWindow(gtk.ApplicationWindow):
         keymode: layer_shell.KeyboardMode | None = None,
         hide_on_esc: bool = False,
         name: str | None = None,
+        setup_popup: bool | None = None,
         **kwargs: t.Any
     ) -> None:
         super().__init__(application=application, name=name, **kwargs)
+        self.name = name
+        self.is_popup = setup_popup
         if width and height:
             self.set_default_size(width, height)
 
@@ -77,6 +82,13 @@ class LayerWindow(gtk.ApplicationWindow):
         else:
             logger.warning(f"No name specified for window: {self}")
 
+        if setup_popup:
+            self.window_handler = state.opened_windows.watch(
+                f"changed::{self.name}",
+                self.update_visible
+            )
+            self.update_visible(False)
+
     def on_key_press(
         self,
         controller: gtk.EventControllerKey,
@@ -84,6 +96,17 @@ class LayerWindow(gtk.ApplicationWindow):
         *args: t.Any
     ) -> None:
         if keyval == gdk.KEY_Escape:
+            if self.is_popup:
+                state.close_window(self.name)
+            else:
+                self.hide()
+
+    def update_visible(self, is_opened: bool) -> None:
+        is_visible = self.get_visible()
+
+        if is_opened and not is_visible:
+            self.present()
+        elif not is_opened and is_visible:
             self.hide()
 
     def on_show(self) -> None:
@@ -103,6 +126,11 @@ class LayerWindow(gtk.ApplicationWindow):
     def destroy(self) -> None:
         if getattr(self, "key_controller", None):
             self.remove_controller(self.key_controller)
+        if getattr(self, "window_handler", None):
+            state.opened_windows.unwatch(
+                f"changed::{self.name}",
+                self.window_handler
+            )
         super().destroy()
 
 
