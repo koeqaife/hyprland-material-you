@@ -3,7 +3,7 @@ from utils.ref import Ref
 from utils.styles import reload_css
 from utils.service import Service
 from utils.colors import generate_by_last_wallpaper
-from repository import gdk, gdk_pixbuf, glib
+from repository import gdk, glib, gio
 import typing as t
 from types import NoneType
 from utils.service import Signals
@@ -65,10 +65,9 @@ def toggle_window(window_name: str) -> None:
 
 def generate_wallpaper_texture() -> None:
     settings = Settings()
-    pixbuf = gdk_pixbuf.Pixbuf.new_from_file(
-        settings.get("wallpaper")
-    )
-    texture = gdk.Texture.new_for_pixbuf(pixbuf)
+    path = settings.get("wallpaper")
+    file = gio.File.new_for_path(path)
+    texture = gdk.Texture.new_from_file(file)
     current_wallpaper.value = texture
 
 
