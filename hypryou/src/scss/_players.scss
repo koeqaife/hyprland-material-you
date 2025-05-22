@@ -10,6 +10,13 @@ window.players {
     border-radius: $hyprlandRounding;
     border: 1px solid $layerBorderColor;
 
+    .no-items label {
+        color: $onSurfaceVariant;
+        font-size: 1rem;
+        font-weight: 400;
+        margin-top: 0.5rem;
+    }
+
     .mpris-player {
         @include elevation(1);
         @include nLayerBackground($surfaceContainer, 2);

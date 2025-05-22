@@ -12,7 +12,11 @@ window.tray {
 
     .no-items label {
         color: $onSurfaceVariant;
+        font-size: 1rem;
+        font-weight: 400;
+        margin-top: 0.5rem;
     }
+
     .tray-item {
         @include elevation(1);
         @include nLayerBackground($surfaceContainer, 2);
