@@ -47,7 +47,7 @@ class AppItem(gtk.Revealer):
         )
         self.item = item
 
-        self.icon = gtk.Image(
+        self.icon = gtk.Picture(
             css_classes=("icon",)
         )
         self.label = gtk.Label(
@@ -58,7 +58,7 @@ class AppItem(gtk.Revealer):
 
         texture = cache_icon(item.icon)
         if texture:
-            self.icon.set_from_paintable(texture)
+            self.icon.set_paintable(texture)
 
         self.box.append(self.icon)
         self.box.append(self.label)
