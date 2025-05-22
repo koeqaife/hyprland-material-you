@@ -6,6 +6,7 @@ RETRY_TIMEOUT=10
 
 START_TIME=0
 
+cd /opt/hypryou
 python utils_cy/setup.py build_ext --build-lib utils_cy --build-temp utils_cy/build
 
 while true; do
