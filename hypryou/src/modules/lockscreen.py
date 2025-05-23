@@ -182,6 +182,46 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         }
         self.update_current_player()
         self.update_expanded()
+        self.map_handler = self.connect("map", self._on_map)
+
+    def _on_map(self, *args: t.Any) -> None:
+        self.set_opacity(0.01)
+        self._fade_in()
+
+    def _fade_in(self) -> None:
+        step: float = 0.05
+
+        def _tick() -> bool:
+            current: float = self.get_opacity() or 0.0
+            new: float = current + step
+            if new < 1.0:
+                self.set_opacity(new)
+                return True
+            self.set_opacity(1.0)
+            self.disconnect(self.map_handler)
+            return False
+
+        glib.timeout_add(15, _tick)
+
+    def fade_out_and_destroy(
+        self,
+        on_done: t.Callable[[], None] | None = None
+    ) -> None:
+        step: float = 0.05
+
+        def _tick() -> bool:
+            current: float = self.get_opacity() or 1.0
+            new: float = current - step
+            if new > 0.01:
+                self.set_opacity(new)
+                return True
+            self.set_opacity(0.01)
+            if on_done:
+                on_done()
+            self.destroy()
+            return False
+
+        glib.timeout_add(15, _tick)
 
     def on_key_pressed(
         self,
@@ -354,10 +394,23 @@ class ScreenLock:
             window.present()
 
     def unlock(self, *args: t.Any) -> None:
-        self.lock_instance.unlock()
-        for window in self.windows.values():
-            window.destroy()
-        self.windows.clear()
+        windows = list(self.windows.values())
+
+        if not windows:
+            self.lock_instance.unlock()
+            return
+
+        remaining = len(windows)
+
+        def on_window_done() -> None:
+            nonlocal remaining
+            remaining -= 1
+            if remaining == 0:
+                self.windows.clear()
+                self.lock_instance.unlock()
+
+        for window in windows:
+            window.fade_out_and_destroy(on_done=on_window_done)
 
     def on_locked(self, lock_instance: session_lock.Instance) -> None:
         pass
