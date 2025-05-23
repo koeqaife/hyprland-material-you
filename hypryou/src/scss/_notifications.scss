@@ -127,8 +127,24 @@ window.notifications {
     transition: none;
     padding-bottom: 2px;
     box.notification {
-        @include nLayerBackground($background, 1);
+        &:not(.critical) {
+            @include nLayerBackground($background, 1);
+        }
         border-radius: $hyprlandRounding;
         border: 1px solid $layerBorderColor;
+    }
+}
+
+.notifications-list {
+    .notifications-categories {
+        > box > :last-child box.notification {
+            margin-bottom: 0.875rem;
+        }
+    }
+
+    .no-notifications label {
+        color: $onSurfaceVariant;
+        font-weight: 400;
+        font-size: 1rem;
     }
 }

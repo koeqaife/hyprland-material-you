@@ -2,6 +2,7 @@ import versions
 
 from gi.repository import Gtk as gtk
 from gi.repository import Gtk4LayerShell as layer_shell
+from gi.repository import Gtk4SessionLock as session_lock
 from gi.repository import Gdk as gdk
 from gi.repository import Gio as gio
 from gi.repository import GLib as glib
@@ -15,5 +16,5 @@ __all__ = [
     "versions", "gtk", "layer_shell",
     "gdk", "gio", "glib", "gsk",
     "gdk_pixbuf", "gobject",
-    "pango", "nm"
+    "pango", "nm", "session_lock"
 ]

@@ -3,6 +3,113 @@
 @use "calculated" as *;
 @use "sass:color";
 
+.mpris-player {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    background-color: $surfaceContainer;
+    .title {
+        font-size: 1rem;
+        font-weight: 400;
+        color: $onSurface;
+    }
+    .artists {
+        font-size: 0.875rem;
+        font-weight: 400;
+        color: $onSurfaceVariant;
+        font-family: "Google Sans Text";
+    }
+    .image {
+        min-height: 4rem;
+        min-width: 4rem;
+        margin-right: 1rem;
+        background-position: center;
+        background-size: contain;
+        background-repeat: no-repeat;
+        border-radius: 0.25rem;
+    }
+    .player {
+        background-color: $surfaceContainerHigh;
+        color: $onSurface;
+        font-size: 0.8rem;
+        border-radius: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .position-label {
+        color: $onSurface;
+        font-size: 0.875rem;
+    }
+
+    scale {
+        margin: 0;
+        padding: 0;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        margin-top: 0.5rem;
+        trough {
+            background-color: $secondaryContainer;
+            min-height: 0.188rem;
+        }
+        highlight {
+            background-color: $primary;
+        }
+
+        slider {
+            min-height: 0;
+            min-width: 0;
+            margin: 0;
+            background-color: transparent;
+        }
+
+        &:not(:disabled):hover trough {
+            background-color: color.mix($secondaryContainer, $onSurface, 90%);
+        }
+
+        &:disabled {
+            opacity: 1;
+            filter: none;
+        }
+    }
+
+    .actions {
+        border-radius: 100px;
+        .icon {
+            font-size: 1.125rem;
+            font-weight: 400;
+            font-variation-settings: "opsz" 20;
+            color: $onSecondaryContainer;
+        }
+        button {
+            border-radius: 1.5rem;
+            min-height: 1.5rem;
+            min-width: 1.5rem;
+            &.play-pause {
+                background-color: $secondaryContainer;
+                &:hover {
+                    background-color: color.mix($secondaryContainer, $onSurfaceVariant, 92%);
+                }
+                &:active {
+                    background-color: color.mix($secondaryContainer, $onSurfaceVariant, 86%);
+                }
+                &:not(:first-child) {
+                    margin-left: 0.188rem;
+                }
+                &:not(:last-child) {
+                    margin-right: 0.188rem;
+                }
+            }
+            &:not(.play-pause) {
+                &:hover {
+                    background-color: color.mix($surfaceContainer, $onSurfaceVariant, 92%);
+                }
+                &:active {
+                    background-color: color.mix($surfaceContainer, $onSurfaceVariant, 86%);
+                }
+            }
+        }
+    }
+}
+
 window.players {
     @include nLayerBackground($background, 1);
     min-width: 25rem;
@@ -16,7 +123,6 @@ window.players {
         font-weight: 400;
         margin-top: 0.5rem;
     }
-
     .mpris-player {
         @include elevation(1);
         @include nLayerBackground($surfaceContainer, 2);
@@ -24,115 +130,19 @@ window.players {
         margin-right: 8px;
         border-radius: $hyprlandRounding - 8px;
         min-width: 20.25rem;
-        padding: 10px;
         outline-offset: -1px;
-        .title {
-            font-size: 1rem;
-            font-weight: 400;
-            color: $onSurface;
-        }
-        .artists {
-            font-size: 0.875rem;
-            font-weight: 400;
-            color: $onSurfaceVariant;
-            font-family: "Google Sans Text";
-        }
-        .image {
-            min-height: 4rem;
-            min-width: 4rem;
-            border-radius: max($hyprlandRounding - 16px, 4px);
-            margin-right: 1rem;
-            background-position: center;
-            background-size: contain;
-            background-repeat: no-repeat;
-        }
-        .player {
-            @include nLayerBackground($surfaceContainerHigh, 3);
-            color: $onSurface;
-            font-size: 0.8rem;
-            border-radius: 0.8rem;
-            padding: 0.25rem 0.5rem;
-        }
-
-        .position-label {
-            color: $onSurface;
-            font-size: 0.875rem;
-        }
-
-        scale {
-            margin: 0;
-            padding: 0;
-            padding-top: 0.5rem;
-            padding-bottom: 0.5rem;
-            margin-top: 0.5rem;
-            trough {
-                background-color: $secondaryContainer;
-                min-height: 0.188rem;
-            }
-            highlight {
-                background-color: $primary;
-            }
-
-            slider {
-                min-height: 0;
-                min-width: 0;
-                margin: 0;
-                background-color: transparent;
-            }
-
-            &:not(:disabled):hover trough {
-                background-color: color.mix($secondaryContainer, $onSurface, 90%);
-            }
-
-            &:disabled {
-                opacity: 1;
-                filter: none;
-            }
-        }
-
+        padding: 10px;
         &.is-current {
             outline: 1px solid $secondary;
         }
-
-        .actions {
-            border-radius: 100px;
-            .icon {
-                font-size: 1.125rem;
-                font-weight: 400;
-                font-variation-settings: "opsz" 20;
-                color: $onSecondaryContainer;
-            }
-            button {
-                border-radius: 1.5rem;
-                min-height: 1.5rem;
-                min-width: 1.5rem;
-                &.play-pause {
-                    background-color: $secondaryContainer;
-                    &:hover {
-                        background-color: color.mix($secondaryContainer, $onSurfaceVariant, 92%);
-                    }
-                    &:active {
-                        background-color: color.mix($secondaryContainer, $onSurfaceVariant, 86%);
-                    }
-                    &:not(:first-child) {
-                        margin-left: 0.188rem;
-                    }
-                    &:not(:last-child) {
-                        margin-right: 0.188rem;
-                    }
-                }
-                &:not(.play-pause) {
-                    &:hover {
-                        background-color: color.mix($surfaceContainer, $onSurfaceVariant, 92%);
-                    }
-                    &:active {
-                        background-color: color.mix($surfaceContainer, $onSurfaceVariant, 86%);
-                    }
-                }
-            }
-        }
         &:first-child {
             margin-top: 8px;
+        }
+        .player {
+            @include nLayerBackground($surfaceContainerHigh, 3);
+        }
+        .image {
+            border-radius: max($hyprlandRounding - 16px, 4px);
         }
     }
 }

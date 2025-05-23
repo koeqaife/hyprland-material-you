@@ -4,7 +4,7 @@ from repository import gtk, layer_shell
 import weakref
 from src.modules.sidebar.management import ManagementBox
 from src.modules.sidebar.actions import Actions
-from src.modules.sidebar.notifications import Notifications
+from src.modules.notifications.list import Notifications
 
 
 class SidebarBox(gtk.Box):

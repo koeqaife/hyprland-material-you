@@ -115,16 +115,4 @@ window.sidebar {
         margin-right: 0.75rem;
         margin-left: 0.75rem;
     }
-
-    .notifications-categories {
-        > box > :last-child box.notification {
-            margin-bottom: 0.875rem;
-        }
-    }
-
-    .no-notifications label {
-        color: $onSurfaceVariant;
-        font-weight: 400;
-        font-size: 1rem;
-    }
 }

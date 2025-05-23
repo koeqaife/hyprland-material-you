@@ -1,0 +1,371 @@
+from src.services.state import is_locked, current_wallpaper
+from repository import session_lock, gtk, gdk, glib
+import typing as t
+import weakref
+from utils.logger import logger
+from utils import widget, toggle_css_class, Ref
+from src.variables.clock import time, full_date
+from src.services.hyprland import active_layout, show_layout
+from src.modules.players import Player
+from src.services.mpris import current_player, MprisPlayer
+from src.modules.notifications.list import Notifications
+import pwd
+import os
+from pam import pam
+from time import monotonic
+
+username = pwd.getpwuid(os.getuid()).pw_name
+
+
+def check_password(username: str, password: str) -> bool:
+    p = pam()
+    return p.authenticate(username, password)
+
+
+class ScreenLockWindow(gtk.ApplicationWindow):
+    def __init__(
+        self,
+        app: gtk.Application
+    ) -> None:
+        super().__init__(
+            application=app,
+            css_classes=("lock-screen",),
+            name="lock",
+            default_height=800,
+            default_width=1200
+        )
+
+        self.expanded = False
+        self.mpris_player: MprisPlayer | None = None
+        self.player_widget: Player | None = None
+        self.mpris_timer: int | None = None
+        self.notifications_visible = False
+        self.showed_on = monotonic()
+
+        self.dim = gtk.Box(
+            css_classes=("lock-screen-dim",),
+            hexpand=True,
+            vexpand=True
+        )
+        self.box = gtk.Box(
+            orientation=gtk.Orientation.VERTICAL,
+            css_classes=("lock-screen-box",),
+            valign=gtk.Align.CENTER,
+            halign=gtk.Align.CENTER
+        )
+
+        self.wallpaper = gtk.Picture(
+            paintable=current_wallpaper.value,
+            css_classes=("lock-wallpaper",),
+            content_fit=gtk.ContentFit.COVER
+        )
+        self.overlay = gtk.Overlay(
+            child=self.wallpaper,
+            css_classes=("lock-overlay",)
+        )
+        self.time = gtk.Label(
+            valign=gtk.Align.CENTER,
+            halign=gtk.Align.CENTER,
+            css_classes=("lock-time",)
+        )
+        self.box.append(self.time)
+
+        self.info_box = gtk.Box(
+            orientation=gtk.Orientation.VERTICAL,
+            css_classes=("lock-info-box",),
+            halign=gtk.Align.START,
+            valign=gtk.Align.START
+        )
+
+        self.date_box = gtk.Box(
+            css_classes=("lock-date-box",)
+        )
+        self.date_icon = widget.Icon(
+            "calendar_today",
+            css_classes=("date-icon",)
+        )
+        self.date = gtk.Label(
+            css_classes=("date-label",),
+            label=full_date.value
+        )
+        self.date_box.append(self.date_icon)
+        self.date_box.append(self.date)
+        self.info_box.append(self.date_box)
+
+        self.layout_box = gtk.Box(
+            css_classes=("lock-layout-box",),
+            visible=show_layout.value
+        )
+        self.layout_icon = widget.Icon(
+            "keyboard",
+            css_classes=("layout-icon",)
+        )
+        self.layout = gtk.Label(
+            css_classes=("layout-label",),
+            label=active_layout.value
+        )
+        self.layout_box.append(self.layout_icon)
+        self.layout_box.append(self.layout)
+        self.info_box.append(self.layout_box)
+
+        self.unlock_box = gtk.Box(
+            css_classes=("lock-unlock-box",),
+            orientation=gtk.Orientation.HORIZONTAL,
+            valign=gtk.Align.END,
+            halign=gtk.Align.CENTER
+        )
+        self.unlock_btn = gtk.Button(
+            css_classes=("unlock-button", "filled"),
+            label="Unlock"
+        )
+        self.unlock_entry = gtk.Entry(
+            css_classes=("lock-entry",),
+            placeholder_text="Password",
+            visibility=False
+        )
+        self.unlock_entry.set_focusable(True)
+        self.btn_revealer = gtk.Revealer(
+            child=self.unlock_btn,
+            reveal_child=True,
+            transition_type=gtk.RevealerTransitionType.SLIDE_LEFT,
+            transition_duration=250
+        )
+        self.entry_revealer = gtk.Revealer(
+            child=self.unlock_entry,
+            reveal_child=False,
+            transition_type=gtk.RevealerTransitionType.SLIDE_RIGHT,
+            transition_duration=250
+        )
+        self.unblock_btn_handler = self.unlock_btn.connect(
+            "clicked", self.on_unlock_button_clicked
+        )
+        self.entry_handlers = (
+            self.unlock_entry.connect(
+                "activate", self.on_entry_activate
+            ),
+            self.unlock_entry.connect(
+                "notify::text", self.on_text_changed
+            ),
+        )
+        self.entry_focus_controller = gtk.EventControllerFocus()
+        self.entry_focus_handler = self.entry_focus_controller.connect(
+            "leave", self.entry_focus_leave
+        )
+        self.unlock_entry.add_controller(self.entry_focus_controller)
+        self.entry_key_controller = gtk.EventControllerKey.new()
+        self.entry_key_handler = self.entry_key_controller.connect(
+            "key-pressed", self.on_key_pressed
+        )
+        self.unlock_entry.add_controller(self.entry_key_controller)
+        self.unlock_box.append(self.btn_revealer)
+        self.unlock_box.append(self.entry_revealer)
+
+        self.notifications = ScreenLockNotifications(self)
+        self.notifications.unfreeze()
+        self.box.append(self.notifications)
+
+        self.overlay.add_overlay(self.dim)
+        self.overlay.add_overlay(self.box)
+        self.overlay.add_overlay(self.info_box)
+        self.overlay.add_overlay(self.unlock_box)
+        self.set_child(self.overlay)
+        weakref.finalize(
+            self, lambda: logger.debug("LockScreenWindow finalized")
+        )
+
+        self.ref_handlers: dict[Ref[t.Any], int] = {
+            time: time.watch(self.update_time),
+            full_date: full_date.watch(self.update_date),
+            active_layout: active_layout.watch(self.update_layout),
+            show_layout: show_layout.watch(self.update_layout),
+            current_player: current_player.watch(self.update_current_player)
+        }
+        self.update_current_player()
+        self.update_expanded()
+
+    def on_key_pressed(
+        self,
+        controller: gtk.EventControllerKey,
+        keyval: int,
+        keycode: int,
+        state: gdk.ModifierType
+    ) -> bool:
+        if keyval == gdk.KEY_Escape:
+            root = self.get_root()
+            if isinstance(root, gtk.Root):
+                root.set_focus(None)
+            return True
+        return False
+
+    def on_text_changed(self, *args: t.Any) -> None:
+        toggle_css_class(self.unlock_box, "invalid", False)
+
+    def on_entry_activate(self, *args: t.Any) -> None:
+        is_correct = check_password(username, self.unlock_entry.get_text())
+        if is_correct:
+            is_locked.value = False
+        else:
+            toggle_css_class(self.unlock_box, "invalid", True)
+
+    def entry_focus_leave(self, *args: t.Any) -> None:
+        self.btn_revealer.set_reveal_child(True)
+        self.entry_revealer.set_reveal_child(False)
+        toggle_css_class(self.unlock_box, "activated", False)
+
+    def on_unlock_button_clicked(self, *args: t.Any) -> None:
+        if monotonic() - self.showed_on < 5:
+            is_locked.value = False
+            return
+        self.btn_revealer.set_reveal_child(False)
+        self.entry_revealer.set_reveal_child(True)
+        toggle_css_class(self.unlock_box, "activated", True)
+
+    def update_expanded(self) -> None:
+        self.change_expanded(
+            self.notifications_visible or
+            self.player_widget is not None
+        )
+
+    def _notifications_changed(self, is_not_empty: bool) -> None:
+        self.notifications_visible = is_not_empty
+        self.update_expanded()
+
+    def _mpris_timer(self) -> None:
+        if self.player_widget:
+            self.player_widget.update_slider_position()
+            return True
+        self.mpris_timer = None
+
+    def update_current_player(self, *args: t.Any) -> None:
+        current = current_player.value[1] if current_player.value else None
+        if current == self.mpris_player:
+            return
+
+        if self.player_widget:
+            self.player_widget.destroy()
+            self.box.remove(self.player_widget)
+
+        if current is None or current.playback_status != "Playing":
+            self.player_widget = None
+            self.mpris_player = None
+            if self.mpris_timer:
+                glib.source_remove(self.mpris_timer)
+                self.mpris_timer = None
+            return
+
+        self.mpris_player = current
+        self.player_widget = Player(current)
+        self.player_widget.set_visible(self.expanded)
+        # Used 1s instead of 500ms for optimization
+        self.mpris_timer = glib.timeout_add(1000, self._mpris_timer)
+
+        self.box.insert_child_after(self.player_widget, self.time)
+        self.update_expanded()
+
+    def update_layout(self, *args: t.Any) -> None:
+        if show_layout.value:
+            self.layout.set_label(active_layout.value)
+            self.layout_box.set_visible(True)
+        else:
+            self.layout_box.set_visible(False)
+
+    def change_expanded(self, new_value: bool) -> None:
+        self.expanded = new_value
+        toggle_css_class(self, "is-expanded", new_value)
+        self.update_time()
+        if self.expanded:
+            self.time.set_halign(gtk.Align.START)
+            self.box.set_valign(gtk.Align.FILL)
+            self.box.set_vexpand(True)
+        else:
+            self.time.set_halign(gtk.Align.CENTER)
+            self.box.set_valign(gtk.Align.CENTER)
+            self.box.set_vexpand(False)
+        self.notifications.set_visible(self.expanded)
+        if self.player_widget:
+            self.player_widget.set_visible(self.expanded)
+
+    def update_date(self, new_date: str) -> None:
+        self.date.set_label(new_date)
+
+    def update_time(self, *args: t.Any) -> None:
+        if self.expanded:
+            self.time.set_label(time.value)
+        else:
+            self.time.set_label("\n".join(time.value.split(":")))
+
+    def destroy(self) -> None:
+        self.unlock_btn.disconnect(self.unblock_btn_handler)
+        for handler_id in self.entry_handlers:
+            self.unlock_entry.disconnect(handler_id)
+        self.unlock_entry.remove_controller(self.entry_focus_controller)
+        self.entry_focus_controller.disconnect(self.entry_focus_handler)
+        self.unlock_entry.remove_controller(self.entry_key_controller)
+        self.entry_key_controller.disconnect(self.entry_key_handler)
+        for ref, handler_id in self.ref_handlers.items():
+            ref.unwatch(handler_id)
+        if self.mpris_timer:
+            glib.source_remove(self.mpris_timer)
+        if self.player_widget:
+            self.box.remove(self.player_widget)
+            self.player_widget.destroy()
+        self.box.remove(self.notifications)
+        self.notifications.destroy()
+        self.notifications = None  # type: ignore
+        super().destroy()
+
+
+class ScreenLockNotifications(Notifications):
+    def __init__(self, window: ScreenLockWindow) -> None:
+        self.window = window
+        super().__init__(True, False)
+
+    def update_no_notifications(self) -> None:
+        self.window._notifications_changed(len(self.items) > 0)
+
+
+class ScreenLock:
+    def __init__(self, app: gtk.Application) -> None:
+        self.app = app
+        self.lock_instance = session_lock.Instance.new()
+        self.lock_instance.connect("locked", self.on_locked)
+        self.lock_instance.connect("unlocked", self.on_unlocked)
+        self.lock_instance.connect("failed", self.on_failed)
+
+        self.windows: dict[gdk.Monitor, ScreenLockWindow] = {}
+        is_locked.watch(self.on_is_locked)
+
+    def on_is_locked(self, new_value: bool) -> None:
+        locked = self.lock_instance.is_locked()
+
+        if new_value != locked:
+            if new_value:
+                self.lock()
+            else:
+                self.unlock()
+
+    def lock(self) -> None:
+        if not self.lock_instance.lock():
+            return
+
+        display = t.cast(gdk.Display, gdk.Display.get_default())
+        for monitor in display.get_monitors():
+            window = ScreenLockWindow(self.app)
+            self.windows[monitor] = window
+            self.lock_instance.assign_window_to_monitor(window, monitor)
+            window.present()
+
+    def unlock(self, *args: t.Any) -> None:
+        self.lock_instance.unlock()
+        for window in self.windows.values():
+            window.destroy()
+        self.windows.clear()
+
+    def on_locked(self, lock_instance: session_lock.Instance) -> None:
+        pass
+
+    def on_unlocked(self, lock_instance: session_lock.Instance) -> None:
+        pass
+
+    def on_failed(self, lock_instance: session_lock.Instance) -> None:
+        pass

@@ -1,6 +1,26 @@
 @use "colors" as *;
 @use "sass:color";
 
+button.filled {
+    border-radius: 2rem;
+    min-height: 2rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    background-color: $primary;
+
+    label {
+        font-size: 1rem;
+        font-weight: 400;
+        color: $onPrimary;
+    }
+    &:hover {
+        background-color: color.mix($primary, $inverseOnSurface, 82%);
+    }
+    &:active {
+        background-color: color.mix($primary, $inverseOnSurface, 75%);
+    }
+}
+
 button.outlined {
     border-radius: 100px;
     min-height: 2rem;

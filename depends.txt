@@ -5,6 +5,7 @@ dart-sass
 Sync:
 python
 python-gobject
+python-pam
 gtk4
 libgirepository
 hyprland
@@ -42,3 +43,4 @@ Versions:
 - python-numpy: Used 2.2.5-1
 - cython: Used 3.0.12-1
 - hyprsunset: Used 0.2.0-4
+- python-pam: Used 2.0.2-4

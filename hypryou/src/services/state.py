@@ -14,10 +14,11 @@ current_wallpaper = Ref[gdk.Texture | None](
     name="wallpaper_texture",
     types=(NoneType, gdk.Texture)
 )
+is_locked = Ref(False, name="is_locked")
 
 
 class OpenedWindowsWatcher(Signals):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.old_set: set[str] = set()
 

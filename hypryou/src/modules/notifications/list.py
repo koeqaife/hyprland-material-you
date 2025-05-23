@@ -1,22 +1,10 @@
 from repository import gtk
-from src.services.notifications import notifications, NotificationUrgency
+from src.services.notifications import notifications
 from src.modules.notifications.item import NotificationItem
 from src.modules.notifications.item import NotificationRevealer
 import typing as t
-import json
-from config import CONFIG_DIR
-from os.path import join as pjoin
 
 T = t.TypeVar("T")
-
-messengers_file = pjoin(CONFIG_DIR, "assets", "messengers.json")
-try:
-    with open(messengers_file, "r") as f:
-        messengers = list(json.load(f))
-except Exception:
-    messengers = []
-
-message_prefixes = ("im", "call", "email")
 
 
 def diff_keys(
@@ -31,8 +19,16 @@ def diff_keys(
 
 class Notifications(gtk.ScrolledWindow):
     def __init__(
-        self
+        self,
+        hide_sensitive_content: bool = False,
+        no_notifications_label: bool = True,
+        item: type[NotificationItem] = NotificationItem,
+        revealer: type[NotificationRevealer] = NotificationRevealer
     ) -> None:
+        self.hide_content = hide_sensitive_content
+        self.show_no_notifications_label = no_notifications_label
+        self._item = item
+        self._revealer = revealer
         self.box = gtk.Box(
             orientation=gtk.Orientation.VERTICAL,
             valign=gtk.Align.START,
@@ -42,18 +38,19 @@ class Notifications(gtk.ScrolledWindow):
             child=self.box,
             vscrollbar_policy=gtk.PolicyType.AUTOMATIC,
             hscrollbar_policy=gtk.PolicyType.NEVER,
-            css_classes=("notifications-scrollable",),
+            css_classes=("notifications-scrollable", "notifications-list"),
             hexpand=True,
             vexpand=True
         )
 
         self.items: dict[int, tuple[gtk.Box, NotificationRevealer]] = {}
-        self.no_notifications_label = gtk.Revealer(
-            transition_type=gtk.RevealerTransitionType.SLIDE_DOWN,
-            transition_duration=250,
-            child=gtk.Label(label="No notifications"),
-            css_classes=("no-notifications",)
-        )
+        if self.show_no_notifications_label:
+            self.no_notifications_label = gtk.Revealer(
+                transition_type=gtk.RevealerTransitionType.SLIDE_DOWN,
+                transition_duration=250,
+                child=gtk.Label(label="No notifications"),
+                css_classes=("no-notifications",)
+            )
         self.critical = gtk.Box(
             css_classes=("notifications",),
             orientation=gtk.Orientation.VERTICAL,
@@ -71,12 +68,14 @@ class Notifications(gtk.ScrolledWindow):
         )
 
         self.children = (
-            self.no_notifications_label,
+            getattr(self, "no_notifications_label", None),
             self.critical,
             self.messages,
             self.other
         )
         for child in self.children:
+            if not isinstance(child, gtk.Widget):
+                continue
             self.box.append(child)
 
         self.freezed = True
@@ -99,24 +98,21 @@ class Notifications(gtk.ScrolledWindow):
             self.on_change()
 
     def update_no_notifications(self) -> None:
+        if not self.show_no_notifications_label:
+            return
         if len(self.items) > 0:
             self.no_notifications_label.set_reveal_child(False)
         else:
             self.no_notifications_label.set_reveal_child(True)
 
     def get_box_for(self, item: NotificationItem) -> gtk.Box:
-        if item.item.urgency == NotificationUrgency.CRITICAL:
-            return self.critical
-
-        category = item.item.hints.get("category")
-        if category is not None:
-            if any(category.startswith(prefix) for prefix in message_prefixes):
-                return self.messages
-
-        if any(m in item.item.app_name.lower() for m in messengers):
+        category = item.get_detected_category()
+        if not category:
+            return self.other
+        if category == "messages":
             return self.messages
-
-        return self.other
+        if category == "critical":
+            return self.critical
 
     def destroy(self) -> None:
         if self.handler_id != -1:
@@ -147,13 +143,14 @@ class Notifications(gtk.ScrolledWindow):
 
         for key in added_keys:
             if key not in self.items and key in notifications.value:
-                item = NotificationItem(
-                    item=notifications.value[key]
+                item = self._item(
+                    item=notifications.value[key],
+                    hide_sensitive_content=self.hide_content
                 )
                 box = self.get_box_for(item)
                 self.items[key] = (
                     box,
-                    NotificationRevealer(
+                    self._revealer(
                         item=item
                     )
                 )

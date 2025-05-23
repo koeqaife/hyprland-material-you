@@ -1,0 +1,118 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "calculated" as *;
+@use "sass:color";
+
+window.lock-screen {
+    background-color: $background;
+
+    .lock-screen-dim {
+        background-color: rgba($background, 0.5);
+    }
+
+    .lock-screen-box {
+        min-width: 30rem;
+    }
+
+    .lock-time {
+        font-size: 14rem;
+        font-weight: 400;
+        font-feature-settings: "tnum";
+        font-family: "Google Sans Display";
+        line-height: 0.7;
+        color: $primary;
+        letter-spacing: -0.06em;
+        transition: none;
+    }
+
+    .lock-info-box {
+        margin-left: 2.5rem;
+        margin-top: 2.5rem;
+        label.icon {
+            font-size: 1.125rem;
+            font-weight: 500;
+            margin-right: 0.25rem;
+            color: $onSurface;
+            font-variation-settings: "opsz" 20;
+        }
+        label:not(.icon) {
+            font-size: 1.125rem;
+            font-weight: 400;
+            color: $onSurface;
+        }
+    }
+
+    .lock-unlock-box {
+        @include elevation(2);
+        margin: 0.5rem;
+        padding: 0.5rem;
+        background-color: $background;
+        border-radius: 3rem;
+        margin-bottom: 5rem;
+
+        entry {
+            margin: 0;
+            background-color: $surfaceContainerHigh;
+            outline: none;
+            border: none;
+            color: $onSurface;
+            border-radius: 2rem;
+
+            placeholder {
+                opacity: 1;
+                color: $onSurfaceVariant;
+            }
+        }
+
+        &.invalid {
+            entry {
+                outline: 0.125rem solid $error;
+            }
+        }
+        &.activated {
+            border-radius: 1rem;
+            entry {
+            border-radius: 0.5rem;
+            }
+        }
+    }
+
+    .mpris-player {
+        margin: 0;
+        margin-bottom: 1rem;
+        border-radius: 1rem;
+    }
+
+    .notifications-categories {
+        min-width: 30rem;
+    }
+
+    .notification {
+        &:not(.critical) {
+            background-color: $surfaceContainer;
+        }
+        border-radius: 1rem;
+        min-width: 29rem;
+    }
+
+    .notification-revealer,
+    .notification-revealer-box {
+        padding: 0;
+    }
+
+    .notifications-categories {
+        margin-bottom: 8rem;
+    }
+
+    &.is-expanded {
+        .lock-time {
+            margin-top: 2.5rem;
+            font-size: 6rem;
+            margin-bottom: 1rem;
+        }
+    }
+
+    button {
+        outline: none;
+    }
+}

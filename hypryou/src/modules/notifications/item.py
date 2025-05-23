@@ -1,19 +1,57 @@
 from repository import gtk, glib, pango, gdk, gio
 from src.services.notifications import Notification, NotificationClosedReason
+from src.services.notifications import Category, NotificationUrgency
 from utils import widget
-# from src.variables import Globals
 import typing as t
 from utils import get_formatted_time, toggle_css_class
 from config import Settings
 import datetime
+import json
+from config import CONFIG_DIR
+from os.path import join as pjoin
+
+safe_categories: tuple[Category, ...] = (
+    "device",
+    "network",
+    "transfer",
+    "call"
+)
+
+messengers_file = pjoin(CONFIG_DIR, "assets", "messengers.json")
+try:
+    with open(messengers_file, "r") as f:
+        messengers = list(json.load(f))
+except Exception:
+    messengers = []
+
+message_prefixes = ("im", "call", "email")
+
+
+def get_is_sensitive(item: "NotificationItem") -> bool:
+    if item.item.urgency == NotificationUrgency.CRITICAL:
+        return False
+
+    category = item.item.hints.get("category")
+    if (
+        (category
+         and not any(
+             category.startswith(prefix) for prefix in safe_categories)
+         )
+        or item.get_detected_category() == "messages"
+    ):
+        return True
+
+    return False
 
 
 class NotificationItem(gtk.Box):
     def __init__(
         self,
         item: Notification,
-        show_dismiss: bool = False
+        show_dismiss: bool = False,
+        hide_sensitive_content: bool = False
     ) -> None:
+        self.hide_content = hide_sensitive_content
         if item.hints.get("transient") and show_dismiss:
             show_dismiss = False
         self.item = item
@@ -24,6 +62,7 @@ class NotificationItem(gtk.Box):
             valign=gtk.Align.START
         )
 
+        self._cached_detected: t.Literal["critical", "messages"] | None = None
         self.conns: dict[gtk.Widget, int] = {}
 
         # Notification header
@@ -137,6 +176,26 @@ class NotificationItem(gtk.Box):
         self.handler_id = item.watch("changed", self.update_values)
         self.update_values()
 
+    def get_detected_category(
+        self
+    ) -> t.Literal["critical", "messages"] | None:
+        if self._cached_detected is not None:
+            return self._cached_detected
+
+        if self.item.urgency == NotificationUrgency.CRITICAL:
+            self._cached_detected = "critical"
+            return "critical"
+
+        category = self.item.hints.get("category")
+        if category is not None:
+            if any(category.startswith(prefix) for prefix in message_prefixes):
+                self._cached_detected = "messages"
+                return "messages"
+
+        if any(m in self.item.app_name.lower() for m in messengers):
+            self._cached_detected = "messages"
+            return "messages"
+
     def on_action(self, action: str) -> None:
         self.item.action(action)
         if not self.item.hints.get("resident"):
@@ -150,7 +209,22 @@ class NotificationItem(gtk.Box):
             self.item.dismiss()
 
     def update_values(self, *args: t.Any) -> None:
+        hide_content = (
+            self.hide_content and get_is_sensitive(self)
+        )
+
         settings = Settings()
+        self.app_title.set_label(self.item.app_name)
+
+        _datetime = datetime.datetime.now()
+        self.time.set_label(
+            get_formatted_time(
+                _datetime,
+                settings.get("time_format") == "12"
+            )
+        )
+        toggle_css_class(self, "critical", self.item.urgency == 2)
+
         app_icon = self.item.get_app_icon()
         display = gdk.Display.get_default()
         icon_theme = gtk.IconTheme.get_for_display(display)
@@ -171,6 +245,11 @@ class NotificationItem(gtk.Box):
                 )
                 if texture:
                     self.app_icon.set_from_paintable(texture)
+
+        self.body_box.set_visible(not hide_content)
+        self.actions_box.set_visible(not hide_content)
+        if hide_content:
+            return
 
         actions = self.item.actions
         for button in self.action_buttons:
@@ -206,19 +285,10 @@ class NotificationItem(gtk.Box):
             self.image.set_visible(False)
             self.image.set_size_request(0, 0)
 
-        self.app_title.set_label(self.item.app_name)
-
-        _datetime = datetime.datetime.now()
-        self.time.set_label(
-            get_formatted_time(
-                _datetime,
-                settings.get("time_format") == "12"
-            )
-        )
-
         self.title.set_label(self.item.summary)
         self.body_text.set_label(self.item.body)
-        toggle_css_class(self, "critical", self.item.urgency == 2)
+        self.body_text.set_visible(self.item.body != "")
+        self.title.set_visible(self.item.summary != "")
 
     def destroy(self) -> None:
         self.item.unwatch("changed", self.handler_id)

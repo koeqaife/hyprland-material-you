@@ -85,6 +85,9 @@ class CliRequest:
         }
         launch_detached(apps[app])
 
+    def do_lock(self, *args: str) -> None:
+        state.is_locked.value = True
+
 
 async def handle_client(
     reader: asyncio.StreamReader, writer: asyncio.StreamWriter
