@@ -274,11 +274,9 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         toggle_css_class(self, "is-expanded", new_value)
         self.update_time()
         if self.expanded:
-            self.time.set_halign(gtk.Align.START)
             self.box.set_valign(gtk.Align.FILL)
             self.box.set_vexpand(True)
         else:
-            self.time.set_halign(gtk.Align.CENTER)
             self.box.set_valign(gtk.Align.CENTER)
             self.box.set_vexpand(False)
         self.notifications.set_visible(self.expanded)
