@@ -43,7 +43,7 @@ def get_formatted_time(
 def get_full_date(
     date: datetime.datetime
 ) -> str:
-    return date.strftime('%A, %d %b %Y')
+    return date.strftime('%a, %d %b %Y')
 
 
 def escape_markup(text: str) -> str:
