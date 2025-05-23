@@ -55,24 +55,12 @@ def rgba_to_rgb(rgba: RGBA) -> str:
     return f'{rgba[0]}, {rgba[1]}, {rgba[2]}'
 
 
-def get_color(scheme: DynamicScheme, color_name: str) -> DynamicColor | None:
-    color = getattr(scheme, color_name)
+def get_color(color_name: str) -> DynamicColor | None:
+    color = getattr(MaterialDynamicColors, color_name, None)
     if isinstance(color, DynamicColor):
         return color
     else:
         return None
-
-
-class Color():
-    def __init__(self) -> None:
-        pass
-
-    def __call__(self, name: str) -> str:
-        color_name: DynamicColor = getattr(MaterialDynamicColors, name)
-        if hasattr(color_name, "get_hct"):
-            return rgb_to_hex(color_name.get_hct(SchemeTonalSpot).to_rgba())
-        else:
-            return "#000000"
 
 
 class ColorsCache:
@@ -91,10 +79,10 @@ class ColorsCache:
         self.is_dark = is_dark
         if isinstance(colors, DynamicScheme):
             for color_name in vars(MaterialDynamicColors).keys():
-                color = get_color(colors, color_name)
+                color = get_color(color_name)
                 if color is None:
-                    return
-                self.colors[str(color)] = rgb_to_hex(
+                    continue
+                self.colors[color_name] = rgb_to_hex(
                     color.get_hct(colors).to_rgba()
                 )
         else:
@@ -150,11 +138,11 @@ additional = {
 
 def generate_color_map(scheme: DynamicScheme) -> dict[str, str]:
     color_map: dict[str, str] = {}
-    for color in vars(MaterialDynamicColors).keys():
-        color_name = getattr(MaterialDynamicColors, color)
-        if hasattr(color_name, "get_hct"):
-            rgba = color_name.get_hct(scheme).to_rgba()
-            color_map[color.strip()] = rgb_to_hex(rgba)
+    for color_name in vars(MaterialDynamicColors).keys():
+        color = get_color(color_name)
+        if color is not None:
+            rgba = color.get_hct(scheme).to_rgba()
+            color_map[color_name] = rgb_to_hex(rgba)
     return color_map
 
 
@@ -304,25 +292,27 @@ def generate_templates(
 
     for file in ready_templates:
         _template = ""
-        for color in vars(MaterialDynamicColors).keys():
-            color_name = getattr(MaterialDynamicColors, color)
-            if hasattr(color_name, "get_hct"):
-                rgba = color_name.get_hct(scheme).to_rgba()
-                hex_color = rgb_to_hex(rgba)
-                rgb_color = rgba_to_rgb(rgba)
+        for color_name in vars(MaterialDynamicColors).keys():
+            color = get_color(color_name)
+            if color is None:
+                continue
+
+            rgba = color.get_hct(scheme).to_rgba()
+            hex_color = rgb_to_hex(rgba)
+            rgb_color = rgba_to_rgb(rgba)
+            new_line = ready_templates[file].format(
+                name=color_name,
+                hex=hex_color,
+                rgb=rgb_color
+            )
+            _template += new_line
+            if color_name in additional:
                 new_line = ready_templates[file].format(
-                    name=color,
+                    name=additional[color_name],
                     hex=hex_color,
                     rgb=rgb_color
                 )
                 _template += new_line
-                if color in additional:
-                    new_line = ready_templates[file].format(
-                        name=additional[color],
-                        hex=hex_color,
-                        rgb=rgb_color
-                    )
-                    _template += new_line
 
         new_path = join(output_folder, os.path.basename(file))
         with open(new_path, 'w') as f:
