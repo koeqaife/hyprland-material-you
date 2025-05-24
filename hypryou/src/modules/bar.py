@@ -62,6 +62,9 @@ class Workspaces(gtk.Box):
             active_workspace: active_workspace.watch(self.update_active),
             workspace_ids: workspace_ids.watch(self.update_empty)
         }
+        self.settings_handler = Settings().watch(
+            "separated_workspaces", self.update_buttons, False
+        )
 
         self._last_scroll = 0.0
         self._scroll = gtk.EventControllerScroll.new(
@@ -95,13 +98,14 @@ class Workspaces(gtk.Box):
         self.update_empty(workspace_ids.value)
 
     def destroy(self) -> None:
-        for button in self.buttons:
+        for button in self.buttons.values():
             button.destroy()
             self.remove(button)
         self.buttons.clear()
 
         self._scroll.disconnect(self._scroll_connection)
         self.remove_controller(self._scroll)
+        Settings().unwatch("separated_workspaces", self.settings_handler)
         self._scroll = None  # type: ignore
         for ref, handler_id in self.ref_handlers.items():
             ref.unwatch(handler_id)
