@@ -34,6 +34,7 @@ default_settings: dict[str, t.Any] = {
     "light_icons": "Tela-nord-light",
     "opacity": 0.9,
     "wallpaper": f"{CONFIG_DIR}/assets/default_wallpaper.jpg",
+    "separated_workspaces": False,
 
     "browser": "firefox",
     "editor": "code",

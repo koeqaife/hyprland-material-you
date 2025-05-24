@@ -34,6 +34,7 @@ class WorkspaceButton(gtk.Button):
         )
 
         self.id = id
+        print(self.id)
 
         self.connected = self.connect("clicked", self.on_clicked)
 
@@ -45,7 +46,8 @@ class WorkspaceButton(gtk.Button):
 
 
 class Workspaces(gtk.Box):
-    def __init__(self) -> None:
+    def __init__(self, monitor_id: int) -> None:
+        self.monitor_id = monitor_id
         super().__init__(
             css_classes=("workspaces",),
             valign=gtk.Align.CENTER
@@ -53,15 +55,9 @@ class Workspaces(gtk.Box):
 
         self._old_active = 0
 
-        self.buttons: list[WorkspaceButton] = [
-            WorkspaceButton(workspace + 1) for workspace in range(10)
-        ]
+        self.buttons: dict[int, WorkspaceButton] = {}
 
-        for button in self.buttons:
-            self.append(button)
-
-        self.update_active(active_workspace.value)
-        self.update_empty(workspace_ids.value)
+        self.update_buttons()
 
         self.ref_handlers: dict[Ref[t.Any], int] = {
             active_workspace: active_workspace.watch(self.update_active),
@@ -76,6 +72,29 @@ class Workspaces(gtk.Box):
             "scroll", self.on_scroll
         )
         self.add_controller(self._scroll)
+
+    def update_buttons(self, *args: t.Any) -> None:
+        if self.buttons:
+            for button in self.buttons.values():
+                button.destroy()
+                self.remove(button)
+            self.buttons.clear()
+        settings = Settings()
+        monitor_multiplier = (
+            self.monitor_id + 1 if settings.get("separated_workspaces") else 1
+        )
+
+        for workspace in (
+            range(10 * (monitor_multiplier - 1), 10 * monitor_multiplier)
+        ):
+            self.buttons[workspace + 1] = WorkspaceButton(workspace + 1)
+
+        for button in self.buttons.values():
+            self.append(button)
+
+        print(self.buttons)
+        self.update_active(active_workspace.value)
+        self.update_empty(workspace_ids.value)
 
     def destroy(self) -> None:
         for button in self.buttons:
@@ -112,17 +131,17 @@ class Workspaces(gtk.Box):
         if self._old_active == new_value:
             return
         if self._old_active:
-            toggle_css_class(self.buttons[self._old_active-1], "active", False)
-        if new_value > 10:
+            toggle_css_class(self.buttons[self._old_active], "active", False)
+        if new_value not in self.buttons.keys():
             return
-        toggle_css_class(self.buttons[new_value-1], "active", True)
+        toggle_css_class(self.buttons[new_value], "active", True)
         self._old_active = new_value
 
     def update_empty(
         self,
         not_empty: set[int]
     ) -> None:
-        for button in self.buttons:
+        for button in self.buttons.values():
             toggle_css_class(button, "empty", button.id not in not_empty)
 
 
@@ -562,7 +581,7 @@ class OpenAppsMenu(gtk.Button):
 
 
 class ModulesLeft(gtk.Box):
-    def __init__(self) -> None:
+    def __init__(self, monitor_id: int) -> None:
         super().__init__(
             css_classes=("modules-left",)
         )
@@ -580,12 +599,12 @@ class ModulesLeft(gtk.Box):
 
 
 class ModulesCenter(gtk.Box):
-    def __init__(self) -> None:
+    def __init__(self, monitor_id: int) -> None:
         super().__init__(
             css_classes=("modules-center",)
         )
         self.children = (
-            Workspaces(),
+            Workspaces(monitor_id),
         )
         for child in self.children:
             self.append(child)
@@ -597,7 +616,7 @@ class ModulesCenter(gtk.Box):
 
 
 class ModulesRight(gtk.Box):
-    def __init__(self) -> None:
+    def __init__(self, monitor_id: int) -> None:
         super().__init__(
             css_classes=("modules-right",)
         )
@@ -618,7 +637,12 @@ class ModulesRight(gtk.Box):
 
 
 class Bar(widget.LayerWindow):
-    def __init__(self, application: gtk.Application, monitor: gdk.Monitor):
+    def __init__(
+        self,
+        application: gtk.Application,
+        monitor: gdk.Monitor,
+        monitor_id: int
+    ) -> None:
         super().__init__(
             application,
             height=1,
@@ -634,9 +658,9 @@ class Bar(widget.LayerWindow):
         )
 
         self.center_box = gtk.CenterBox(
-            start_widget=ModulesLeft(),
-            center_widget=ModulesCenter(),
-            end_widget=ModulesRight()
+            start_widget=ModulesLeft(monitor_id),
+            center_widget=ModulesCenter(monitor_id),
+            end_widget=ModulesRight(monitor_id)
         )
 
         self.set_child(self.center_box)

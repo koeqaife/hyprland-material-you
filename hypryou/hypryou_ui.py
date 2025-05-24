@@ -159,7 +159,7 @@ class HyprYou(gtk.Application):
                     monitor.get_model()
                 )
                 windows: list[gtk.ApplicationWindow] = [
-                    Bar(self, monitor),
+                    Bar(self, monitor, i),
                     Notifications(self, monitor, i),
                     WallpapersWindow(self, monitor)
                 ]
