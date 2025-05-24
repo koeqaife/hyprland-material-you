@@ -114,9 +114,20 @@ class ScreenLockWindow(gtk.ApplicationWindow):
             valign=gtk.Align.END,
             halign=gtk.Align.CENTER
         )
+        self.unlock_btn_box = gtk.Box(
+            css_classes=("unlock-button-box",)
+        )
+        self.unlock_btn_icon = widget.Icon(
+            "lock_open"
+        )
+        self.unlock_btn_label = gtk.Label(
+            label="Unlock"
+        )
+        self.unlock_btn_box.append(self.unlock_btn_icon)
+        self.unlock_btn_box.append(self.unlock_btn_label)
         self.unlock_btn = gtk.Button(
             css_classes=("unlock-button", "filled"),
-            label="Unlock"
+            child=self.unlock_btn_box
         )
         self.unlock_entry = gtk.Entry(
             css_classes=("lock-entry",),
@@ -183,6 +194,13 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         self.update_current_player()
         self.update_expanded()
         self.map_handler = self.connect("map", self._on_map)
+        self.change_icon_timeout: int | None = glib.timeout_add(
+            5000, self.change_button_icon
+        )
+
+    def change_button_icon(self) -> None:
+        self.change_icon_timeout = None
+        self.unlock_btn_icon.set_label("lock")
 
     def _on_map(self, *args: t.Any) -> None:
         self.set_opacity(0.01)
@@ -347,6 +365,8 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         if self.player_widget:
             self.box.remove(self.player_widget)
             self.player_widget.destroy()
+        if self.change_icon_timeout:
+            glib.source_remove(self.change_icon_timeout)
         self.box.remove(self.notifications)
         self.notifications.destroy()
         self.notifications = None  # type: ignore
