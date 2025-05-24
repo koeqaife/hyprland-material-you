@@ -13,6 +13,11 @@ button.filled {
         font-weight: 400;
         color: $onPrimary;
     }
+    .icon {
+        font-weight: 500;
+        margin-right: 0.5rem;
+        font-variation-settings: "opsz" 20;
+    }
     &:hover {
         background-color: color.mix($primary, $inverseOnSurface, 82%);
     }
@@ -32,6 +37,11 @@ button.outlined {
         font-size: 1rem;
         font-weight: 400;
         color: $primary;
+    }
+    .icon {
+        font-weight: 500;
+        margin-right: 0.5rem;
+        font-variation-settings: "opsz" 20;
     }
     &:hover {
         background-color: color.mix(transparent, $onSurfaceVariant, 92%);
@@ -53,6 +63,11 @@ button.attention {
         font-weight: 400;
         color: $onError;
     }
+    .icon {
+        font-weight: 500;
+        margin-right: 0.5rem;
+        font-variation-settings: "opsz" 20;
+    }
     &:hover {
         background-color: color.mix($error, $inverseOnSurface, 82%);
     }
@@ -72,6 +87,11 @@ button.attention-outlined {
         font-size: 1rem;
         font-weight: 400;
         color: $error;
+    }
+    .icon {
+        font-weight: 500;
+        margin-right: 0.5rem;
+        font-variation-settings: "opsz" 20;
     }
     &:hover {
         background-color: color.mix(transparent, $onSurfaceVariant, 92%);
@@ -93,7 +113,6 @@ button.icon-outlined {
         font-weight: 400;
         color: $onSurface;
     }
-
     &:hover {
         background-color: color.mix(transparent, $onSurfaceVariant, 92%);
     }
@@ -114,7 +133,6 @@ button.icon-outlined-attention {
         font-weight: 400;
         color: $error;
     }
-
     &:hover {
         background-color: color.mix(transparent, $onSurfaceVariant, 92%);
     }
@@ -133,7 +151,6 @@ button.icon-default {
         font-weight: 400;
         color: $onSurface;
     }
-
     &:hover {
         background-color: color.mix(transparent, $onSurfaceVariant, 92%);
     }
@@ -154,7 +171,6 @@ button.icon-tonal {
         font-weight: 400;
         color: $onSecondaryContainer;
     }
-
     &:hover {
         background-color: color.mix($secondaryContainer, $onSurfaceVariant, 88%);
     }
