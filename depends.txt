@@ -1,6 +1,7 @@
 AUR:
 gtk4-layer-shell
 dart-sass
+python-materialyoucolor-git
 
 Sync:
 python
@@ -44,3 +45,4 @@ Versions:
 - cython: Used 3.0.12-1
 - hyprsunset: Used 0.2.0-4
 - python-pam: Used 2.0.2-4
+- python-materialyoucolor: Used 2.0.10
