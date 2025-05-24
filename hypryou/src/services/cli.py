@@ -10,6 +10,14 @@ from src.services.mpris import current_player
 import subprocess
 import shlex
 from src.services import state
+import shutil
+
+
+screenshot_mode_args = {
+    "region": "-m region",
+    "active": "-m active -m output",
+    "window": "-m window"
+}
 
 
 def launch_detached(exec: str) -> None:
@@ -23,9 +31,7 @@ def launch_detached(exec: str) -> None:
         stderr=subprocess.DEVNULL,
         preexec_fn=os.setsid,
         cwd=cwd,
-        shell=True,
-        env=os.environ.copy(),
-        executable="/bin/bash"
+        env=os.environ.copy()
     )
 
 
@@ -85,8 +91,22 @@ class CliRequest:
         }
         launch_detached(apps[app])
 
-    def do_lock(self, *args: str) -> None:
+    def do_lock(self, args: str) -> None:
         state.is_locked.value = True
+
+    def do_screenshot(self, _mode: str) -> None:
+        mode = _mode.split()[0] if _mode else "region"
+        args = []
+        args.append(screenshot_mode_args[mode])
+        if "freeze" in _mode:
+            args.append("--freeze")
+        if shutil.which("swappy"):
+            args.append("--raw")
+            command = f"bash -c \"hyprshot {" ".join(args)} | swappy -f -\""
+            launch_detached(command)
+        else:
+            command = f"bash -c \"hyprshot {" ".join(args)}\""
+            launch_detached(command)
 
 
 async def handle_client(
