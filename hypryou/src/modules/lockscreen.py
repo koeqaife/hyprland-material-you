@@ -15,6 +15,7 @@ from pam import pam
 from time import monotonic
 
 username = pwd.getpwuid(os.getuid()).pw_name
+close_player = Ref(False, name="lock_close_player")
 
 
 def check_password(username: str, password: str) -> bool:
@@ -27,6 +28,8 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         self,
         app: gtk.Application
     ) -> None:
+        if close_player.value:
+            close_player.value = False
         super().__init__(
             application=app,
             css_classes=("lock-screen",),
@@ -37,7 +40,7 @@ class ScreenLockWindow(gtk.ApplicationWindow):
 
         self.expanded = False
         self.mpris_player: MprisPlayer | None = None
-        self.player_widget: Player | None = None
+        self.player_widget: ScreenLockPlayer | None = None
         self.mpris_timer: int | None = None
         self.notifications_visible = False
         self.showed_on = monotonic()
@@ -189,7 +192,8 @@ class ScreenLockWindow(gtk.ApplicationWindow):
             full_date: full_date.watch(self.update_date),
             active_layout: active_layout.watch(self.update_layout),
             show_layout: show_layout.watch(self.update_layout),
-            current_player: current_player.watch(self.update_current_player)
+            current_player: current_player.watch(self.update_current_player),
+            close_player: close_player.watch(self.update_current_player)
         }
         self.update_current_player()
         self.update_expanded()
@@ -201,6 +205,12 @@ class ScreenLockWindow(gtk.ApplicationWindow):
     def change_button_icon(self) -> None:
         self.change_icon_timeout = None
         self.unlock_btn_icon.set_label("lock")
+
+    def close_player(self) -> None:
+        if self.mpris_player is None:
+            return
+        self.mpris_player.pause()
+        close_player.value = True
 
     def _on_map(self, *args: t.Any) -> None:
         self.set_opacity(0.01)
@@ -296,26 +306,32 @@ class ScreenLockWindow(gtk.ApplicationWindow):
 
     def update_current_player(self, *args: t.Any) -> None:
         current = current_player.value[1] if current_player.value else None
-        if current == self.mpris_player:
+        if current == self.mpris_player and not close_player.value:
             return
 
         if self.player_widget:
             self.player_widget.destroy()
             self.box.remove(self.player_widget)
 
-        if current is None or current.playback_status != "Playing":
+        if (
+            current is None
+            or current.playback_status != "Playing"
+            or close_player.value
+        ):
             self.player_widget = None
             self.mpris_player = None
             if self.mpris_timer:
                 glib.source_remove(self.mpris_timer)
                 self.mpris_timer = None
+            self.update_expanded()
             return
 
         self.mpris_player = current
-        self.player_widget = Player(current)
+        self.player_widget = ScreenLockPlayer(current, self.close_player)
         self.player_widget.set_visible(self.expanded)
         # Used 1s instead of 500ms for optimization
-        self.mpris_timer = glib.timeout_add(1000, self._mpris_timer)
+        if not self.mpris_timer:
+            self.mpris_timer = glib.timeout_add(1000, self._mpris_timer)
 
         self.box.insert_child_after(self.player_widget, self.time)
         self.update_expanded()
@@ -365,11 +381,47 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         if self.player_widget:
             self.box.remove(self.player_widget)
             self.player_widget.destroy()
+            self.player_widget = None  # type: ignore
         if self.change_icon_timeout:
             glib.source_remove(self.change_icon_timeout)
         self.box.remove(self.notifications)
         self.notifications.destroy()
         self.notifications = None  # type: ignore
+        super().destroy()
+
+
+class ScreenLockPlayer(Player):
+    def __init__(
+        self,
+        item: MprisPlayer,
+        on_close: t.Callable[[], None]
+    ) -> None:
+        super().__init__(item)
+        self.text_box.remove(self.player)
+        self.player_box = gtk.Box(
+            css_classes=("lock-player-box",),
+            halign=gtk.Align.END
+        )
+        self.close_button = gtk.Button(
+            css_classes=("lock-player-close", "icon-tonal"),
+            child=widget.Icon("close")
+        )
+        self.player_box.append(self.player)
+        self.player_box.append(self.close_button)
+        self.text_box.insert_child_after(self.player_box, None)
+
+        self._close_handler = self.close_button.connect(
+            "clicked", self._on_close_clicked
+        )
+        self._on_close = weakref.WeakMethod(on_close)
+
+    def _on_close_clicked(self, *args: t.Any) -> None:
+        callback = self._on_close()
+        if callback is not None:
+            callback()
+
+    def destroy(self) -> None:
+        self.close_button.disconnect(self._close_handler)
         super().destroy()
 
 

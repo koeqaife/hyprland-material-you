@@ -81,6 +81,11 @@ window.lock-screen {
         margin: 0;
         margin-bottom: 1rem;
         border-radius: 1rem;
+        .lock-player-close {
+            margin-left: 0.25rem;
+            min-height: 1.5rem;
+            min-width: 1.5rem;
+        }
     }
 
     .notifications-categories {
