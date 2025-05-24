@@ -56,7 +56,7 @@ class ClipItem(gtk.Revealer):
             self.button.set_child(image_widget)
             self._child = image_widget
 
-            max_width_rem = 400 / 16
+            max_width_rem = 29.25
             width_px = (self.width / self.height) * 200
             width_rem = width_px / 16
 
