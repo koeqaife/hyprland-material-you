@@ -477,10 +477,9 @@ class Applet(widget.Icon):
             self.on_wheel_click()
 
     def destroy(self) -> None:
-        self._icon.destroy()
-        self.set_child(None)
         self.click_gesture.disconnect(self.gesture_conn)
         self.remove_controller(self.click_gesture)
+        super().destroy()
 
 
 class Applets(gtk.Box):
