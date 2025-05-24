@@ -34,7 +34,6 @@ class WorkspaceButton(gtk.Button):
         )
 
         self.id = id
-        print(self.id)
 
         self.connected = self.connect("clicked", self.on_clicked)
 
@@ -92,7 +91,6 @@ class Workspaces(gtk.Box):
         for button in self.buttons.values():
             self.append(button)
 
-        print(self.buttons)
         self.update_active(active_workspace.value)
         self.update_empty(workspace_ids.value)
 
