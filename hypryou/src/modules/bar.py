@@ -512,14 +512,10 @@ class Applets(gtk.Box):
         self.children = (
             Applet("audio", "volume_up", lambda: None, self.open_pavucontrol),
             Applet("bluetooth", "bluetooth", lambda: None),
-            Applet("wifi", get_network().icon, lambda: None),
-            Applet("cliphist", "content_paste", self.toggle_cliphist),
+            Applet("wifi", get_network().icon, lambda: None)
         )
         for child in self.children:
             self.append(child)
-
-    def toggle_cliphist(self) -> None:
-        toggle_window("cliphist")
 
     def open_pavucontrol(self) -> None:
         subprocess.Popen(["pavucontrol"])
@@ -541,6 +537,22 @@ class OpenTray(gtk.Button):
 
     def on_clicked(self, *args: t.Any) -> None:
         toggle_window("tray")
+
+    def destroy(self) -> None:
+        self.disconnect(self.conn_id)
+
+
+class OpenCliphist(gtk.Button):
+    def __init__(self) -> None:
+        super().__init__(
+            css_classes=("open-cliphist", "bar-applet"),
+            child=widget.Icon("content_paste"),
+            tooltip_text="Clipboard"
+        )
+        self.conn_id = self.connect("clicked", self.on_clicked)
+
+    def on_clicked(self, *args: t.Any) -> None:
+        toggle_window("cliphist")
 
     def destroy(self) -> None:
         self.disconnect(self.conn_id)
@@ -625,6 +637,7 @@ class ModulesRight(gtk.Box):
         self.children = (
             KeyboardLayout(),
             OpenTray(),
+            OpenCliphist(),
             Applets(),
             Clock(),
             OpenSidebar()

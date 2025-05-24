@@ -23,9 +23,9 @@ window.bar {
         }
         > * {
             @include elevation(1);
-            border-radius: 100px;
             margin-left: 0.313rem;
             margin-right: 0.313rem;
+            border-radius: 1.25rem;
         }
     }
 
@@ -103,21 +103,27 @@ window.bar {
 
     .applets {
         margin-left: 0.125rem;
-        border-top-left-radius: 1.563rem;
-        border-bottom-left-radius: 1.563rem;
+        border-top-left-radius: 0.5rem;
+        border-bottom-left-radius: 0.5rem;
     }
 
-    .open-tray {
-        margin-right: 0.125rem;
-        border-top-right-radius: 1.563rem;
-        border-bottom-right-radius: 1.563rem;
-
+    .open-tray, .open-cliphist {
         label {
             color: $onSurface;
             font-size: 1.063rem;
             font-variation-settings: "opsz" 20;
             font-weight: 500;
         }
+    }
+    .open-tray {
+        margin-right: 0.125rem;
+        border-top-right-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+    }
+    .open-cliphist {
+        margin-right: 0.125rem;
+        margin-left: 0.125rem;
+        border-radius: 0.5rem;
     }
 
     .mpris-player {
