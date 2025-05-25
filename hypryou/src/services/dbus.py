@@ -83,7 +83,7 @@ def cache_proxy_properties_finish(
     proxy: gio.DBusProxy,
     result: gio.AsyncResult,
     changed: list[str] | None = None,
-    callback: t.Callable[[], None] | None = None
+    callback: t.Callable[..., None] | None = None
 ) -> None:
     try:
         props_var: glib.Variant = conn.call_finish(result)
@@ -119,7 +119,7 @@ def cache_proxy_properties_finish(
             )
 
     if callback:
-        callback()
+        callback(changed)
 
 
 class DBusService(Service):

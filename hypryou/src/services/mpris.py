@@ -146,15 +146,6 @@ class MprisPlayer(Signals):
             changed_properties_variant.unpack()
         )
         self._cache_properties(list(changed_properties.keys()))
-        if "PlaybackStatus" in changed_properties:
-            self._last_known_position = self.position
-            self._pos_changed_time = time.monotonic()
-            self._playback_status = self.playback_status
-
-        self._last_changed_time = time.monotonic()
-        update_current_player()
-
-        self.notify("changed")
 
     def prop(self, property_name: str) -> t.Any:
         value = self._proxy.get_cached_property(property_name)
@@ -331,9 +322,20 @@ class MprisPlayer(Signals):
             self._cache_properties_finish
         )
 
-    def _cache_properties_finish(self, *args: t.Any) -> None:
-        self._metadata = None
+    def _cache_properties_finish(
+        self,
+        changed: list[str] | None = None,
+        *args: t.Any
+    ) -> None:
+        if changed and "PlaybackStatus" in changed:
+            self._last_known_position = self.position
+            self._pos_changed_time = time.monotonic()
+            self._playback_status = self.playback_status
+
+        self._last_changed_time = time.monotonic()
         update_current_player()
+
+        self.notify("changed")
 
 
 class MprisWatcher:
