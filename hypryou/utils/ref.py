@@ -292,13 +292,13 @@ class Ref(t.Generic[T]):
     def ready(self) -> None:
         self.is_ready = True
 
-    def unbind(self, ref: "Ref[T]", handler_id: int):
+    def unbind(self, ref: "Ref[T]", handler_id: int) -> None:
         """Basically helper function. ref.unwatch() can be used as well"""
         ref.unwatch(handler_id)
 
     def bind(self, ref: "Ref[U]", transform: t.Callable[[U], T]) -> int:
         def on_changed(new_value: T) -> None:
-            self.value = transform(new_value)
+            self.value = transform(new_value)  # type: ignore [arg-type]
 
-        handler_id = ref.watch(on_changed)
+        handler_id = ref.watch(on_changed)  # type: ignore [arg-type]
         return handler_id

@@ -90,6 +90,7 @@ class CliRequest:
             "browser": settings.get("browser"),
         }
         launch_detached(apps[app])
+        return "ok"
 
     def do_lock(self, args: str) -> None:
         state.is_locked.value = True

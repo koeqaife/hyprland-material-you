@@ -36,7 +36,9 @@ class LayerWindow(gtk.ApplicationWindow):
         setup_popup: bool | None = None,
         **kwargs: t.Any
     ) -> None:
-        super().__init__(application=application, name=name, **kwargs)
+        if name is not None:
+            kwargs["name"] = name
+        super().__init__(application=application, **kwargs)
         self.name = name
         self.is_popup = setup_popup
         if width and height:
@@ -96,7 +98,7 @@ class LayerWindow(gtk.ApplicationWindow):
         *args: t.Any
     ) -> None:
         if keyval == gdk.KEY_Escape:
-            if self.is_popup:
+            if self.is_popup and self.name:
                 state.close_window(self.name)
             else:
                 self.hide()

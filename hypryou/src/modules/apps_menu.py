@@ -177,7 +177,7 @@ class AppsBox(gtk.Box):
         )
         self._apps = new_dict
 
-        for child in list(self.list):
+        for child in list(self.list):  # type: ignore [call-overload]
             self.list.remove(child)
 
         for item, _widget in self._apps.items():

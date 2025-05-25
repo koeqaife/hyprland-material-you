@@ -25,7 +25,7 @@ class OpenedWindowsWatcher(Signals):
     def init(self) -> None:
         _opened_windows.watch(self.on_changed)
 
-    def is_visible(self, window_name: str) -> None:
+    def is_visible(self, window_name: str) -> bool:
         return window_name in _opened_windows.value
 
     def on_changed(self, new_value: list[str]) -> None:
@@ -82,7 +82,7 @@ def on_opacity_changed(new_value: float) -> None:
 
 
 class StateService(Service):
-    def start(self):
+    def start(self) -> None:
         opened_windows.init()
         settings = Settings()
         settings.watch("wallpaper", on_wallpapers_changed, False)

@@ -29,7 +29,7 @@ class BatteryLevel(int, Enum):
     FULL = 8
 
 
-battery_icons = {
+battery_icons: dict[str, dict[int, str]] = {
     "discharging": {
         0: "battery_0_bar",
         20: "battery_1_bar",
@@ -47,8 +47,7 @@ battery_icons = {
         60: "battery_charging_60",
         80: "battery_charging_80",
         99: "battery_full"
-    },
-    "full": "battery_full"
+    }
 }
 
 
@@ -85,7 +84,7 @@ class UPower(Signals):
 
     def update_icon(self, *args: t.Any) -> None:
         if not self.is_battery:
-            self.battery_icon = "battery_unknown"
+            self.battery_icon.value = "battery_unknown"
             return
         thresholds: dict[int, str] | None = None
         if self.state == BatteryState.DISCHARGING:
@@ -93,7 +92,7 @@ class UPower(Signals):
         elif self.state == BatteryState.CHARGING:
             thresholds = battery_icons["charging"]
         elif self.state == BatteryState.FULL_CHARGED:
-            self.battery_icon.value = battery_icons["full"]
+            self.battery_icon.value = "battery_full"
             return
         else:
             self.battery_icon.value = "battery_unknown"

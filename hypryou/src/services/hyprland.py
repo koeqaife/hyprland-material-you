@@ -192,7 +192,7 @@ async def get_active_layout(client: HyprlandClient) -> tuple[bool, str]:
     )
 
     if not keyboards:
-        return "English (US)"
+        return False, "English (US)"
 
     for keyboard in keyboards:
         if keyboard["main"]:
@@ -284,7 +284,7 @@ async def init() -> None:
 
 
 class HyprlandService(AsyncService):
-    async def app_init(self):
+    async def app_init(self) -> None:
         await init()
 
     async def start(self) -> None:

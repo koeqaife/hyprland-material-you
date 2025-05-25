@@ -56,7 +56,7 @@ class Application:
         self.entry = app.get_id()
         self.keywords = app.get_keywords()
         self.frequency = 0
-        self.score = 1
+        self.score = 1.0
 
         self._match: dict[str | None, float] = {
             self.exec: -0.1,
@@ -66,11 +66,13 @@ class Application:
         }
 
     def launch(self) -> None:
-        increase_frequency(self.entry)
-        launch_detached(self.exec)
+        if self.entry is not None:
+            increase_frequency(self.entry)
+        if self.exec is not None:
+            launch_detached(self.exec)
 
     def match(self, pattern: str) -> bool:
-        scores = []
+        scores: list[float] = []
 
         normalized_pattern = pattern.strip().lower()
 
@@ -98,7 +100,7 @@ class Application:
                     compute_score(normalized_keyword, normalized_pattern) - 1.5
                 )
 
-        self.score = max(scores) if scores else 0
+        self.score = max(scores) if scores else 0.0
         return self.score > FOUND_THRESHOLD
 
 
@@ -112,7 +114,7 @@ def increase_frequency(entry: str) -> None:
         json.dump(frequents.value, f)
 
 
-def get_apps_frequency() -> None:
+def get_apps_frequency() -> dict[str, int]:
     frequencies: dict[str, int] = {}
     for file_path in (APP_FREQUENCY, LEGACY_APP_FREQUENCY):
         if not path.exists(file_path):
@@ -144,9 +146,10 @@ def get_apps_list() -> list[Application]:
         if app.get_nodisplay() or app.get_is_hidden() or not app.should_show():
             continue
 
-        app = Application(app)
-        app.frequency = frequents.value.get(app.entry, 0)
-        new_list.append(app)
+        _app = Application(app)
+        if _app.entry is not None:
+            _app.frequency = frequents.value.get(_app.entry, 0)
+        new_list.append(_app)
 
     return new_list
 
@@ -156,15 +159,15 @@ def reload() -> None:
 
 
 class AppsService(Service):
-    def app_init(self):
+    def app_init(self) -> None:
         frequents.value = get_apps_frequency()
         frequents.ready()
 
         reload()
         apps.ready()
 
-    def start(self):
+    def start(self) -> None:
         ...
 
-    def on_close(self):
+    def on_close(self) -> None:
         ...

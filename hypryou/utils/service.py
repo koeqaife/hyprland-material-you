@@ -118,7 +118,7 @@ class Service:
 
 
 class AsyncService:
-    def __init__(self):
+    def __init__(self) -> None:
         ...
 
     async def app_init(self) -> None:

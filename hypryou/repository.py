@@ -10,7 +10,7 @@ from gi.repository import Gsk as gsk
 from gi.repository import GdkPixbuf as gdk_pixbuf
 from gi.repository import GObject as gobject
 from gi.repository import Pango as pango
-from gi.repository import NM as nm
+from gi.repository import NM as nm  # type: ignore [attr-defined]
 
 __all__ = [
     "versions", "gtk", "layer_shell",

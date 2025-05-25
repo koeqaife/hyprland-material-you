@@ -12,7 +12,7 @@ from src.services.upower import get_upower
 from src.modules.notifications.list import Notifications
 import pwd
 import os
-from pam import pam
+from pam import pam  # type: ignore [import-untyped]
 from time import monotonic
 
 username = pwd.getpwuid(os.getuid()).pw_name
@@ -21,7 +21,7 @@ close_player = Ref(False, name="lock_close_player")
 
 def check_password(username: str, password: str) -> bool:
     p = pam()
-    return p.authenticate(username, password)
+    return bool(p.authenticate(username, password))
 
 
 class ScreenLockWindow(gtk.ApplicationWindow):
@@ -331,11 +331,12 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         self.notifications_visible = is_not_empty
         self.update_expanded()
 
-    def _mpris_timer(self) -> None:
+    def _mpris_timer(self) -> bool | None:
         if self.player_widget:
             self.player_widget.update_slider_position()
             return True
         self.mpris_timer = None
+        return None
 
     def update_current_player(self, *args: t.Any) -> None:
         current = current_player.value[1] if current_player.value else None
@@ -414,7 +415,7 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         if self.player_widget:
             self.box.remove(self.player_widget)
             self.player_widget.destroy()
-            self.player_widget = None  # type: ignore
+            self.player_widget = None
         if self.change_icon_timeout:
             glib.source_remove(self.change_icon_timeout)
         self.box.remove(self.notifications)
@@ -491,10 +492,10 @@ class ScreenLock:
         if not self.lock_instance.lock():
             return
 
-        display = t.cast(gdk.Display, gdk.Display.get_default())
+        display: gdk.Display = gdk.Display.get_default()
         for monitor in display.get_monitors():
             window = ScreenLockWindow(self.app)
-            self.windows[monitor] = window
+            self.windows[t.cast(gdk.Monitor, monitor)] = window
             self.lock_instance.assign_window_to_monitor(window, monitor)
             window.present()
 

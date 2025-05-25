@@ -313,6 +313,7 @@ class MprisPlayer(Signals):
         mpris_length = self.metadata.get("mpris:length")
         if mpris_length is not None:
             return mpris_length / 1_000_000
+        return None
 
     def _cache_properties(self, changed: list[str] | None = None) -> None:
         cache_proxy_properties(

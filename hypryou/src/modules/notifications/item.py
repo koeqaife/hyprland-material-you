@@ -196,6 +196,8 @@ class NotificationItem(gtk.Box):
             self._cached_detected = "messages"
             return "messages"
 
+        return None
+
     def on_action(self, action: str) -> None:
         self.item.action(action)
         if not self.item.hints.get("resident"):

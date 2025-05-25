@@ -28,7 +28,7 @@ class ClipItem(gtk.Revealer):
             transition_duration=250,
             transition_type=gtk.RevealerTransitionType.SLIDE_DOWN
         )
-        self.score = -1
+        self.score = -1.0
         self.item = item
         self.show_image = False
         self._child: gtk.Box | gtk.Label | None = None

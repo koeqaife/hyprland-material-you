@@ -75,7 +75,7 @@ def debounce(delay: float) -> t.Callable[..., t.Any]:
 
 
 def sync_debounce(
-    delay: float,
+    delay: int,
     min_n_times: int = 0,
     immediate: bool = False
 ) -> t.Callable[..., t.Any]:

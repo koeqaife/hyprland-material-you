@@ -43,7 +43,7 @@ class ScreenSaver:
         self._conn: gio.DBusConnection | None = None
         self.node_info = gio.DBusNodeInfo.new_for_xml(WATCHER_XML)
         self.ifaces = self.node_info.interfaces
-        self.items: dict[int, (str, str)] = {}
+        self.items: dict[int, tuple[str, str]] = {}
         self.next_id = 100
         self.last_battery_state = upower.state
 
@@ -60,7 +60,9 @@ class ScreenSaver:
         self.display.dispatch()
         self.display.roundtrip()
         self.display.roundtrip()
-        glib.io_add_watch(self.fd, glib.IO_IN, self.on_event)
+        glib.io_add_watch(  # type: ignore
+            self.fd, glib.IO_IN, self.on_event
+        )
 
         get_upower().watch(
             "changed", self.update_on_battery
@@ -96,6 +98,9 @@ class ScreenSaver:
     ) -> None:
         if timeout == 0:
             return
+        if self.idle_notifier is None:
+            logger.critical("IdleNotifier proxy is None")
+            return
         timeout *= 1000
         notification: Notification = self.idle_notifier.get_idle_notification(
             timeout=timeout, seat=self.seat
@@ -108,7 +113,7 @@ class ScreenSaver:
     @property
     def is_inhibited(self) -> bool:
         login1 = get_login_manager()
-        return login1.is_idle_inhibited() or self.items
+        return login1.is_idle_inhibited() or bool(self.items)
 
     def dpms_off(self, *args: t.Any) -> None:
         if self.is_inhibited:
@@ -167,7 +172,11 @@ class ScreenSaver:
             )
 
     def global_handler(
-        self, registry: WlRegistryProxy, name, interface, version
+        self,
+        registry: WlRegistryProxy,
+        name: int,
+        interface: str,
+        version: int
     ) -> None:
         if interface == "wl_seat":
             self.seat = registry.bind(name, WlSeat, version)
@@ -220,7 +229,7 @@ class ScreenSaver:
 
         return conn.flush()
 
-    def un_inhibit(self, cookie: int) -> int:
+    def un_inhibit(self, cookie: int) -> None:
         if cookie not in self.items.keys():
             return
         logger.debug(

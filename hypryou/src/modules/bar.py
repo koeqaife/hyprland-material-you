@@ -483,8 +483,8 @@ class Battery(gtk.Box):
 
     def destroy(self) -> None:
         self.icon.destroy()
-        get_upower().unwatch(self.handler_id)
-        Settings().unwatch(self.settings_handler)
+        get_upower().unwatch("changed", self.handler_id)
+        Settings().unwatch("always_show_battery", self.settings_handler)
 
     def update(self, *args: t.Any) -> None:
         settings = Settings()
@@ -552,7 +552,7 @@ class Applet(widget.Icon):
         button_number = gesture.get_current_button()
         if button_number == gdk.BUTTON_PRIMARY:
             self.on_click()
-        elif button_number == gdk.BUTTON_MIDDLE:
+        elif button_number == gdk.BUTTON_MIDDLE and self.on_wheel_click:
             self.on_wheel_click()
 
     def destroy(self) -> None:

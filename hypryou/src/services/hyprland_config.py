@@ -11,7 +11,7 @@ import os
 generated_config = os.path.join(config_path, "hyprland_generated.conf")
 
 
-def generate_binds() -> None:
+def generate_binds() -> str:
     output = ""
     for bind in key_binds:
         if isinstance(bind, KeyBindHint):
@@ -42,7 +42,7 @@ def generate_binds() -> None:
     return output + "\n"
 
 
-def generate_env() -> None:
+def generate_env() -> str:
     settings = Settings()
     env_vars = {
         "BROWSER": settings.get("browser"),

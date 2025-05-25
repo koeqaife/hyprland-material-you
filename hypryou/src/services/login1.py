@@ -4,7 +4,7 @@ from utils.service import Service
 
 
 class Login1Manager:
-    def __init__(self):
+    def __init__(self) -> None:
         self._proxy = gio.DBusProxy.new_for_bus_sync(
             gio.BusType.SYSTEM,
             gio.DBusProxyFlags.NONE,

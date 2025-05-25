@@ -9,7 +9,9 @@ from config import HyprlandVars
 import weakref
 import typing as t
 
-type HandlersDict = dict[tuple[Signals, str] | Ref | gobject.GObject, int]
+type HandlersDict = dict[
+    tuple[Signals, str] | Ref[t.Any] | gobject.Object, int
+]
 
 
 @dataclass
@@ -171,12 +173,16 @@ class Player(gtk.Box):
     def seek(self, *args: t.Any) -> None:
         self._item.set_position(
             self._item.metadata["mpris:trackid"],
-            self.slider.get_value() * 1_000_000
+            int(self.slider.get_value() * 1_000_000)
         )
         self.unlock_timer()
 
-    def on_cur_player_changed(self, new: tuple[bool, MprisPlayer]) -> None:
-        toggle_css_class(self, "is-current", new[1] is self._item)
+    def on_cur_player_changed(
+        self, new: tuple[bool, MprisPlayer] | tuple[()]
+    ) -> None:
+        toggle_css_class(
+            self, "is-current", new[1] is self._item if new else False
+        )
 
     def update_buttons(self) -> None:
         last_changed = self.last_changed
@@ -217,7 +223,7 @@ class Player(gtk.Box):
             self.slider.set_visible(False)
             return
         self.slider.set_visible(True)
-        self.slider.set_range(0, self._item.length)
+        self.slider.set_range(0, length)
         self.slider.set_sensitive(self._item.can_seek)
         self.max_position.set_label(format_seconds(length))
         self.update_slider_position()
@@ -352,7 +358,7 @@ class PlayersBox(gtk.ScrolledWindow):
 
         self.no_items_label.set_reveal_child(len(self.items) == 0)
 
-    def timer(self) -> None:
+    def timer(self) -> bool:
         for key, item in self.items.items():
             if item._locked_timer:
                 continue

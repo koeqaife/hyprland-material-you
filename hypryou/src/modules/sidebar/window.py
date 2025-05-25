@@ -48,7 +48,7 @@ class Sidebar(widget.LayerWindow):
 
         weakref.finalize(self, lambda: logger.debug("Sidebar finalized"))
 
-    def present(self):
+    def present(self) -> None:
         if self._child:
             self._child.notifications.unfreeze()
         super().present()
