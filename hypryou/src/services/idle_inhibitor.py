@@ -96,7 +96,7 @@ def get_inhibitor() -> IdleInhibitor:
 
 
 class IdleInhibitorService(Service):
-    def start(self) -> None:
+    def app_init(self) -> None:
         global _instance
         logger.debug("Starting idle inhibitor proxy")
         _instance = IdleInhibitor()
