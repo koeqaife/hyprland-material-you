@@ -1,6 +1,6 @@
 from utils import widget
 from utils.logger import logger
-from repository import layer_shell, gtk, gdk
+from repository import layer_shell, gtk, gdk, glib
 import weakref
 from src.services.state import current_wallpaper
 import typing as t
@@ -26,7 +26,9 @@ class WallpapersWidget(gtk.Stack):
         self.counter += 1
         self.add_named(new_picture, str(self.counter))
         self.set_visible_child_name(str(self.counter))
+        glib.timeout_add(451, self.delete_old_picture, new_picture)
 
+    def delete_old_picture(self, new_picture: gtk.Picture) -> None:
         if self.old_picture is not None:
             self.remove(self.old_picture)
             self.old_picture = None
