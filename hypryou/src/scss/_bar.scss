@@ -107,7 +107,23 @@ window.bar {
         border-bottom-left-radius: 0.5rem;
     }
 
-    .open-tray, .open-cliphist {
+    .battery {
+        .icon {
+            margin-right: 0.25rem;
+            font-size: 1.063rem;
+            font-variation-settings: "opsz" 20;
+            font-weight: 400;
+            color: $onSurface;
+        }
+        label {
+            color: $onSurface;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+    }
+
+    .open-tray,
+    .open-cliphist {
         label {
             color: $onSurface;
             font-size: 1.063rem;

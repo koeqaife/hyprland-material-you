@@ -8,6 +8,7 @@ from src.variables.clock import time, full_date
 from src.services.hyprland import active_layout, show_layout
 from src.modules.players import Player
 from src.services.mpris import current_player, MprisPlayer
+from src.services.upower import get_upower
 from src.modules.notifications.list import Notifications
 import pwd
 import os
@@ -111,6 +112,22 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         self.layout_box.append(self.layout)
         self.info_box.append(self.layout_box)
 
+        self.battery_box = gtk.Box(
+            css_classes=("lock-battery-box",),
+            visible=False
+        )
+        self.battery_icon = widget.Icon(
+            get_upower().battery_icon,
+            css_classes=("battery-icon",)
+        )
+        self.battery = gtk.Label(
+            css_classes=("battery-label",),
+            label="0%"
+        )
+        self.battery_box.append(self.battery_icon)
+        self.battery_box.append(self.battery)
+        self.info_box.append(self.battery_box)
+
         self.unlock_box = gtk.Box(
             css_classes=("lock-unlock-box",),
             orientation=gtk.Orientation.HORIZONTAL,
@@ -195,12 +212,28 @@ class ScreenLockWindow(gtk.ApplicationWindow):
             current_player: current_player.watch(self.update_current_player),
             close_player: close_player.watch(self.update_current_player)
         }
+        self.battery_handler = get_upower().watch(
+            "changed", self.update_battery
+        )
+        self.update_battery()
         self.update_current_player()
         self.update_expanded()
         self.map_handler = self.connect("map", self._on_map)
         self.change_icon_timeout: int | None = glib.timeout_add(
             5000, self.change_button_icon
         )
+
+    def update_battery(self, *args: t.Any) -> None:
+        upower = get_upower()
+
+        is_battery_connected = upower.is_battery and upower.is_present
+        if not is_battery_connected:
+            self.battery_box.set_visible(False)
+            return
+        else:
+            self.battery_box.set_visible(True)
+
+        self.battery.set_label(f"{round(upower.percentage)}%")
 
     def change_button_icon(self) -> None:
         self.change_icon_timeout = None

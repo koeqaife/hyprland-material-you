@@ -27,6 +27,7 @@ from src.services.idle_inhibitor import IdleInhibitorService
 from src.services.apps import AppsService
 from src.services.hyprland_config import HyprlandConfigService
 from src.services.state import StateService
+from src.services.upower import UPowerService
 
 from src.services import events
 
@@ -54,6 +55,7 @@ services: tuple[AsyncService | Service, ...] = (
     CliService(),
     AppsService(),
     IdleInhibitorService(),
+    UPowerService()
 )
 
 

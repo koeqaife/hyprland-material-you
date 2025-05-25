@@ -19,6 +19,7 @@ from src.services.mpris import MprisPlayer, current_player
 import weakref
 from src.services.network import get_network
 from src.services.state import toggle_window
+from src.services.upower import get_upower, BatteryLevel, BatteryState
 
 
 dummy_region = cairo.Region()
@@ -461,6 +462,58 @@ class KeyboardLayout(gtk.Label):
             ref.unwatch(handler_id)
 
 
+class Battery(gtk.Box):
+    def __init__(self) -> None:
+        super().__init__(
+            css_classes=("battery", "bar-applet")
+        )
+        upower = get_upower()
+        self.icon = widget.Icon(upower.battery_icon)
+        self.label = gtk.Label(
+            label="0%",
+            css_classes=("battery-percentage",)
+        )
+        self.append(self.icon)
+        self.append(self.label)
+        self.handler_id = upower.watch("changed", self.update)
+        self.settings_handler = Settings().watch(
+            "always_show_battery", self.update
+        )
+        self.update("")
+
+    def destroy(self) -> None:
+        self.icon.destroy()
+        get_upower().unwatch(self.handler_id)
+        Settings().unwatch(self.settings_handler)
+
+    def update(self, *args: t.Any) -> None:
+        settings = Settings()
+        upower = get_upower()
+
+        is_battery_connected = upower.is_battery and upower.is_present
+        is_low_charge = (upower.percentage or 0) < 99
+        is_not_charging = upower.state not in {
+            BatteryState.CHARGING,
+            BatteryState.FULL_CHARGED
+        }
+
+        is_visible = is_battery_connected and (
+            settings.get("always_show_battery")
+            or is_low_charge
+            or is_not_charging
+        )
+        if not is_visible:
+            self.set_visible(False)
+            return
+        else:
+            self.set_visible(True)
+
+        is_critical = upower.battery_level == BatteryLevel.CRITICAL or True
+        toggle_css_class(self, "critical", is_critical)
+
+        self.label.set_label(f"{round(upower.percentage)}%")
+
+
 class Applet(widget.Icon):
     def __init__(
         self,
@@ -636,6 +689,7 @@ class ModulesRight(gtk.Box):
         )
         self.children = (
             KeyboardLayout(),
+            Battery(),
             OpenTray(),
             OpenCliphist(),
             Applets(),
