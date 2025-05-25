@@ -92,10 +92,11 @@ class CliRequest:
         launch_detached(apps[app])
         return "ok"
 
-    def do_lock(self, args: str) -> None:
+    def do_lock(self, args: str) -> str:
         state.is_locked.value = True
+        return "ok"
 
-    def do_screenshot(self, _mode: str) -> None:
+    def do_screenshot(self, _mode: str) -> str:
         mode = _mode.split()[0] if _mode else "region"
         args = []
         args.append(screenshot_mode_args[mode])
@@ -108,6 +109,7 @@ class CliRequest:
         else:
             command = f"bash -c \"hyprshot {" ".join(args)}\""
             launch_detached(command)
+        return "ok"
 
 
 async def handle_client(
