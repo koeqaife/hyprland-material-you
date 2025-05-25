@@ -15,6 +15,7 @@ window.cliphist {
         @include nLayerBackground($surfaceContainer, 2);
         margin-left: 8px;
         margin-right: 8px;
+        margin-bottom: 8px;
         outline-offset: -1px;
         transition: all 0.25s ease-in;
 
@@ -57,9 +58,6 @@ window.cliphist {
         }
         &.highest .cliphist-item {
             outline: 1px solid $primary;
-        }
-        &:not(:last-child) .cliphist-item {
-            margin-bottom: 8px;
         }
     }
 

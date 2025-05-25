@@ -15,6 +15,7 @@ window.apps-menu {
         @include nLayerBackground($surfaceContainer, 2);
         margin-left: 8px;
         margin-right: 8px;
+        margin-bottom: 8px;
 
         outline-offset: -1px;
         transition: all 0.25s ease-in;
@@ -44,10 +45,6 @@ window.apps-menu {
             background-color: color.mix($surfaceContainer, $onSurfaceVariant, 88%);
             outline: none;
         }
-    }
-
-    .app-item-revealer:not(:last-child) .app-item {
-        margin-bottom: 8px;
     }
 
     .app-item-revealer {
