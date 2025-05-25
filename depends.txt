@@ -18,6 +18,7 @@ libnm
 python-numpy
 cython
 hyprsunset
+upower
 
 cliphist
 xdg-dbus-proxy
