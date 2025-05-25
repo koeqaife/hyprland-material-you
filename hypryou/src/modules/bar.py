@@ -479,7 +479,7 @@ class Battery(gtk.Box):
         self.settings_handler = Settings().watch(
             "always_show_battery", self.update
         )
-        self.update("")
+        self.update()
 
     def destroy(self) -> None:
         self.icon.destroy()
@@ -508,10 +508,15 @@ class Battery(gtk.Box):
         else:
             self.set_visible(True)
 
-        is_critical = upower.battery_level == BatteryLevel.CRITICAL or True
+        is_critical = (
+            upower.battery_level == BatteryLevel.CRITICAL
+            or upower.percentage <= 10
+        )
         toggle_css_class(self, "critical", is_critical)
 
-        self.label.set_label(f"{round(upower.percentage)}%")
+        percent = f"{round(upower.percentage)}%"
+        self.label.set_label(percent)
+        self.set_tooltip_text(percent)
 
 
 class Applet(widget.Icon):

@@ -120,6 +120,12 @@ window.bar {
             font-size: 1rem;
             font-weight: 400;
         }
+        &.critical {
+            background-color: $error;
+            label {
+                color: $onError;
+            }
+        }
     }
 
     .open-tray,
