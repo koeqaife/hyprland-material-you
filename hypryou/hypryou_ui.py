@@ -28,6 +28,8 @@ from src.services.apps import AppsService
 from src.services.hyprland_config import HyprlandConfigService
 from src.services.state import StateService
 from src.services.upower import UPowerService
+from src.services.idle import ScreenSaverService
+from src.services.login1 import Login1ManagerService
 
 from src.services import events
 
@@ -54,8 +56,10 @@ services: tuple[AsyncService | Service, ...] = (
     MprisService(),
     CliService(),
     AppsService(),
+    Login1ManagerService(),
+    ScreenSaverService(),
     IdleInhibitorService(),
-    UPowerService()
+    UPowerService(),
 )
 
 

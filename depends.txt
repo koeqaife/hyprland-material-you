@@ -19,6 +19,7 @@ python-numpy
 cython
 hyprsunset
 upower
+python-pywayland
 
 cliphist
 xdg-dbus-proxy

@@ -1,0 +1,12 @@
+<node>
+    <interface name="org.freedesktop.ScreenSaver">
+    <method name="Inhibit">
+        <arg type="s" name="application_name" direction="in"/>
+        <arg type="s" name="reason_for_inhibit" direction="in"/>
+        <arg type="u" name="cookie" direction="out"/>
+    </method>
+    <method name="UnInhibit">
+        <arg type="u" name="cookie" direction="in"/>
+    </method>
+    </interface>
+</node>

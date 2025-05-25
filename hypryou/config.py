@@ -39,7 +39,14 @@ default_settings: dict[str, t.Any] = {
     "browser": "firefox",
     "editor": "code",
     "files": "nautilus",
-    "terminal": "alacritty"
+    "terminal": "alacritty",
+
+    "ac_lock": 300,
+    "ac_dpms": 60,
+    "ac_sleep": 0,
+    "battery_lock": 60,
+    "battery_dpms": 60,
+    "battery_sleep": 60
 }
 
 os.makedirs(config_path, exist_ok=True)
