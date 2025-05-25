@@ -4,7 +4,7 @@ from config import socket_path
 from utils.logger import logger
 import socket
 from config import Settings
-from utils import apply_css
+from utils import reload_css
 from utils.service import AsyncService
 from src.services.mpris import current_player
 import subprocess
@@ -65,7 +65,7 @@ class CliRequest:
         return "ok"
 
     def do_reload_css(self, args: str) -> str:
-        apply_css()
+        reload_css()
         return "ok"
 
     def do_player(self, action: str) -> str:
