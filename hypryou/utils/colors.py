@@ -70,13 +70,17 @@ class ColorsCache:
         wallpaper: str | None,
         original_color: int | None,
         contrast_level: int,
-        is_dark: bool
+        is_dark: bool,
+
+        colors_dark: DynamicScheme | dict[str, str] | None = None,
+        colors_light: DynamicScheme | dict[str, str] | None = None,
     ) -> None:
         self.colors: dict[str, str] = {}
         self.wallpaper = wallpaper
         self.original_color = original_color
         self.contrast_level = contrast_level
         self.is_dark = is_dark
+
         if isinstance(colors, DynamicScheme):
             for color_name in vars(MaterialDynamicColors).keys():
                 color = get_color(color_name)
@@ -87,6 +91,22 @@ class ColorsCache:
                 )
         else:
             self.colors = colors
+
+        _schemes = ((colors_dark, "Dark"), (colors_light, "Light"))
+        for scheme, suffix in _schemes:
+            if scheme is None:
+                continue
+            if isinstance(scheme, dict):
+                for key, value in scheme.items():
+                    self.colors[f"{key}{suffix}"] = value
+                continue
+            for color_name in vars(MaterialDynamicColors).keys():
+                color = get_color(color_name)
+                if color is None:
+                    continue
+                self.colors[f"{color_name}{suffix}"] = rgb_to_hex(
+                    color.get_hct(colors).to_rgba()
+                )
 
 
 def colors_dict(cache: ColorsCache) -> dict[str, t.Any]:
@@ -136,19 +156,35 @@ additional = {
 }
 
 
-def generate_color_map(scheme: DynamicScheme) -> dict[str, str]:
+def generate_color_map(
+    scheme: DynamicScheme,
+    dark_scheme: DynamicScheme,
+    light_scheme: DynamicScheme
+) -> dict[str, str]:
+    _schemes = (
+        (scheme, ""),
+        (dark_scheme, "Dark"),
+        (light_scheme, "Light")
+    )
     color_map: dict[str, str] = {}
-    for color_name in vars(MaterialDynamicColors).keys():
-        color = get_color(color_name)
-        if color is not None:
-            rgba = color.get_hct(scheme).to_rgba()
-            color_map[color_name] = rgb_to_hex(rgba)
+    for _color_name in vars(MaterialDynamicColors).keys():
+        for _scheme, suffix in _schemes:
+            color = get_color(_color_name)
+            color_name = f"{_color_name}{suffix}"
+            if color is not None:
+                rgba = color.get_hct(_scheme).to_rgba()
+                color_map[color_name] = rgb_to_hex(rgba)
     return color_map
 
 
 class ColorFormatter:
-    def __init__(self, scheme: DynamicScheme) -> None:
-        self.color_map = generate_color_map(scheme)
+    def __init__(
+        self,
+        scheme: DynamicScheme,
+        dark_scheme: DynamicScheme,
+        light_scheme: DynamicScheme
+    ) -> None:
+        self.color_map = generate_color_map(scheme, dark_scheme, light_scheme)
 
     def apply_transformations(
         self,
@@ -262,6 +298,8 @@ def generate_templates(
     folder: str,
     output_folder: str,
     scheme: DynamicScheme,
+    dark_scheme: DynamicScheme,
+    light_scheme: DynamicScheme,
     is_dark: bool,
     wallpaper: str | None = None
 ) -> None:
@@ -278,7 +316,7 @@ def generate_templates(
     for file_path in file_list:
         with open(file_path) as f:
             template = f.read()
-        formatter = ColorFormatter(scheme)
+        formatter = ColorFormatter(scheme, dark_scheme, light_scheme)
         template = formatter.format(template)
         template = (
             template
@@ -290,33 +328,40 @@ def generate_templates(
         with open(new_path, 'w') as f:
             f.write(template)
 
+    _schemes = (
+        (scheme, ""),
+        (dark_scheme, "Dark"),
+        (light_scheme, "Light")
+    )
     for file in ready_templates:
         _template = ""
-        for color_name in vars(MaterialDynamicColors).keys():
-            color = get_color(color_name)
-            if color is None:
-                continue
+        for _color_name in vars(MaterialDynamicColors).keys():
+            for _scheme, suffix in _schemes:
+                color = get_color(_color_name)
+                color_name = f"{_color_name}{suffix}"
+                if color is None:
+                    continue
 
-            rgba = color.get_hct(scheme).to_rgba()
-            hex_color = rgb_to_hex(rgba)
-            rgb_color = rgba_to_rgb(rgba)
-            new_line = ready_templates[file].format(
-                name=color_name,
-                hex=hex_color,
-                rgb=rgb_color
-            )
-            _template += new_line
-            if color_name in additional:
+                rgba = color.get_hct(_scheme).to_rgba()
+                hex_color = rgb_to_hex(rgba)
+                rgb_color = rgba_to_rgb(rgba)
                 new_line = ready_templates[file].format(
-                    name=additional[color_name],
+                    name=color_name,
                     hex=hex_color,
                     rgb=rgb_color
                 )
                 _template += new_line
+                if color_name in additional:
+                    new_line = ready_templates[file].format(
+                        name=additional[color_name],
+                        hex=hex_color,
+                        rgb=rgb_color
+                    )
+                    _template += new_line
 
-        new_path = join(output_folder, os.path.basename(file))
-        with open(new_path, 'w') as f:
-            f.write(_template)
+            new_path = join(output_folder, os.path.basename(file))
+            with open(new_path, 'w') as f:
+                f.write(_template)
 
 
 def process_image(
@@ -407,20 +452,33 @@ def generate_colors_sync(
     else:
         raise TypeError("Either image_path or use_color should be not None.")
 
-    scheme = SchemeTonalSpot(
+    dark_scheme = SchemeTonalSpot(
         Hct.from_int(color),
-        is_dark,
+        True,
         contrast_level
     )
+    light_scheme = SchemeTonalSpot(
+        Hct.from_int(color),
+        False,
+        contrast_level
+    )
+    scheme = dark_scheme if is_dark else light_scheme
 
     with open(colors_json, 'w') as f:
         object = ColorsCache(
-            scheme, image_path, use_color, contrast_level, is_dark
+            scheme, image_path, use_color, contrast_level, is_dark,
+            dark_scheme, light_scheme
         )
         json.dump(colors_dict(object), f, indent=2)
 
     generate_templates(
-        TEMPLATES_DIR, CACHE_PATH, scheme, is_dark, image_path
+        TEMPLATES_DIR,
+        CACHE_PATH,
+        scheme,
+        dark_scheme,
+        light_scheme,
+        is_dark,
+        image_path
     )
 
 
