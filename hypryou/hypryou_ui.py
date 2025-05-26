@@ -56,10 +56,10 @@ services: tuple[AsyncService | Service, ...] = (
     MprisService(),
     CliService(),
     AppsService(),
+    UPowerService(),
     Login1ManagerService(),
     ScreenSaverService(),
     IdleInhibitorService(),
-    UPowerService(),
 )
 
 
