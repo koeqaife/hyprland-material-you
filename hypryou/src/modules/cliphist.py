@@ -227,6 +227,7 @@ class ClipHistoryBox(gtk.Box):
 
         if not highest and self.last_highest:
             toggle_css_class(self.last_highest[1], "highest", False)
+            self.last_highest = None
         elif not highest:
             return
         elif not self.last_highest or self.last_highest[1] is not highest[1]:
