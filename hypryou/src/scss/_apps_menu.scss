@@ -52,19 +52,4 @@ window.apps-menu {
             outline: 1px solid $primary;
         }
     }
-
-    .search {
-        @include elevation(1);
-        @include nLayerBackground($surfaceContainerHigh, 2);
-        margin: 8px;
-        outline: none;
-        border-radius: 2.75rem;
-        color: $onSurface;
-        min-height: 2.75rem;
-
-        placeholder {
-            opacity: 1;
-            color: $onSurfaceVariant;
-        }
-    }
 }

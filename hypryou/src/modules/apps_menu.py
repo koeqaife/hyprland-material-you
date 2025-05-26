@@ -107,10 +107,17 @@ class AppsBox(gtk.Box):
             vexpand=True
         )
 
-        self.entry = gtk.Entry(
-            css_classes=("entry", "search"),
-            placeholder_text="Search"
+        self.search_box = gtk.Box(
+            css_classes=("misc--search", "search")
         )
+        self.entry_icon = widget.Icon("search")
+        self.entry = gtk.Entry(
+            css_classes=("entry",),
+            placeholder_text="Search",
+            hexpand=True
+        )
+        self.search_box.append(self.entry_icon)
+        self.search_box.append(self.entry)
         self.entry_handlers = (
             self.entry.connect("notify::text", self.on_search),
             self.entry.connect("activate", self.on_entry_enter)
@@ -118,7 +125,7 @@ class AppsBox(gtk.Box):
 
         self._apps: dict[Application, AppItem] = {}
 
-        self.append(self.entry)
+        self.append(self.search_box)
         self.append(self.scrollable)
 
         self.update_apps(apps.value)
