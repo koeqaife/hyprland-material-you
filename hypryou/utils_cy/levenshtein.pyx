@@ -164,3 +164,26 @@ cpdef float compute_text_match_score(str s1, str s2):
         score = 0.0
 
     return score
+
+
+cpdef float token_set_ratio(str s1, str s2):
+    cdef set tokens1 = set(s1.lower().split())
+    cdef set tokens2 = set(s2.lower().split())
+
+    cdef set intersection = tokens1.intersection(tokens2)
+    cdef set diff1 = tokens1.difference(tokens2)
+    cdef set diff2 = tokens2.difference(tokens1)
+
+    cdef str sorted_intersection = " ".join(sorted(intersection))
+    cdef str sorted_diff1 = " ".join(sorted(diff1))
+    cdef str sorted_diff2 = " ".join(sorted(diff2))
+
+    cdef str combined1 = (sorted_intersection + " " + sorted_diff1).strip()
+    cdef str combined2 = (sorted_intersection + " " + sorted_diff2).strip()
+    cdef str base = sorted_intersection
+
+    cdef float score1 = compute_score(base, combined1)
+    cdef float score2 = compute_score(base, combined2)
+    cdef float score3 = compute_score(combined1, combined2)
+
+    return max(score1, score2, score3)

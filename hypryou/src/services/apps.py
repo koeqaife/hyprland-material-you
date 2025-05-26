@@ -97,7 +97,9 @@ class Application:
 
                 normalized_keyword = keyword.lower()
                 scores.append(
-                    compute_score(normalized_keyword, normalized_pattern) - 1.5
+                    compute_score(
+                        normalized_keyword, normalized_pattern
+                    ) - 1.5
                 )
 
         self.score = max(scores) if scores else 0.0

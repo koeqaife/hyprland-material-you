@@ -8,6 +8,7 @@ import weakref
 import typing as t
 import re
 from utils_cy.levenshtein import compute_text_match_score
+from utils_cy.levenshtein import token_set_ratio
 from src.services.state import close_window
 
 FOUND_THRESHOLD = 0.5
@@ -157,7 +158,10 @@ class ClipItem(gtk.Revealer):
                     compute_text_match_score(string, search_normalized)
                     if search_normalized else -1
                 )
-                score = max(raw_score, normalized_score)
+                token_score = (
+                    token_set_ratio(string, search)
+                )
+                score = max(raw_score, normalized_score, token_score)
                 scores.append(score)
 
             max_score = max(*scores)
