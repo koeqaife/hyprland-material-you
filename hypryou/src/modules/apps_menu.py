@@ -181,7 +181,10 @@ class AppsBox(gtk.Box):
 
     def sort_by_frequent(self) -> None:
         new_dict = dict(
-            sorted(self._apps.items(), key=lambda item: item[0].frequency)
+            sorted(
+                self._apps.items(),
+                key=lambda item: (item[0].frequency, item[0].name)
+            )
         )
         self._apps = new_dict
 
