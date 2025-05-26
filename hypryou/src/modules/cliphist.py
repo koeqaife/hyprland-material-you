@@ -10,7 +10,7 @@ import re
 from utils_cy.levenshtein import compute_text_match_score
 from src.services.state import close_window
 
-FOUND_THRESHOLD = 0.6
+FOUND_THRESHOLD = 0.5
 data_regex = re.compile(
     r"\[\[ binary data (\d+) (KiB|MiB) (\w+) (\d+)x(\d+) \]\]"
 )

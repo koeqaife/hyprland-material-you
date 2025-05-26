@@ -140,7 +140,7 @@ cpdef float compute_text_match_score(str s1, str s2):
     elif len(s2) < len(s1):
         part = partial_ratio(s2, s1)
 
-    cdef float score = 0.4 * full + 0.6 * part
+    cdef float score = 0.5 * full + 0.5 * part
 
     cdef int len_diff = abs(len(s1) - len(s2))
     if len_diff >= 10:
