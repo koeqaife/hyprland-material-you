@@ -16,6 +16,12 @@ data_regex = re.compile(
 )
 
 
+def normalize_string(s: str) -> str:
+    s = re.sub(r"[-_]", " ", s)
+    s = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", s)
+    return s.lower()
+
+
 class ClipItem(gtk.Revealer):
     def __init__(self, item: tuple[str, str], search: str) -> None:
         self.button = gtk.Button(
@@ -32,6 +38,12 @@ class ClipItem(gtk.Revealer):
         self.item = item
         self.show_image = False
         self._child: gtk.Box | gtk.Label | None = None
+
+        self.search_strings = (
+            self.item[1],
+            normalize_string(self.item[1])
+        )
+
         self.check_is_image()
         self.update_widget()
 
@@ -133,14 +145,24 @@ class ClipItem(gtk.Revealer):
         close_window("cliphist")
         copy_by_id(self.item[0])
 
-    def update_search(self, search: str) -> None:
+    def update_search(self, search: str, search_normalized: str = "") -> None:
         if not search or not search.strip():
             self.set_reveal_child(True)
             self.score = -1
         else:
-            score = compute_text_match_score(self.item[1], search)
-            self.set_reveal_child(score >= FOUND_THRESHOLD)
-            self.score = score
+            scores = []
+            for string in self.search_strings:
+                raw_score = compute_text_match_score(string, search)
+                normalized_score = (
+                    compute_text_match_score(string, search_normalized)
+                    if search_normalized else -1
+                )
+                score = max(raw_score, normalized_score)
+                scores.append(score)
+
+            max_score = max(*scores)
+            self.set_reveal_child(max_score >= FOUND_THRESHOLD)
+            self.score = max_score
 
     def destroy(self) -> None:
         self.button.disconnect(self.on_click_handler)
@@ -196,8 +218,9 @@ class ClipHistoryBox(gtk.Box):
     @sync_debounce(150)
     def on_search(self, *args: t.Any) -> None:
         text = self.entry.get_text()
+        normalized = normalize_string(text)
         for item in self._items.values():
-            item.update_search(text)
+            item.update_search(text, normalized)
         if len(text.strip()) > 0:
             self.hint_highest()
         elif self.last_highest:
@@ -205,7 +228,9 @@ class ClipHistoryBox(gtk.Box):
             self.last_highest = None
 
     def destroy(self) -> None:
-        ...
+        items.unwatch(self.handler_id)
+        for handler in self.entry_handlers:
+            self.entry.disconnect(handler)
 
     def idle_items(self) -> None:
         for key, item in self._items.items():
