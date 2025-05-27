@@ -81,6 +81,6 @@ def save_cache_file(item_id: str) -> str:
 
 
 def clear_tmp() -> None:
-    tmp_dir = Path("/tmp/hypryou/cliphist/")
+    tmp_dir = Path(TEMP_PATH)
     for file in tmp_dir.glob("*"):
         file.unlink()

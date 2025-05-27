@@ -1,5 +1,6 @@
 from repository import gtk, layer_shell, glib, pango
 from src.services.cliphist import items, repopulate, save_cache_file
+from src.services.cliphist import clear_tmp
 from src.services.cliphist import copy_by_id
 from utils import widget, sync_debounce, toggle_css_class
 from utils.logger import logger
@@ -56,6 +57,7 @@ class ClipItem(gtk.Revealer):
         self.button.set_child(None)
         self._child = None
         self.show_image = False
+        clear_tmp()
 
     def update_widget(self) -> None:
         if self.show_image and not isinstance(self._child, gtk.Box):
