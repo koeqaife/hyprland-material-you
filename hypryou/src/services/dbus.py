@@ -3,9 +3,6 @@ from utils.logger import logger
 import typing as t
 from utils.service import Service, Signals
 
-NAME_DBUS = "org.freedesktop.DBus"
-IFACE_DBUS = "org.freedesktop.DBus"
-SIGNAL_NAME_OWNER_CHANGED = "NameOwnerChanged"
 
 session_bus = gio.bus_get_sync(gio.BusType.SESSION, None)
 system_bus = gio.bus_get_sync(gio.BusType.SYSTEM, None)
@@ -42,9 +39,9 @@ def on_name_owner_changed(
 
 def subscribe_signals(connection: gio.DBusConnection) -> int:
     return connection.signal_subscribe(
-        NAME_DBUS,
-        IFACE_DBUS,
-        SIGNAL_NAME_OWNER_CHANGED,
+        "org.freedesktop.DBus",
+        "org.freedesktop.DBus",
+        "NameOwnerChanged",
         None,
         None,
         gio.DBusSignalFlags.NONE,
