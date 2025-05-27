@@ -8,7 +8,6 @@ import os
 from repository import glib, gio, gdk_pixbuf, gtk, gdk
 from utils import Ref
 from utils.logger import logger
-from src.services.dbus import BUS_TYPE
 import typing as t
 from pathlib import Path
 from utils.service import Signals, Service
@@ -272,7 +271,7 @@ class NotificationsWatcher:
 
     def register(self) -> int:
         return gio.bus_own_name(
-            BUS_TYPE,
+            gio.BusType.SESSION,
             BUS_WATCHER,
             gio.BusNameOwnerFlags.NONE,
             self.on_bus_acquired,

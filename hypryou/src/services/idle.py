@@ -3,7 +3,6 @@ import os
 from config import CONFIG_DIR
 from utils.service import Service
 from repository import gio, glib
-from src.services.dbus import BUS_TYPE
 from utils.logger import logger
 import typing as t
 from pywayland.client.display import Display
@@ -80,7 +79,7 @@ class ScreenSaver:
 
     def register(self) -> int:
         return gio.bus_own_name(
-            BUS_TYPE,
+            gio.BusType.SESSION,
             BUS_WATCHER,
             gio.BusNameOwnerFlags.NONE,
             self.on_bus_acquired,

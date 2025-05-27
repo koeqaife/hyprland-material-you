@@ -3,7 +3,7 @@ from __future__ import annotations
 import time
 from repository import gio, glib
 import typing as t
-from src.services.dbus import dbus_proxy, bus, cache_proxy_properties
+from src.services.dbus import dbus_proxy, session_bus, cache_proxy_properties
 from src.services.dbus import name_owner_changed
 from utils.logger import logger
 from utils import Ref
@@ -372,7 +372,7 @@ class MprisWatcher:
             return
 
         proxy = gio.DBusProxy.new_sync(
-            bus,
+            session_bus,
             gio.DBusProxyFlags.NONE,
             None,
             name,

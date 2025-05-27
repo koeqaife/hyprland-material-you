@@ -5,7 +5,7 @@ import os
 from repository import gio, glib, gtk, gdk_pixbuf
 from config import CONFIG_DIR
 from utils.logger import logger
-from src.services.dbus import BUS_TYPE, dbus_proxy, cache_proxy_properties
+from src.services.dbus import dbus_proxy, cache_proxy_properties
 from src.services.dbus import name_owner_changed
 import typing as t
 from utils import Ref
@@ -326,7 +326,7 @@ class StatusNotifierWatcher:
 
     def register(self) -> int:
         return gio.bus_own_name(
-            BUS_TYPE,
+            gio.BusType.SESSION,
             BUS_WATCHER,
             gio.BusNameOwnerFlags.NONE,
             self.on_bus_acquired,
@@ -342,7 +342,6 @@ class StatusNotifierWatcher:
         old_owner: str,
         new_owner: str
     ) -> None:
-        print("Tray", name, old_owner, new_owner)
         if name in items.value and new_owner == "":
             logger.debug("Tray item '%s' disappeared from bus.", name)
             self.remove_item(items.value[name])
@@ -456,7 +455,7 @@ class StatusNotifierWatcher:
 
     def acquire_item_proxy(self, bus_name: str, bus_path: str) -> None:
         return gio.DBusProxy.new_for_bus(
-            BUS_TYPE,
+            gio.BusType.SESSION,
             gio.DBusProxyFlags.NONE,
             self.ifaces[0],
             bus_name,

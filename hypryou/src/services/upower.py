@@ -1,7 +1,7 @@
 from __future__ import annotations
 from enum import Enum
 
-from src.services.dbus import cache_proxy_properties
+from src.services.dbus import cache_proxy_properties, system_bus
 from repository import gio, glib
 from utils import Ref
 from utils.logger import logger
@@ -54,9 +54,8 @@ battery_icons: dict[str, dict[int, str]] = {
 class UPower(Signals):
     def __init__(self) -> None:
         super().__init__()
-        bus = gio.bus_get_sync(gio.BusType.SYSTEM, None)
         self._proxy = gio.DBusProxy.new_sync(
-            bus,
+            system_bus,
             gio.DBusProxyFlags.NONE,
             None,
             "org.freedesktop.UPower",

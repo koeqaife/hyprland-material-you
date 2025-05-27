@@ -3,14 +3,14 @@ from utils.logger import logger
 import typing as t
 from utils.service import Service, Signals
 
-BUS_TYPE = gio.BusType.SESSION
 NAME_DBUS = "org.freedesktop.DBus"
 IFACE_DBUS = "org.freedesktop.DBus"
 SIGNAL_NAME_OWNER_CHANGED = "NameOwnerChanged"
 
-bus = gio.bus_get_sync(BUS_TYPE, None)
+session_bus = gio.bus_get_sync(gio.BusType.SESSION, None)
+system_bus = gio.bus_get_sync(gio.BusType.SYSTEM, None)
 dbus_proxy = gio.DBusProxy.new_sync(
-    bus,
+    session_bus,
     gio.DBusProxyFlags.NONE,
     None,
     "org.freedesktop.DBus",
@@ -120,4 +120,4 @@ def cache_proxy_properties_finish(
 
 class DBusService(Service):
     def start(self) -> None:
-        subscribe_signals(bus)
+        subscribe_signals(session_bus)

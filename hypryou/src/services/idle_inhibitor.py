@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from src.services.dbus import bus
+from src.services.dbus import session_bus
 from repository import gio, glib
 from utils import Ref
 from utils.logger import logger
@@ -12,7 +12,7 @@ inhibited = Ref(False, name="inhibited")
 class IdleInhibitor:
     def __init__(self) -> None:
         self._proxy = gio.DBusProxy.new_sync(
-            bus,
+            session_bus,
             gio.DBusProxyFlags.NONE,
             None,
             "org.freedesktop.ScreenSaver",
