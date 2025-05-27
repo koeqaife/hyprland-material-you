@@ -1,49 +1,78 @@
+// <post:compile_scss.material-discord.css>
 @use "sass:color";
+@use "sass:math";
+@use "<var:outputFolder>/colors.scss" as *;
 
 @import url(https://capnkitten.github.io/BetterDiscord/Themes/Material-Discord/css/source.css);
-@import "<output-folder>/colors.scss";
 
+$hueLight: math.round(color.channel($primaryLight, "hue", $space: hsl));
+$saturationLight: math.round(color.channel($primaryLight, "saturation", $space: hsl));
+$lightnessLight: math.round(color.channel($primaryLight, "lightness", $space: hsl));
 
-$color-scheme: <color-scheme>;
+$hueDark: math.round(color.channel($primaryDark, "hue", $space: hsl));
+$saturationDark: math.round(color.channel($primaryDark, "saturation", $space: hsl));
+$lightnessDark: math.round(color.channel($primaryDark, "lightness", $space: hsl));
 
-$hue: round(color.channel($primary, "hue", $space: hsl));
-$saturation: round(color.channel($primary, "saturation", $space: hsl));
-$lightness: round(color.channel($primary, "lightness", $space: hsl));
+.theme-light {
+	--main-color: #{$backgroundLight};
+	--main-alt: #{$surfaceContainerLowLight};
 
-* {
-    transition: color 0.2s ease-in-out;
-    transition-property: background-color, color;
+	--message-color: #{$surfaceContainerLowestLight};
+	--message-color-hover: #{$surfaceContainerLight};
+	--message-color-alt: #{$surfaceContainerLight};
+	--attachment-color: #{$backgroundLight};
+
+	--accent-hue: #{$hueLight};
+	--accent-saturation: #{$saturationLight};
+	--accent-lightness: #{$lightnessLight};
+	--accent-text-color: #{$onPrimaryLight};
+
+	--main-textarea-color: #{$surfaceContainerHighLight};
+	--main-textarea-color-alt: #{$surfaceContainerHighestLight};
+	--status-picker-color: #{$surfaceContainerHighLight};
+
+	--tooltip-color: #{$surfaceContainerLight};
+	--popout-color: #{$surfaceContainerLight};
+	--popout-color-alt: #{$surfaceContainerLowestLight};
+	--popout-header-border: #{$onSurfaceLight};
+	--separator-color: #{$outlineVariantLight};
+	--sidebar-panel-color: #{$surfaceContainerLowestLight};
+	--server-color: #{$surfaceContainerLowLight};
+
+	[class*="botTag_"] svg path {
+		fill: #{$onPrimaryLight};
+	}
 }
 
-.theme-#{$color-scheme} {
-	--main-color: #{$background};
-	--main-alt: #{$surfaceContainerLow};
+.theme-dark {
+	--main-color: #{$backgroundDark};
+	--main-alt: #{$surfaceContainerLowDark};
 
-	--message-color: #{$surfaceContainerLowest};
-	--message-color-hover: #{$surfaceContainer};
-	--message-color-alt: #{$surfaceContainer};
-	--attachment-color: #{$background};
+	--message-color: #{$surfaceContainerLowestDark};
+	--message-color-hover: #{$surfaceContainerDark};
+	--message-color-alt: #{$surfaceContainerDark};
+	--attachment-color: #{$backgroundDark};
 
-	--accent-hue: #{$hue};
-	--accent-saturation: #{$saturation};
-	--accent-lightness: #{$lightness};
-	--accent-text-color: #{$onPrimary};
+	--accent-hue: #{$hueDark};
+	--accent-saturation: #{$saturationDark};
+	--accent-lightness: #{$lightnessDark};
+	--accent-text-color: #{$onPrimaryDark};
 
-	--main-textarea-color: #{$surfaceContainerHigh};
-	--main-textarea-color-alt: #{$surfaceContainerHighest};
-	--status-picker-color: #{$surfaceContainerHigh};
+	--main-textarea-color: #{$surfaceContainerHighDark};
+	--main-textarea-color-alt: #{$surfaceContainerHighestDark};
+	--status-picker-color: #{$surfaceContainerHighDark};
 
-	--tooltip-color: #{$surfaceContainer};
-	--popout-color: #{$surfaceContainer};
-	--popout-color-alt: #{$surfaceContainerLowest};
-	--popout-header-border: #{$onSurface};
-	--separator-color: #{$outlineVariant};
-	--sidebar-panel-color: #{$surfaceContainerLowest};
-	--server-color: #{$surfaceContainerLow};
-}
+	--tooltip-color: #{$surfaceContainerDark};
+	--popout-color: #{$surfaceContainerDark};
+	--popout-color-alt: #{$surfaceContainerLowestDark};
+	--popout-header-border: #{$onSurfaceDark};
+	--separator-color: #{$outlineVariantDark};
+	--sidebar-panel-color: #{$surfaceContainerLowestDark};
+	--server-color: #{$surfaceContainerLowDark};
 
-[class*="botTag_"] svg path {
-	fill: #{$onPrimary};
+	[class*="botTag_"] svg path {
+		fill: #{$onPrimaryDark};
+	}
 }
 
 [class*="repliedTextContent_"] {
