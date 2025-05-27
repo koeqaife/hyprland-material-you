@@ -1,6 +1,7 @@
 import functools
 import os
 import json
+import subprocess
 import threading
 from PIL import Image
 import concurrent
@@ -177,14 +178,18 @@ def generate_color_map(
     return color_map
 
 
-class ColorFormatter:
+class TemplateFormatter:
     def __init__(
         self,
         scheme: DynamicScheme,
         dark_scheme: DynamicScheme,
-        light_scheme: DynamicScheme
+        light_scheme: DynamicScheme,
+        vars: dict[str, str],
+        allowed_actions: tuple[str] | tuple[()] = ()
     ) -> None:
         self.color_map = generate_color_map(scheme, dark_scheme, light_scheme)
+        self.vars = vars
+        self.post_actions = allowed_actions
 
     def apply_transformations(
         self,
@@ -263,35 +268,46 @@ class ColorFormatter:
                     result.append(command)
         return result
 
-    def format(
-        self,
-        text: str
-    ) -> str:
-        pattern = r'(<(\w+)(?:\.(.+))?>)'
+    def format(self, text: str) -> str:
+        pattern = r'(<(?:(\w+):)?(\w+)(?:\.(.+))?>)'
         matches = re.findall(pattern, text)
         result = []
+        actions = []
         last_end = 0
 
         for match in matches:
-            full_match, key, transformations_str = match
-            if key in self.color_map:
-                result.append(text[last_end:text.find(full_match, last_end)])
+            full_match, tag_type, key, transformations_str = match
+            start_index = text.find(full_match, last_end)
+            if start_index == -1:
+                continue
+
+            result.append(text[last_end:start_index])
+            value = None
+
+            if tag_type == 'var' and key in self.vars:
+                value = self.vars[key]
+            elif tag_type == 'post' and key in self.post_actions:
+                value = f"Post action: {key}"
+                actions.append(f"{key}.{transformations_str}")
+            elif tag_type is None and key in self.color_map:
                 value = self.color_map[key]
-                if transformations_str:
+
+            if value is not None:
+                if transformations_str and tag_type is None:
                     transformations = self.parse_transformations(
                         transformations_str
                     )
                     value = self.apply_transformations(value, transformations)
                 result.append(value)
-                last_end = text.find(full_match, last_end) + len(full_match)
+                last_end = start_index + len(full_match)
 
         result.append(text[last_end:])
+
         str_result = ''.join(result)
-        pattern = r'<\\\\([^>]+)>'
 
-        str_result = re.sub(pattern, r'<\1>', str_result)
+        str_result = re.sub(r'<\\\\([^>]+)>', r'<\1>', str_result)
 
-        return str_result
+        return str_result, actions
 
 
 def generate_templates(
@@ -301,8 +317,10 @@ def generate_templates(
     dark_scheme: DynamicScheme,
     light_scheme: DynamicScheme,
     is_dark: bool,
-    wallpaper: str | None = None
-) -> None:
+    wallpaper: str | None = None,
+    allowed_actions: tuple[str] | tuple[()] = ()
+) -> dict[str, list[str]]:
+    actions: dict[str, list[str]] = {}
     color_scheme = "dark" if is_dark else "light"
 
     if not os.path.exists(output_folder):
@@ -316,17 +334,23 @@ def generate_templates(
     for file_path in file_list:
         with open(file_path) as f:
             template = f.read()
-        formatter = ColorFormatter(scheme, dark_scheme, light_scheme)
-        template = formatter.format(template)
-        template = (
-            template
-            .replace("<color-scheme>", color_scheme)
-            .replace("<output-folder>", output_folder)
-            .replace("<wallpaper>", wallpaper or "")
+        formatter = TemplateFormatter(
+            scheme,
+            dark_scheme,
+            light_scheme,
+            {
+                "colorScheme": color_scheme,
+                "outputFolder": output_folder,
+                "wallpaper": wallpaper or ""
+            },
+            allowed_actions
         )
+        template, _actions = formatter.format(template)
         new_path = join(output_folder, os.path.basename(file_path))
         with open(new_path, 'w') as f:
             f.write(template)
+        if _actions:
+            actions[new_path] = _actions
 
     _schemes = (
         (scheme, ""),
@@ -362,6 +386,8 @@ def generate_templates(
             new_path = join(output_folder, os.path.basename(file))
             with open(new_path, 'w') as f:
                 f.write(_template)
+
+    return actions
 
 
 def process_image(
@@ -471,15 +497,44 @@ def generate_colors_sync(
         )
         json.dump(colors_dict(object), f, indent=2)
 
-    generate_templates(
+    allowed_actions = ("compile_scss")
+    post = generate_templates(
         TEMPLATES_DIR,
         CACHE_PATH,
         scheme,
         dark_scheme,
         light_scheme,
         is_dark,
-        image_path
+        image_path,
+        allowed_actions
     )
+
+    for file_path, actions in post.items():
+        for action in actions:
+            if action.startswith("compile_scss"):
+                command = action.split(".", 1)
+                file_name = (
+                    command[1]
+                    if len(command) > 1
+                    else os.path.basename(file_path)
+                )
+                output = join(
+                    CACHE_PATH,
+                    "compiled",
+                    file_name
+                )
+                compile_scss(file_path, output)
+
+
+def compile_scss(path: str, output: str) -> None:
+    logger.debug("Compiling scss")
+    command = [
+        'sass',
+        path,
+        output
+    ]
+
+    subprocess.Popen(command)
 
 
 def default_on_complete() -> None:
