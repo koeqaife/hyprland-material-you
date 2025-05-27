@@ -31,8 +31,6 @@ from src.services.upower import UPowerService
 from src.services.idle import ScreenSaverService
 from src.services.login1 import Login1ManagerService
 
-from src.services import events
-
 # Modules
 from src.modules.bar import Bar, Corner
 from src.modules.tray import TrayWindow
@@ -186,7 +184,6 @@ def init() -> None:
         )
         exit(1)
 
-    Globals.events = events.EventsBus()
     Settings()
     asyncio.set_event_loop_policy(GLibEventLoopPolicy())
     logger.debug("Initialized")

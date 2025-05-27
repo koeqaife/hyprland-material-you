@@ -1,11 +1,8 @@
 from repository import gio, glib
-from src.variables import Globals
-from src.services.events import EventsBus, NameOwnerChanged
 from utils.logger import logger
 import typing as t
-from utils.service import Service
+from utils.service import Service, Signals
 
-events: EventsBus
 BUS_TYPE = gio.BusType.SESSION
 NAME_DBUS = "org.freedesktop.DBus"
 IFACE_DBUS = "org.freedesktop.DBus"
@@ -21,6 +18,7 @@ dbus_proxy = gio.DBusProxy.new_sync(
     "org.freedesktop.DBus",
     None
 )
+name_owner_changed = Signals()
 
 
 def on_name_owner_changed(
@@ -36,12 +34,10 @@ def on_name_owner_changed(
         "NameOwnerChanged: %s, '%s' -> '%s'",
         name, old_owner, new_owner
     )
-    event = NameOwnerChanged(
-        (name, old_owner, new_owner),
-        "global",
-        "name_owner_changed"
+    name_owner_changed.notify(
+        "notify",
+        name, old_owner, new_owner
     )
-    events.notify(event)
 
 
 def subscribe_signals(connection: gio.DBusConnection) -> int:
@@ -124,6 +120,4 @@ def cache_proxy_properties_finish(
 
 class DBusService(Service):
     def start(self) -> None:
-        global events
-        events = Globals.events
         subscribe_signals(bus)

@@ -4,8 +4,7 @@ import time
 from repository import gio, glib
 import typing as t
 from src.services.dbus import dbus_proxy, bus, cache_proxy_properties
-from src.services.events import NameOwnerChanged
-from src.variables import Globals
+from src.services.dbus import name_owner_changed
 from utils.logger import logger
 from utils import Ref
 from utils.service import Signals, Service
@@ -341,14 +340,14 @@ class MprisPlayer(Signals):
 
 class MprisWatcher:
     def __init__(self) -> None:
-        Globals.events.watch(
-            "name_owner_changed",
-            self.on_name_owner_changed
-        )
+        name_owner_changed.watch("notify", self.on_name_owner_changed)
 
-    def on_name_owner_changed(self, event: NameOwnerChanged) -> None:
-        name, old_owner, new_owner = event.data
-
+    def on_name_owner_changed(
+        self,
+        name: str,
+        old_owner: str,
+        new_owner: str
+    ) -> None:
         if name.startswith(MPRIS_PREFIX):
             if old_owner != "" and new_owner == "":  # Disappeared
                 self.remove_player(name)
@@ -397,5 +396,5 @@ class MprisWatcher:
 class MprisService(Service):
     def start(self) -> None:
         logger.debug("Starting mpris watcher")
-        watcher = MprisWatcher()
-        watcher.scan_existing_players()
+        self.watcher = MprisWatcher()
+        self.watcher.scan_existing_players()

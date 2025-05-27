@@ -6,8 +6,7 @@ from repository import gio, glib, gtk, gdk_pixbuf
 from config import CONFIG_DIR
 from utils.logger import logger
 from src.services.dbus import BUS_TYPE, dbus_proxy, cache_proxy_properties
-from src.services.events import NameOwnerChanged
-from src.variables import Globals
+from src.services.dbus import name_owner_changed
 import typing as t
 from utils import Ref
 from utils.service import Signals, Service
@@ -104,6 +103,8 @@ class StatusNotifierItem(Signals):
     def finalize(self) -> None:
         # Removes all links so item will be removed by GC
         # Tested with weakref.finalize
+        if self._proxy is None:
+            return
         for conn in self.conns:
             self._proxy.disconnect(conn)
         self._proxy = None  # type: ignore
@@ -159,6 +160,9 @@ class StatusNotifierItem(Signals):
         )
 
     def prop(self, property_name: str) -> t.Any:
+        if self._proxy is None:
+            self.finalize()
+            return
         value = self._proxy.get_cached_property(property_name)
         if value is None:
             return None
@@ -334,9 +338,11 @@ class StatusNotifierWatcher:
 
     def on_name_owner_changed(
         self,
-        event: NameOwnerChanged
+        name: str,
+        old_owner: str,
+        new_owner: str
     ) -> None:
-        name, old_owner, new_owner = event.data
+        print("Tray", name, old_owner, new_owner)
         if name in items.value and new_owner == "":
             logger.debug("Tray item '%s' disappeared from bus.", name)
             self.remove_item(items.value[name])
@@ -348,10 +354,7 @@ class StatusNotifierWatcher:
         self, conn: gio.DBusConnection, name: str, user_data: object = None
     ) -> None:
         logger.debug("System tray bus acquired")
-        Globals.events.watch(
-            "name_owner_changed",
-            self.on_name_owner_changed
-        )
+        name_owner_changed.watch("notify", self.on_name_owner_changed)
         self._conn = conn
         for interface in self.ifaces:
             if interface.name == name:
