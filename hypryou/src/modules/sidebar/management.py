@@ -198,7 +198,11 @@ class BluetoothButton(ManagementButton):
             on_right_click=lambda: None
         )
         self.on_update()
-        self.bluetooth.connect("notify", self.on_update)
+        self.handler = self.bluetooth.connect("notify", self.on_update)
+
+    def destroy(self) -> None:
+        self.bluetooth.disconnect(self.handler)
+        super().destroy()
 
     def toggle_bluetooth(self) -> None:
         self.bluetooth.toggle()
