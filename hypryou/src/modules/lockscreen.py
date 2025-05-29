@@ -1,3 +1,4 @@
+import threading
 from src.services.state import is_locked, current_wallpaper
 from repository import session_lock, gtk, gdk, glib
 import typing as t
@@ -17,6 +18,7 @@ from time import monotonic
 
 username = pwd.getpwuid(os.getuid()).pw_name
 close_player = Ref(False, name="lock_close_player")
+blocked_input = Ref(False, name="lock_blocked_input")
 
 
 def check_password(username: str, password: str) -> bool:
@@ -302,11 +304,27 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         toggle_css_class(self.unlock_box, "invalid", False)
 
     def on_entry_activate(self, *args: t.Any) -> None:
-        is_correct = check_password(username, self.unlock_entry.get_text())
-        if is_correct:
-            is_locked.value = False
-        else:
-            toggle_css_class(self.unlock_box, "invalid", True)
+        if blocked_input.value:
+            return
+        password = self.unlock_entry.get_text()
+
+        self.unlock_entry.set_editable(False)
+
+        def authenticate_and_continue() -> None:
+            blocked_input.value = True
+            is_correct = check_password(username, password)
+
+            def on_done() -> None:
+                blocked_input.value = False
+                self.unlock_entry.set_editable(True)
+                if is_correct:
+                    is_locked.value = False
+                else:
+                    toggle_css_class(self.unlock_box, "invalid", True)
+
+            glib.idle_add(on_done)
+
+        threading.Thread(target=authenticate_and_continue, daemon=True).start()
 
     def entry_focus_leave(self, *args: t.Any) -> None:
         self.btn_revealer.set_reveal_child(True)
@@ -493,6 +511,7 @@ class ScreenLock:
             return
 
         display: gdk.Display = gdk.Display.get_default()
+        blocked_input.value = False
         for monitor in display.get_monitors():
             window = ScreenLockWindow(self.app)
             self.windows[t.cast(gdk.Monitor, monitor)] = window
@@ -514,6 +533,7 @@ class ScreenLock:
             if remaining == 0:
                 self.windows.clear()
                 self.lock_instance.unlock()
+        blocked_input.value = False
 
         for window in windows:
             window.fade_out_and_destroy(on_done=on_window_done)
