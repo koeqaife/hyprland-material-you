@@ -11,10 +11,12 @@ from gi.repository import GdkPixbuf as gdk_pixbuf
 from gi.repository import GObject as gobject
 from gi.repository import Pango as pango
 from gi.repository import NM as nm  # type: ignore [attr-defined]
+from gi.repository import AstalBluetooth as bluetooth
 
 __all__ = [
     "versions", "gtk", "layer_shell",
     "gdk", "gio", "glib", "gsk",
     "gdk_pixbuf", "gobject",
-    "pango", "nm", "session_lock"
+    "pango", "nm", "session_lock",
+    "bluetooth"
 ]

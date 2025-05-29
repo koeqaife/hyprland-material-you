@@ -1,4 +1,4 @@
-from repository import gtk, pango, gdk
+from repository import gtk, pango, gdk, bluetooth
 from utils import widget, Ref, toggle_css_class
 import typing as t
 from src.variables.clock import full_date
@@ -186,6 +186,40 @@ class InternetButton(ManagementButton):
             self.set_activated(False)
 
 
+class BluetoothButton(ManagementButton):
+    def __init__(self) -> None:
+        self.bluetooth = bluetooth.get_default()
+        super().__init__(
+            "bluetooth_disabled",
+            "Bluetooth",
+            "UNKNOWN",
+            False,
+            self.toggle_bluetooth,
+            on_right_click=lambda: None
+        )
+        self.on_update()
+        self.bluetooth.connect("notify", self.on_update)
+
+    def toggle_bluetooth(self) -> None:
+        self.bluetooth.toggle()
+
+    def on_update(self, *args: t.Any) -> None:
+        is_connected = self.bluetooth.get_is_connected()
+        is_powered = self.bluetooth.get_is_powered()
+        if is_connected:
+            self.set_activated(True)
+            self.state.set_label("Connected")
+            self.icon.set_label("bluetooth_connected")
+        elif is_powered:
+            self.set_activated(True)
+            self.state.set_label("On")
+            self.icon.set_label("bluetooth")
+        else:
+            self.set_activated(False)
+            self.state.set_label("Off")
+            self.icon.set_label("bluetooth_disabled")
+
+
 class ToggleButton(ManagementButton):
     def __init__(
         self,
@@ -252,13 +286,7 @@ class ManagementFirstPage(gtk.Box):
         )
 
         self.internet = InternetButton()
-        self.bluetooth = ManagementButton(
-            "bluetooth",
-            "Bluetooth",
-            "Off",
-            False,
-            on_right_click=lambda: None
-        )
+        self.bluetooth = BluetoothButton()
         self.dark_mode = ToggleButton(
             "contrast",
             "Dark Mode",
