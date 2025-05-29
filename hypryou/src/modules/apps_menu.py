@@ -31,6 +31,7 @@ def cache_icon(icon: str | None) -> gtk.IconPaintable | None:
 
 class AppItem(gtk.Revealer):
     def __init__(self, item: Application, search: str) -> None:
+        self.on_click = sync_debounce(750, 1, True)(self._on_click)
         self.box = gtk.Box(
             css_classes=("app-item-box",)
         )
@@ -67,8 +68,7 @@ class AppItem(gtk.Revealer):
 
         self.on_click_handler = self.button.connect("clicked", self.on_click)
 
-    @sync_debounce(750, 1, immediate=True)
-    def on_click(self, *args: t.Any) -> None:
+    def _on_click(self, *args: t.Any) -> None:
         self.launch()
 
     def launch(self, *args: t.Any) -> None:
@@ -83,6 +83,7 @@ class AppItem(gtk.Revealer):
 
     def destroy(self) -> None:
         self.button.disconnect(self.on_click_handler)
+        del self.on_click
 
 
 class AppsBox(gtk.Box):

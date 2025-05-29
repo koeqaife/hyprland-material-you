@@ -26,6 +26,7 @@ def normalize_string(s: str) -> str:
 
 class ClipItem(gtk.Revealer):
     def __init__(self, item: tuple[str, str], search: str) -> None:
+        self.on_activate = sync_debounce(750, 1, True)(self._on_activate)
         self.button = gtk.Button(
             css_classes=("cliphist-item",),
             tooltip_text=item[1]
@@ -140,8 +141,7 @@ class ClipItem(gtk.Revealer):
             self.update_widget()
         self.on_activate()
 
-    @sync_debounce(750, 1, immediate=True)
-    def on_activate(self, *args: t.Any) -> None:
+    def _on_activate(self, *args: t.Any) -> None:
         self._activate()
 
     def _activate(self, *args: t.Any) -> None:
