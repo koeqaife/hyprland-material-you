@@ -1,4 +1,6 @@
 @use "colors" as *;
+@use "variables" as *;
+@use "calculated" as *;
 @use "sass:color";
 
 button.filled {
@@ -23,6 +25,32 @@ button.filled {
     }
     &:active {
         background-color: color.mix($primary, $inverseOnSurface, 75%);
+    }
+}
+
+button.elevated {
+    @include elevation(1);
+    border-radius: 2rem;
+    min-height: 2rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    background-color: $surfaceContainerLow;
+
+    label {
+        font-size: 1rem;
+        font-weight: 400;
+        color: $primary;
+    }
+    .icon {
+        font-weight: 500;
+        margin-right: 0.5rem;
+        font-variation-settings: "opsz" 20;
+    }
+    &:hover {
+        background-color: color.mix($surfaceContainerLow, $inverseOnSurface, 82%);
+    }
+    &:active {
+        background-color: color.mix($surfaceContainerLow, $inverseOnSurface, 75%);
     }
 }
 
