@@ -6,7 +6,7 @@ from utils import widget, Ref, downloader
 from utils import toggle_css_class, escape_markup
 from utils.logger import logger
 from src.variables.clock import date, time
-from repository import gtk, gdk, pango
+from repository import gtk, gdk, pango, bluetooth
 from src.services import hyprland
 from src.services.hyprland import active_workspace, workspace_ids
 from src.services.hyprland import active_layout, show_layout
@@ -561,6 +561,32 @@ class Applet(widget.Icon):
         super().destroy()
 
 
+class BluetoothApplet(Applet):
+    def __init__(self) -> None:
+        self.bluetooth = bluetooth.get_default()
+        super().__init__(
+            "bluetooth",
+            "bluetooth_disabled",
+            lambda: None
+        )
+        self.on_update()
+        self.handler = self.bluetooth.connect("notify", self.on_update)
+
+    def destroy(self) -> None:
+        self.bluetooth.disconnect(self.handler)
+        super().destroy()
+
+    def on_update(self, *args: t.Any) -> None:
+        is_connected = self.bluetooth.get_is_connected()
+        is_powered = self.bluetooth.get_is_powered()
+        if is_connected:
+            self.set_label("bluetooth_connected")
+        elif is_powered:
+            self.set_label("bluetooth")
+        else:
+            self.set_label("bluetooth_disabled")
+
+
 class Applets(gtk.Box):
     def __init__(self) -> None:
         super().__init__(
@@ -569,7 +595,7 @@ class Applets(gtk.Box):
 
         self.children = (
             Applet("audio", "volume_up", lambda: None, self.open_pavucontrol),
-            Applet("bluetooth", "bluetooth", lambda: None),
+            BluetoothApplet(),
             Applet("wifi", get_network().icon, lambda: None)
         )
         for child in self.children:
