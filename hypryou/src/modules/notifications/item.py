@@ -51,6 +51,7 @@ class NotificationItem(gtk.Box):
         show_dismiss: bool = False,
         hide_sensitive_content: bool = False
     ) -> None:
+        self.is_destroyed = False
         self.hide_content = hide_sensitive_content
         if item.hints.get("transient") and show_dismiss:
             show_dismiss = False
@@ -293,6 +294,9 @@ class NotificationItem(gtk.Box):
         self.title.set_visible(self.item.summary != "")
 
     def destroy(self) -> None:
+        if self.is_destroyed:
+            return
+        self.is_destroyed = True
         self.item.unwatch("changed", self.handler_id)
         for _widget, conn in self.conns.items():
             _widget.disconnect(conn)
@@ -306,6 +310,7 @@ class NotificationRevealer(gtk.Box):
         item: NotificationItem,
         transition_duration: int = 250
     ) -> None:
+        self.is_destroyed = False
         self.duration = transition_duration
         self.item = item
         self.first_revealer = gtk.Revealer(
@@ -365,7 +370,10 @@ class NotificationRevealer(gtk.Box):
         )
 
     def self_destroy(self) -> None:
+        self.item.destroy()
+        if self.is_destroyed:
+            return
+        self.is_destroyed = True
         self.first_revealer.set_child(None)
         self.second_revealer.set_child(None)
         self.remove(self.first_revealer)
-        self.item.destroy()

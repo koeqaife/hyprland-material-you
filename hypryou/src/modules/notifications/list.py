@@ -117,13 +117,18 @@ class Notifications(gtk.ScrolledWindow):
                 next_item[1].destroy_with_anim(
                     self.on_item_destroy_anim
                 )
-                return True
+                if self.closing_source != -1:
+                    return True
             except StopIteration:
+                pass
+            except AttributeError:
                 pass
         self.closing_source = -1
         is_closing.value = False
         self.items.clear()
         self.unfreeze()
+        if getattr(self, "_iterator", None):
+            del self._iterator
 
     def close_all(self, *args: t.Any) -> None:
         if is_closing.value:
@@ -141,10 +146,21 @@ class Notifications(gtk.ScrolledWindow):
         self.update_clear_button()
 
     def freeze(self) -> None:
+        if getattr(self, "_iterator", None):
+            del self._iterator
+
+        if self.closing_source != -1:
+            try:
+                glib.source_remove(self.closing_source)
+                self.closing_source = -1
+                is_closing.value = False
+            except glib.Error:
+                pass
         if not self.freezed:
             for item in self.items.values():
                 item[1].self_destroy()
-                item[0].remove(item[1])
+                if item[1] in item[0]:
+                    item[0].remove(item[1])
             self.items.clear()
             if self.handler_id != -1:
                 notifications.unwatch(self.handler_id)
@@ -247,5 +263,4 @@ class Notifications(gtk.ScrolledWindow):
                 self.items[key][1].show()
 
         self.update_no_notifications()
-        if added_keys:
-            self.update_clear_button()
+        self.update_clear_button()
