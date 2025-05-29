@@ -159,15 +159,22 @@ class ScreenSaver:
             sleep_timeout = settings.get("battery_sleep")
 
         if lock_timeout > 0:
-            self.create_idle_notification(lock_timeout, self.on_lock)
+            self.create_idle_notification(
+                lock_timeout,
+                self.on_lock,
+                self.dpms_on
+            )
         if dpms_timeout > 0:
             self.create_idle_notification(
-                lock_timeout + dpms_timeout, self.dpms_off, self.dpms_on
+                lock_timeout + dpms_timeout,
+                self.dpms_off,
+                self.dpms_on
             )
         if sleep_timeout > 0:
             self.create_idle_notification(
                 lock_timeout + dpms_timeout + sleep_timeout,
-                self.on_sleep
+                self.on_sleep,
+                self.dpms_on
             )
 
     def global_handler(
