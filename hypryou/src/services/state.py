@@ -15,6 +15,7 @@ current_wallpaper = Ref[gdk.Texture | None](
     types=(NoneType, gdk.Texture)
 )
 is_locked = Ref(False, name="is_locked")
+is_idle_locked = Ref(False, name="is_idle_locked")
 
 
 class OpenedWindowsWatcher(Signals):

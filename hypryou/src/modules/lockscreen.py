@@ -1,5 +1,6 @@
 import threading
 from src.services.state import is_locked, current_wallpaper
+from src.services.state import is_idle_locked
 from repository import session_lock, gtk, gdk, glib
 import typing as t
 import weakref
@@ -221,9 +222,13 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         self.update_current_player()
         self.update_expanded()
         self.map_handler = self.connect("map", self._on_map)
-        self.change_icon_timeout: int | None = glib.timeout_add(
-            5000, self.change_button_icon
-        )
+        self.change_icon_timeout: int | None = None
+        if is_idle_locked.value:
+            self.change_icon_timeout = glib.timeout_add(
+                5000, self.change_button_icon
+            )
+        else:
+            self.change_button_icon()
 
     def update_battery(self, *args: t.Any) -> None:
         upower = get_upower()
@@ -332,7 +337,7 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         toggle_css_class(self.unlock_box, "activated", False)
 
     def on_unlock_button_clicked(self, *args: t.Any) -> None:
-        if monotonic() - self.showed_on < 5:
+        if monotonic() - self.showed_on < 5 and is_idle_locked.value:
             is_locked.value = False
             return
         self.btn_revealer.set_reveal_child(False)
@@ -542,7 +547,7 @@ class ScreenLock:
         pass
 
     def on_unlocked(self, lock_instance: session_lock.Instance) -> None:
-        pass
+        is_idle_locked.value = False
 
     def on_failed(self, lock_instance: session_lock.Instance) -> None:
         pass

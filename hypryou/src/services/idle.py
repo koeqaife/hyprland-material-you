@@ -16,7 +16,7 @@ from pywayland.protocol.ext_idle_notify_v1.ext_idle_notifier_v1 import (
 )
 from src.services import hyprland
 from src.services.upower import get_upower, BatteryState
-from src.services.state import is_locked
+from src.services.state import is_locked, is_idle_locked
 from src.services.login1 import get_login_manager
 from src.services.mpris import players
 from config import Settings
@@ -125,6 +125,7 @@ class ScreenSaver:
     def on_lock(self, *args: t.Any) -> None:
         if self.is_inhibited:
             return
+        is_idle_locked.value = True
         is_locked.value = True
 
     def on_sleep(self, *args: t.Any) -> None:
