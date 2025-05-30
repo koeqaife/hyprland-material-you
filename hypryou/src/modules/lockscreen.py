@@ -454,6 +454,8 @@ class ScreenLockPlayer(Player):
         on_close: t.Callable[[], None]
     ) -> None:
         super().__init__(item)
+        self.title.set_max_width_chars(37)
+        self.artists.set_max_width_chars(37)
         self.text_box.remove(self.player)
         self.player_box = gtk.Box(
             css_classes=("lock-player-box",),
