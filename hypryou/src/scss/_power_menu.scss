@@ -29,7 +29,7 @@ window.power-menu {
         padding-left: 0.75rem;
         padding-right: 0.75rem;
         border-radius: max($hyprlandRounding - 8px, 0px);
-            margin-bottom: 8px;
+        margin-bottom: 8px;
 
         &:hover {
             background-color: color.mix($surfaceContainer, $onSurfaceVariant, 95%);
