@@ -53,7 +53,7 @@ class PowerMenu(gtk.Box):
             ActionButton("logout", "Logout", self.on_logout),
             ActionButton("restart_alt", "Restart", self.on_restart),
             ActionButton("mode_off_on", "Shutdown", self.on_shutdown),
-            ActionButton("cancel", "Cancel", self.on_cancel),
+            ActionButton("close", "Cancel", self.on_cancel),
         )
         for child in self.children:
             self.append(child)
