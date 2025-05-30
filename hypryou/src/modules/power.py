@@ -5,7 +5,7 @@ import typing as t
 from config import HyprlandVars
 import weakref
 from src.services.login1 import get_login_manager
-from src.services.state import is_locked
+from src.services.state import is_locked, close_window
 from src.services import hyprland
 from src.services.mpris import players
 import asyncio
@@ -53,6 +53,7 @@ class PowerMenu(gtk.Box):
             ActionButton("logout", "Logout", self.on_logout),
             ActionButton("restart_alt", "Restart", self.on_restart),
             ActionButton("mode_off_on", "Shutdown", self.on_shutdown),
+            ActionButton("cancel", "Cancel", self.on_cancel),
         )
         for child in self.children:
             self.append(child)
@@ -79,6 +80,9 @@ class PowerMenu(gtk.Box):
 
     def on_shutdown(self, *args: t.Any) -> None:
         self.login1.power_off()
+
+    def on_cancel(self, *args: t.Any) -> None:
+        close_window("power_menu")
 
     def destroy(self) -> None:
         for child in self.children:
