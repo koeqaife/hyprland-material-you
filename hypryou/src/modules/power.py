@@ -2,7 +2,7 @@ from repository import gtk, layer_shell
 from utils import widget, sync_debounce
 from utils.logger import logger
 import typing as t
-from config import HyprlandVars
+from config import HyprlandVars, Settings
 import weakref
 from src.services.login1 import get_login_manager
 from src.services.state import is_locked, close_window
@@ -53,10 +53,16 @@ class PowerMenu(gtk.Box):
             ActionButton("logout", "Logout", self.on_logout),
             ActionButton("restart_alt", "Restart", self.on_restart),
             ActionButton("mode_off_on", "Shutdown", self.on_shutdown),
-            ActionButton("close", "Cancel", self.on_cancel),
         )
         for child in self.children:
             self.append(child)
+
+        self.cancel_button: ActionButton | None = None
+        if Settings().get("power_menu_cancel_button"):
+            self.cancel_button = ActionButton(
+                "close", "Cancel", self.on_cancel
+            )
+            self.append(self.cancel_button)
         weakref.finalize(
             self, lambda: logger.debug("PowerMenu finalized")
         )
@@ -88,6 +94,9 @@ class PowerMenu(gtk.Box):
         for child in self.children:
             child.destroy()
             self.remove(child)
+        if self.cancel_button:
+            self.cancel_button.destroy()
+            self.remove(self.cancel_button)
 
 
 class PowerMenuWindow(widget.LayerWindow):
