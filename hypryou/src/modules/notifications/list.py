@@ -8,7 +8,7 @@ from utils import widget, Ref
 T = t.TypeVar("T")
 
 
-is_closing = Ref(False)
+is_closing = Ref(False, name="notifications_is_closing")
 
 
 def diff_keys(
