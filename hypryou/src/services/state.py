@@ -42,6 +42,12 @@ class OpenedWindowsWatcher(Signals):
             self.notify(f"closed::{window_name}")
             self.notify(f"changed::{window_name}", False)
 
+        if added and Settings().get("one_popup_at_time"):
+            for window_name in _opened_windows.value:
+                if window_name not in added and window_name not in removed:
+                    _opened_windows.value.remove(window_name)
+                    self.notify(f"changed::{window_name}", False)
+
         self.old_set = new_set
 
 

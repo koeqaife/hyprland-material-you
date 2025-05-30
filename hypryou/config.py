@@ -35,6 +35,7 @@ default_settings: dict[str, t.Any] = {
     "opacity": 0.9,
     "wallpaper": f"{CONFIG_DIR}/assets/default_wallpaper.jpg",
     "separated_workspaces": False,
+    "one_popup_at_time": True,
 
     "browser": "firefox",
     "editor": "code",
