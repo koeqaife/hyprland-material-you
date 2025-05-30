@@ -3,7 +3,7 @@ from utils import widget, Ref
 import typing as t
 import subprocess
 from utils.logger import logger
-from src.services.state import close_window
+from src.services.state import close_window, open_window
 
 
 def open_hyprpicker(*_: t.Any) -> None:
@@ -14,7 +14,8 @@ def open_hyprpicker(*_: t.Any) -> None:
 
 
 def open_power_menu(*_: t.Any) -> None:
-    logger.warning("Not implemented yet")
+    close_window("sidebar")
+    open_window("power_menu")
 
 
 def open_settings(*_: t.Any) -> None:
