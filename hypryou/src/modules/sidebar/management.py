@@ -14,7 +14,6 @@ dnd_icon.bind(
     dnd,
     lambda bool: "do_not_disturb_on" if bool else "do_not_disturb_off"
 )
-# TODO: Make buttons work
 
 
 class ManagementButton(gtk.Box):
