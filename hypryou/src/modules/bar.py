@@ -590,7 +590,8 @@ class BluetoothApplet(Applet):
 class Applets(gtk.Box):
     def __init__(self) -> None:
         super().__init__(
-            css_classes=("applets", "bar-applet")
+            css_classes=("applets", "bar-applet"),
+            valign=gtk.Align.CENTER
         )
 
         self.children = (
@@ -615,7 +616,8 @@ class OpenTray(gtk.Button):
         super().__init__(
             css_classes=("open-tray", "bar-applet"),
             child=widget.Icon("browse"),
-            tooltip_text="System tray"
+            tooltip_text="System tray",
+            valign=gtk.Align.CENTER
         )
         self.conn_id = self.connect("clicked", self.on_clicked)
 
@@ -631,7 +633,8 @@ class OpenCliphist(gtk.Button):
         super().__init__(
             css_classes=("open-cliphist", "bar-applet"),
             child=widget.Icon("content_paste"),
-            tooltip_text="Clipboard"
+            tooltip_text="Clipboard",
+            valign=gtk.Align.CENTER
         )
         self.conn_id = self.connect("clicked", self.on_clicked)
 
@@ -681,7 +684,8 @@ class OpenAppsMenu(gtk.Button):
 class ModulesLeft(gtk.Box):
     def __init__(self, monitor_id: int) -> None:
         super().__init__(
-            css_classes=("modules-left",)
+            css_classes=("modules-left",),
+            valign=gtk.Align.CENTER
         )
         self.children = (
             OpenAppsMenu(),
@@ -699,7 +703,8 @@ class ModulesLeft(gtk.Box):
 class ModulesCenter(gtk.Box):
     def __init__(self, monitor_id: int) -> None:
         super().__init__(
-            css_classes=("modules-center",)
+            css_classes=("modules-center",),
+            valign=gtk.Align.CENTER
         )
         self.children = (
             Workspaces(monitor_id),
@@ -716,7 +721,8 @@ class ModulesCenter(gtk.Box):
 class ModulesRight(gtk.Box):
     def __init__(self, monitor_id: int) -> None:
         super().__init__(
-            css_classes=("modules-right",)
+            css_classes=("modules-right",),
+            valign=gtk.Align.CENTER
         )
         self.children = (
             KeyboardLayout(),

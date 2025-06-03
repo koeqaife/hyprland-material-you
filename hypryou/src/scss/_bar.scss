@@ -25,7 +25,6 @@ window.bar {
             @include elevation(1);
             margin-left: 0.313rem;
             margin-right: 0.313rem;
-            border-radius: 1.25rem;
         }
     }
 
@@ -37,6 +36,8 @@ window.bar {
     .bar-applet {
         @include nLayerBackground($surfaceContainer, 2);
         padding: 0.125rem 0.625rem 0.125rem 0.625rem;
+        border-radius: 1.825rem;
+        min-height: 1.825rem;
 
         color: $onSurface;
     }
@@ -52,6 +53,7 @@ window.bar {
         font-size: 1rem;
         color: $onSurface;
         padding: 0.25rem;
+        border-radius: 2rem;
 
         .workspace {
             margin-right: 0.188rem;
@@ -103,8 +105,10 @@ window.bar {
 
     .applets {
         margin-left: 0.125rem;
-        border-top-left-radius: 0.5rem;
-        border-bottom-left-radius: 0.5rem;
+        border-radius: 1rem;
+        min-height: 1.825rem;
+        border-top-left-radius: 0.375rem;
+        border-bottom-left-radius: 0.375rem;
     }
 
     .battery {
@@ -139,17 +143,21 @@ window.bar {
     }
     .open-tray {
         margin-right: 0.125rem;
-        border-top-right-radius: 0.5rem;
-        border-bottom-right-radius: 0.5rem;
+        border-radius: 1rem;
+        min-height: 1.825rem;
+        border-top-right-radius: 0.375rem;
+        border-bottom-right-radius: 0.375rem;
     }
     .open-cliphist {
         margin-right: 0.125rem;
         margin-left: 0.125rem;
-        border-radius: 0.5rem;
+        min-height: 1.825rem;
+        border-radius: 0.375rem;
     }
 
     .mpris-player {
         min-width: 20.25rem;
+        min-height: 2rem;
         padding: 0;
         label {
             font-size: 1rem;
