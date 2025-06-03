@@ -14,6 +14,31 @@ class Login1Manager:
             "org.freedesktop.login1.Manager",
             None
         )
+        self.session = gio.DBusProxy.new_for_bus_sync(
+            gio.BusType.SYSTEM,
+            gio.DBusProxyFlags.NONE,
+            None,
+            "org.freedesktop.login1",
+            "/org/freedesktop/login1/session/self",
+            "org.freedesktop.login1.Session"
+        )
+
+    def set_brightness(
+        self,
+        subsystem: str,
+        device: str,
+        brightness: int
+    ) -> None:
+        self.session.call_sync(
+            "SetBrightness",
+            glib.Variant(
+                "(ssu)",
+                (subsystem, device, brightness)
+            ),
+            gio.DBusCallFlags.NONE,
+            -1,
+            None
+        )
 
     def call(self, name: str, params: glib.Variant | None = None) -> None:
         self._proxy.call(

@@ -30,6 +30,7 @@ from src.services.state import StateService
 from src.services.upower import UPowerService
 from src.services.idle import ScreenSaverService
 from src.services.login1 import Login1ManagerService
+from src.services.backlight import BacklightService
 
 # Modules
 from src.modules.bar import Bar, Corner
@@ -59,6 +60,7 @@ services: tuple[AsyncService | Service, ...] = (
     Login1ManagerService(),
     ScreenSaverService(),
     IdleInhibitorService(),
+    BacklightService()
 )
 
 
