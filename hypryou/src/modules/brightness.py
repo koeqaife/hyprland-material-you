@@ -137,7 +137,7 @@ class BrightnessWindow(widget.LayerWindow):
             hide_on_esc=True,
             name="brightness",
             height=1,
-            width=400,
+            width=1,
             setup_popup=True
         )
         self._child: DevicesBox | None = None

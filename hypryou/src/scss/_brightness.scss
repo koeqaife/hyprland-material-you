@@ -5,7 +5,7 @@
 
 window.brightness {
     @include nLayerBackground($background, 1);
-    min-width: 25rem;
+    min-width: 22.5rem;
     border-radius: $hyprlandRounding;
     border: 1px solid $layerBorderColor;
 
