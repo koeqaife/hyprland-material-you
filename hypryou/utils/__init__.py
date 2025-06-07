@@ -17,7 +17,8 @@ from utils.format import (
     get_formatted_time,
     escape_markup,
     get_full_date,
-    format_seconds
+    format_seconds,
+    capitalize_first
 )
 from utils.debounce import (
     sync_debounce, debounce
@@ -42,5 +43,6 @@ __all__ = [
     "escape_markup",
     "colors",
     "format_seconds",
-    "sync_debounce"
+    "sync_debounce",
+    "capitalize_first"
 ]

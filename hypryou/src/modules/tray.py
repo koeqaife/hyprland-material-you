@@ -1,4 +1,4 @@
-from utils import widget
+from utils import widget, capitalize_first
 from utils.logger import logger
 from repository import gtk, layer_shell, gdk, glib
 from src.services.system_tray import StatusNotifierItem, items
@@ -8,12 +8,6 @@ import typing as t
 
 # It's so cool that when tray isn't opened there isn't any load to CPU
 # Cause it's not listening to any updates of items
-
-
-def capitalize_first(s: str) -> str:
-    if not s:
-        return s
-    return ''.join((s[0].upper(), s[1:]))
 
 
 class TrayItem(gtk.Box):

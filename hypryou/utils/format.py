@@ -63,3 +63,9 @@ def format_seconds(seconds: float | int) -> str:
     minutes = total_seconds // 60
     remaining_seconds = total_seconds % 60
     return f"{minutes}:{remaining_seconds:02}"
+
+
+def capitalize_first(s: str) -> str:
+    if not s:
+        return s
+    return ''.join((s[0].upper(), s[1:]))
