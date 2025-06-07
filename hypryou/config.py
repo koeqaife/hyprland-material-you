@@ -32,7 +32,7 @@ default_settings: dict[str, t.Any] = {
     "corners": False,
     "dark_icons": "Tela-nord-dark",
     "light_icons": "Tela-nord-light",
-    "opacity": 0.9,
+    "opacity": 1,
     "wallpaper": f"{CONFIG_DIR}/assets/default_wallpaper.jpg",
     "separated_workspaces": False,
     "one_popup_at_time": True,
