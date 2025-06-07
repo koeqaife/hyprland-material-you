@@ -43,6 +43,7 @@ from src.modules.cliphist import ClipHistoryWindow
 from src.modules.wallpapers import WallpapersWindow
 from src.modules.lockscreen import ScreenLock
 from src.modules.power import PowerMenuWindow
+from src.modules.brightness import BrightnessWindow
 
 START = time.perf_counter()
 
@@ -121,6 +122,7 @@ class HyprYou(gtk.Application):
         self.add_window(PlayersWindow(self))
         self.add_window(ClipHistoryWindow(self))
         self.add_window(PowerMenuWindow(self))
+        self.add_window(BrightnessWindow(self))
         self.screen_lock = ScreenLock(self)
 
         logger.info(

@@ -20,6 +20,7 @@ import weakref
 from src.services.network import get_network
 from src.services.state import toggle_window
 from src.services.upower import get_upower, BatteryLevel, BatteryState
+from src.services.backlight import get_backlight_manager
 
 
 dummy_region = cairo.Region()
@@ -531,6 +532,7 @@ class Applet(widget.Icon):
             icon=icon,
             css_classes=("applet",)
         )
+        self.set_tooltip_text(name.capitalize())
 
         self.click_gesture = gtk.GestureClick.new()
         self.click_gesture.set_button(0)
@@ -587,6 +589,75 @@ class BluetoothApplet(Applet):
             self.set_label("bluetooth_disabled")
 
 
+class BrightnessApplet(Applet):
+    def __init__(self) -> None:
+        manager = get_backlight_manager()
+        self.manager = manager
+        super().__init__(
+            "brightness",
+            manager.devices[0].icon if manager.devices else "",
+            self.open_brightness_menu
+        )
+        if not manager.devices:
+            self.initialized = False
+            self.set_visible(False)
+        else:
+            self.initialized = True
+            self.scroll = gtk.EventControllerScroll.new(
+                gtk.EventControllerScrollFlags.VERTICAL
+            )
+            self.scroll_handler = self.scroll.connect(
+                "scroll", self.on_scroll
+            )
+            self.add_controller(self.scroll)
+
+            self.device_handler = manager.devices[0].watch(
+                "changed", self.update_tooltip
+            )
+            self.update_tooltip()
+
+    def update_tooltip(self, *args: t.Any) -> None:
+        if not self.manager.devices:
+            return
+
+        device = self.manager.devices[0]
+        current = device.brightness
+        max_brightness = device.max_brightness
+
+        value = current / max_brightness * 100
+        self.set_tooltip_text(f"Brightness: {round(value)}%")
+
+    def destroy(self) -> None:
+        if self.initialized:
+            self.remove_controller(self.scroll)
+            self.scroll.disconnect(self.scroll_handler)
+            self.manager.devices[0].unwatch(
+                "changed", self.device_handler
+            )
+        super().destroy()
+
+    def open_brightness_menu(self) -> None:
+        toggle_window("brightness")
+
+    def on_scroll(
+        self,
+        controller: gtk.EventControllerScroll,
+        dx: float,
+        dy: float
+    ) -> None:
+        if not self.manager.devices:
+            return
+
+        device = self.manager.devices[0]
+        current = device.brightness
+        max_brightness = device.max_brightness
+        new = 5 / 100 * max_brightness * dy * -1 + current
+        device.set_brightness(
+            max(min(new, max_brightness), 1),
+            True
+        )
+
+
 class Applets(gtk.Box):
     def __init__(self) -> None:
         super().__init__(
@@ -597,10 +668,12 @@ class Applets(gtk.Box):
         self.children = (
             Applet("audio", "volume_up", lambda: None, self.open_pavucontrol),
             BluetoothApplet(),
-            Applet("wifi", get_network().icon, lambda: None)
+            Applet("wifi", get_network().icon, lambda: None),
+            BrightnessApplet(),
         )
         for child in self.children:
-            self.append(child)
+            if isinstance(child, Applet):
+                self.append(child)
 
     def open_pavucontrol(self) -> None:
         subprocess.Popen(["pavucontrol"])
