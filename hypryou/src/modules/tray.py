@@ -201,11 +201,10 @@ class TrayWindow(widget.LayerWindow):
             keymode=layer_shell.KeyboardMode.ON_DEMAND,
             hide_on_esc=True,
             name="tray",
-            height=400,
-            width=400,
+            height=1,
+            width=1,
             setup_popup=True
         )
-        self.name = "tray"
         self._child: TrayBox | None = None
 
         weakref.finalize(self, lambda: logger.debug("TrayWindow finalized"))
