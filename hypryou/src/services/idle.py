@@ -75,6 +75,7 @@ class ScreenSaver:
     def on_event(self, *args: t.Any) -> bool:
         self.display.dispatch()
         self.display.roundtrip()
+        self.display.roundtrip()
         return True
 
     def register(self) -> int:
@@ -144,7 +145,15 @@ class ScreenSaver:
     def update_notifications(self) -> None:
         if self.notifications:
             for notification in self.notifications:
-                notification.destroy()
+                try:
+                    resumed_cb = notification.dispatcher["resumed"]
+                    if resumed_cb:
+                        logger.debug(
+                            "Calling on_resumed manually before destroy"
+                        )
+                        resumed_cb(notification)
+                finally:
+                    notification.destroy()
             self.notifications.clear()
 
         settings = Settings()
@@ -162,8 +171,7 @@ class ScreenSaver:
         if lock_timeout > 0:
             self.create_idle_notification(
                 lock_timeout,
-                self.on_lock,
-                self.dpms_on
+                self.on_lock
             )
         if dpms_timeout > 0:
             self.create_idle_notification(
@@ -268,5 +276,7 @@ class ScreenSaverService(Service):
         self.watcher.register()
 
     def on_close(self):
+        if not getattr(self, "watcher"):
+            return
         for notification in self.watcher.notifications:
             notification.destroy()
