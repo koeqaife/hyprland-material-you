@@ -18,12 +18,14 @@ import pickle
 import numpy as np
 import re
 import typing as t
-from config import color_templates, CONFIG_DIR
+from config import color_templates, CONFIG_DIR, CONFIG_PATH
 from utils.logger import logger
 from utils.styles import reload_css
 from utils.ref import Ref
 from repository import gio, glib
 from config import Settings
+import shutil
+from pathlib import Path
 
 
 # I dropped support of color schemes
@@ -36,6 +38,12 @@ gsettings = gio.Settings.new("org.gnome.desktop.interface")
 
 TEMPLATES_DIR = join(CONFIG_DIR, "assets", "templates")
 CACHE_PATH = color_templates
+
+GTK3_PATH = join(CONFIG_PATH, "gtk-3.0")
+GTK4_PATH = join(CONFIG_PATH, "gtk-4.0")
+
+gtk3_css = join(CACHE_PATH, "compiled", "gtk-3.0.css")
+gtk4_css = join(CACHE_PATH, "compiled", "gtk-4.0.css")
 
 colors_json = join(CACHE_PATH, "colors.json")
 
@@ -537,10 +545,34 @@ def compile_scss(path: str, output: str) -> None:
     subprocess.Popen(command)
 
 
+def update_gtk(
+    theme_key: str,
+    src_path: str,
+    dst_dir: str
+) -> None:
+    if not Settings().get(theme_key):
+        return
+    if os.path.isfile(src_path):
+        src = Path(src_path)
+        dst = Path(dst_dir) / "gtk.css"
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(src, dst)
+
+
+def update_gtk3() -> None:
+    update_gtk("gtk3_theme", gtk3_css, GTK3_PATH)
+
+
+def update_gtk4() -> None:
+    update_gtk("gtk4_theme", gtk4_css, GTK4_PATH)
+
+
 def default_on_complete() -> None:
     reload_css()
     sync()
     update_settings()
+    update_gtk3()
+    update_gtk4()
 
 
 def generate_colors(

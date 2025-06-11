@@ -11,6 +11,7 @@ DEBUG = os.environ.get("HYPRYOU_DEBUG", 0)
 HOME = os.environ["HOME"]
 
 CACHE_PATH = os.getenv("XDG_CACHE_HOME", f"{HOME}/.cache")
+CONFIG_PATH = os.getenv("XDG_CONFIG_HOME", f"{HOME}/.config")
 APP_CACHE_PATH = pjoin(CACHE_PATH, "hypryou")
 CONFIG_DIR = os.path.dirname(os.path.abspath(sys.argv[0]))
 TEMP_PATH = "/tmp/hypryou/"
@@ -19,7 +20,7 @@ color_templates = pjoin(APP_CACHE_PATH, "colors")
 styles_output = pjoin(APP_CACHE_PATH, "style.css")
 scss_variables = pjoin(TEMP_PATH, "_variables.scss")
 main_scss = pjoin(CONFIG_DIR, "src", "scss", "main.scss")
-config_path = pjoin(HOME, ".config", "hypryou")
+config_path = pjoin(CONFIG_PATH, "hypryou")
 settings_path = pjoin(config_path, "settings.json")
 socket_path = pjoin(
     TEMP_PATH, "sockets",
@@ -37,6 +38,8 @@ default_settings: dict[str, t.Any] = {
     "separated_workspaces": False,
     "one_popup_at_time": True,
     "power_menu_cancel_button": True,
+    "gtk4_theme": True,
+    "gtk3_theme": True,
 
     "browser": "firefox",
     "editor": "code",

@@ -1,0 +1,552 @@
+// <post:compile_scss.gtk-4.0.css>
+@use "<var:outputFolder>/colors.scss" as *;
+@use "sass:color";
+
+@at-root {
+  @#{'define-color'} theme_fg_color             #AEE5FA;
+  @#{'define-color'} theme_text_color           #AEE5FA;
+  @#{'define-color'} theme_bg_color             #1a1b26;
+  @#{'define-color'} theme_base_color           #1a1b26;
+  @#{'define-color'} theme_selected_bg_color    #AEE5FA;
+  @#{'define-color'} theme_selected_fg_color    rgba(0, 0, 0, 0.87);
+  @#{'define-color'} insensitive_bg_color       #1a1b26;
+  @#{'define-color'} insensitive_fg_color       rgba(192, 202, 245, 0.5);
+  @#{'define-color'} insensitive_base_color     #24283b;
+  @#{'define-color'} theme_unfocused_fg_color   #AEE5FA;
+  @#{'define-color'} theme_unfocused_text_color         #c0caf5;
+  @#{'define-color'} theme_unfocused_bg_color           #1a1b26;
+  @#{'define-color'} theme_unfocused_base_color         #1a1b26;
+  @#{'define-color'} theme_unfocused_selected_bg_color  #a9b1d6;
+  @#{'define-color'} theme_unfocused_selected_fg_color  rgba(0, 0, 0, 0.87);
+  @#{'define-color'} unfocused_insensitive_color        rgba(192, 202, 245, 0.5);
+  @#{'define-color'} borders                    rgba(192, 202, 245, 0.12);
+  @#{'define-color'} unfocused_borders          rgba(192, 202, 245, 0.12);
+  @#{'define-color'} warning_color              #FDD633;
+  @#{'define-color'} error_color                #BA1B1B;
+  @#{'define-color'} success_color              #81C995;
+  @#{'define-color'} wm_title                   #AEE5FA;
+  @#{'define-color'} wm_unfocused_title         rgba(192, 202, 245, 0.7);
+  @#{'define-color'} wm_highlight               rgba(192, 202, 245, 0.1);
+  @#{'define-color'} wm_bg                      #1a1b26;
+  @#{'define-color'} wm_unfocused_bg            #1a1b26;
+  @#{'define-color'} wm_button_close_icon       #1a1b26;
+  @#{'define-color'} wm_button_close_hover_bg   #a9b1d6;
+  @#{'define-color'} wm_button_close_active_bg  #c7c7c7;
+  @#{'define-color'} content_view_bg            #1a1b26;
+  @#{'define-color'} placeholder_text_color     #{"" + $onSurface};
+  @#{'define-color'} text_view_bg               #1d1d1d;
+  @#{'define-color'} budgie_tasklist_indicator_color                #90D1F6;
+  @#{'define-color'} budgie_tasklist_indicator_color_active         #90D1F6;
+  @#{'define-color'} budgie_tasklist_indicator_color_active_window  #999999;
+  @#{'define-color'} budgie_tasklist_indicator_color_attention      #FDD633;
+  @#{'define-color'} STRAWBERRY_100             #FF9262;
+  @#{'define-color'} STRAWBERRY_300             #FF793E;
+  @#{'define-color'} STRAWBERRY_500             #F15D22;
+  @#{'define-color'} STRAWBERRY_700             #CF3B00;
+  @#{'define-color'} STRAWBERRY_900             #AC1800;
+  @#{'define-color'} ORANGE_100                 #FFDB91;
+  @#{'define-color'} ORANGE_300                 #FFCA40;
+  @#{'define-color'} ORANGE_500                 #FAA41A;
+  @#{'define-color'} ORANGE_700                 #DE8800;
+  @#{'define-color'} ORANGE_900                 #C26C00;
+  @#{'define-color'} BANANA_100                 #FFFFA8;
+  @#{'define-color'} BANANA_300                 #FFFA7D;
+  @#{'define-color'} BANANA_500                 #FFCE51;
+  @#{'define-color'} BANANA_700                 #D1A023;
+  @#{'define-color'} BANANA_900                 #A27100;
+  @#{'define-color'} LIME_100                   #A2F3BE;
+  @#{'define-color'} LIME_300                   #8ADBA6;
+  @#{'define-color'} LIME_500                   #73C48F;
+  @#{'define-color'} LIME_700                   #479863;
+  @#{'define-color'} LIME_900                   #1C6D38;
+  @#{'define-color'} BLUEBERRY_100              #94A6FF;
+  @#{'define-color'} BLUEBERRY_300              #6A7CE0;
+  @#{'define-color'} BLUEBERRY_500              #3F51B5;
+  @#{'define-color'} BLUEBERRY_700              #213397;
+  @#{'define-color'} BLUEBERRY_900              #031579;
+  @#{'define-color'} GRAPE_100                  #D25DE6;
+  @#{'define-color'} GRAPE_300                  #B84ACB;
+  @#{'define-color'} GRAPE_500                  #9C27B0;
+  @#{'define-color'} GRAPE_700                  #830E97;
+  @#{'define-color'} GRAPE_900                  #6A007E;
+  @#{'define-color'} COCOA_100                  #9F9792;
+  @#{'define-color'} COCOA_300                  #7B736E;
+  @#{'define-color'} COCOA_500                  #574F4A;
+  @#{'define-color'} COCOA_700                  #463E39;
+  @#{'define-color'} COCOA_900                  #342C27;
+  @#{'define-color'} SILVER_100                 #EEE;
+  @#{'define-color'} SILVER_300                 #CCC;
+  @#{'define-color'} SILVER_500                 #AAA;
+  @#{'define-color'} SILVER_700                 #888;
+  @#{'define-color'} SILVER_900                 #666;
+  @#{'define-color'} SLATE_100                  #888;
+  @#{'define-color'} SLATE_300                  #666;
+  @#{'define-color'} SLATE_500                  #444;
+  @#{'define-color'} SLATE_700                  #222;
+  @#{'define-color'} SLATE_900                  #111;
+  @#{'define-color'} BLACK_100                  #474341;
+  @#{'define-color'} BLACK_300                  #403C3A;
+  @#{'define-color'} BLACK_500                  #393634;
+  @#{'define-color'} BLACK_700                  #33302F;
+  @#{'define-color'} BLACK_900                  #2B2928;
+  @#{'define-color'} accent_bg_color            #{"" + $primary};
+  @#{'define-color'} accent_fg_color            #{"" + $onPrimary};
+  @#{'define-color'} accent_color               #{"" + $primary};
+  @#{'define-color'} destructive_bg_color       #{"" + $error};
+  @#{'define-color'} destructive_fg_color       #{"" + $onError};
+  @#{'define-color'} destructive_color          #{"" + $error};
+  @#{'define-color'} success_bg_color           #C5E1A5;
+  @#{'define-color'} success_fg_color           #33691E;
+  @#{'define-color'} warning_bg_color           #FFE082;
+  @#{'define-color'} warning_fg_color           #E65100;
+  @#{'define-color'} error_bg_color             #{"" + $error};
+  @#{'define-color'} error_fg_color             #{"" + $onError};
+  @#{'define-color'} window_bg_color            #{"" + $background};
+  @#{'define-color'} window_fg_color            #{"" + $foreground};
+  @#{'define-color'} view_bg_color              #{"" + $surface};
+  @#{'define-color'} view_fg_color              #{"" + $onSurface};
+  @#{'define-color'} headerbar_bg_color         #{"" + color.mix($surfaceContainer, $background, 50%)};
+  @#{'define-color'} headerbar_fg_color         #{"" + $onSecondaryContainer};
+  @#{'define-color'} headerbar_border_color     #{"" + $secondaryContainer};
+  @#{'define-color'} headerbar_backdrop_color   @headerbar_bg_color;
+  @#{'define-color'} headerbar_shade_color      rgba(0, 0, 0, 0.09);
+  @#{'define-color'} card_bg_color              #{"" + $surfaceContainerLowest};
+  @#{'define-color'} card_fg_color              #{"" + $onSecondaryContainer};
+  @#{'define-color'} card_shade_color           rgba(0, 0, 0, 0.09);
+  @#{'define-color'} dialog_bg_color            #{"" + $surfaceContainer};
+  @#{'define-color'} dialog_fg_color            #{"" + $onSecondaryContainer};
+  @#{'define-color'} popover_bg_color           #{"" + $surfaceContainer};
+  @#{'define-color'} popover_fg_color           #{"" + $onSecondaryContainer};
+  @#{'define-color'} thumbnail_bg_color         #1a1b26;
+  @#{'define-color'} thumbnail_fg_color         #AEE5FA;
+  @#{'define-color'} shade_color                rgba(0, 0, 0, 0.36);
+  @#{'define-color'} scrollbar_outline_color    rgba(0, 0, 0, 0.5);
+  @#{'define-color'} sidebar_bg_color           #{"" + $surface};
+  @#{'define-color'} sidebar_fg_color           #{"" + $onSurface};
+  @#{'define-color'} sidebar_border_color       #{"" + $surface};
+  @#{'define-color'} sidebar_backdrop_color     #{"" + $surface};
+}
+
+window {
+    --accent-bg-color: @accent_bg_color;
+    --success-color: @success_color;
+}
+
+* {
+    transition: all 0.25s ease-in;
+    transition-property: background, color, background-color, border-color, outline-color;
+}
+
+.navigation-sidebar {
+    background-color: $surface;
+}
+
+.navigation-sidebar row {
+    border-radius: 100px;
+}
+
+.navigation-sidebar label {
+    color: $outline;
+}
+
+.navigation-sidebar row:selected {
+    background-color: $secondaryContainer;
+}
+
+.navigation-sidebar row:selected label {
+    color: $onSecondaryContainer;
+    background-color: transparent;
+}
+
+.navigation-sidebar row:active {
+    background-color: color.mix($secondaryContainer, $onSecondaryContainer, 90%);
+}
+
+.navigation-sidebar row:active label {
+    color: $onSecondaryContainer;
+    background-color: transparent;
+}
+
+label {
+    color: $onBackground;
+}
+
+tooltip {
+    background-color: $surfaceContainer;
+    color: $onBackground;
+    border-radius: 11px;
+    border: 0px solid;
+}
+
+menu * {
+    border-radius: 0px;
+}
+
+menu separator {
+    color: $outline;
+}
+
+menu {
+    padding: 8px 0px 8px 0px;
+    background: $surfaceContainer;
+}
+
+separator {
+    color: $outline;
+    margin-right: 0px;
+    margin-left: 0px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    padding: 0px;
+}
+
+button,
+entry {
+    &:not(.combo) {
+        border-radius: 100px;
+        outline: none;
+    }
+}
+
+button.text-button {
+    background-color: $surfaceContainer;
+    &.flat {
+        background-color: transparent;
+    }
+    color: $onSurface;
+
+    &:hover {
+        background-color: color.mix($onSurfaceVariant, transparent, 10%);
+    }
+
+    &:disabled {
+        opacity: 1;
+        filter: none;
+        background-color: color.mix($surfaceContainer, transparent, 38%);
+        &, label {
+            color: color.mix($onSurface, transparent, 62%);
+        }
+    }
+
+    &.link {
+        &, label {
+            color: $primary;
+        }
+        &:disabled {
+            &, label {
+                color: color.mix($onSurface, transparent, 62%);
+            }
+        }
+    }
+}
+
+:not(spinbutton) {
+    button:not(.flat):not(.up):not(.down).image-button {
+        background-color: $secondaryContainer;
+        color: $onSecondaryContainer;
+        margin-top: 2px;
+        margin-bottom: 2px;
+        transition: all 0.2s ease-in-out;
+        transition-property: background, background-color;
+        border-radius: 100%;
+
+        &:hover {
+            background-color: color.mix($secondaryContainer, $onSecondaryContainer, 95%);
+            box-shadow: 0px 3px 3px -2px rgba(0, 0, 0, 0.2);
+        }
+
+        &:active {
+            background-color: color.mix($secondaryContainer, $onSecondaryContainer, 90%);
+            box-shadow: none;
+        }
+
+        &:checked {
+            background-color: color.mix($secondaryContainer, $onSecondaryContainer, 90%);
+            box-shadow: none;
+        }
+
+        label,
+        .icon,
+        image {
+            color: $onSecondaryContainer;
+            transition: all 0.2s ease-in-out;
+            transition-property: color;
+        }
+    }
+}
+
+scale {
+    trough {
+        background-color: $secondaryContainer;
+    }
+
+    highlight {
+        background-color: $primary;
+    }
+
+    &.marks-after,
+    &.marks-before {
+        slider {
+            transform: none;
+        }
+    }
+
+    &.horizontal {
+        trough {
+            min-height: 0.188rem;
+        }
+        slider {
+            min-height: 1.5rem;
+            min-width: 0.5rem;
+            margin: 0;
+            margin-top: -0.75rem;
+            margin-bottom: -0.75rem;
+            border-radius: 0.75rem;
+            background-color: $primary;
+        }
+    }
+
+    &.vertical {
+        trough {
+            min-width: 0.188rem;
+        }
+        slider {
+            min-width: 1.5rem;
+            min-height: 0.5rem;
+            margin: 0;
+            margin-left: -0.75rem;
+            margin-right: -0.75rem;
+            border-radius: 0.75rem;
+            background-color: $primary;
+        }
+    }
+}
+
+switch {
+    border: 2px solid;
+    border-radius: 100px;
+    border-color: $outline;
+    background-color: $surfaceContainerHighest;
+
+    slider {
+        border-radius: 100px;
+        background-color: $outline;
+    }
+
+    &:disabled {
+        background-color: $surfaceContainerHighest;
+        border-color: $onSurface;
+        slider {
+            background-color: $onSurface;
+        }
+    }
+
+    &:hover {
+        background-color: color.mix($surfaceContainerHighest, $onSurface, 92%);
+
+        slider {
+            background-color: $onSurfaceVariant;
+        }
+    }
+
+    &:active {
+        background-color: color.mix($surfaceContainerHighest, $onSurface, 92%);
+
+        slider {
+            background-color: $onSurfaceVariant;
+        }
+    }
+
+    &:checked {
+        background-color: $primary;
+        border-color: $primary;
+
+        slider {
+            background-color: $onPrimary;
+        }
+
+        &:disabled {
+            background-color: $onSurface;
+            border-color: $onSurface;
+
+            slider {
+                background-color: $surface;
+            }
+        }
+
+        &:hover {
+            background-color: $primary;
+            border-color: $primary;
+
+            slider {
+                background-color: $primaryContainer;
+            }
+        }
+
+        &:active {
+            background-color: $primary;
+            border-color: $primary;
+
+            slider {
+                background-color: $primaryContainer;
+                border-color: $primaryContainer;
+            }
+        }
+    }
+}
+
+radio {
+    color: $onSurfaceVariant;
+    background-color: transparent;
+    border: 2px solid;
+    border-color: $onSurfaceVariant;
+    opacity: 1;
+    padding: 1px;
+
+    &:hover {
+        background-color: color.mix($onSurface, transparent, 8%);
+    }
+    &:active {
+        background-color: color.mix($onSurface, transparent, 10%);
+    }
+    &:disabled {
+        color: $onSurface;
+        border-color: $onSurface;
+        background-color: transparent;
+        opacity: 0.38;
+    }
+
+    &:checked {
+        color: $primary;
+        border-color: $primary;
+        &:hover {
+            background-color: color.mix($primary, transparent, 8%);
+        }
+        &:active {
+            background-color: color.mix($primary, transparent, 10%);
+        }
+        &:disabled {
+            color: $surface;
+            border-color: $onSurface;
+            background-color: $onSurface;
+            opacity: 0.38;
+        }
+    }
+
+    &:indeterminate {
+        color: $primary;
+        border-color: $primary;
+        &:hover {
+            background-color: color.mix($primary, transparent, 8%);
+        }
+        &:active {
+            background-color: color.mix($primary, transparent, 10%);
+        }
+        &:disabled {
+            color: $surface;
+            border-color: $onSurface;
+            background-color: $onSurface;
+            opacity: 0.38;
+        }
+    }
+}
+
+check {
+    color: $onSurface;
+    background-color: transparent;
+    border: 2px solid;
+    border-color: $onSurfaceVariant;
+    opacity: 1;
+    padding: 1px;
+
+    &:hover {
+        background-color: color.mix($onSurface, transparent, 8%);
+    }
+    &:active {
+        background-color: color.mix($onSurface, transparent, 8%);
+    }
+
+    &:disabled {
+        color: $onSurface;
+        border-color: $onSurface;
+        opacity: 0.38;
+    }
+
+    &:checked {
+        background-color: $primary;
+        border-color: transparent;
+        color: $onPrimary;
+
+        &:hover {
+            background-color: $primary;
+        }
+        &:active {
+            background-color: $primary;
+        }
+
+        &:disabled {
+            background-color: $onSurface;
+            border-color: transparent;
+            color: $surface;
+            opacity: 0.38;
+        }
+    }
+
+    &:indeterminate {
+        background-color: $primary;
+        border-color: transparent;
+        color: $onPrimary;
+
+        &:hover {
+            background-color: $primary;
+        }
+        &:active {
+            background-color: $primary;
+        }
+
+        &:disabled {
+            background-color: $onSurface;
+            border-color: transparent;
+            color: $surface;
+            opacity: 0.38;
+        }
+    }
+}
+
+progressbar {
+    &.horizontal {
+        through, progress, & {
+            min-height: 6px;
+        }
+    }
+    &.vertical {
+        through, progress, & {
+            min-width: 6px;
+        }
+    }
+    trough {
+        background-color: $secondaryContainer;
+    }
+
+    progress {
+        background-color: $primary;
+    }
+}
+
+levelbar {
+    &.horizontal block {
+        min-height: 6px;
+    }
+    &.vertical block {
+        min-width: 6px;
+    }
+    block.empty {
+        background-color: $secondaryContainer;
+    }
+}
+
+spinbutton {
+    button.down, button.up {
+        border-radius: 0;
+    }
+}
