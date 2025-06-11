@@ -497,7 +497,7 @@ def generate_colors_sync(
         )
         json.dump(colors_dict(object), f, indent=2)
 
-    allowed_actions = ("compile_scss")
+    allowed_actions = ("compile_scss",)
     post = generate_templates(
         TEMPLATES_DIR,
         CACHE_PATH,
