@@ -1,6 +1,8 @@
 from repository import gio, glib
 from utils.logger import logger
 from utils.service import Service
+from config import Settings
+import src.services.cliphist as cliphist
 
 
 class Login1Manager:
@@ -56,12 +58,16 @@ class Login1Manager:
         )
 
     def power_off(self) -> None:
+        if Settings().get("secure_cliphist"):
+            cliphist.secure_clear()
         self.call(
             "PowerOff",
             glib.Variant("(b)", (True,))
         )
 
     def reboot(self) -> None:
+        if Settings().get("secure_cliphist"):
+            cliphist.secure_clear()
         self.call(
             "Reboot",
             glib.Variant("(b)", (True,))

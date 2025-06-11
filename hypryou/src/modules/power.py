@@ -9,6 +9,7 @@ from src.services.state import is_locked, close_window
 from src.services import hyprland
 from src.services.mpris import players
 import asyncio
+import src.services.cliphist as cliphist
 
 
 class ActionButton(gtk.Button):
@@ -77,6 +78,8 @@ class PowerMenu(gtk.Box):
         self.login1.suspend()
 
     def on_logout(self, *args: t.Any) -> None:
+        if Settings().get("secure_cliphist"):
+            cliphist.secure_clear()
         asyncio.create_task(
             hyprland.client.raw("dispatch exit")
         )
