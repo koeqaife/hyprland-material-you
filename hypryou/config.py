@@ -40,6 +40,7 @@ default_settings: dict[str, t.Any] = {
     "power_menu_cancel_button": True,
     "gtk4_theme": True,
     "gtk3_theme": True,
+    "secure_cliphist": False,
 
     "browser": "firefox",
     "editor": "code",

@@ -32,6 +32,8 @@ from src.services.idle import ScreenSaverService
 from src.services.login1 import Login1ManagerService
 from src.services.backlight import BacklightService
 
+import src.services.cliphist as cliphist
+
 # Modules
 from src.modules.bar import Bar, Corner
 from src.modules.tray import TrayWindow
@@ -190,8 +192,12 @@ def init() -> None:
         )
         exit(1)
 
-    Settings()
+    settings = Settings()
     asyncio.set_event_loop_policy(GLibEventLoopPolicy())
+
+    if settings.get("secure_cliphist"):
+        cliphist.secure_clear()
+
     logger.debug("Initialized")
 
 
@@ -211,5 +217,7 @@ if __name__ == "__main__":
         logger.warning("Bye!")
         exit(0)
     finally:
+        if Settings().get("secure_cliphist"):
+            cliphist.secure_clear()
         for service in services:
             service.on_close()
