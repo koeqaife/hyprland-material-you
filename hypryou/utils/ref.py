@@ -4,9 +4,6 @@ from collections.abc import MutableSequence, MutableSet
 from utils.logger import logger
 from utils.service import Signals
 
-# I wanted to make weakref for watchers
-# but it's to difficult for me heh
-
 __all__ = [
     "Ref"
 ]
@@ -50,15 +47,25 @@ class ReactiveList(MutableSequence[L], t.Generic[L]):
     def __setitem__(
         self,
         index: int | slice,
-        value: L | t.Iterable[L],
+        value: L | t.Iterable[L]
     ) -> None:
-        if isinstance(index, int) and not isinstance(value, t.Iterable):
+        if isinstance(index, int):
+            self._check_type(value)
             self._data[index] = value
-        elif isinstance(index, slice) and isinstance(value, t.Iterable):
+        else:
+            for v in value:
+                self._check_type(v)
             self._data[index] = value
 
         if self._ref.is_ready:
             self._ref._trigger_watchers()
+
+    def _check_type(self, value: L) -> None:
+        if self._ref.types and not isinstance(value, self._ref.types):
+            raise TypeError(
+                f"Types do not match {repr(value)}: " +
+                f"{type(value)} not in {self._ref.types}"
+            )
 
     @t.overload
     def __delitem__(self, index: int) -> None:
@@ -73,11 +80,25 @@ class ReactiveList(MutableSequence[L], t.Generic[L]):
         if self._ref.is_ready:
             self._ref._trigger_watchers()
 
+    def clear(self) -> None:
+        self._data.clear()
+        if self._ref.is_ready:
+            self._ref._trigger_watchers()
+
+    def pop(self, index: t.SupportsIndex) -> None:
+        self._data.pop(index)
+        if self._ref.is_ready:
+            self._ref._trigger_watchers()
+
     def insert(self, i: int, value: L) -> None:
+        self._check_type(value)
         self._data.insert(i, value)
 
         if self._ref.is_ready:
             self._ref._trigger_watchers()
+
+    def __contains__(self, value) -> bool:
+        return self._data.__contains__(value)
 
     def __len__(self) -> int:
         return len(self._data)
@@ -91,6 +112,13 @@ class ReactiveSet(MutableSet[L], t.Generic[L]):
         self._data = data
         self._ref = ref
 
+    def _check_type(self, value: L) -> None:
+        if self._ref.types and not isinstance(value, self._ref.types):
+            raise TypeError(
+                f"Types do not match {repr(value)}: " +
+                f"{type(value)} not in {self._ref.types}"
+            )
+
     def __contains__(self, item: object) -> bool:
         return item in self._data
 
@@ -102,17 +130,26 @@ class ReactiveSet(MutableSet[L], t.Generic[L]):
 
     def add(self, value: L) -> None:
         if value not in self._data:
+            self._check_type(value)
             self._data.add(value)
 
             if self._ref.is_ready:
                 self._ref._trigger_watchers()
 
     def discard(self, value: L) -> None:
-        if value in self._data:
+        if value is self._data:
             self._data.discard(value)
 
             if self._ref.is_ready:
                 self._ref._trigger_watchers()
+
+    def remove(self, value: L) -> None:
+        if value not in self._data:
+            raise KeyError(value)
+        self._data.remove(value)
+
+        if self._ref.is_ready:
+            self._ref._trigger_watchers()
 
     def __repr__(self) -> str:
         return repr(self._data)
@@ -122,14 +159,16 @@ class ReactiveDict(dict[K, V], t.Generic[K, V]):
     def __init__(self, data: dict[K, V], parent_ref: 'Ref[t.Any]') -> None:
         super().__init__()
         self._ref = parent_ref
+        self._initialized = False
         for k, v in data.items():
             self[k] = v
+        self._initialized = True
 
     def __setitem__(self, key: K, value: V) -> None:
         wrapped_value = self._ref._wrap_if_mutable(value)
         super().__setitem__(key, wrapped_value)
 
-        if self._ref.is_ready:
+        if self._ref.is_ready and self._initialized:
             self._ref._trigger_watchers()
 
     def __delitem__(self, key: K) -> None:
@@ -270,12 +309,18 @@ class Ref(t.Generic[T]):
         old_value = self._value
         new_value = self._wrap_if_mutable(new_value)
         if old_value != new_value:
-            assert self.types or isinstance(old_value, type(new_value)), (
-                f"Types do not match: {type(old_value)} != {type(new_value)}"
-            )
-            assert not self.types or isinstance(new_value, self.types), (
-                f"Types do not match: {type(new_value)} not in {self.types}"
-            )
+            if self.types:
+                if not isinstance(new_value, self.types):
+                    raise TypeError(
+                        f"Types do not match {repr(new_value)}: " +
+                        f"{type(new_value)} not in {self.types}"
+                    )
+            else:
+                if not isinstance(old_value, type(new_value)):
+                    raise TypeError(
+                        f"Types do not match {repr(new_value)}: " +
+                        f"{type(old_value)} != {type(new_value)}"
+                    )
             if self.name:
                 logger.debug("Ref '%s' changed value", self.name)
 
@@ -294,12 +339,12 @@ class Ref(t.Generic[T]):
         self.is_ready = True
 
     def unbind(self, ref: "Ref[T]", handler_id: int) -> None:
-        """Basically helper function. ref.unwatch() can be used as well"""
+        """Basically wrapper function. ref.unwatch() can be used as well"""
         ref.unwatch(handler_id)
 
     def bind(self, ref: "Ref[U]", transform: t.Callable[[U], T]) -> int:
-        def on_changed(new_value: T) -> None:
-            self.value = transform(new_value)  # type: ignore [arg-type]
+        def on_changed(new_value: U) -> None:
+            self.value = transform(new_value)
 
-        handler_id = ref.watch(on_changed)  # type: ignore [arg-type]
+        handler_id = ref.watch(on_changed)
         return handler_id
