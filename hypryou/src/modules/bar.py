@@ -108,7 +108,7 @@ class Workspaces(gtk.Box):
 
         self._scroll.disconnect(self._scroll_connection)
         self.remove_controller(self._scroll)
-        Settings().unwatch("separated_workspaces", self.settings_handler)
+        Settings().unwatch(self.settings_handler)
         self._scroll = None  # type: ignore
         for ref, handler_id in self.ref_handlers.items():
             ref.unwatch(handler_id)
@@ -404,7 +404,7 @@ class Player(gtk.Box):
 
         for player, handler in list(self.player_handlers.items()):
             if player is not current:
-                player.unwatch("changed", handler)
+                player.unwatch(handler)
                 del self.player_handlers[player]
 
         if current not in self.player_handlers.keys():
@@ -417,7 +417,7 @@ class Player(gtk.Box):
 
     def destroy(self) -> None:
         for player, handler in self.player_handlers.items():
-            player.unwatch("changed", handler)
+            player.unwatch(handler)
 
         for btn in self.buttons:
             btn_child = btn.get_child()
@@ -485,8 +485,8 @@ class Battery(gtk.Box):
 
     def destroy(self) -> None:
         self.icon.destroy()
-        get_upower().unwatch("changed", self.handler_id)
-        Settings().unwatch("always_show_battery", self.settings_handler)
+        get_upower().unwatch(self.handler_id)
+        Settings().unwatch(self.settings_handler)
 
     def update(self, *args: t.Any) -> None:
         settings = Settings()
@@ -632,9 +632,7 @@ class BrightnessApplet(Applet):
         if self.initialized:
             self.remove_controller(self.scroll)
             self.scroll.disconnect(self.scroll_handler)
-            self.manager.devices[0].unwatch(
-                "changed", self.device_handler
-            )
+            self.manager.devices[0].unwatch(self.device_handler)
         super().destroy()
 
     def open_brightness_menu(self) -> None:

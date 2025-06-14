@@ -142,9 +142,5 @@ class Settings:
             callback(self.get(name))
         return self._signals.watch(f"changed::{name}", callback, **kwargs)
 
-    def unwatch(
-        self, name: str, handler_id: int
-    ) -> None:
-        self._signals.unwatch(
-            f"changed::{name}", handler_id
-        )
+    def unwatch(self, handler_id: int) -> None:
+        self._signals.unwatch(handler_id)

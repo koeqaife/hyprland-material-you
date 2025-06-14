@@ -305,7 +305,7 @@ class Player(gtk.Box):
             elif isinstance(object, gobject.Object):
                 object.disconnect(handler_id)
             else:
-                object[0].unwatch(object[1], handler_id)
+                object[0].unwatch(handler_id)
 
 
 class PlayersBox(gtk.ScrolledWindow):

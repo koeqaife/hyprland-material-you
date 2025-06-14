@@ -211,7 +211,7 @@ class Wifi(Signals):
             return
 
         if self.ap_handler > 0 and self.active_access_point:
-            self.active_access_point.unwatch("changed", self.ap_handler)
+            self.active_access_point.unwatch(self.ap_handler)
             self.ap_handler = 0
             self.active_access_point = None
 

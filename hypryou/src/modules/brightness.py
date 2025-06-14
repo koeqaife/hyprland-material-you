@@ -72,7 +72,7 @@ class DeviceItem(gtk.Box):
         self.update_percent()
 
     def destroy(self) -> None:
-        self._item.unwatch("changed-external", self.handler)
+        self._item.unwatch(self.handler)
 
 
 class DevicesBox(gtk.ScrolledWindow):

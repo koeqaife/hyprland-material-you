@@ -14,6 +14,7 @@ Wrapper = t.Callable[..., bool | None]
 class Signals:
     def __init__(self) -> None:
         self._signals: dict[str, dict[int, Wrapper]] = {}
+        self._handler_signals: dict[int, str] = {}
         self._blocked: set[str] = set()
         self._lock = threading.RLock()
         self._pending_idle: set[str] = set()
@@ -52,14 +53,26 @@ class Signals:
             base_id = max(callbacks.keys(), default=0) + 1
             handler_id = base_id + priority * 0x10000
             callbacks[handler_id] = wrapper
+            self._handler_signals[handler_id] = signal_name
             return handler_id
 
-    def unwatch(self, signal_name: str, handler_id: int) -> bool:
+    def unwatch_fast(self, signal_name: str, handler_id: int) -> bool:
         with self._lock:
             callbacks = self._signals.get(signal_name)
             if not callbacks or handler_id not in callbacks:
                 return False
             del callbacks[handler_id]
+            del self._handler_signals[handler_id]
+            return True
+
+    def unwatch(self, handler_id: int) -> bool:
+        with self._lock:
+            signal_name = self._handler_signals[handler_id]
+            callbacks = self._signals.get(signal_name)
+            if not callbacks or handler_id not in callbacks:
+                return False
+            del callbacks[handler_id]
+            del self._handler_signals[handler_id]
             return True
 
     def notify_sync(self, signal_name: str, *args: t.Any) -> None:
@@ -71,18 +84,23 @@ class Signals:
             if signal_callbacks is None:
                 return
 
+            to_remove: list[int] = []
             for handler_id in sorted(signal_callbacks):
                 cb = self._signals[signal_name][handler_id]
                 try:
                     result = cb(*args)
                     if result not in (None, True):
-                        del self._signals[signal_name][handler_id]
+                        to_remove.append(handler_id)
                 except Exception as e:
                     logger.error(
                         "Error while calling callback: %s",
                         e, exc_info=e
                     )
-                    del self._signals[signal_name][handler_id]
+                    to_remove.append(handler_id)
+
+            for handler_id in to_remove:
+                del signal_callbacks[handler_id]
+                self._handler_signals.pop(handler_id, None)
 
     def _idle_notify(self, signal_name: str, *args: t.Any) -> bool:
         with self._lock:
@@ -107,11 +125,13 @@ class Signals:
 
     def handlers(self, signal_name: str) -> list[int]:
         with self._lock:
-            return list(self._signals.get(signal_name, {}).keys())
+            return list(self._signals.get(signal_name, ()))
 
     def clear(self, signal_name: str) -> None:
         with self._lock:
-            self._signals.pop(signal_name, None)
+            callbacks = self._signals.pop(signal_name, {})
+            for handler_id in callbacks:
+                self._handler_signals.pop(handler_id, None)
 
 
 class Service:

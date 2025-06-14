@@ -333,7 +333,7 @@ class Ref(t.Generic[T]):
 
     def unwatch(self, handler_id: int) -> None:
         logger.debug("Ref '%s' remove watcher", self.name)
-        self._signals.unwatch("changed", handler_id)
+        self._signals.unwatch_fast("changed", handler_id)
 
     def ready(self) -> None:
         self.is_ready = True

@@ -297,7 +297,7 @@ class NotificationItem(gtk.Box):
         if self.is_destroyed:
             return
         self.is_destroyed = True
-        self.item.unwatch("changed", self.handler_id)
+        self.item.unwatch(self.handler_id)
         for _widget, conn in self.conns.items():
             _widget.disconnect(conn)
         for child in self.children:

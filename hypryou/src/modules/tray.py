@@ -124,7 +124,7 @@ class TrayItem(gtk.Box):
         self.click_gesture.disconnect(self.gesture_conn)
         self.remove_controller(self.click_gesture)
         self.quit_btn.disconnect(self.quit_conn)
-        self._item.unwatch("changed", self.handler_id)
+        self._item.unwatch(self.handler_id)
 
 
 class TrayBox(gtk.ScrolledWindow):

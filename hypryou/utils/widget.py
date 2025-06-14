@@ -129,10 +129,7 @@ class LayerWindow(gtk.ApplicationWindow):
         if getattr(self, "key_controller", None):
             self.remove_controller(self.key_controller)
         if getattr(self, "window_handler", None):
-            state.opened_windows.unwatch(
-                f"changed::{self.name}",
-                self.window_handler
-            )
+            state.opened_windows.unwatch(self.window_handler)
         super().destroy()
 
 
