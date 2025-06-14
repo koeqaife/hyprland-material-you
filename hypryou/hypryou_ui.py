@@ -7,7 +7,6 @@ import logging
 
 import utils
 from utils.logger import logger
-from src.variables.clock import clock_task
 from src.variables import Globals
 from config import Settings, DEBUG
 
@@ -32,6 +31,7 @@ from src.services.idle import ScreenSaverService
 from src.services.login1 import Login1ManagerService
 from src.services.backlight import BacklightService
 from src.services.audio import AudioService
+from src.services.clock import ClockService
 
 import src.services.cliphist as cliphist
 
@@ -65,7 +65,8 @@ services: tuple[AsyncService | Service, ...] = (
     ScreenSaverService(),
     IdleInhibitorService(),
     BacklightService(),
-    AudioService()
+    AudioService(),
+    ClockService()
 )
 
 
@@ -110,9 +111,7 @@ class HyprYou(gtk.Application):
         except Exception:
             utils.colors.restore_palette()
 
-        self.tasks = [
-            asyncio.create_task(clock_task())
-        ]
+        self.tasks: list[asyncio.Task] = []
         await self.start_services()
 
         self.display: gdk.Display = gdk.Display.get_default()

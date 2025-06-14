@@ -1,7 +1,7 @@
 from repository import gtk, pango, gdk, bluetooth
 from utils import Ref, toggle_css_class
 import typing as t
-from src.variables.clock import full_date
+from src.services.clock import full_date
 from src.services.network import get_network, Primary
 import os
 from utils import colors

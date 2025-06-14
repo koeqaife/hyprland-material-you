@@ -6,7 +6,7 @@ import typing as t
 import weakref
 from utils.logger import logger
 from utils import toggle_css_class, Ref
-from src.variables.clock import time, full_date
+from src.services.clock import time, full_date
 from src.services.hyprland import active_layout, show_layout
 from src.modules.players import Player
 from src.services.mpris import current_player, MprisPlayer

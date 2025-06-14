@@ -5,7 +5,7 @@ import cairo
 from utils import Ref, downloader
 from utils import toggle_css_class, escape_markup
 from utils.logger import logger
-from src.variables.clock import date, time
+from src.services.clock import date, time
 from repository import gtk, gdk, pango, bluetooth
 from src.services import hyprland
 from src.services.hyprland import active_workspace, workspace_ids
