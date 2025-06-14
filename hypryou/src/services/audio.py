@@ -1,4 +1,4 @@
-from repository import wireplumber
+from repository import wp
 from utils.ref import Ref
 from utils.service import Service
 import typing as t
@@ -25,33 +25,33 @@ volume = Ref(0.0, name="audio_volume")
 volume_icon = Ref("volume_off", name="audio_volume_icon")
 volume_icon.bind(volume, get_volume_icon)
 
-streams = Ref[set[wireplumber.Stream]](
+streams = Ref[set[wp.Stream]](
     set(), name="audio_streams",
-    types=(wireplumber.Stream,)
+    types=(wp.Stream,)
 )
-recorders = Ref[set[wireplumber.Stream]](
+recorders = Ref[set[wp.Stream]](
     set(), name="audio_recorders",
-    types=(wireplumber.Stream,)
+    types=(wp.Stream,)
 )
 
-speakers = Ref[set[wireplumber.Endpoint]](
+speakers = Ref[set[wp.Endpoint]](
     set(), name="audio_speakers",
-    types=(wireplumber.Endpoint,)
+    types=(wp.Endpoint,)
 )
-microphones = Ref[set[wireplumber.Endpoint]](
+microphones = Ref[set[wp.Endpoint]](
     set(), name="audio_mics",
-    types=(wireplumber.Endpoint,)
+    types=(wp.Endpoint,)
 )
 
 
 class AudioService(Service):
     def __init__(self) -> None:
-        self.wp = wireplumber.get_default()
+        self.wp = wp.get_default()
         self.audio = self.wp.get_audio()
         self.default_speaker = self.audio.get_default_speaker()
         self.default_mic = self.audio.get_default_microphone()
 
-    def on_volume_ref_changed(self, new_value: int) -> None:
+    def on_volume_ref_changed(self, new_value: float) -> None:
         volume = self.default_speaker.get_volume() * 100.0
         if volume == new_value:
             return
@@ -65,7 +65,7 @@ class AudioService(Service):
         volume.watch(self.on_volume_ref_changed)
         self.default_speaker.connect("notify::volume", self.on_volume_changed)
 
-        targets: dict[str, Ref[set[wireplumber.Node]]] = {
+        targets: dict[str, Ref[set[wp.Node]]] = {
             "microphone": microphones,
             "stream": streams,
             "speaker": speakers,
