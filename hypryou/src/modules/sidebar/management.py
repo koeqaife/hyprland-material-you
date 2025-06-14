@@ -1,5 +1,5 @@
 from repository import gtk, pango, gdk, bluetooth
-from utils import widget, Ref, toggle_css_class
+from utils import Ref, toggle_css_class
 import typing as t
 from src.variables.clock import full_date
 from src.services.network import get_network, Primary
@@ -8,6 +8,7 @@ from utils import colors
 from src.services.idle_inhibitor import inhibited, get_inhibitor
 from src.services.notifications import dnd
 from src.services.hyprland import night_light
+from src import widget
 
 dnd_icon = Ref("do_not_disturb_off", name="dnd_icon")
 dnd_icon.bind(

@@ -1,5 +1,4 @@
 import utils.ref as ref
-import utils.widget as widget
 import utils.format as format
 import utils.downloader as downloader
 import utils.colors as colors

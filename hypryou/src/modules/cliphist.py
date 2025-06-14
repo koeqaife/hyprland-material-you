@@ -2,7 +2,7 @@ from repository import gtk, layer_shell, glib, pango
 from src.services.cliphist import items, repopulate, save_cache_file
 from src.services.cliphist import clear_tmp
 from src.services.cliphist import copy_by_id
-from utils import widget, sync_debounce, toggle_css_class
+from utils import sync_debounce, toggle_css_class
 from utils.logger import logger
 from config import HyprlandVars
 import weakref
@@ -11,6 +11,7 @@ import re
 from utils_cy.levenshtein import compute_text_match_score
 from utils_cy.levenshtein import token_set_ratio
 from src.services.state import close_window
+from src import widget
 
 FOUND_THRESHOLD = 0.5
 data_regex = re.compile(

@@ -3,7 +3,8 @@ from src.services.notifications import notifications, NotificationClosedReason
 from src.modules.notifications.item import NotificationItem
 from src.modules.notifications.item import NotificationRevealer
 import typing as t
-from utils import widget, Ref
+from utils import Ref
+from src import widget
 
 T = t.TypeVar("T")
 

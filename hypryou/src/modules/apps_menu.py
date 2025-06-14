@@ -1,12 +1,13 @@
 from functools import lru_cache
 from repository import gtk, gdk, layer_shell, glib, pango
 from src.services.apps import Application, apps, reload as apps_reload
-from utils import widget, sync_debounce, toggle_css_class
+from utils import sync_debounce, toggle_css_class
 from utils.logger import logger
 from config import HyprlandVars
 import weakref
 import typing as t
 from src.services.state import close_window
+from src import widget
 
 
 @lru_cache(512)

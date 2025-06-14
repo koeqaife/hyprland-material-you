@@ -5,7 +5,7 @@ from repository import session_lock, gtk, gdk, glib
 import typing as t
 import weakref
 from utils.logger import logger
-from utils import widget, toggle_css_class, Ref
+from utils import toggle_css_class, Ref
 from src.variables.clock import time, full_date
 from src.services.hyprland import active_layout, show_layout
 from src.modules.players import Player
@@ -16,6 +16,7 @@ import pwd
 import os
 from pam import pam  # type: ignore [import-untyped]
 from time import monotonic
+from src import widget
 
 username = pwd.getpwuid(os.getuid()).pw_name
 close_player = Ref(False, name="lock_close_player")

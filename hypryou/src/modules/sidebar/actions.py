@@ -1,9 +1,10 @@
 from repository import gtk, glib
-from utils import widget, Ref
+from utils import Ref
 import typing as t
 import subprocess
 from utils.logger import logger
 from src.services.state import close_window, open_window
+from src import widget
 
 
 def open_hyprpicker(*_: t.Any) -> None:

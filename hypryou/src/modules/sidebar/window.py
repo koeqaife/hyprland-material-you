@@ -1,10 +1,10 @@
-from utils import widget
 from utils.logger import logger
 from repository import gtk, layer_shell
 import weakref
 from src.modules.sidebar.management import ManagementBox
 from src.modules.sidebar.actions import Actions
 from src.modules.notifications.list import Notifications
+from src import widget
 
 
 class SidebarBox(gtk.Box):

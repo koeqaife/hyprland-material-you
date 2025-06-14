@@ -2,7 +2,7 @@ import subprocess
 from dataclasses import dataclass
 
 import cairo
-from utils import widget, Ref, downloader
+from utils import Ref, downloader
 from utils import toggle_css_class, escape_markup
 from utils.logger import logger
 from src.variables.clock import date, time
@@ -22,6 +22,7 @@ from src.services.state import toggle_window
 from src.services.upower import get_upower, BatteryLevel, BatteryState
 from src.services.backlight import get_backlight_manager
 import src.services.audio as audio
+from src import widget
 
 
 dummy_region = cairo.Region()

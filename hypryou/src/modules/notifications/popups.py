@@ -1,4 +1,3 @@
-from utils import widget
 from repository import gtk, gdk, glib
 from src.services.notifications import popups
 from src.modules.notifications.item import NotificationItem
@@ -6,6 +5,7 @@ from src.modules.notifications.item import NotificationRevealer
 import typing as t
 from config import HyprlandVars
 from src.services.state import opened_windows
+from src import widget
 
 T = t.TypeVar("T")
 

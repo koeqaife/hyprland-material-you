@@ -1,10 +1,11 @@
-from utils import widget, toggle_css_class
+from utils import toggle_css_class
 from utils.logger import logger
 from repository import gtk, layer_shell
 from src.services.backlight import BacklightDevice, get_backlight_manager
 from config import HyprlandVars
 import weakref
 import typing as t
+from src import widget
 
 SCALE_MAX = 512
 

@@ -1,5 +1,5 @@
 from repository import gtk, layer_shell
-from utils import widget, sync_debounce
+from utils import sync_debounce
 from utils.logger import logger
 import typing as t
 from config import HyprlandVars, Settings
@@ -10,6 +10,7 @@ from src.services import hyprland
 from src.services.mpris import players
 import asyncio
 import src.services.cliphist as cliphist
+from src import widget
 
 
 class ActionButton(gtk.Button):

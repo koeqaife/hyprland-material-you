@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from utils import widget, downloader, toggle_css_class, Ref, sync_debounce
+from utils import downloader, toggle_css_class, Ref, sync_debounce
 from utils import format_seconds
 from utils.service import Signals
 from utils.logger import logger
@@ -8,6 +8,7 @@ from src.services.mpris import players, MprisPlayer, current_player
 from config import HyprlandVars
 import weakref
 import typing as t
+from src import widget
 
 type HandlersDict = dict[
     tuple[Signals, str] | Ref[t.Any] | gobject.Object, int

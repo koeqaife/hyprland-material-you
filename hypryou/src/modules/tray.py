@@ -1,10 +1,11 @@
-from utils import widget, capitalize_first
+from utils import capitalize_first
 from utils.logger import logger
 from repository import gtk, layer_shell, gdk, glib
 from src.services.system_tray import StatusNotifierItem, items
 from config import HyprlandVars
 import weakref
 import typing as t
+from src import widget
 
 # It's so cool that when tray isn't opened there isn't any load to CPU
 # Cause it's not listening to any updates of items

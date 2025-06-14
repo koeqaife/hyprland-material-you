@@ -1,7 +1,7 @@
 from repository import gtk, glib, pango, gdk, gio
 from src.services.notifications import Notification, NotificationClosedReason
 from src.services.notifications import Category, NotificationUrgency
-from utils import widget
+from src import widget
 import typing as t
 from utils import get_formatted_time, toggle_css_class
 from config import Settings

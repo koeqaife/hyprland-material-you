@@ -1,9 +1,9 @@
-from utils import widget
 from utils.logger import logger
 from repository import layer_shell, gtk, gdk, glib
 import weakref
 from src.services.state import current_wallpaper
 import typing as t
+from src import widget
 
 
 class WallpapersWidget(gtk.Stack):
