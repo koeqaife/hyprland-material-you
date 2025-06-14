@@ -276,7 +276,7 @@ class TemplateFormatter:
                     result.append(command)
         return result
 
-    def format(self, text: str) -> str:
+    def format(self, text: str) -> tuple[str, list[str]]:
         pattern = r'(<(?:(\w+):)?(\w+)(?:\.(.+))?>)'
         matches = re.findall(pattern, text)
         result = []

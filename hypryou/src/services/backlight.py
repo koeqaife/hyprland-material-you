@@ -36,7 +36,7 @@ class BacklightDevice(Signals):
         )
 
         self.max_brightness = -1
-        self.changed_threshold = 0
+        self.changed_threshold = 0.0
         self.update_max_brightness()
 
         self.monitor_handler = self.monitor.connect(

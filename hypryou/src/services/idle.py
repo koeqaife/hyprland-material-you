@@ -265,17 +265,17 @@ class ScreenSaver:
 
 
 class ScreenSaverService(Service):
-    def __init__(self):
+    def __init__(self) -> None:
         self.watcher: ScreenSaver
 
-    def app_init(self):
+    def app_init(self) -> None:
         self.watcher = ScreenSaver()
 
     def start(self) -> None:
         logger.debug("Starting screen saver dbus")
         self.watcher.register()
 
-    def on_close(self):
+    def on_close(self) -> None:
         if not getattr(self, "watcher"):
             return
         for notification in self.watcher.notifications:

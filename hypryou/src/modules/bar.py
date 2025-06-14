@@ -652,7 +652,7 @@ class BrightnessApplet(Applet):
         max_brightness = device.max_brightness
         new = 5 / 100 * max_brightness * dy * -1 + current
         device.set_brightness(
-            max(min(new, max_brightness), 1),
+            max(min(int(new), max_brightness), 1),
             True
         )
 

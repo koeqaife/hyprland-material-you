@@ -129,6 +129,7 @@ class Notifications(gtk.ScrolledWindow):
         self.unfreeze()
         if getattr(self, "_iterator", None):
             del self._iterator
+        return None
 
     def close_all(self, *args: t.Any) -> None:
         if is_closing.value:
@@ -159,7 +160,7 @@ class Notifications(gtk.ScrolledWindow):
         if not self.freezed:
             for item in self.items.values():
                 item[1].self_destroy()
-                if item[1] in item[0]:
+                if item[1] in item[0]:  # type: ignore [operator]
                     item[0].remove(item[1])
             self.items.clear()
             if self.handler_id != -1:

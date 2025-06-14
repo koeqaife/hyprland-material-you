@@ -65,7 +65,7 @@ class AudioService(Service):
         volume.watch(self.on_volume_ref_changed)
         self.default_speaker.connect("notify::volume", self.on_volume_changed)
 
-        targets: dict[str, Ref[set[wp.Node]]] = {
+        targets: dict[str, Ref[set[wp.Stream]] | Ref[set[wp.Endpoint]]] = {
             "microphone": microphones,
             "stream": streams,
             "speaker": speakers,

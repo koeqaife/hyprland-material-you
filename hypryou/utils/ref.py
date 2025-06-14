@@ -50,9 +50,13 @@ class ReactiveList(MutableSequence[L], t.Generic[L]):
         value: L | t.Iterable[L]
     ) -> None:
         if isinstance(index, int):
+            if t.TYPE_CHECKING:
+                value = t.cast(L, value)
             self._check_type(value)
             self._data[index] = value
         else:
+            if t.TYPE_CHECKING:
+                value = t.cast(t.Iterable[L], value)
             for v in value:
                 self._check_type(v)
             self._data[index] = value
@@ -85,10 +89,11 @@ class ReactiveList(MutableSequence[L], t.Generic[L]):
         if self._ref.is_ready:
             self._ref._trigger_watchers()
 
-    def pop(self, index: t.SupportsIndex) -> None:
-        self._data.pop(index)
+    def pop(self, index: int = -1) -> L:
+        value = self._data.pop(index)
         if self._ref.is_ready:
             self._ref._trigger_watchers()
+        return value
 
     def insert(self, i: int, value: L) -> None:
         self._check_type(value)
@@ -97,8 +102,8 @@ class ReactiveList(MutableSequence[L], t.Generic[L]):
         if self._ref.is_ready:
             self._ref._trigger_watchers()
 
-    def __contains__(self, value) -> bool:
-        return self._data.__contains__(value)
+    def __contains__(self, value: object) -> bool:
+        return value in self._data
 
     def __len__(self) -> int:
         return len(self._data)
@@ -224,7 +229,7 @@ class Ref(t.Generic[T]):
         self.is_ready = not delayed_init
         self.types = types
 
-        self._value = self._wrap_if_mutable(value)
+        self._value: T = self._wrap_if_mutable(value)
 
         self.name = name or "unknown"
         self.asyncio_lock = asyncio.Lock()
@@ -305,9 +310,9 @@ class Ref(t.Generic[T]):
         return self._value
 
     @value.setter
-    def value(self, new_value: T) -> None:
+    def value(self, _new_value: T) -> None:
         old_value = self._value
-        new_value = self._wrap_if_mutable(new_value)
+        new_value = self._wrap_if_mutable(_new_value)
         if old_value != new_value:
             if self.types:
                 if not isinstance(new_value, self.types):
