@@ -3,6 +3,7 @@ gtk4-layer-shell
 dart-sass
 python-materialyoucolor-git
 libastal-bluetooth-git
+libastal-wireplumber-git
 
 Sync:
 python

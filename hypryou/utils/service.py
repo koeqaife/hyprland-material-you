@@ -16,6 +16,7 @@ class Signals:
         self._signals: dict[str, dict[int, Wrapper]] = {}
         self._blocked: set[str] = set()
         self._lock = threading.RLock()
+        self._pending_idle: set[str] = set()
 
     def watch(
         self,
@@ -83,8 +84,18 @@ class Signals:
                     )
                     del self._signals[signal_name][handler_id]
 
+    def _idle_notify(self, signal_name: str, *args: t.Any) -> bool:
+        with self._lock:
+            self._pending_idle.discard(signal_name)
+        self.notify_sync(signal_name, *args)
+        return False
+
     def notify(self, signal_name: str, *args: t.Any) -> None:
-        glib.idle_add(self.notify_sync, signal_name, *args)
+        with self._lock:
+            if signal_name in self._pending_idle:
+                return
+            self._pending_idle.add(signal_name)
+        glib.idle_add(self._idle_notify, signal_name, *args)
 
     def block(self, signal_name: str) -> None:
         with self._lock:

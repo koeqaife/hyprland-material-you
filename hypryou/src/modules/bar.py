@@ -21,6 +21,7 @@ from src.services.network import get_network
 from src.services.state import toggle_window
 from src.services.upower import get_upower, BatteryLevel, BatteryState
 from src.services.backlight import get_backlight_manager
+import src.services.audio as audio
 
 
 dummy_region = cairo.Region()
@@ -658,6 +659,56 @@ class BrightnessApplet(Applet):
         )
 
 
+class AudioApplet(Applet):
+    def __init__(self) -> None:
+        super().__init__(
+            "volume",
+            audio.volume_icon,
+            self.open_audio_menu,
+            self.open_pavucontrol
+        )
+        self.scroll = gtk.EventControllerScroll.new(
+            gtk.EventControllerScrollFlags.VERTICAL
+        )
+        self.scroll_handler = self.scroll.connect(
+            "scroll", self.on_scroll
+        )
+        self.add_controller(self.scroll)
+
+        self.volume_handler = audio.volume.watch(
+            self.update_tooltip
+        )
+        self.update_tooltip()
+        self._last_scroll = 0.0
+
+    def update_tooltip(self, *args: t.Any) -> None:
+        self.set_tooltip_text(f"Volume: {int(audio.volume.value)}%")
+
+    def destroy(self) -> None:
+        self.remove_controller(self.scroll)
+        self.scroll.disconnect(self.scroll_handler)
+        audio.volume.unwatch(self.volume_handler)
+        super().destroy()
+
+    def open_pavucontrol(self) -> None:
+        subprocess.Popen(["pavucontrol"])
+
+    def open_audio_menu(self) -> None:
+        toggle_window("audio")
+
+    def on_scroll(
+        self,
+        controller: gtk.EventControllerScroll,
+        dx: float,
+        dy: float
+    ) -> None:
+        now = perf_counter()
+        if self._last_scroll < now - 0.055:
+            self._last_scroll = now
+            new = 5 * max(min(dy, 1), -1) * -1 + audio.volume.value
+            audio.volume.value = max(min(new, 100.0), 1.0)
+
+
 class Applets(gtk.Box):
     def __init__(self) -> None:
         super().__init__(
@@ -666,7 +717,7 @@ class Applets(gtk.Box):
         )
 
         self.children = (
-            Applet("audio", "volume_up", lambda: None, self.open_pavucontrol),
+            AudioApplet(),
             BluetoothApplet(),
             Applet("wifi", get_network().icon, lambda: None),
             BrightnessApplet(),
@@ -674,9 +725,6 @@ class Applets(gtk.Box):
         for child in self.children:
             if isinstance(child, Applet):
                 self.append(child)
-
-    def open_pavucontrol(self) -> None:
-        subprocess.Popen(["pavucontrol"])
 
     def destroy(self) -> None:
         for child in self.children:

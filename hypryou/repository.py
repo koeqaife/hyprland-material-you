@@ -12,11 +12,12 @@ from gi.repository import GObject as gobject
 from gi.repository import Pango as pango
 from gi.repository import NM as nm  # type: ignore [attr-defined]
 from gi.repository import AstalBluetooth as bluetooth
+from gi.repository import AstalWp as wireplumber
 
 __all__ = [
     "versions", "gtk", "layer_shell",
     "gdk", "gio", "glib", "gsk",
     "gdk_pixbuf", "gobject",
     "pango", "nm", "session_lock",
-    "bluetooth"
+    "bluetooth", "wireplumber"
 ]

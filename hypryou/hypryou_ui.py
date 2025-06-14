@@ -31,6 +31,7 @@ from src.services.upower import UPowerService
 from src.services.idle import ScreenSaverService
 from src.services.login1 import Login1ManagerService
 from src.services.backlight import BacklightService
+from src.services.audio import AudioService
 
 import src.services.cliphist as cliphist
 
@@ -63,7 +64,8 @@ services: tuple[AsyncService | Service, ...] = (
     Login1ManagerService(),
     ScreenSaverService(),
     IdleInhibitorService(),
-    BacklightService()
+    BacklightService(),
+    AudioService()
 )
 
 
