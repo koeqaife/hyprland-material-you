@@ -6,6 +6,7 @@ from src.services.backlight import (
     get_backlight_manager, BacklightDevice,
     BacklightDeviceView
 )
+from src.services.audio import volume, volume_icon
 import typing as t
 from src.services.state import opened_windows
 from math import ceil
@@ -114,9 +115,41 @@ class BrightnessPopup(Popup):
         value = ceil(scale_value / self.max * self.device.max_brightness)
         if value == self.device.brightness:
             return
-        print(value, self.device.brightness)
         self.device.set_brightness(value)
         if not opened_windows.is_visible("brightness"):
+            self.reveal()
+        super().scale_changed(*args)
+
+
+class VolumePopup(Popup):
+    def __init__(self) -> None:
+        super().__init__(volume_icon)
+
+        self.handler = volume.watch(
+            self.update_scale_value
+        )
+        self.update_scale_value(volume, False)
+
+    def update_scale_value(
+        self,
+        new_value: float,
+        reveal: bool = True
+    ) -> None:
+        if reveal and not opened_windows.is_visible("audio"):
+            value = new_value
+            self.scale.handler_block(self.scale_handler)
+            self.scale.set_value(value)
+            self.scale.handler_unblock(self.scale_handler)
+            self.update_percent()
+            self.reveal()
+        elif self.revealed:
+            self.un_reveal()
+
+    def scale_changed(self, *args: t.Any) -> None:
+        if not self.revealed:
+            return
+        volume.value = self.scale.get_value()
+        if not opened_windows.is_visible("audio"):
             self.reveal()
         super().scale_changed(*args)
 
@@ -139,8 +172,21 @@ class PopupsWindow(widget.LayerWindow):
             name="popups",
             css_classes=("popups",)
         )
-        self.child = gtk.Box()
+        self.child = gtk.Box(
+            orientation=gtk.Orientation.VERTICAL
+        )
         self.manager = get_backlight_manager()
         self.child.append(BrightnessPopup(self.manager.devices[0]))
+        self.child.append(VolumePopup())
         self.set_child(self.child)
-        self.present()
+
+        self.handler = window_counter.watch(
+            self._update_visible
+        )
+        self._update_visible(window_counter.value)
+
+    def _update_visible(self, new_counter: int) -> None:
+        if new_counter > 0:
+            self.show()
+        else:
+            self.hide()
