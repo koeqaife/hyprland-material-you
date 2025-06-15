@@ -147,7 +147,6 @@ class NotificationItem(gtk.Box):
         )
         self.body_text = gtk.Label(
             css_classes=("body-text",),
-            use_markup=True,
             halign=gtk.Align.START,
             wrap=True,
             wrap_mode=pango.WrapMode.WORD_CHAR,
@@ -289,7 +288,11 @@ class NotificationItem(gtk.Box):
             self.image.set_size_request(0, 0)
 
         self.title.set_label(self.item.summary)
-        self.body_text.set_label(self.item.body)
+        try:
+            pango.parse_markup(self.item.body, -1, "\x00")
+            self.body_text.set_markup(self.item.body)
+        except Exception:
+            self.body_text.set_label(self.item.body)
         self.body_text.set_visible(self.item.body != "")
         self.title.set_visible(self.item.summary != "")
 
