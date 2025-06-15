@@ -76,7 +76,7 @@ class Settings:
 
     def __init__(self) -> None:
         if not hasattr(self, '_initialized'):
-            self._signals = Signals()
+            self._signals = Signals(True)
             self._initialized = True
             self._values = {}
             try:

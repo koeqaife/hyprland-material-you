@@ -12,12 +12,13 @@ Wrapper = t.Callable[..., bool | None]
 
 
 class Signals:
-    def __init__(self) -> None:
-        self._signals: dict[str, dict[int, Wrapper]] = {}
+    def __init__(self, no_idle_pending: bool = False) -> None:
+        self._signals: dict[str, dict[int, Callback]] = {}
         self._handler_signals: dict[int, str] = {}
         self._blocked: set[str] = set()
         self._lock = threading.RLock()
         self._pending_idle: set[str] = set()
+        self._no_idle_pending = no_idle_pending
 
     def watch(
         self,
@@ -50,7 +51,7 @@ class Signals:
                 wrapper = one_shot
 
             callbacks = self._signals.setdefault(signal_name, {})
-            base_id = max(callbacks.keys(), default=0) + 1
+            base_id = max(self._handler_signals.keys(), default=0) + 1
             handler_id = base_id + priority * 0x10000
             callbacks[handler_id] = wrapper
             self._handler_signals[handler_id] = signal_name
@@ -108,11 +109,16 @@ class Signals:
         self.notify_sync(signal_name, *args)
         return False
 
-    def notify(self, signal_name: str, *args: t.Any) -> None:
-        with self._lock:
-            if signal_name in self._pending_idle:
-                return
-            self._pending_idle.add(signal_name)
+    def notify(
+        self,
+        signal_name: str,
+        *args: t.Any
+    ) -> None:
+        if not self._no_idle_pending:
+            with self._lock:
+                if signal_name in self._pending_idle:
+                    return
+                self._pending_idle.add(signal_name)
         glib.idle_add(self._idle_notify, signal_name, *args)
 
     def block(self, signal_name: str) -> None:

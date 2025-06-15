@@ -45,7 +45,7 @@ class SocketType(int, Enum):
 
 class HyprlandClient(Signals):
     def __init__(self) -> None:
-        super().__init__()
+        super().__init__(True)
         runtime_dir = os.environ.get("XDG_RUNTIME_DIR", "/run/user/1000")
         instance = os.environ["HYPRLAND_INSTANCE_SIGNATURE"]
 
