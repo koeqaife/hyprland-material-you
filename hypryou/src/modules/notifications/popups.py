@@ -52,8 +52,6 @@ class NotificationPopups(gtk.Box):
             self.window.hide()
         else:
             self.window.show()
-        self.window.queue_draw()
-        self.window.queue_resize()
 
     def on_change(self, *args: t.Any) -> None:
         added_keys, removed_keys = diff_keys(
