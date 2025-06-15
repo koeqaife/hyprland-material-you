@@ -142,7 +142,7 @@ class ReactiveSet(MutableSet[L], t.Generic[L]):
                 self._ref._trigger_watchers()
 
     def discard(self, value: L) -> None:
-        if value is self._data:
+        if value in self._data:
             self._data.discard(value)
 
             if self._ref.is_ready:
