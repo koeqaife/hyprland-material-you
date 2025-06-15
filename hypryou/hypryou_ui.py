@@ -176,7 +176,7 @@ class HyprYou(gtk.Application):
                     Bar(self, monitor, i),
                     Notifications(self, monitor, i),
                     WallpapersWindow(self, monitor),
-                    PopupsWindow(self, monitor)
+                    PopupsWindow(self, monitor, i)
                 ]
                 corners = [
                     Corner(self, monitor, "left"),
