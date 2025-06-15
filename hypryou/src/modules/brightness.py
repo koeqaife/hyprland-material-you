@@ -48,6 +48,9 @@ class DeviceItem(gtk.Box):
             0, SCALE_MAX, 1
         )
         self.scale.set_hexpand(True)
+        self.scale_handler = self.scale.connect(
+            "value-changed", self.scale_changed
+        )
 
         self.append(self.info_box)
         self.append(self.scale)
@@ -57,10 +60,6 @@ class DeviceItem(gtk.Box):
             self.update_scale_value
         )
         self.update_scale_value(self.device.brightness)
-
-        self.scale_handler = self.scale.connect(
-            "value-changed", self.scale_changed
-        )
 
     def update_percent(self) -> None:
         scale_value = self.scale.get_value()
@@ -75,12 +74,15 @@ class DeviceItem(gtk.Box):
 
     def update_scale_value(self, brightness: int) -> None:
         value = brightness / self.device.max_brightness * SCALE_MAX
+        self.scale.handler_block(self.scale_handler)
         self.scale.set_value(value)
+        self.scale.handler_unblock(self.scale_handler)
         self.update_percent()
 
     def destroy(self) -> None:
-        self.device.unwatch(self.handler)
         self.device.destroy()
+        self.device.unwatch(self.handler)
+        self.scale.disconnect(self.scale_handler)
 
 
 class DevicesBox(gtk.ScrolledWindow):

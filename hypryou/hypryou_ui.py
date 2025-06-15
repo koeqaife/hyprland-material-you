@@ -47,6 +47,7 @@ from src.modules.wallpapers import WallpapersWindow
 from src.modules.lockscreen import ScreenLock
 from src.modules.power import PowerMenuWindow
 from src.modules.brightness import BrightnessWindow
+from src.modules.popups import PopupsWindow
 
 START = time.perf_counter()
 
@@ -174,7 +175,8 @@ class HyprYou(gtk.Application):
                 windows: list[gtk.ApplicationWindow] = [
                     Bar(self, monitor, i),
                     Notifications(self, monitor, i),
-                    WallpapersWindow(self, monitor)
+                    WallpapersWindow(self, monitor),
+                    PopupsWindow(self, monitor)
                 ]
                 corners = [
                     Corner(self, monitor, "left"),

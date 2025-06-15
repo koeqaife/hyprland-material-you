@@ -6,6 +6,7 @@ from repository import gio
 import typing as t
 from utils.logger import logger
 import os
+from math import ceil
 
 NAMESPACE_DIR = "/sys/class/backlight"
 
@@ -45,7 +46,7 @@ class BacklightDevice(Signals):
 
     def update_icon(self) -> None:
         normalized = self.brightness / self.max_brightness
-        level = round((normalized ** 0.5) * 7)
+        level = ceil((normalized ** 0.5) * 7)
         level = max(level, 1)
         self.icon.value = f"brightness_{level}"
 
@@ -142,10 +143,11 @@ class BacklightDeviceView(Signals):
         self._destroyed = False
 
     def __del__(self) -> None:
-        if not self._destroyed:
-            self.destroy()
+        self.destroy()
 
     def destroy(self) -> None:
+        if self._destroyed:
+            return
         for handler_id in self.device_handlers:
             self._device.unwatch(handler_id)
         self._destroyed = True
