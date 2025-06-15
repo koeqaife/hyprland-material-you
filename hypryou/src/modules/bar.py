@@ -20,7 +20,7 @@ import weakref
 from src.services.network import get_network
 from src.services.state import toggle_window
 from src.services.upower import get_upower, BatteryLevel, BatteryState
-from src.services.backlight import get_backlight_manager
+from src.services.backlight import get_backlight_manager, BacklightDeviceView
 import src.services.audio as audio
 from src import widget
 
@@ -604,6 +604,7 @@ class BrightnessApplet(Applet):
             self.initialized = False
             self.set_visible(False)
         else:
+            self.device = BacklightDeviceView(manager.devices[0])
             self.initialized = True
             self.scroll = gtk.EventControllerScroll.new(
                 gtk.EventControllerScrollFlags.VERTICAL
@@ -613,8 +614,8 @@ class BrightnessApplet(Applet):
             )
             self.add_controller(self.scroll)
 
-            self.device_handler = manager.devices[0].watch(
-                "changed", self.update_tooltip
+            self.device_handler = self.device.watch(
+                "changed-external", self.update_tooltip
             )
             self.update_tooltip()
 
@@ -622,7 +623,7 @@ class BrightnessApplet(Applet):
         if not self.manager.devices:
             return
 
-        device = self.manager.devices[0]
+        device = self.device
         current = device.brightness
         max_brightness = device.max_brightness
 
@@ -633,7 +634,7 @@ class BrightnessApplet(Applet):
         if self.initialized:
             self.remove_controller(self.scroll)
             self.scroll.disconnect(self.scroll_handler)
-            self.manager.devices[0].unwatch(self.device_handler)
+            self.device.unwatch(self.device_handler)
         super().destroy()
 
     def open_brightness_menu(self) -> None:
@@ -648,13 +649,12 @@ class BrightnessApplet(Applet):
         if not self.manager.devices:
             return
 
-        device = self.manager.devices[0]
+        device = self.device
         current = device.brightness
         max_brightness = device.max_brightness
         new = 5 / 100 * max_brightness * dy * -1 + current
         device.set_brightness(
-            max(min(int(new), max_brightness), 1),
-            True
+            max(min(int(new), max_brightness), 1)
         )
 
 

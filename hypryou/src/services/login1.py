@@ -24,6 +24,8 @@ class Login1Manager:
             "/org/freedesktop/login1/session/self",
             "org.freedesktop.login1.Session"
         )
+        self._throttle_active: bool = False
+        self._pending_args: tuple[str, str, int] | None = None
 
     def set_brightness(
         self,
@@ -31,16 +33,38 @@ class Login1Manager:
         device: str,
         brightness: int
     ) -> None:
-        self.session.call_sync(
-            "SetBrightness",
-            glib.Variant(
-                "(ssu)",
-                (subsystem, device, brightness)
-            ),
-            gio.DBusCallFlags.NONE,
-            -1,
-            None
-        )
+        self._pending_args = (subsystem, device, brightness)
+
+        if not self._throttle_active:
+            self._apply_brightness(self._pending_args)
+            self._pending_args = None
+            self._throttle_active = True
+            glib.timeout_add(25, self._throttle_tick)
+
+    def _apply_brightness(self, args: tuple[str, str, int]) -> None:
+        subsystem, device, brightness = args
+        try:
+            self.session.call_sync(
+                "SetBrightness",
+                glib.Variant("(ssu)", (subsystem, device, brightness)),
+                gio.DBusCallFlags.NONE,
+                -1,
+                None
+            )
+        except Exception as e:
+            logger.warning(
+                f"Failed to set brightness for {device}: {e}"
+            )
+
+    def _throttle_tick(self) -> bool:
+        if self._pending_args is None:
+            self._throttle_active = False
+            return False
+
+        args = self._pending_args
+        self._pending_args = None
+        self._apply_brightness(args)
+        return True
 
     def call(self, name: str, params: glib.Variant | None = None) -> None:
         self._proxy.call(

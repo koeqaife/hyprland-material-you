@@ -1,7 +1,10 @@
 from utils import toggle_css_class
 from utils.logger import logger
 from repository import gtk, layer_shell
-from src.services.backlight import BacklightDevice, get_backlight_manager
+from src.services.backlight import (
+    BacklightDevice, get_backlight_manager,
+    BacklightDeviceView
+)
 from config import HyprlandVars
 import weakref
 import typing as t
@@ -18,16 +21,16 @@ class DeviceItem(gtk.Box):
             css_classes=("brightness-item",),
             orientation=gtk.Orientation.VERTICAL
         )
-        self._item = item
+        self.device = BacklightDeviceView(item)
         self.info_box = gtk.Box(
             css_classes=("info-box",),
             hexpand=True
         )
-        self.icon = widget.Icon(item.icon)
+        self.icon = widget.Icon(self.device.icon)
         self.label = gtk.Label(
             label=f"Device {number}",
             css_classes=("label",),
-            tooltip_text=item.device,
+            tooltip_text=self.device.device,
             hexpand=True,
             halign=gtk.Align.START
         )
@@ -49,8 +52,11 @@ class DeviceItem(gtk.Box):
         self.append(self.info_box)
         self.append(self.scale)
 
-        self.handler = item.watch("changed-external", self.update_scale_value)
-        self.update_scale_value(item.brightness)
+        self.handler = self.device.watch(
+            "changed-external",
+            self.update_scale_value
+        )
+        self.update_scale_value(self.device.brightness)
 
         self.scale_handler = self.scale.connect(
             "value-changed", self.scale_changed
@@ -63,17 +69,18 @@ class DeviceItem(gtk.Box):
 
     def scale_changed(self, *args: t.Any) -> None:
         scale_value = self.scale.get_value()
-        value = scale_value / SCALE_MAX * self._item.max_brightness
-        self._item.set_brightness(int(value))
+        value = scale_value / SCALE_MAX * self.device.max_brightness
+        self.device.set_brightness(int(value))
         self.update_percent()
 
     def update_scale_value(self, brightness: int) -> None:
-        value = brightness / self._item.max_brightness * SCALE_MAX
+        value = brightness / self.device.max_brightness * SCALE_MAX
         self.scale.set_value(value)
         self.update_percent()
 
     def destroy(self) -> None:
-        self._item.unwatch(self.handler)
+        self.device.unwatch(self.handler)
+        self.device.destroy()
 
 
 class DevicesBox(gtk.ScrolledWindow):

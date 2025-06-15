@@ -52,12 +52,14 @@ class BacklightDevice(Signals):
     def set_brightness(
         self,
         value: int,
-        notify_external: bool = False
+        view_id: int = -1
     ) -> None:
+        value = max(min(value, self.max_brightness), 0)
+        if value == self.brightness:
+            return
         self.brightness = value
         self.notify("changed", value)
-        if notify_external:
-            self.notify("changed-external", value)
+        self.notify("changed-external", value, view_id)
         get_login_manager().set_brightness(
             "backlight",
             self.device,
@@ -105,7 +107,7 @@ class BacklightDevice(Signals):
                 elif abs(value - self.brightness) > self.changed_threshold:
                     self.brightness = value
                     self.notify("changed", value)
-                    self.notify("changed-external", value)
+                    self.notify("changed-external", value, -1)
                     self.update_icon()
         except Exception as e:
             logger.error(
@@ -125,6 +127,58 @@ class BacklightDevice(Signals):
         self.brightness_file.read_async(
             0, None, self.brightness_finish, None
         )
+
+
+class BacklightDeviceView(Signals):
+    def __init__(self, device: BacklightDevice) -> None:
+        super().__init__()
+        self._device = device
+
+        self.view_id = int.from_bytes(os.urandom(8), byteorder="big")
+        self.device_handlers = (
+            device.watch("changed", self._on_changed),
+            device.watch("changed-external", self._on_changed_external)
+        )
+        self._destroyed = False
+
+    def __del__(self) -> None:
+        if not self._destroyed:
+            self.destroy()
+
+    def destroy(self) -> None:
+        for handler_id in self.device_handlers:
+            self._device.unwatch(handler_id)
+        self._destroyed = True
+
+    @property
+    def device(self) -> str:
+        return self._device.device
+
+    @property
+    def icon(self) -> Ref[str]:
+        return self._device.icon
+
+    @property
+    def brightness(self) -> int:
+        return self._device.brightness
+
+    @property
+    def max_brightness(self) -> int:
+        return self._device.max_brightness
+
+    def set_brightness(self, value: int) -> None:
+        self._device.set_brightness(value, self.view_id)
+
+    def _on_changed(self, value: int) -> None:
+        self.notify("changed", value)
+
+    def _on_changed_external(
+        self,
+        value: int,
+        view_id: int
+    ) -> None:
+        if view_id != self.view_id:
+            self.notify("changed-external", value)
 
 
 class BacklightManager:
