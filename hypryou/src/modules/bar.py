@@ -347,7 +347,7 @@ class Player(gtk.Box):
             title = metadata.get("xesam:title")
 
             if not artist or not title:
-                text = "Nothing's playing"
+                text = current.get_bus_name().split(".")[3].capitalize()
                 self.last_changed.title = None
                 self.last_changed.artist = None
             else:
@@ -384,7 +384,11 @@ class Player(gtk.Box):
             assert current_player.value
             metadata = current_player.value[1].metadata
             art_url = metadata.get("mpris:artUrl")
-            if not art_url or art_url == self.last_changed.artUrl:
+            if not art_url:
+                self.children[0].set_visible(False)
+                self.last_changed.artUrl = None
+                return
+            if art_url == self.last_changed.artUrl:
                 return
             self.children[0].set_visible(True)
 

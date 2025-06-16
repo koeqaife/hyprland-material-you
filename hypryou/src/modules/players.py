@@ -48,7 +48,7 @@ class Player(gtk.Box):
             css_classes=("text-box",),
             orientation=gtk.Orientation.VERTICAL,
             hexpand=True,
-            valign=gtk.Align.END
+            valign=gtk.Align.START
         )
 
         self.info_box.append(self.image)
@@ -279,7 +279,10 @@ class Player(gtk.Box):
     def update_image(self) -> None:
         metadata = self._item.metadata
         art_url = metadata.get("mpris:artUrl")
-        if not art_url or art_url == self.last_changed.art_url:
+        if not art_url:
+            self.image.set_visible(False)
+            return
+        if art_url == self.last_changed.art_url:
             return
         self.image.set_visible(True)
 
