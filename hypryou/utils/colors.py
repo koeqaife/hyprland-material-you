@@ -297,11 +297,11 @@ class TemplateFormatter:
             elif tag_type == 'post' and key in self.post_actions:
                 value = f"Post action: {key}"
                 actions.append(f"{key}.{transformations_str}")
-            elif tag_type is None and key in self.color_map:
+            elif not tag_type and key in self.color_map:
                 value = self.color_map[key]
 
             if value is not None:
-                if transformations_str and tag_type is None:
+                if transformations_str and not tag_type:
                     transformations = self.parse_transformations(
                         transformations_str
                     )
