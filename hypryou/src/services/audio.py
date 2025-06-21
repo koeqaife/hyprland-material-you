@@ -1,5 +1,6 @@
 from repository import wp
 from utils.ref import Ref
+from utils.logger import logger
 from utils.service import Service
 import typing as t
 
@@ -14,16 +15,23 @@ ICON_VALUES: t.Final[tuple[str, ...]] = (
 )
 
 
-def get_volume_icon(volume: float) -> str:
+def get_volume_icon(*args: t.Any) -> str:
+    if volume_muted.value:
+        return ICON_VALUES[0]
+
     for i in range(len(ICON_THRESHOLDS) - 1, -1, -1):
-        if volume >= ICON_THRESHOLDS[i]:
+        if volume.value >= ICON_THRESHOLDS[i]:
             return ICON_VALUES[i]
     return ICON_VALUES[0]
 
 
 volume = Ref(0.0, name="audio_volume")
+volume_muted = Ref(False, name="audio_volume_muted")
 volume_icon = Ref("volume_off", name="audio_volume_icon")
 volume_icon.bind(volume, get_volume_icon)
+volume_icon.bind(volume_muted, get_volume_icon)
+
+mic_muted = Ref(False, name="mic_muted")
 
 streams = Ref[set[wp.Stream]](
     set(), name="audio_streams",
@@ -47,9 +55,15 @@ microphones = Ref[set[wp.Endpoint]](
 class AudioService(Service):
     def __init__(self) -> None:
         self.wp = wp.get_default()
-        self.audio = self.wp.get_audio()
-        self.default_speaker = self.audio.get_default_speaker()
-        self.default_mic = self.audio.get_default_microphone()
+
+        try:
+            self.audio = self.wp.get_audio()
+            self.default_speaker = self.audio.get_default_speaker()
+            self.default_mic = self.audio.get_default_microphone()
+            self.success = True
+        except Exception as e:
+            self.success = False
+            logger.error("AudioService init error", exc_info=e)
 
     def on_volume_ref_changed(self, new_value: float) -> None:
         volume = self.default_speaker.get_volume() * 100.0
@@ -60,10 +74,29 @@ class AudioService(Service):
     def on_volume_changed(self, *args: t.Any) -> None:
         volume.value = self.default_speaker.get_volume() * 100.0
 
+    def on_muted_changed(self, *args: t.Any) -> None:
+        volume_muted.value = self.default_speaker.get_mute()
+
+    def on_muted_ref_changed(self, new_value: bool) -> None:
+        self.default_speaker.set_mute(new_value)
+
+    def on_mic_muted_changed(self, *args: t.Any) -> None:
+        mic_muted.value = self.default_mic.get_mute()
+
+    def on_mic_muted_ref_changed(self, new_value: bool) -> None:
+        self.default_mic.set_mute(new_value)
+
     def app_init(self) -> None:
+        if not self.success:
+            return
         volume.value = self.default_speaker.get_volume()
         volume.watch(self.on_volume_ref_changed)
+        volume_muted.watch(self.on_muted_ref_changed)
         self.default_speaker.connect("notify::volume", self.on_volume_changed)
+        self.default_speaker.connect("notify::mute", self.on_muted_changed)
+
+        mic_muted.watch(self.on_mic_muted_ref_changed)
+        self.default_mic.connect("notify::mute", self.on_mic_muted_changed)
 
         targets: dict[str, Ref[set[wp.Stream]] | Ref[set[wp.Endpoint]]] = {
             "microphone": microphones,
