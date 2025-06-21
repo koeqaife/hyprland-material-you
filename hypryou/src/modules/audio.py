@@ -92,7 +92,6 @@ class EndpointItem(gtk.Box):
             "notify::is-default",
             self.on_default
         )
-        self.update_scale_value()
 
         self.click_gesture = gtk.GestureClick.new()
         self.click_gesture.set_button(gdk.BUTTON_SECONDARY)
@@ -109,6 +108,10 @@ class EndpointItem(gtk.Box):
 
         self.install_action("set_default", None, self.set_default)
         self.install_action("mute", None, self.toggle_mute)
+
+        self.update_scale_value()
+        self.on_muted()
+        self.on_default()
 
     @staticmethod
     def set_default(self: "EndpointItem", *args: t.Any) -> None:
@@ -152,6 +155,7 @@ class EndpointItem(gtk.Box):
         return True
 
     def on_default(self, *args: t.Any) -> None:
+        toggle_css_class(self, "is-default", self.node.get_is_default())
         self.update_icon()
         self.update_menu()
 
@@ -220,8 +224,10 @@ class StreamItem(gtk.Box):
         self.icon = gtk.Image(
             icon_name=node.get_icon() or "image-missing",
         )
+        is_muted = "" if not self.node.get_mute() else "Muted: "
+        self.name = self.node.get_description() or self.node.get_name()
         self.label = gtk.Label(
-            label=self.node.get_description() or self.node.get_name(),
+            label=f"{is_muted}{self.name}",
             css_classes=("label",),
             tooltip_text=self.node.get_name(),
             hexpand=True,
@@ -257,10 +263,33 @@ class StreamItem(gtk.Box):
             "notify::mute",
             self.on_muted
         )
+
+        self.click_gesture = gtk.GestureClick.new()
+        self.click_gesture.set_button(gdk.BUTTON_SECONDARY)
+        self.gesture_conn = (
+            self.click_gesture.connect("released", self.on_click_released)
+        )
+        self.add_controller(self.click_gesture)
+
         self.update_scale_value()
+        self.on_muted()
+
+    def on_click_released(
+        self,
+        gesture: gtk.GestureClick,
+        n_press: int,
+        x: int,
+        y: int
+    ) -> bool:
+        button = gesture.get_current_button()
+        if button != gdk.BUTTON_SECONDARY:
+            return False
+        self.node.set_mute(not self.node.get_mute())
 
     def on_muted(self, *args: t.Any) -> None:
         toggle_css_class(self, "muted", self.node.get_mute())
+        is_muted = "" if not self.node.get_mute() else "Muted: "
+        self.label.set_label(f"{is_muted}{self.name}")
 
     def update_percent(self) -> None:
         scale_value = self.scale.get_value()

@@ -77,6 +77,17 @@ window.audio {
         padding: 0.25rem;
         padding-top: 0.5rem;
         margin-top: 0.5rem;
+        outline-offset: -0.0625rem;
+
+        &.muted {
+            outline: 0.0625rem solid $outlineVariant;
+        }
+        &:not(:only-child).is-default {
+            outline: 0.0625rem solid $primary;
+        }
+        &.is-default.muted {
+            outline: 0.0625rem dashed $secondary;
+        }
 
         .icon,
         image {
