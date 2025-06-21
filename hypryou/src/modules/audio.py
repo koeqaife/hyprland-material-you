@@ -128,7 +128,7 @@ class EndpointItem(gtk.Box):
             # NOTE: IDK
             self.menu.append("Is default", "is__default")
         self.menu.append(
-            "UnMute" if self.node.get_mute() else "Mute",
+            "Unmute" if self.node.get_mute() else "Mute",
             "mute"
         )
         self.popover.set_menu_model(self.menu)
