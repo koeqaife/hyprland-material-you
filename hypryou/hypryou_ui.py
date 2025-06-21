@@ -48,6 +48,8 @@ from src.modules.lockscreen import ScreenLock
 from src.modules.power import PowerMenuWindow
 from src.modules.brightness import BrightnessWindow
 from src.modules.popups import PopupsWindow
+from src.modules.audio import AudioWindow
+from src.modules.audio import MicsWindow
 
 START = time.perf_counter()
 
@@ -127,6 +129,8 @@ class HyprYou(gtk.Application):
         self.add_window(ClipHistoryWindow(self))
         self.add_window(PowerMenuWindow(self))
         self.add_window(BrightnessWindow(self))
+        self.add_window(AudioWindow(self))
+        self.add_window(MicsWindow(self))
         self.screen_lock = ScreenLock(self)
 
         logger.info(

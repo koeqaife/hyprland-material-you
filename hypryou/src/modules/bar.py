@@ -684,6 +684,21 @@ class AudioApplet(Applet):
         self.update_tooltip()
         self._last_scroll = 0.0
 
+    def on_click_released(
+        self,
+        gesture: gtk.GestureClick,
+        n_press: int,
+        x: int,
+        y: int
+    ) -> None:
+        button_number = gesture.get_current_button()
+        if button_number == gdk.BUTTON_PRIMARY:
+            self.on_click()
+        elif button_number == gdk.BUTTON_MIDDLE and self.on_wheel_click:
+            self.on_wheel_click()
+        elif button_number == gdk.BUTTON_SECONDARY:
+            audio.volume_muted.value = not audio.volume_muted.value
+
     def update_tooltip(self, *args: t.Any) -> None:
         self.set_tooltip_text(f"Volume: {int(audio.volume.value)}%")
 
@@ -712,6 +727,55 @@ class AudioApplet(Applet):
             audio.volume.value = max(min(new, 100.0), 1.0)
 
 
+class MicApplet(Applet):
+    def __init__(self) -> None:
+        super().__init__(
+            "microphone",
+            "mic_off",
+            self.open_mics_menu
+        )
+
+        self.ref_handlers: dict[Ref[t.Any], int] = {
+            audio.microphones: audio.microphones.watch(
+                self.on_mics_changed
+            ),
+            audio.mic_muted: audio.mic_muted.watch(
+                self.on_muted_changed
+            )
+        }
+        self.on_muted_changed(audio.mic_muted.value)
+        self.on_mics_changed(audio.microphones.value)
+
+    def on_muted_changed(self, new: bool) -> None:
+        self.set_label("mic" if not new else "mic_off")
+
+    def on_mics_changed(self, new_list: list[t.Any]) -> None:
+        self.set_visible(len(new_list) > 0)
+
+    def on_click_released(
+        self,
+        gesture: gtk.GestureClick,
+        n_press: int,
+        x: int,
+        y: int
+    ) -> None:
+        button_number = gesture.get_current_button()
+        if button_number == gdk.BUTTON_PRIMARY:
+            self.on_click()
+        elif button_number == gdk.BUTTON_MIDDLE and self.on_wheel_click:
+            self.on_wheel_click()
+        elif button_number == gdk.BUTTON_SECONDARY:
+            audio.mic_muted.value = not audio.mic_muted.value
+
+    def destroy(self) -> None:
+        for ref, handler in self.ref_handlers.items():
+            ref.unwatch(handler)
+        super().destroy()
+
+    def open_mics_menu(self) -> None:
+        toggle_window("mics")
+
+
 class Applets(gtk.Box):
     def __init__(self) -> None:
         super().__init__(
@@ -720,6 +784,7 @@ class Applets(gtk.Box):
         )
 
         self.children = (
+            MicApplet(),
             AudioApplet(),
             BluetoothApplet(),
             Applet("wifi", get_network().icon, lambda: None),
