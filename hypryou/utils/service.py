@@ -13,7 +13,7 @@ Wrapper = t.Callable[..., bool | None]
 
 class Signals:
     def __init__(self, no_idle_pending: bool = False) -> None:
-        self._signals: dict[str, dict[int, Callback]] = {}
+        self._signals: dict[str, dict[int, Wrapper]] = {}
         self._handler_signals: dict[int, str] = {}
         self._blocked: set[str] = set()
         self._lock = threading.RLock()
