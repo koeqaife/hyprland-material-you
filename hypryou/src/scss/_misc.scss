@@ -22,7 +22,7 @@ box {
 
 tooltip {
     background-color: $surfaceContainer;
-    border-radius: 11px;
+    border-radius: 0.75rem;
     outline: none;
     border: none;
     box-shadow: none;
@@ -48,7 +48,7 @@ tooltip label {
 .misc--search {
     @include elevation(1);
     @include nLayerBackground($surfaceContainerHigh, 2);
-    margin: 8px;
+    margin: 0.5rem;
     border-radius: 2.75rem;
     min-height: 2.75rem;
     padding-left: 1rem;

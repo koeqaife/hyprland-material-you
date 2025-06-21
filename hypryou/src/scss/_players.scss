@@ -72,7 +72,7 @@
     }
 
     .actions {
-        border-radius: 100px;
+        border-radius: 2.25rem;
         .icon {
             font-size: 1.125rem;
             font-weight: 400;
@@ -115,7 +115,7 @@ window.players {
     min-width: 25rem;
     min-height: 25rem;
     border-radius: $hyprlandRounding;
-    border: 1px solid $layerBorderColor;
+    border: 0.0625rem solid $layerBorderColor;
 
     .no-items label {
         color: $onSurfaceVariant;
@@ -126,23 +126,24 @@ window.players {
     .mpris-player {
         @include elevation(1);
         @include nLayerBackground($surfaceContainer, 2);
-        margin-left: 8px;
-        margin-right: 8px;
-        border-radius: $hyprlandRounding - 8px;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        border-radius: max(calc($hyprlandRounding - 0.5rem), 0.25rem);
         min-width: 20.25rem;
-        outline-offset: -1px;
-        padding: 10px;
+        outline-offset: -0.0625rem;
+        padding: 0.625rem;
         &.is-current {
-            outline: 1px solid $secondary;
+            outline: 0.0625rem solid $secondary;
         }
         &:first-child {
-            margin-top: 8px;
+            margin-top: 0.5rem;
         }
         .player {
             @include nLayerBackground($surfaceContainerHigh, 3);
         }
         .image {
-            border-radius: max($hyprlandRounding - 16px, 4px);
+            border-radius: max(calc($hyprlandRounding - 1rem), 0.25rem);
         }
     }
 }

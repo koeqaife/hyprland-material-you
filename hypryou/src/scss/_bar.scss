@@ -176,7 +176,7 @@ window.bar {
         }
         .buttons {
             @include nLayerBackground($surfaceContainerHigh, 3);
-            border-radius: 100px;
+            border-radius: 2.25rem;
             margin: 0.25rem;
             margin-left: 0.375rem;
             padding: 0.063rem;

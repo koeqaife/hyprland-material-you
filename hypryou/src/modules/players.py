@@ -318,8 +318,7 @@ class PlayersBox(gtk.ScrolledWindow):
             orientation=gtk.Orientation.VERTICAL
         )
         self.list = gtk.Box(
-            orientation=gtk.Orientation.VERTICAL,
-            spacing=8
+            orientation=gtk.Orientation.VERTICAL
         )
         self.no_items_label = gtk.Revealer(
             child=gtk.Label(label="There isn't any players"),

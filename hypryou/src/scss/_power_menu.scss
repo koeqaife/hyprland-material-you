@@ -7,13 +7,13 @@ window.power-menu {
     @include nLayerBackground($background, 1);
     min-width: 22.5rem;
     border-radius: $hyprlandRounding;
-    border: 1px solid $layerBorderColor;
+    border: 0.0625rem solid $layerBorderColor;
 
     .power-button {
         @include elevation(1);
         @include nLayerBackground($surfaceContainer, 2);
-        margin-left: 8px;
-        margin-right: 8px;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
         .icon {
             font-size: 1.51rem;
             font-weight: 300;
@@ -28,8 +28,8 @@ window.power-menu {
         padding: 0.375rem;
         padding-left: 0.75rem;
         padding-right: 0.75rem;
-        border-radius: max($hyprlandRounding - 8px, 0px);
-        margin-bottom: 8px;
+        border-radius: max(calc($hyprlandRounding - 0.5rem), 0.25rem);
+        margin-bottom: 0.5rem;
 
         &:hover {
             background-color: color.mix($surfaceContainer, $onSurfaceVariant, 95%);
@@ -42,7 +42,7 @@ window.power-menu {
             outline: none;
         }
         &:first-child {
-            margin-top: 8px;
+            margin-top: 0.5rem;
         }
     }
 }

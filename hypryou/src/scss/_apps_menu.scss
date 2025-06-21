@@ -8,16 +8,16 @@ window.apps-menu {
     min-width: 31.25rem;
     min-height: 43.75rem;
     border-radius: $hyprlandRounding;
-    border: 1px solid $layerBorderColor;
+    border: 0.0625rem solid $layerBorderColor;
 
     .app-item {
         @include elevation(1);
         @include nLayerBackground($surfaceContainer, 2);
-        margin-left: 8px;
-        margin-right: 8px;
-        margin-bottom: 8px;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
 
-        outline-offset: -1px;
+        outline-offset: -0.0625rem;
         transition: all 0.25s ease-in;
         .icon {
             margin-right: 0.5rem;
@@ -33,7 +33,7 @@ window.apps-menu {
         }
 
         padding: 0.5rem;
-        border-radius: max($hyprlandRounding - 8px, 0px);
+        border-radius: max(calc($hyprlandRounding - 0.5rem), 0.25rem);
 
         &:hover {
             background-color: color.mix($surfaceContainer, $onSurfaceVariant, 95%);
@@ -49,7 +49,7 @@ window.apps-menu {
 
     .app-item-revealer {
         &.highest .app-item {
-            outline: 1px solid $primary;
+            outline: 0.0625rem solid $primary;
         }
     }
 }

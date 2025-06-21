@@ -91,8 +91,7 @@ class DevicesBox(gtk.ScrolledWindow):
             orientation=gtk.Orientation.VERTICAL
         )
         self.list = gtk.Box(
-            orientation=gtk.Orientation.VERTICAL,
-            spacing=8
+            orientation=gtk.Orientation.VERTICAL
         )
 
         self.box.append(self.list)

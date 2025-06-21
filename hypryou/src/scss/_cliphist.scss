@@ -8,21 +8,21 @@ window.cliphist {
     min-width: 31.25rem;
     min-height: 35rem;
     border-radius: $hyprlandRounding;
-    border: 1px solid $layerBorderColor;
+    border: 0.0625rem solid $layerBorderColor;
 
     .cliphist-item {
         @include elevation(1);
         @include nLayerBackground($surfaceContainer, 2);
-        margin-left: 8px;
-        margin-right: 8px;
-        margin-bottom: 8px;
-        outline-offset: -1px;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        outline-offset: -0.0625rem;
         transition: all 0.25s ease-in;
 
         padding: 0.5rem;
         padding-left: 1rem;
         padding-right: 1rem;
-        border-radius: max($hyprlandRounding - 8px, 0px);
+        border-radius: max(calc($hyprlandRounding - 0.5rem), 0.25rem);
 
         .label {
             font-size: 1rem;
@@ -57,14 +57,14 @@ window.cliphist {
             }
         }
         &.highest .cliphist-item {
-            outline: 1px solid $primary;
+            outline: 0.0625rem solid $primary;
         }
     }
 
     .search {
         @include elevation(1);
         @include nLayerBackground($surfaceContainerHigh, 2);
-        margin: 8px;
+        margin: 0.5rem;
         outline: none;
         border-radius: 2.75rem;
         color: $onSurface;

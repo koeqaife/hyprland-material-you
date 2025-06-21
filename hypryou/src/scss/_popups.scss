@@ -8,7 +8,7 @@ window.popups {
     .popup {
         @include nLayerBackground($background, 1);
         border-radius: $hyprlandRounding;
-        border: 1px solid $layerBorderColor;
+        border: 0.0625rem solid $layerBorderColor;
         min-width: 15rem;
         min-height: 1rem;
         padding: 0.25rem;

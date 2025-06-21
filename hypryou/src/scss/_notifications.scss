@@ -118,20 +118,20 @@ box.notification-revealer-box {
 box.notification-popups,
 box.notifications {
     > :not(:last-child) box.notification {
-        margin-bottom: 8px;
+        margin-bottom: 0.5rem;
     }
 }
 
 window.notifications {
     min-width: 26.563rem;
     transition: none;
-    padding-bottom: 2px;
+    padding-bottom: 0.125rem;
     box.notification {
         &:not(.critical) {
             @include nLayerBackground($background, 1);
         }
         border-radius: $hyprlandRounding;
-        border: 1px solid $layerBorderColor;
+        border: 0.0625rem solid $layerBorderColor;
     }
 }
 
