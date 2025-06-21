@@ -1,4 +1,4 @@
-from repository import gtk, gdk, glib
+from repository import gtk, gdk, glib, layer_shell
 from src.services.notifications import popups
 from src.modules.notifications.item import NotificationItem
 from src.modules.notifications.item import NotificationRevealer
@@ -102,6 +102,7 @@ class Notifications(widget.LayerWindow):
             },
             css_classes=("notifications", "transparent"),
             name=f"notifications{monitor_id}",
+            layer=layer_shell.Layer.OVERLAY
         )
 
         self.popups = NotificationPopups(self)
