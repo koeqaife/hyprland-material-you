@@ -276,7 +276,7 @@ class ScreenSaverService(Service):
         self.watcher.register()
 
     def on_close(self) -> None:
-        if not getattr(self, "watcher"):
+        if not getattr(self, "watcher", None):
             return
         for notification in self.watcher.notifications:
             notification.destroy()
