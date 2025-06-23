@@ -964,9 +964,15 @@ class Bar(widget.LayerWindow):
 
     def destroy(self) -> None:
         box = self.center_box
-        t.cast(t.Any, box.get_start_widget()).destroy()
-        t.cast(t.Any, box.get_center_widget()).destroy()
-        t.cast(t.Any, box.get_end_widget()).destroy()
+        start_widget = box.get_start_widget()
+        center_widget = box.get_center_widget()
+        end_widget = box.get_end_widget()
+        if isinstance(start_widget, ModulesLeft):
+            start_widget.destroy()
+        if isinstance(center_widget, ModulesCenter):
+            center_widget.destroy()
+        if isinstance(end_widget, ModulesRight):
+            end_widget.destroy()
         box.set_start_widget(None)
         box.set_center_widget(None)
         box.set_end_widget(None)
