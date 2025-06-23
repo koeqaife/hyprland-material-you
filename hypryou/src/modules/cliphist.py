@@ -308,6 +308,7 @@ class ClipHistoryWindow(widget.LayerWindow):
             },
             css_classes=("cliphist",),
             keymode=layer_shell.KeyboardMode.ON_DEMAND,
+            layer=layer_shell.Layer.OVERLAY,
             hide_on_esc=True,
             name="cliphist",
             height=400,

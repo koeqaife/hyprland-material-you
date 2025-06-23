@@ -143,6 +143,7 @@ class BrightnessWindow(widget.LayerWindow):
             },
             css_classes=("brightness",),
             keymode=layer_shell.KeyboardMode.ON_DEMAND,
+            layer=layer_shell.Layer.OVERLAY,
             hide_on_esc=True,
             name="brightness",
             height=1,

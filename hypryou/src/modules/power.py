@@ -117,6 +117,7 @@ class PowerMenuWindow(widget.LayerWindow):
             },
             css_classes=("power-menu",),
             keymode=layer_shell.KeyboardMode.ON_DEMAND,
+            layer=layer_shell.Layer.OVERLAY,
             hide_on_esc=True,
             name="power_menu",
             height=1,

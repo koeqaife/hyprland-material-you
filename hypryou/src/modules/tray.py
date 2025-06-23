@@ -199,6 +199,7 @@ class TrayWindow(widget.LayerWindow):
             },
             css_classes=("tray",),
             keymode=layer_shell.KeyboardMode.ON_DEMAND,
+            layer=layer_shell.Layer.OVERLAY,
             hide_on_esc=True,
             name="tray",
             height=1,

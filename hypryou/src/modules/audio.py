@@ -583,6 +583,7 @@ class MicsWindow(widget.LayerWindow):
             setup_popup=True,
             hide_on_esc=True,
             keymode=layer_shell.KeyboardMode.ON_DEMAND,
+            layer=layer_shell.Layer.OVERLAY,
             name="mics",
             css_classes=("audio",)
         )

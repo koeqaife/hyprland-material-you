@@ -39,6 +39,7 @@ class Sidebar(widget.LayerWindow):
                 "bottom": True
             },
             keymode=layer_shell.KeyboardMode.ON_DEMAND,
+            layer=layer_shell.Layer.OVERLAY,
             hide_on_esc=True,
             name="sidebar",
             css_classes=("sidebar",),

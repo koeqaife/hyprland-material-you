@@ -394,6 +394,7 @@ class PlayersWindow(widget.LayerWindow):
             },
             css_classes=("players",),
             keymode=layer_shell.KeyboardMode.ON_DEMAND,
+            layer=layer_shell.Layer.OVERLAY,
             hide_on_esc=True,
             name="players",
             height=400,
