@@ -72,6 +72,25 @@ services: tuple[AsyncService | Service, ...] = (
     ClockService()
 )
 
+popups_types = (
+    TrayWindow,
+    Sidebar,
+    AppsWindow,
+    PlayersWindow,
+    ClipHistoryWindow,
+    PowerMenuWindow,
+    BrightnessWindow,
+    AudioWindow,
+    MicsWindow
+)
+
+windows_types = (
+    Bar,
+    Notifications,
+    WallpapersWindow,
+    PopupsWindow,
+)
+
 
 class HyprYou(gtk.Application):
     def do_activate(self) -> None:
@@ -83,15 +102,22 @@ class HyprYou(gtk.Application):
 
     async def init_services(self) -> None:
         for service in services:
-            if isinstance(service, AsyncService):
-                await service.app_init()
-            elif isinstance(service, Service):
-                service.app_init()
-            else:
+            try:
+                if isinstance(service, AsyncService):
+                    await service.app_init()
+                elif isinstance(service, Service):
+                    service.app_init()
+                else:
+                    logger.critical(
+                        "Unknown type of service: %s; Couldn't init.",
+                        service
+                    )
+            except Exception as e:
                 logger.critical(
-                    "Unknown type of service: %s; Couldn't init.",
-                    service
+                    "Couldn't initialize service %s.",
+                    type(service).__name__, exc_info=e
                 )
+                exit(1)
 
     async def start_services(self) -> None:
         for service in services:
@@ -122,15 +148,14 @@ class HyprYou(gtk.Application):
         self.monitors.connect("items-changed", self.update_monitors)
 
         self.update_monitors()
-        self.add_window(TrayWindow(self))
-        self.add_window(Sidebar(self))
-        self.add_window(AppsWindow(self))
-        self.add_window(PlayersWindow(self))
-        self.add_window(ClipHistoryWindow(self))
-        self.add_window(PowerMenuWindow(self))
-        self.add_window(BrightnessWindow(self))
-        self.add_window(AudioWindow(self))
-        self.add_window(MicsWindow(self))
+        for window_type in popups_types:
+            try:
+                self.add_window(window_type(self))
+            except Exception as e:
+                logger.error(
+                    "Couldn't add window %s.",
+                    window_type.__name__, exc_info=e
+                )
         self.screen_lock = ScreenLock(self)
 
         logger.info(
@@ -176,12 +201,15 @@ class HyprYou(gtk.Application):
                     "Adding windows for monitor: %s",
                     monitor.get_model()
                 )
-                windows: list[gtk.ApplicationWindow] = [
-                    Bar(self, monitor, i),
-                    Notifications(self, monitor, i),
-                    WallpapersWindow(self, monitor),
-                    PopupsWindow(self, monitor, i)
-                ]
+                windows: list[gtk.ApplicationWindow] = []
+                for window_type in windows_types:
+                    try:
+                        windows.append(window_type(self, monitor, i))
+                    except Exception as e:
+                        logger.error(
+                            "Couldn't add window %s.",
+                            window_type.__name__, exc_info=e
+                        )
                 corners = [
                     Corner(self, monitor, "left"),
                     Corner(self, monitor, "right")

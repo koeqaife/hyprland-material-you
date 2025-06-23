@@ -40,7 +40,12 @@ class WallpapersWidget(gtk.Stack):
 
 
 class WallpapersWindow(widget.LayerWindow):
-    def __init__(self, application: gtk.Application, monitor: gdk.Monitor):
+    def __init__(
+        self,
+        application: gtk.Application,
+        monitor: gdk.Monitor,
+        monitor_id: int
+    ) -> None:
         super().__init__(
             application,
             anchors={
