@@ -74,3 +74,31 @@ tooltip label {
         }
     }
 }
+
+scale {
+    padding: 0;
+    margin: 0.5rem;
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+
+    trough {
+        background-color: $secondaryContainer;
+        min-height: 0.675rem;
+        border-radius: 0.675rem;
+    }
+
+    highlight {
+        background-color: $primary;
+        border-radius: 0;
+    }
+
+    slider {
+        min-height: 1.75rem;
+        min-width: 0.375rem;
+        margin: 0;
+        margin-top: -0.875rem;
+        margin-bottom: -0.875rem;
+        border-radius: 0.875rem;
+        background-color: $primary;
+    }
+}

@@ -44,29 +44,9 @@ window.brightness {
             font-weight: 400;
             color: $onSurfaceVariant;
         }
-
-        scale {
-            padding: 0;
-            margin: 0.5rem;
-            margin-top: 0.75rem;
-            margin-bottom: 0.75rem;
-
-            trough {
-                background-color: $secondaryContainer;
-                min-height: 0.675rem;
-            }
-            highlight {
-                background-color: $primary;
-            }
-
-            slider {
-                min-height: 1.75rem;
-                min-width: 0.375rem;
-                margin: 0;
-                margin-top: -0.875rem;
-                margin-bottom: -0.875rem;
-                border-radius: 0.875rem;
-                background-color: $primary;
+        scale slider {
+            box-shadow: none;
+            @if $layerOpacity == 1 {
                 box-shadow: -0.375rem 0 0 0 $surfaceContainer, 0.375rem 0 0 0 $surfaceContainer;
             }
         }
