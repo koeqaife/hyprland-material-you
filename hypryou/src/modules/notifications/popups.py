@@ -4,7 +4,7 @@ from src.modules.notifications.item import NotificationItem
 from src.modules.notifications.item import NotificationRevealer
 import typing as t
 from config import HyprlandVars
-from src.services.state import opened_windows
+from src.services.state import opened_windows, is_locked
 from src import widget
 
 T = t.TypeVar("T")
@@ -48,7 +48,11 @@ class NotificationPopups(gtk.Box):
         self.update_window_state()
 
     def update_window_state(self) -> None:
-        if len(self.items) == 0 or opened_windows.is_visible("sidebar"):
+        if (
+            len(self.items) == 0
+            or opened_windows.is_visible("sidebar")
+            or is_locked.value
+        ):
             self.window.hide()
         else:
             self.window.show()
@@ -64,6 +68,10 @@ class NotificationPopups(gtk.Box):
                 self.items[key].destroy_with_anim(
                     self.on_item_destroy
                 )
+
+        if is_locked.value:
+            self.window.hide()
+            return
 
         for key in added_keys:
             if key not in self.items and key in popups.value:
