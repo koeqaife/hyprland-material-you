@@ -73,7 +73,7 @@ class ClipItem(gtk.Revealer):
             self.button.set_child(image_widget)
             self._child = image_widget
 
-            max_width_rem = 29.25
+            max_width_rem = 27
             width_px = (self.width / self.height) * 200
             width_rem = width_px / 16
 
@@ -311,8 +311,8 @@ class ClipHistoryWindow(widget.LayerWindow):
             layer=layer_shell.Layer.OVERLAY,
             hide_on_esc=True,
             name="cliphist",
-            height=400,
-            width=400,
+            height=1,
+            width=1,
             setup_popup=True
         )
         self.name = "cliphist"

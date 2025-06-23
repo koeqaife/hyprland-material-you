@@ -5,7 +5,7 @@
 
 window.apps-menu {
     @include nLayerBackground($background, 1);
-    min-width: 31.25rem;
+    min-width: 29rem;
     min-height: 43.75rem;
     border-radius: $hyprlandRounding;
     border: 0.0625rem solid $layerBorderColor;
