@@ -24,6 +24,8 @@ def open_settings(*_: t.Any) -> None:
 
 
 class ActionButton(gtk.Button):
+    __gtype_name__ = "SidebarActionButton"
+
     def __init__(
         self,
         icon: str | Ref[str],
@@ -43,6 +45,8 @@ class ActionButton(gtk.Button):
 
 
 class Actions(gtk.Box):
+    __gtype_name__ = "SidebarActionsBox"
+
     def __init__(self) -> None:
         super().__init__(
             css_classes=("action-buttons",),

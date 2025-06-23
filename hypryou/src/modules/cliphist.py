@@ -26,6 +26,8 @@ def normalize_string(s: str) -> str:
 
 
 class ClipItem(gtk.Revealer):
+    __gtype_name__ = "ClipHistoryItem"
+
     def __init__(self, item: tuple[str, str], search: str) -> None:
         self.on_activate = sync_debounce(750, 1, True)(self._on_activate)
         self.button = gtk.Button(
@@ -176,6 +178,8 @@ class ClipItem(gtk.Revealer):
 
 
 class ClipHistoryBox(gtk.Box):
+    __gtype_name__ = "ClipHistoryBox"
+
     def __init__(self) -> None:
         self.search = ""
         super().__init__(
@@ -295,6 +299,8 @@ class ClipHistoryBox(gtk.Box):
 
 
 class ClipHistoryWindow(widget.LayerWindow):
+    __gtype_name__ = "ClipHistoryWindow"
+
     def __init__(self, app: gtk.Application) -> None:
         super().__init__(
             app,

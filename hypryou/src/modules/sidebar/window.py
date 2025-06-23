@@ -8,6 +8,8 @@ from src import widget
 
 
 class SidebarBox(gtk.Box):
+    __gtype_name__ = "SidebarBox"
+
     def __init__(self) -> None:
         super().__init__(
             orientation=gtk.Orientation.VERTICAL
@@ -30,6 +32,8 @@ class SidebarBox(gtk.Box):
 
 
 class Sidebar(widget.LayerWindow):
+    __gtype_name__ = "SidebarWindow"
+
     def __init__(self, app: gtk.Application) -> None:
         super().__init__(
             application=app,

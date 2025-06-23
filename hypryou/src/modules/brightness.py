@@ -14,6 +14,8 @@ SCALE_MAX = 512
 
 
 class DeviceItem(gtk.Box):
+    __gtype_name__ = "BrightnessDeviceItem"
+
     def __init__(self, item: BacklightDevice, number: int) -> None:
         super().__init__(
             valign=gtk.Align.START,
@@ -86,6 +88,8 @@ class DeviceItem(gtk.Box):
 
 
 class DevicesBox(gtk.ScrolledWindow):
+    __gtype_name__ = "BrightnessDevicesBox"
+
     def __init__(self) -> None:
         self.box = gtk.Box(
             orientation=gtk.Orientation.VERTICAL
@@ -130,6 +134,8 @@ class DevicesBox(gtk.ScrolledWindow):
 
 
 class BrightnessWindow(widget.LayerWindow):
+    __gtype_name__ = "BrightnessWindow"
+
     def __init__(self, app: gtk.Application) -> None:
         super().__init__(
             app,

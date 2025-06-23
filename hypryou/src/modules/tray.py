@@ -12,6 +12,8 @@ from src import widget
 
 
 class TrayItem(gtk.Box):
+    __gtype_name__ = "TrayItem"
+
     def __init__(self, item: StatusNotifierItem) -> None:
         super().__init__(
             valign=gtk.Align.START,
@@ -129,6 +131,8 @@ class TrayItem(gtk.Box):
 
 
 class TrayBox(gtk.ScrolledWindow):
+    __gtype_name__ = "TrayBox"
+
     def __init__(self) -> None:
         self.box = gtk.Box(
             orientation=gtk.Orientation.VERTICAL
@@ -186,6 +190,8 @@ class TrayBox(gtk.ScrolledWindow):
 
 
 class TrayWindow(widget.LayerWindow):
+    __gtype_name__ = "TrayWindow"
+
     def __init__(self, app: gtk.Application) -> None:
         super().__init__(
             app,

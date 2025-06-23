@@ -23,6 +23,8 @@ def diff_keys(
 
 
 class Notifications(gtk.ScrolledWindow):
+    __gtype_name__ = "NotificationsScrolled"
+
     def __init__(
         self,
         hide_sensitive_content: bool = False,

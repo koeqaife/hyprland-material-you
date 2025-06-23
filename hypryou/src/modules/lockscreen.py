@@ -29,6 +29,8 @@ def check_password(username: str, password: str) -> bool:
 
 
 class ScreenLockWindow(gtk.ApplicationWindow):
+    __gtype_name__ = "ScreenLockWindow"
+
     def __init__(
         self,
         app: gtk.Application
@@ -449,6 +451,8 @@ class ScreenLockWindow(gtk.ApplicationWindow):
 
 
 class ScreenLockPlayer(Player):
+    __gtype_name__ = "ScreenLockPlayer"
+
     def __init__(
         self,
         item: MprisPlayer,

@@ -27,6 +27,8 @@ class LastChanged:
 
 
 class Player(gtk.Box):
+    __gtype_name__ = "Player"
+
     def __init__(self, item: MprisPlayer) -> None:
         super().__init__(
             valign=gtk.Align.START,
@@ -313,6 +315,8 @@ class Player(gtk.Box):
 
 
 class PlayersBox(gtk.ScrolledWindow):
+    __gtype_name__ = "PlayersBox"
+
     def __init__(self) -> None:
         self.box = gtk.Box(
             orientation=gtk.Orientation.VERTICAL
@@ -381,6 +385,8 @@ class PlayersBox(gtk.ScrolledWindow):
 
 
 class PlayersWindow(widget.LayerWindow):
+    __gtype_name__ = "PlayersWindow"
+
     def __init__(self, app: gtk.Application) -> None:
         super().__init__(
             app,

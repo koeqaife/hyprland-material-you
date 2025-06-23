@@ -45,6 +45,8 @@ def get_is_sensitive(item: "NotificationItem") -> bool:
 
 
 class NotificationItem(gtk.Box):
+    __gtype_name__ = "NotificationItem"
+
     def __init__(
         self,
         item: Notification,
@@ -308,6 +310,8 @@ class NotificationItem(gtk.Box):
 
 
 class NotificationRevealer(gtk.Box):
+    __gtype_name__ = "NotificationRevealer"
+
     def __init__(
         self,
         item: NotificationItem,

@@ -31,6 +31,8 @@ class StackPage(t.NamedTuple):
 
 
 class EndpointItem(gtk.Box):
+    __gtype_name__ = "EndpointItem"
+
     def __init__(
         self,
         node: wp.Node | wp.Endpoint,
@@ -204,6 +206,8 @@ class EndpointItem(gtk.Box):
 
 
 class StreamItem(gtk.Box):
+    __gtype_name__ = "StreamItem"
+
     def __init__(
         self,
         node: wp.Node | wp.Stream
@@ -315,6 +319,8 @@ class StreamItem(gtk.Box):
 
 
 class NodesList(gtk.ScrolledWindow):
+    __gtype_name__ = "NodesList"
+
     def __init__(
         self,
         ref: Ref[set[wp.Node]],
@@ -387,6 +393,8 @@ class NodesList(gtk.ScrolledWindow):
 
 
 class StackButton(gtk.Button):
+    __gtype_name__ = "StackButton"
+
     def __init__(
         self,
         name: str,
@@ -424,6 +432,7 @@ class StackButton(gtk.Button):
 
 
 class AudioBoxTemplate(gtk.Box):
+    __gtype_name__ = "AudioBoxTemplate"
     pages: list[StackPage] = []
 
     def __init__(self) -> None:
@@ -485,6 +494,7 @@ class AudioBoxTemplate(gtk.Box):
 
 
 class SpeakersBox(AudioBoxTemplate):
+    __gtype_name__ = "SpeakersBox"
     pages = [
         StackPage(
             "speakers",
@@ -512,6 +522,7 @@ class SpeakersBox(AudioBoxTemplate):
 
 
 class MicsBox(AudioBoxTemplate):
+    __gtype_name__ = "MicsBox"
     pages = [
         StackPage(
             "mics",
@@ -539,6 +550,8 @@ class MicsBox(AudioBoxTemplate):
 
 
 class AudioWindow(widget.LayerWindow):
+    __gtype_name__ = "AudioWindow"
+
     def __init__(self, app: gtk.Application) -> None:
         super().__init__(
             app,
@@ -570,6 +583,8 @@ class AudioWindow(widget.LayerWindow):
 
 
 class MicsWindow(widget.LayerWindow):
+    __gtype_name__ = "MicsWindow"
+
     def __init__(self, app: gtk.Application) -> None:
         super().__init__(
             app,

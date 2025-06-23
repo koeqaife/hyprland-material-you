@@ -14,6 +14,8 @@ from src import widget
 
 
 class ActionButton(gtk.Button):
+    __gtype_name__ = "PowerActionButton"
+
     def __init__(
         self,
         icon: str,
@@ -44,6 +46,8 @@ class ActionButton(gtk.Button):
 
 
 class PowerMenu(gtk.Box):
+    __gtype_name__ = "PowerMenu"
+
     def __init__(self) -> None:
         super().__init__(
             orientation=gtk.Orientation.VERTICAL
@@ -104,6 +108,8 @@ class PowerMenu(gtk.Box):
 
 
 class PowerMenuWindow(widget.LayerWindow):
+    __gtype_name__ = "PowerMenuWindow"
+
     def __init__(self, app: gtk.Application) -> None:
         super().__init__(
             app,

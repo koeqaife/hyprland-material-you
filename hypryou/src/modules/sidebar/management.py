@@ -18,6 +18,8 @@ dnd_icon.bind(
 
 
 class ManagementButton(gtk.Box):
+    __gtype_name__ = "ManagementButton"
+
     def __init__(
         self,
         icon: str | Ref[str],
@@ -93,6 +95,8 @@ class ManagementButton(gtk.Box):
 
 
 class InfoBox(gtk.Box):
+    __gtype_name__ = "InfoBox"
+
     def __init__(self) -> None:
         super().__init__(
             css_classes=("info-box",)
@@ -121,6 +125,8 @@ class InfoBox(gtk.Box):
 
 
 class ManagementLine(gtk.Box):
+    __gtype_name__ = "ManagementLine"
+
     def __init__(
         self,
         first_child: ManagementButton,
@@ -141,6 +147,8 @@ class ManagementLine(gtk.Box):
 
 
 class InternetButton(ManagementButton):
+    __gtype_name__ = "InternetButton"
+
     def __init__(self) -> None:
         network = get_network()
         super().__init__(
@@ -187,6 +195,8 @@ class InternetButton(ManagementButton):
 
 
 class BluetoothButton(ManagementButton):
+    __gtype_name__ = "BluetoothButton"
+
     def __init__(self) -> None:
         self.bluetooth = bluetooth.get_default()
         super().__init__(
@@ -225,6 +235,8 @@ class BluetoothButton(ManagementButton):
 
 
 class ToggleButton(ManagementButton):
+    __gtype_name__ = "ToggleButton"
+
     def __init__(
         self,
         icon: str | Ref[str],
@@ -284,6 +296,8 @@ def toggle_night_light(self: ToggleButton, value: bool) -> None:
 
 
 class ManagementFirstPage(gtk.Box):
+    __gtype_name__ = "ManagementFirstPage"
+
     def __init__(self) -> None:
         super().__init__(
             orientation=gtk.Orientation.VERTICAL
@@ -330,6 +344,8 @@ class ManagementFirstPage(gtk.Box):
 
 
 class ManagementBox(gtk.Box):
+    __gtype_name__ = "ManagementBox"
+
     def __init__(self) -> None:
         super().__init__(
             orientation=gtk.Orientation.VERTICAL,

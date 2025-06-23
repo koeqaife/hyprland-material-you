@@ -29,6 +29,8 @@ dummy_region = cairo.Region()
 
 
 class WorkspaceButton(gtk.Button):
+    __gtype_name__ = "HyprlandWorkspaceButton"
+
     def __init__(self, id: int) -> None:
         super().__init__(
             css_classes=("workspace",),
@@ -49,6 +51,8 @@ class WorkspaceButton(gtk.Button):
 
 
 class Workspaces(gtk.Box):
+    __gtype_name__ = "HyprlandWorkspaces"
+
     def __init__(self, monitor_id: int) -> None:
         self.monitor_id = monitor_id
         super().__init__(
@@ -152,6 +156,8 @@ class Workspaces(gtk.Box):
 
 
 class Clock(gtk.Label):
+    __gtype_name__ = "ClockApplet"
+
     def __init__(self) -> None:
         super().__init__(
             css_classes=("clock", "bar-applet"),
@@ -187,6 +193,8 @@ class LastChanged:
 
 
 class Player(gtk.Box):
+    __gtype_name__ = "MprisPlayer"
+
     def __init__(self) -> None:
         super().__init__(
             css_classes=("mpris-player", "bar-applet"),
@@ -445,6 +453,8 @@ class Player(gtk.Box):
 
 
 class KeyboardLayout(gtk.Label):
+    __gtype_name__ = "KeyboardLayoutApplet"
+
     def __init__(self) -> None:
         super().__init__(
             css_classes=("keyboard-layout", "bar-applet")
@@ -470,6 +480,8 @@ class KeyboardLayout(gtk.Label):
 
 
 class Battery(gtk.Box):
+    __gtype_name__ = "BatteryApplet"
+
     def __init__(self) -> None:
         super().__init__(
             css_classes=("battery", "bar-applet")
@@ -527,6 +539,8 @@ class Battery(gtk.Box):
 
 
 class Applet(widget.Icon):
+    __gtype_name__ = "Applet"
+
     def __init__(
         self,
         name: str,
@@ -570,6 +584,8 @@ class Applet(widget.Icon):
 
 
 class BluetoothApplet(Applet):
+    __gtype_name__ = "BluetoothApplet"
+
     def __init__(self) -> None:
         self.bluetooth = bluetooth.get_default()
         super().__init__(
@@ -596,6 +612,8 @@ class BluetoothApplet(Applet):
 
 
 class BrightnessApplet(Applet):
+    __gtype_name__ = "BrightnessApplet"
+
     def __init__(self) -> None:
         manager = get_backlight_manager()
         self.manager = manager
@@ -663,6 +681,8 @@ class BrightnessApplet(Applet):
 
 
 class AudioApplet(Applet):
+    __gtype_name__ = "AudioApplet"
+
     def __init__(self) -> None:
         super().__init__(
             "volume",
@@ -728,6 +748,8 @@ class AudioApplet(Applet):
 
 
 class MicApplet(Applet):
+    __gtype_name__ = "MicApplet"
+
     def __init__(self) -> None:
         super().__init__(
             "microphone",
@@ -777,6 +799,8 @@ class MicApplet(Applet):
 
 
 class Applets(gtk.Box):
+    __gtype_name__ = "BarApplets"
+
     def __init__(self) -> None:
         super().__init__(
             css_classes=("applets", "bar-applet"),
@@ -801,6 +825,8 @@ class Applets(gtk.Box):
 
 
 class OpenTray(gtk.Button):
+    __gtype_name__ = "OpenTrayButton"
+
     def __init__(self) -> None:
         super().__init__(
             css_classes=("open-tray", "bar-applet"),
@@ -818,6 +844,8 @@ class OpenTray(gtk.Button):
 
 
 class OpenCliphist(gtk.Button):
+    __gtype_name__ = "OpenCliphistButton"
+
     def __init__(self) -> None:
         super().__init__(
             css_classes=("open-cliphist", "bar-applet"),
@@ -835,6 +863,8 @@ class OpenCliphist(gtk.Button):
 
 
 class OpenSidebar(gtk.Button):
+    __gtype_name__ = "OpenSidebarButton"
+
     def __init__(self) -> None:
         super().__init__(
             css_classes=("open-sidebar", "icon-tonal"),
@@ -853,6 +883,8 @@ class OpenSidebar(gtk.Button):
 
 
 class OpenAppsMenu(gtk.Button):
+    __gtype_name__ = "OpenAppsMenuButton"
+
     def __init__(self) -> None:
         super().__init__(
             css_classes=("open-apps-menu", "icon-tonal"),
@@ -871,6 +903,8 @@ class OpenAppsMenu(gtk.Button):
 
 
 class ModulesLeft(gtk.Box):
+    __gtype_name__ = "BarModulesLeft"
+
     def __init__(self, monitor_id: int) -> None:
         super().__init__(
             css_classes=("modules-left",),
@@ -890,6 +924,8 @@ class ModulesLeft(gtk.Box):
 
 
 class ModulesCenter(gtk.Box):
+    __gtype_name__ = "BarModulesCenter"
+
     def __init__(self, monitor_id: int) -> None:
         super().__init__(
             css_classes=("modules-center",),
@@ -908,6 +944,8 @@ class ModulesCenter(gtk.Box):
 
 
 class ModulesRight(gtk.Box):
+    __gtype_name__ = "BarModulesRight"
+
     def __init__(self, monitor_id: int) -> None:
         super().__init__(
             css_classes=("modules-right",),
@@ -932,6 +970,8 @@ class ModulesRight(gtk.Box):
 
 
 class Bar(widget.LayerWindow):
+    __gtype_name__ = "Bar"
+
     def __init__(
         self,
         application: gtk.Application,

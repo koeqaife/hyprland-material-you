@@ -15,6 +15,8 @@ window_counter = Ref[dict[int, int]]({}, name="popup_counter")
 
 
 class Popup(gtk.Revealer):
+    __gtype_name__ = "Popup"
+
     def __init__(
         self,
         icon: str | Ref[str],
@@ -90,6 +92,8 @@ class Popup(gtk.Revealer):
 
 
 class BrightnessPopup(Popup):
+    __gtype_name__ = "BrightnessPopup"
+
     def __init__(self, device: BacklightDevice, num: int) -> None:
         self.device = BacklightDeviceView(device)
         super().__init__(device.icon, num, 512)
@@ -133,6 +137,8 @@ class BrightnessPopup(Popup):
 
 
 class VolumePopup(Popup):
+    __gtype_name__ = "VolumePopup"
+
     def __init__(self, num: int) -> None:
         super().__init__(volume_icon, num)
 
@@ -173,6 +179,8 @@ class VolumePopup(Popup):
 
 
 class PopupsWindow(widget.LayerWindow):
+    __gtype_name__ = "PopupsWindow"
+
     def __init__(
         self,
         app: gtk.Application,

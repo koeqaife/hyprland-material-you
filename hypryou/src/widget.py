@@ -19,6 +19,8 @@ type Anchors = dict[Edges, bool]
 
 
 class LayerWindow(gtk.ApplicationWindow):
+    __gtype_name__ = "LayerWindow"
+
     def __init__(
         self,
         application: gtk.Application,
@@ -134,6 +136,8 @@ class LayerWindow(gtk.ApplicationWindow):
 
 
 class Icon(gtk.Label):
+    __gtype_name__ = "MaterialIcon"
+
     def __init__(
         self, icon: str | Ref[str],
         **props: t.Any

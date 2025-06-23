@@ -7,6 +7,8 @@ from src import widget
 
 
 class WallpapersWidget(gtk.Stack):
+    __gtype_name__ = "WallpapersWidget"
+
     def __init__(self) -> None:
         super().__init__(
             css_classes=("wallpapers-stack",),
@@ -40,6 +42,8 @@ class WallpapersWidget(gtk.Stack):
 
 
 class WallpapersWindow(widget.LayerWindow):
+    __gtype_name__ = "WallpapersWindow"
+
     def __init__(
         self,
         application: gtk.Application,

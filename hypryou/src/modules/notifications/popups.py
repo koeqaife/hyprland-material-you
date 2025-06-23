@@ -21,6 +21,8 @@ def diff_keys(
 
 
 class NotificationPopups(gtk.Box):
+    __gtype_name__ = "NotificationPopups"
+
     def __init__(
         self,
         window: gtk.ApplicationWindow
@@ -89,6 +91,8 @@ class NotificationPopups(gtk.Box):
 
 
 class Notifications(widget.LayerWindow):
+    __gtype_name__ = "NotificationsWindow"
+
     def __init__(
         self,
         application: gtk.Application,

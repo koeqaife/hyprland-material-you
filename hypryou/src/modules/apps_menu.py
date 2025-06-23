@@ -31,6 +31,8 @@ def cache_icon(icon: str | None) -> gtk.IconPaintable | None:
 
 
 class AppItem(gtk.Revealer):
+    __gtype_name__ = "AppItem"
+
     def __init__(self, item: Application, search: str) -> None:
         self.on_click = sync_debounce(750, 1, True)(self._on_click)
         self.box = gtk.Box(
@@ -88,6 +90,8 @@ class AppItem(gtk.Revealer):
 
 
 class AppsBox(gtk.Box):
+    __gtype_name__ = "AppsBox"
+
     def __init__(self) -> None:
         self.search = ""
         super().__init__(
@@ -216,6 +220,8 @@ class AppsBox(gtk.Box):
 
 
 class AppsWindow(widget.LayerWindow):
+    __gtype_name__ = "AppsWindow"
+
     def __init__(self, app: gtk.Application) -> None:
         super().__init__(
             app,

@@ -93,6 +93,8 @@ windows_types = (
 
 
 class HyprYou(gtk.Application):
+    __gtype_name__ = "HyprYou"
+
     def do_activate(self) -> None:
         self.windows: dict[gdk.Monitor, list[gtk.ApplicationWindow]] = {}
         self.corners: dict[gdk.Monitor, list[Corner]] = {}
