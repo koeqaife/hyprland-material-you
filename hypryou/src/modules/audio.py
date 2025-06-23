@@ -10,8 +10,8 @@ import weakref
 from utils.ref import Ref
 
 
-type NodeItem = "EndpointItem"
-type CreatorCallback = t.Callable[..., NodeItem]
+type NodeItem = "EndpointItem | StreamItem"
+type CreatorCallback = t.Callable[[wp.Node], NodeItem]
 
 
 class EndpointIcons(t.NamedTuple):
@@ -285,6 +285,7 @@ class StreamItem(gtk.Box):
         if button != gdk.BUTTON_SECONDARY:
             return False
         self.node.set_mute(not self.node.get_mute())
+        return True
 
     def on_muted(self, *args: t.Any) -> None:
         toggle_css_class(self, "muted", self.node.get_mute())

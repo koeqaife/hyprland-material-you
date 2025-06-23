@@ -140,7 +140,7 @@ class HyprYou(gtk.Application):
         except Exception:
             utils.colors.restore_palette()
 
-        self.tasks: list[asyncio.Task] = []
+        self.tasks: list[asyncio.Task[t.Any]] = []
         await self.start_services()
 
         self.display: gdk.Display = gdk.Display.get_default()

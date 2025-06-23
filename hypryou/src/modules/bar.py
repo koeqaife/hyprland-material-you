@@ -749,7 +749,7 @@ class MicApplet(Applet):
     def on_muted_changed(self, new: bool) -> None:
         self.set_label("mic" if not new else "mic_off")
 
-    def on_mics_changed(self, new_list: list[t.Any]) -> None:
+    def on_mics_changed(self, new_list: set[t.Any]) -> None:
         self.set_visible(len(new_list) > 0)
 
     def on_click_released(

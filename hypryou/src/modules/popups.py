@@ -139,7 +139,7 @@ class VolumePopup(Popup):
         self.handler = volume.watch(
             self.update_scale_value
         )
-        self.update_scale_value(volume, False)
+        self.update_scale_value(volume.value, False)
 
     def destroy(self) -> None:
         volume.unwatch(self.handler)
