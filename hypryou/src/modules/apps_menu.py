@@ -39,7 +39,7 @@ class AppItem(gtk.Revealer):
         self.button = gtk.Button(
             css_classes=("app-item",),
             child=self.box,
-            tooltip_text=f"{item.name}\n{item.description}"
+            tooltip_text=f"{item.name}\n{item.description or ""}"
         )
         super().__init__(
             css_classes=("app-item-revealer",),
