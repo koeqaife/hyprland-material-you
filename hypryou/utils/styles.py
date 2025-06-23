@@ -11,6 +11,8 @@ from utils.logger import logger
 
 
 def apply_css() -> None:
+    if hasattr(Globals, "css_provider"):
+        return
     compile_scss()
 
     logger.debug("Creating css provider")
