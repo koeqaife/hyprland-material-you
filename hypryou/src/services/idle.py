@@ -48,25 +48,11 @@ class ScreenSaver:
 
         self.display = Display()
         self.display.connect()
-        self.fd = self.display.get_fd()
         self.registry: WlRegistryProxy = self.display.get_registry()
         self.idle_notifier: Notifier | None = None
         self.seat: WlSeat | None = None
         self.notifications: list[Notification] = []
         self.notifier_set = False
-
-        self.registry.dispatcher["global"] = self.global_handler
-        self.display.dispatch()
-        self.display.roundtrip()
-        self.display.roundtrip()
-        glib.io_add_watch(  # type: ignore
-            self.fd, glib.IO_IN, self.on_event
-        )
-
-        get_upower().watch(
-            "changed", self.update_on_battery
-        )
-        Settings()._signals.watch("changed", self.on_settings_changed)
 
     def on_settings_changed(self, key: str, value: str) -> None:
         if key in SETTINGS_KEYS:
@@ -84,11 +70,26 @@ class ScreenSaver:
             BUS_WATCHER,
             gio.BusNameOwnerFlags.NONE,
             self.on_bus_acquired,
-            None,
+            self.on_name_acquired,
             lambda *_: logger.warning(
                 "Another screen saver is running"
             )
         )
+
+    def on_name_acquired(self, *args: t.Any) -> None:
+        self.fd = self.display.get_fd()
+        self.registry.dispatcher["global"] = self.global_handler
+        self.display.dispatch()
+        self.display.roundtrip()
+        self.display.roundtrip()
+        glib.io_add_watch(  # type: ignore
+            self.fd, glib.IO_IN, self.on_event
+        )
+
+        get_upower().watch(
+            "changed", self.update_on_battery
+        )
+        Settings()._signals.watch("changed", self.on_settings_changed)
 
     def create_idle_notification(
         self,
