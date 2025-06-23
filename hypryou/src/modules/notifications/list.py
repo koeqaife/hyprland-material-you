@@ -135,6 +135,16 @@ class Notifications(gtk.ScrolledWindow):
     def close_all(self, *args: t.Any) -> None:
         if is_closing.value:
             return
+        if len(self.items) > 250:
+            for item in self.items.values():
+                item[1].item.item.close(
+                    NotificationClosedReason.DISMISSED_BY_USER
+                )
+                item[1].destroy_with_anim(
+                    self.on_item_destroy_anim
+                )
+            self.items.clear()
+            return
         if self.handler_id != -1:
             notifications.unwatch(self.handler_id)
             self.handler_id = -1
@@ -144,7 +154,10 @@ class Notifications(gtk.ScrolledWindow):
         self.freezed = True
         is_closing.value = True
         self._iterator = iter(self.items.items())
-        self.closing_source = glib.timeout_add(75, self.close_next)
+        self.closing_source = glib.timeout_add(
+            75 if len(self.items) < 30 else 45,
+            self.close_next
+        )
         self.update_clear_button()
 
     def freeze(self) -> None:
