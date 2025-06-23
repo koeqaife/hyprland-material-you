@@ -229,6 +229,7 @@ class AppsWindow(widget.LayerWindow):
             },
             css_classes=("apps-menu",),
             keymode=layer_shell.KeyboardMode.ON_DEMAND,
+            layer=layer_shell.Layer.OVERLAY,
             hide_on_esc=True,
             name="apps_menu",
             height=400,
