@@ -1,4 +1,4 @@
-from repository import gtk, gdk, glib, layer_shell
+from repository import gtk, gdk, layer_shell
 from src.services.notifications import popups
 from src.modules.notifications.item import NotificationItem
 from src.modules.notifications.item import NotificationRevealer
@@ -60,6 +60,7 @@ class NotificationPopups(gtk.Box):
             self.window.show()
 
     def on_change(self, *args: t.Any) -> None:
+        to_show: list[NotificationRevealer] = []
         added_keys, removed_keys = diff_keys(
             old=self.items,
             new=popups.value
@@ -85,9 +86,12 @@ class NotificationPopups(gtk.Box):
                     item=item
                 )
                 self.insert_child_after(self.items[key], None)
-                glib.idle_add(self.items[key].show)
+                to_show.append(self.items[key])
 
         self.update_window_state()
+
+        for revealer in to_show:
+            revealer.show()
 
 
 class Notifications(widget.LayerWindow):
