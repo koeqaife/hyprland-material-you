@@ -47,6 +47,9 @@ default_settings: dict[str, t.Any] = {
     "files": "nautilus",
     "terminal": "alacritty",
 
+    "cursor": "Bibata-Modern-Ice",
+    "cursor_size": "24",
+
     "ac_lock": 300,
     "ac_dpms": 60,
     "ac_sleep": 0,

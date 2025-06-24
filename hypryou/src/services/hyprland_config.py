@@ -11,6 +11,17 @@ import os
 generated_config = os.path.join(config_path, "hyprland_generated.conf")
 
 
+def generate_cursor_settings() -> str:
+    settings = Settings()
+    cursor = settings.get("cursor")
+    cursor_size = settings.get("cursor_size")
+
+    return (
+        f"env = XCURSOR_SIZE,{cursor_size}\n" +
+        f"exec-once = hyprctl setcursor {cursor} {cursor_size}\n\n"
+    )
+
+
 def generate_binds() -> str:
     output = ""
     for bind in key_binds:
@@ -63,6 +74,7 @@ def generate_config() -> None:
     output = ""
     output += generate_env()
     output += generate_binds()
+    output += generate_cursor_settings()
     with open(generated_config, "w") as f:
         f.write(output)
 
