@@ -11,6 +11,7 @@ import subprocess
 import shlex
 from src.services import state
 import shutil
+import traceback
 
 
 screenshot_mode_args = {
@@ -89,7 +90,12 @@ class CliRequest:
             "terminal": settings.get("terminal"),
             "browser": settings.get("browser"),
         }
-        launch_detached(apps[app])
+        exec = apps.get(app)
+        if exec is not None:
+            launch_detached(exec)
+        else:
+            _apps = ", ".join(apps.keys())
+            return f"Couldn't find app {repr(app)}.\nAll apps: {_apps}"
         return "ok"
 
     def do_lock(self, args: str) -> str:
@@ -140,10 +146,18 @@ async def handle_request(data: str) -> str:
     command, args = data.split(" ", 1) if " " in data else (data, "")
     attr = "do_" + command
     request = CliRequest()
-    if hasattr(request, attr):
-        method = getattr(request, attr)
-        if callable(method):
-            return str(method(args))
+    try:
+        if hasattr(request, attr):
+            method = getattr(request, attr)
+            if callable(method):
+                return str(method(args))
+    except Exception as e:
+        tb = traceback.format_exc()
+        logger.error(
+            "Error while calling %s", attr,
+            exc_info=e
+        )
+        return tb
     return "unknown request"
 
 
