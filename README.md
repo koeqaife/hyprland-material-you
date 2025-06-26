@@ -35,9 +35,9 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 <details>
     <summary>Automatic installation (Arch)</summary>
 
-Not available for now. Wait until v2 releases.
-Will be as PKGBUILD for Arch Linux.
-Maybe it will be in AUR,
+-# Not available for now. Wait until v2 releases.  
+-# Will be as PKGBUILD for Arch Linux.  
+-# Maybe it will be in AUR.
 </details>
 
 ## Things left to do
