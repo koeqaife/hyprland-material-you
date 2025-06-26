@@ -160,6 +160,45 @@ class Icon(gtk.Label):
             self.icon.unwatch(self.handler_id)
 
 
+class StackButton(gtk.Button):
+    __gtype_name__ = "StackButton"
+
+    def __init__(
+        self,
+        name: str,
+        label: str,
+        icon: str,
+        on_click: t.Callable[[str], None],
+        tooltip: str
+    ) -> None:
+        self.box = gtk.Box()
+        super().__init__(
+            tooltip_text=tooltip,
+            css_classes=("stack-button",),
+            child=self.box
+        )
+
+        self.icon = Icon(icon)
+        self.label = gtk.Label(
+            css_classes=("label",),
+            label=label
+        )
+        self.name = name
+        self.on_click = on_click
+
+        self.box.append(self.icon)
+        self.box.append(self.label)
+
+        self.handler = self.connect("clicked", self.on_clicked)
+
+    def on_clicked(self, *args: t.Any) -> None:
+        self.on_click(self.name)
+
+    def destroy(self) -> None:
+        self.disconnect(self.handler)
+        self.on_click = None  # type: ignore
+
+
 class RoundedCorner(gtk.DrawingArea):
     def __init__(
         self,

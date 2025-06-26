@@ -206,3 +206,57 @@ button.icon-tonal {
         background-color: color.mix($secondaryContainer, $onSurfaceVariant, 80%);
     }
 }
+
+button.stack-button {
+    border-radius: 2rem;
+    min-height: 2rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    margin-right: 0.5rem;
+    margin-top: 0.5rem;
+
+    &:first-child {
+        margin-left: 0.5rem;
+    }
+
+    label {
+        font-size: 1rem;
+        font-weight: 400;
+    }
+    .icon {
+        font-weight: 500;
+        margin-right: 0.5rem;
+        font-variation-settings: "opsz" 20;
+    }
+
+    &.active {
+        background-color: $secondaryContainer;
+        label {
+            color: $onSecondaryContainer;
+        }
+        .icon {
+            font-variation-settings: "opsz" 20, "FILL" 1;
+        }
+
+        &:hover {
+            background-color: color.mix($secondaryContainer, $inverseOnSurface, 82%);
+        }
+        &:active {
+            background-color: color.mix($secondaryContainer, $inverseOnSurface, 75%);
+        }
+    }
+
+    &:not(.active) {
+        background-color: transparent;
+        label {
+            color: $onSurface;
+        }
+
+        &:hover {
+            background-color: color.mix(transparent, $inverseOnSurface, 82%);
+        }
+        &:active {
+            background-color: color.mix(transparent, $inverseOnSurface, 75%);
+        }
+    }
+}
