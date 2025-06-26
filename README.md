@@ -19,6 +19,10 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 > I'm doing everything by myself and **for free**.  
 > If you want to support me, you can buy me a coffee on [**ko-fi**](https://ko-fi.com/koeqaife).
 
+> [!NOTE]
+> If you want to talk or to check devlogs go to our Discord server  
+> <https://discord.gg/nCK3sh8mNU>
+
 ## How to install
 
 <details>
