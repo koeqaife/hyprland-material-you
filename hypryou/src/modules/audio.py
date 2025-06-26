@@ -461,7 +461,7 @@ class SpeakersBox(AudioBoxTemplate):
             "speakers",
             "Speakers",
             "volume_up",
-            "Tooltip",
+            "Speakers",
             t.cast(Ref[set[wp.Node]], audio.speakers),
             lambda node: EndpointItem(
                 node,
@@ -475,7 +475,7 @@ class SpeakersBox(AudioBoxTemplate):
             "playback",
             "Playback",
             "apps",
-            "Tooltip",
+            "Apps/plugins that play sound",
             t.cast(Ref[set[wp.Node]], audio.streams),
             lambda node: StreamItem(node)
         )
@@ -489,7 +489,7 @@ class MicsBox(AudioBoxTemplate):
             "mics",
             "Mics",
             "mic",
-            "Tooltip",
+            "Microphones",
             t.cast(Ref[set[wp.Node]], audio.microphones),
             lambda node: EndpointItem(
                 node,
@@ -503,7 +503,7 @@ class MicsBox(AudioBoxTemplate):
             "recorders",
             "Recorders",
             "mic_double",
-            "Tooltip",
+            "Apps that use your mic",
             t.cast(Ref[set[wp.Node]], audio.recorders),
             lambda node: StreamItem(node)
         ),
