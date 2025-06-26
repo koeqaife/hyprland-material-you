@@ -146,7 +146,7 @@ class HyprYou(gtk.Application):
             else:
                 raise ValueError
         except Exception:
-            utils.colors.restore_palette()
+            utils.colors.generate_by_last_wallpaper()
 
         self.tasks: list[asyncio.Task[t.Any]] = []
         await self.start_services()
