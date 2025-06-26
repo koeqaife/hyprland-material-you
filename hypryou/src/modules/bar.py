@@ -762,14 +762,24 @@ class MicApplet(Applet):
                 self.on_mics_changed
             ),
             audio.mic_muted: audio.mic_muted.watch(
-                self.on_muted_changed
+                self.update_icon
+            ),
+            audio.recorders: audio.recorders.watch(
+                self.update_icon
             )
         }
-        self.on_muted_changed(audio.mic_muted.value)
         self.on_mics_changed(audio.microphones.value)
+        self.update_icon()
 
-    def on_muted_changed(self, new: bool) -> None:
-        self.set_label("mic" if not new else "mic_off")
+    def update_icon(self, *args: t.Any) -> None:
+        muted = audio.mic_muted.value
+        is_recording = len(audio.recorders.value) > 0
+        if muted:
+            self.set_label("mic_off")
+        elif is_recording:
+            self.set_label("mic_double")
+        else:
+            self.set_label("mic")
 
     def on_mics_changed(self, new_list: set[t.Any]) -> None:
         self.set_visible(len(new_list) > 0)
