@@ -142,6 +142,11 @@ class HyprYou(gtk.Application):
                 if colors.wallpaper == Settings().get("wallpaper"):
                     utils.apply_css()
                 else:
+                    logger.warning(
+                        "Settings wallpaper and " +
+                        "colors wallpaper are different. " +
+                        "Generating new colors."
+                    )
                     utils.colors.generate_by_last_wallpaper()
             else:
                 raise ValueError
