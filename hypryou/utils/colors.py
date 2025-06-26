@@ -735,10 +735,11 @@ def set_dark_mode(
         )
 
 
-def sync() -> None:
+def sync() -> ColorsCache | None:
     try:
         with open(colors_json) as f:
             content = get_cache_object(f.read())
         dark_mode.value = content.is_dark
+        return content
     except FileNotFoundError:
         restore_palette()
