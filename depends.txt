@@ -22,7 +22,6 @@ cython
 hyprsunset
 upower
 python-pywayland
-
 cliphist
 xdg-dbus-proxy
 xdg-desktop-portal
@@ -50,3 +49,9 @@ Versions:
 - hyprsunset: Used 0.2.0-4
 - python-pam: Used 2.0.2-4
 - python-materialyoucolor: Used 2.0.10
+- python-pywayland: Used 0.4.18-2
+- upower: Used 1.90.9-1
+- libastal-bluetooth-git: Used r788.36f1daf-1
+- libastal-wireplumber-git: Used r788.36f1daf-1
+- cliphist: Used 1:0.6.1-1
+
