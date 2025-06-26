@@ -13,7 +13,6 @@ STATIC = {
     "cpu": f"{system.get_cpu_name()} ({system.get_cpu_counts()})",
     "kernel": " ".join(system.get_kernel_info())
 }
-print(STATIC)
 
 
 class InfoPage(gtk.Box):
