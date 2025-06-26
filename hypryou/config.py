@@ -36,7 +36,7 @@ socket_path = pjoin(
 default_settings: dict[str, t.Any] = {
     "time_format": "24",
     "always_show_battery": False,
-    "corners": False,
+    "corners": True,
     "dark_icons": "Tela-nord-dark",
     "light_icons": "Tela-nord-light",
     "opacity": 1,
