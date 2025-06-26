@@ -35,7 +35,7 @@ window.info {
         .buttons-box {
             margin: 0.5rem;
             button {
-                background-color: $surfaceContainer;
+                @include nLayerBackground($surfaceContainer, 2);
                 min-height: 3rem;
                 border-radius: max(calc($hyprlandRounding - 0.5rem), 0.25rem);
                 image {
