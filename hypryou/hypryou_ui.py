@@ -8,7 +8,7 @@ import logging
 import utils
 from utils.logger import logger
 from src.variables import Globals
-from config import Settings, DEBUG
+from config import Settings, DEBUG, CONFIG_DIR
 
 from gi.events import GLibEventLoopPolicy  # type: ignore[import-untyped]
 import asyncio
@@ -50,6 +50,7 @@ from src.modules.brightness import BrightnessWindow
 from src.modules.popups import PopupsWindow
 from src.modules.audio import AudioWindow
 from src.modules.audio import MicsWindow
+from src.modules.info import InfoWindow
 
 START = time.perf_counter()
 
@@ -81,7 +82,8 @@ popups_types = (
     PowerMenuWindow,
     BrightnessWindow,
     AudioWindow,
-    MicsWindow
+    MicsWindow,
+    InfoWindow
 )
 
 windows_types = (
@@ -242,6 +244,9 @@ def init() -> None:
 
     settings = Settings()
     asyncio.set_event_loop_policy(GLibEventLoopPolicy())
+    display = gdk.Display.get_default()
+    icon_theme = gtk.IconTheme.get_for_display(display)
+    icon_theme.add_search_path(f"{CONFIG_DIR}/assets/icons")
 
     if settings.get("secure_cliphist"):
         cliphist.secure_clear()

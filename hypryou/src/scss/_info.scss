@@ -1,0 +1,87 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "calculated" as *;
+@use "sass:color";
+
+window.info {
+    @include nLayerBackground($background, 1);
+    min-width: 22.5rem;
+    min-height: 22.5rem;
+    border-radius: $hyprlandRounding;
+    border: 0.0625rem solid $layerBorderColor;
+
+    .info-page {
+        .logo {
+            font-size: 2.5rem;
+            border-radius: 50%;
+            background-color: $primary;
+            color: $onPrimary;
+            font-family: "Google Sans Display";
+            min-height: 5rem;
+            min-width: 5rem;
+            margin-bottom: 0.5rem;
+        }
+        .name {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: $onSurface;
+        }
+        .version {
+            font-size: 1rem;
+            font-weight: 400;
+            color: $onSurfaceVariant;
+        }
+
+        .buttons-box {
+            margin: 0.5rem;
+            button {
+                background-color: $surfaceContainer;
+                min-height: 3rem;
+                border-radius: max(calc($hyprlandRounding - 0.5rem), 0.25rem);
+                image {
+                    color: $onSurface;
+                }
+                &:hover {
+                    background-color: color.mix($surfaceContainer, $onSurface, 90%);
+                }
+                &:active {
+                    background-color: color.mix($surfaceContainer, $onSurface, 85%);
+                }
+                &:not(:last-child) {
+                    margin-right: 0.5rem;
+                }
+            }
+        }
+    }
+
+    .system-page {
+        .monitor-row, .info-row {
+            @include elevation(1);
+            background-color: $surfaceContainer;
+            margin-left: 0.5rem;
+            margin-right: 0.5rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border-radius: max(calc($hyprlandRounding - 0.5rem), 0.25rem);
+
+            .label {
+                font-size: 1rem;
+                font-weight: 500;
+            }
+            .value, .description {
+                font-size: 1rem;
+                font-weight: 400;
+                color: $onSurfaceVariant;
+            }
+        }
+
+        > :last-child {
+            margin-bottom: 0.5rem;
+        }
+
+        separator {
+            margin: 0.5rem;
+            margin-bottom: 0;
+        }
+    }
+}

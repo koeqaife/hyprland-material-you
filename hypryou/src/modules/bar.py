@@ -902,6 +902,26 @@ class OpenAppsMenu(gtk.Button):
         self.disconnect(self.conn_id)
 
 
+class OpenInfoMenu(gtk.Button):
+    __gtype_name__ = "OpenInfoMenuButton"
+
+    def __init__(self) -> None:
+        super().__init__(
+            css_classes=("open-info-menu", "icon-tonal"),
+            child=widget.Icon("info_i"),
+            tooltip_text="Info",
+            halign=gtk.Align.CENTER,
+            valign=gtk.Align.CENTER
+        )
+        self.conn_id = self.connect("clicked", self.on_clicked)
+
+    def on_clicked(self, *args: t.Any) -> None:
+        toggle_window("info")
+
+    def destroy(self) -> None:
+        self.disconnect(self.conn_id)
+
+
 class ModulesLeft(gtk.Box):
     __gtype_name__ = "BarModulesLeft"
 
@@ -912,6 +932,7 @@ class ModulesLeft(gtk.Box):
         )
         self.children = (
             OpenAppsMenu(),
+            OpenInfoMenu(),
             Player(),
         )
         for child in self.children:

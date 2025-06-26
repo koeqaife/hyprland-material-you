@@ -33,6 +33,14 @@ socket_path = pjoin(
     os.environ["HYPRLAND_INSTANCE_SIGNATURE"]
 )
 
+info = {
+    "name": "HyprYou",
+    "author": "koeqaife",
+    "github": "https://github.com/koeqaife/hyprland-material-you",
+    "discord": "https://discord.gg/nCK3sh8mNU",
+    "ko-fi": "https://ko-fi.com/koeqaife"
+}
+
 default_settings: dict[str, t.Any] = {
     "time_format": "24",
     "always_show_battery": False,
