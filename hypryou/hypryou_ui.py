@@ -137,8 +137,14 @@ class HyprYou(gtk.Application):
         await self.init_services()
 
         try:
-            utils.colors.sync()
-            utils.apply_css()
+            colors = utils.colors.sync()
+            if colors is not None:
+                if colors.wallpaper == Settings().get("wallpaper"):
+                    utils.apply_css()
+                else:
+                    utils.colors.generate_by_last_wallpaper()
+            else:
+                raise ValueError
         except Exception:
             utils.colors.restore_palette()
 
