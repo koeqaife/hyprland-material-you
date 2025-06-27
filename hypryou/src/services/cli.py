@@ -21,6 +21,26 @@ screenshot_mode_args = {
     "window": "-m window"
 }
 
+HELP = {
+    "ping": "Pong!",
+    "reload": "Reload UI",
+    "exit": "Exit UI",
+    "sync_settings": "Sync changes in settings.json with UI",
+    "toggle_window": "Toggle window/popup",
+    "open_window": "Open window/popup",
+    "close_window": "Close window/popup",
+    "reload_css": "Reload styles",
+    "player": ("Mini playerctl, sub commands: " +
+               "play-pause, pause, next, previous, play"),
+    "apps": "Open app, available apps: files, editor, terminal, browser",
+    "lock": "Lock session",
+    "screenshot": ("Take a screenshot, available modes: " +
+                   "region, active, window. " +
+                   "Use freeze after mode to freeze the screen"),
+    "help": "This message"
+}
+HELP_CACHE = ""
+
 
 def launch_detached(exec: str) -> None:
     cmd = shlex.split(exec)
@@ -82,6 +102,7 @@ class CliRequest:
         current = current_player.value[1]
         actions = {
             "play-pause": current.play_pause,
+            "play": current.play,
             "pause": current.pause,
             "next": current.next,
             "previous": current.previous
@@ -126,6 +147,25 @@ class CliRequest:
             command = f"bash -c \"hyprshot {" ".join(args)}\""
             launch_detached(command)
         return "ok"
+
+    def do_help(self, args: str) -> None:
+        global HELP_CACHE
+        if HELP_CACHE:
+            return HELP_CACHE
+        for attr in dir(CliRequest):
+            if attr.startswith("do_"):
+                cmd = attr.removeprefix("do_")
+                callback = getattr(self, attr)
+                if callable(callback) and cmd not in HELP.keys():
+                    logger.warning(f"Command {attr} doesn't have description!")
+
+        max_cmd_len = max((len(cmd) for cmd in HELP), default=0)
+        output = ""
+        for cmd, help in HELP.items():
+            padding = " " * (max_cmd_len - len(cmd))
+            output += f"{cmd}{padding} -> {help}\n"
+        HELP_CACHE = output
+        return HELP_CACHE
 
 
 async def handle_client(
