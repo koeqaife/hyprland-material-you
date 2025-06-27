@@ -236,6 +236,9 @@ class CliService(AsyncService):
         self.server: asyncio.Server | None = None
 
     async def app_init(self) -> None:
+        if not __debug__:
+            # Skip checks in production mode
+            return
         for attr in dir(CliRequest):
             if attr.startswith("do_"):
                 cmd = attr.removeprefix("do_")
