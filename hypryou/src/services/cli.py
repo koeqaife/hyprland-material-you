@@ -12,6 +12,7 @@ import shlex
 from src.services import state
 import shutil
 import traceback
+import typing as t
 
 
 screenshot_mode_args = {
@@ -44,9 +45,15 @@ class CliRequest:
         return "pong"
 
     def do_reload(self, args: str) -> str:
+        return "ok"
+
+    def post_reload(self, args: str) -> None:
         exit(100)
 
     def do_exit(self, args: str) -> str:
+        return "ok"
+
+    def post_exit(self, args: str) -> None:
         exit(0)
 
     def do_sync_settings(self, args: str) -> str:
@@ -126,11 +133,13 @@ async def handle_client(
         message = data.decode()
         logger.debug("Received message from socket: '%s'", message)
 
-        response = await handle_request(message)
+        response, post = await handle_request(message)
         writer.write(response.encode())
         await writer.drain()
         writer.close()
         await writer.wait_closed()
+        if post is not None:
+            post()
     except (
         ConnectionResetError,
         ConnectionRefusedError,
@@ -142,23 +151,30 @@ async def handle_client(
             writer.close()
 
 
-async def handle_request(data: str) -> str:
+async def handle_request(data: str) -> tuple[str, t.Callable[[], None] | None]:
     command, args = data.split(" ", 1) if " " in data else (data, "")
     attr = "do_" + command
+    post_attr = "post_" + command
     request = CliRequest()
     try:
         if hasattr(request, attr):
             method = getattr(request, attr)
+            post_method = getattr(request, post_attr, None)
             if callable(method):
-                return str(method(args))
+                return (
+                    str(method(args)),
+                    lambda: post_method(args)
+                    if post_method and callable(post_method)
+                    else None
+                )
     except Exception as e:
         tb = traceback.format_exc()
         logger.error(
             "Error while calling %s", attr,
             exc_info=e
         )
-        return tb
-    return "unknown request"
+        return tb, None
+    return "unknown request", None
 
 
 def is_socket_exists() -> bool:
