@@ -104,8 +104,9 @@ class Signals:
                 self._handler_signals.pop(handler_id, None)
 
     def _idle_notify(self, signal_name: str, *args: t.Any) -> bool:
-        with self._lock:
-            self._pending_idle.discard(signal_name)
+        if not self._no_idle_pending:
+            with self._lock:
+                self._pending_idle.discard(signal_name)
         self.notify_sync(signal_name, *args)
         return False
 
