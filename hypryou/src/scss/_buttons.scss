@@ -240,10 +240,10 @@ button.stack-button {
         }
 
         &:hover {
-            background-color: color.mix($secondaryContainer, $inverseOnSurface, 82%);
+            background-color: color.mix($secondaryContainer, $onSurfaceVariant, 88%);
         }
         &:active {
-            background-color: color.mix($secondaryContainer, $inverseOnSurface, 75%);
+            background-color: color.mix($secondaryContainer, $onSurfaceVariant, 80%);
         }
     }
 
@@ -254,10 +254,10 @@ button.stack-button {
         }
 
         &:hover {
-            background-color: color.mix(transparent, $inverseOnSurface, 82%);
+            background-color: color.mix(transparent, $onSurfaceVariant, 92%);
         }
         &:active {
-            background-color: color.mix(transparent, $inverseOnSurface, 75%);
+            background-color: color.mix(transparent, $onSurfaceVariant, 90%);
         }
     }
 }
