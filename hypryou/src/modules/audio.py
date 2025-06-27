@@ -343,10 +343,11 @@ class NodesList(gtk.ScrolledWindow):
             vscrollbar_policy=gtk.PolicyType.NEVER,
             hscrollbar_policy=gtk.PolicyType.NEVER
         )
-        weakref.finalize(
-            self,
-            lambda: logger.debug("NodesList finalized")
-        )
+        if __debug__:
+            weakref.finalize(
+                self,
+                lambda: logger.debug("NodesList finalized")
+            )
         self.with_min_height: bool | None = None
 
         self._ref = ref

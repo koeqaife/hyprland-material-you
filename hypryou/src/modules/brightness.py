@@ -107,10 +107,11 @@ class DevicesBox(gtk.ScrolledWindow):
             vscrollbar_policy=gtk.PolicyType.NEVER,
             hscrollbar_policy=gtk.PolicyType.NEVER
         )
-        weakref.finalize(
-            self,
-            lambda: logger.debug("brightness.DevicesBox finalized")
-        )
+        if __debug__:
+            weakref.finalize(
+                self,
+                lambda: logger.debug("brightness.DevicesBox finalized")
+            )
 
         devices = get_backlight_manager().devices
         for i, device in enumerate(devices, 1):
@@ -158,9 +159,10 @@ class BrightnessWindow(widget.LayerWindow):
         )
         self._child: DevicesBox | None = None
 
-        weakref.finalize(
-            self, lambda: logger.debug("BrightnessWindow finalized")
-        )
+        if __debug__:
+            weakref.finalize(
+                self, lambda: logger.debug("BrightnessWindow finalized")
+            )
 
     def on_show(self) -> None:
         self._child = DevicesBox()

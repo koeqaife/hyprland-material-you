@@ -1052,7 +1052,8 @@ class Bar(widget.LayerWindow):
 
         self.set_child(self.center_box)
         self.present()
-        weakref.finalize(self, lambda: logger.debug("Bar finalized"))
+        if __debug__:
+            weakref.finalize(self, lambda: logger.debug("Bar finalized"))
 
     def destroy(self) -> None:
         box = self.center_box

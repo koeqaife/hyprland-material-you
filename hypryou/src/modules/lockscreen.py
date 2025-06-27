@@ -206,9 +206,10 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         self.overlay.add_overlay(self.info_box)
         self.overlay.add_overlay(self.unlock_box)
         self.set_child(self.overlay)
-        weakref.finalize(
-            self, lambda: logger.debug("LockScreenWindow finalized")
-        )
+        if __debug__:
+            weakref.finalize(
+                self, lambda: logger.debug("LockScreenWindow finalized")
+            )
 
         self.ref_handlers: dict[Ref[t.Any], int] = {
             time: time.watch(self.update_time),

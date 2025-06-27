@@ -69,9 +69,10 @@ class PowerMenu(gtk.Box):
                 "close", "Cancel", self.on_cancel
             )
             self.append(self.cancel_button)
-        weakref.finalize(
-            self, lambda: logger.debug("PowerMenu finalized")
-        )
+        if __debug__:
+            weakref.finalize(
+                self, lambda: logger.debug("PowerMenu finalized")
+            )
 
     def on_lock(self, *args: t.Any) -> None:
         is_locked.value = True
@@ -132,9 +133,10 @@ class PowerMenuWindow(widget.LayerWindow):
         )
         self._child: PowerMenu | None = None
 
-        weakref.finalize(
-            self, lambda: logger.debug("PowerMenuWindow finalized")
-        )
+        if __debug__:
+            weakref.finalize(
+                self, lambda: logger.debug("PowerMenuWindow finalized")
+            )
 
     def on_show(self) -> None:
         self._child = PowerMenu()

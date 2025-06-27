@@ -8,7 +8,7 @@ import logging
 import utils
 from utils.logger import logger
 from src.variables import Globals
-from config import Settings, DEBUG, CONFIG_DIR
+from config import Settings, CONFIG_DIR
 
 from gi.events import GLibEventLoopPolicy  # type: ignore[import-untyped]
 import asyncio
@@ -192,10 +192,11 @@ class HyprYou(gtk.Application):
 
         for monitor in list(self.windows.keys()):
             if monitor not in monitors:
-                logger.debug(
-                    "Removing windows for monitor: %s",
-                    monitor.get_model()
-                )
+                if __debug__:
+                    logger.debug(
+                        "Removing windows for monitor: %s",
+                        monitor.get_model()
+                    )
                 for window in self.windows[monitor]:
                     window.destroy()
                 self.windows[monitor].clear()
@@ -203,10 +204,11 @@ class HyprYou(gtk.Application):
 
         for monitor in list(self.corners.keys()):
             if monitor not in monitors:
-                logger.debug(
-                    "Removing corners for monitor: %s",
-                    monitor.get_model()
-                )
+                if __debug__:
+                    logger.debug(
+                        "Removing corners for monitor: %s",
+                        monitor.get_model()
+                    )
                 for corner in self.corners[monitor]:
                     corner.destroy_window()
                 self.corners[monitor].clear()
@@ -214,10 +216,11 @@ class HyprYou(gtk.Application):
 
         for i, monitor in enumerate(list(monitors)):  # type: ignore[assignment]  # noqa
             if monitor not in self.windows:
-                logger.debug(
-                    "Adding windows for monitor: %s",
-                    monitor.get_model()
-                )
+                if __debug__:
+                    logger.debug(
+                        "Adding windows for monitor: %s",
+                        monitor.get_model()
+                    )
                 windows: list[gtk.ApplicationWindow] = []
                 for window_type in windows_types:
                     try:
@@ -237,7 +240,7 @@ class HyprYou(gtk.Application):
 
 
 def init() -> None:
-    utils.setup_logger(logging.DEBUG if DEBUG else logging.INFO)
+    utils.setup_logger(logging.DEBUG if __debug__ else logging.INFO)
     if is_socket_exists():
         logger.critical(
             "Other HyprYou is running on the same hyprland instance!"
@@ -253,11 +256,13 @@ def init() -> None:
     if settings.get("secure_cliphist"):
         cliphist.secure_clear()
 
-    logger.debug("Initialized")
+    if __debug__:
+        logger.debug("Initialized")
 
 
 def main() -> None:
-    logger.debug("Starting app")
+    if __debug__:
+        logger.debug("Starting app")
     app = HyprYou(application_id="com.koeqaife.hypryou")
 
     app.run(None)

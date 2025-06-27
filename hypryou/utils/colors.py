@@ -535,7 +535,8 @@ def generate_colors_sync(
 
 
 def compile_scss(path: str, output: str) -> None:
-    logger.debug("Compiling scss")
+    if __debug__:
+        logger.debug("Compiling scss")
     command = [
         'sass',
         path,

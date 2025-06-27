@@ -201,5 +201,6 @@ def get_upower() -> UPower:
 class UPowerService(Service):
     def app_init(self) -> None:
         global _instance
-        logger.debug("Starting upower proxy")
+        if __debug__:
+            logger.debug("Starting upower proxy")
         _instance = UPower()

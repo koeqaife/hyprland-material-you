@@ -51,7 +51,8 @@ class Sidebar(widget.LayerWindow):
         )
         self._child: SidebarBox | None = None
 
-        weakref.finalize(self, lambda: logger.debug("Sidebar finalized"))
+        if __debug__:
+            weakref.finalize(self, lambda: logger.debug("Sidebar finalized"))
 
     def present(self) -> None:
         if self._child:

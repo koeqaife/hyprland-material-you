@@ -346,7 +346,10 @@ class PlayersBox(gtk.ScrolledWindow):
 
         self.timer_id = glib.timeout_add(500, self.timer)
 
-        weakref.finalize(self, lambda: logger.debug("PlayersBox finalized"))
+        if __debug__:
+            weakref.finalize(
+                self, lambda: logger.debug("PlayersBox finalized")
+            )
 
     def update_items(self, new_items: dict[str, MprisPlayer]) -> None:
         existing_items = set(self.items.keys())
@@ -410,7 +413,11 @@ class PlayersWindow(widget.LayerWindow):
         self.name = "players"
         self._child: PlayersBox | None = None
 
-        weakref.finalize(self, lambda: logger.debug("PlayersWindow finalized"))
+        if __debug__:
+            weakref.finalize(
+                self,
+                lambda: logger.debug("PlayersWindow finalized")
+            )
 
     def on_show(self) -> None:
         self._child = PlayersBox()

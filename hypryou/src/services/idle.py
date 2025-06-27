@@ -149,9 +149,10 @@ class ScreenSaver:
                 try:
                     resumed_cb = notification.dispatcher["resumed"]
                     if resumed_cb:
-                        logger.debug(
-                            "Calling on_resumed manually before destroy"
-                        )
+                        if __debug__:
+                            logger.debug(
+                                "Calling on_resumed manually before destroy"
+                            )
                         resumed_cb(notification)
                 finally:
                     notification.destroy()
@@ -208,11 +209,13 @@ class ScreenSaver:
     def on_bus_acquired(
         self, conn: gio.DBusConnection, name: str, user_data: object = None
     ) -> None:
-        logger.debug("Screen saver bus acquired")
+        if __debug__:
+            logger.debug("Screen saver bus acquired")
         self._conn = conn
         for interface in self.ifaces:
             if interface.name == name:
-                logger.debug("Registering interface '%s'", name)
+                if __debug__:
+                    logger.debug("Registering interface '%s'", name)
                 conn.register_object(
                     PATH_WATCHER,
                     interface,
@@ -248,20 +251,22 @@ class ScreenSaver:
     def un_inhibit(self, cookie: int) -> None:
         if cookie not in self.items.keys():
             return
-        logger.debug(
-            "ScreenSaver UnInhibit: App: '%s' Cookie: '%s'",
-            self.items[cookie][0], cookie
-        )
+        if __debug__:
+            logger.debug(
+                "ScreenSaver UnInhibit: App: '%s' Cookie: '%s'",
+                self.items[cookie][0], cookie
+            )
         del self.items[cookie]
 
     def inhibit(self, app_name: str, reason: str) -> int:
         cookie = self.next_id
         self.next_id += 1
         self.items[cookie] = (app_name, reason)
-        logger.debug(
-            "ScreenSaver Inhibit: App: '%s' Reason: '%s' Cookie: %s",
-            app_name, reason, cookie
-        )
+        if __debug__:
+            logger.debug(
+                "ScreenSaver Inhibit: App: '%s' Reason: '%s' Cookie: %s",
+                app_name, reason, cookie
+            )
         return cookie
 
 
@@ -273,7 +278,8 @@ class ScreenSaverService(Service):
         self.watcher = ScreenSaver()
 
     def start(self) -> None:
-        logger.debug("Starting screen saver dbus")
+        if __debug__:
+            logger.debug("Starting screen saver dbus")
         self.watcher.register()
 
     def on_close(self) -> None:

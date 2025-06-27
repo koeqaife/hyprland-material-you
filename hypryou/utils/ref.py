@@ -233,7 +233,8 @@ class Ref(t.Generic[T]):
 
         self.name = name or "unknown"
         self.asyncio_lock = asyncio.Lock()
-        logger.debug("Ref with name '%s' created", self.name)
+        if __debug__:
+            logger.debug("Ref with name '%s' created", self.name)
 
     def _wrap_if_mutable(self, value: T) -> T:
         if not self.deep:
@@ -266,9 +267,11 @@ class Ref(t.Generic[T]):
         return deep_wrap(value)
 
     async def __aenter__(self) -> t.Self:
-        logger.debug("Ref '%s' started transaction", self.name)
+        if __debug__:
+            logger.debug("Ref '%s' started transaction", self.name)
         await self.asyncio_lock.acquire()
-        logger.debug("Ref '%s' lock acquired", self.name)
+        if __debug__:
+            logger.debug("Ref '%s' lock acquired", self.name)
         return self
 
     async def __aexit__(
@@ -277,7 +280,8 @@ class Ref(t.Generic[T]):
         exc_val: t.Any,
         traceback: t.Any
     ) -> None:
-        logger.debug("Ref '%s' lock released", self.name)
+        if __debug__:
+            logger.debug("Ref '%s' lock released", self.name)
         self.asyncio_lock.release()
         if not exc_type:
             self._trigger_watchers()
@@ -294,7 +298,7 @@ class Ref(t.Generic[T]):
 
         self._signals.notify("changed", self.value)
 
-        if log:
+        if __debug__ and log:
             logger.debug(
                 "Ref '%s' triggered watchers",
                 self.name
@@ -326,18 +330,20 @@ class Ref(t.Generic[T]):
                         f"Types do not match {repr(new_value)}: " +
                         f"{type(old_value)} != {type(new_value)}"
                     )
-            if self.name:
+            if __debug__ and self.name:
                 logger.debug("Ref '%s' changed value", self.name)
 
             self._value = new_value
             self._trigger_watchers(log=False)
 
     def watch(self, callback: t.Callable[[T], None], **kwargs: t.Any) -> int:
-        logger.debug("Ref '%s' create watcher", self.name)
+        if __debug__:
+            logger.debug("Ref '%s' create watcher", self.name)
         return self._signals.watch("changed", callback, **kwargs)
 
     def unwatch(self, handler_id: int) -> None:
-        logger.debug("Ref '%s' remove watcher", self.name)
+        if __debug__:
+            logger.debug("Ref '%s' remove watcher", self.name)
         self._signals.unwatch_fast("changed", handler_id)
 
     def ready(self) -> None:

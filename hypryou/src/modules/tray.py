@@ -55,7 +55,6 @@ class TrayItem(gtk.Box):
         self.update_visible()
 
         self.handler_id = self._item.watch("changed", self.on_changed)
-        # weakref.finalize(self, lambda: logger.debug("TrayWidget finalized"))
 
     def on_changed(self, data: dict[str, t.Any] | None = None) -> None:
         if data:
@@ -159,7 +158,8 @@ class TrayBox(gtk.ScrolledWindow):
         )
         self.handler_id = items.watch(self.update_items)
         self.update_items(items.value)
-        weakref.finalize(self, lambda: logger.debug("TrayBox finalized"))
+        if __debug__:
+            weakref.finalize(self, lambda: logger.debug("TrayBox finalized"))
 
     def update_items(self, new_items: dict[str, StatusNotifierItem]) -> None:
         existing_items = set(self.items.keys())
@@ -214,7 +214,11 @@ class TrayWindow(widget.LayerWindow):
         )
         self._child: TrayBox | None = None
 
-        weakref.finalize(self, lambda: logger.debug("TrayWindow finalized"))
+        if __debug__:
+            weakref.finalize(
+                self,
+                lambda: logger.debug("TrayWindow finalized")
+            )
 
     def on_show(self) -> None:
         self._child = TrayBox()

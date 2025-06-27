@@ -15,10 +15,12 @@ def apply_css() -> None:
         return
     compile_scss()
 
-    logger.debug("Creating css provider")
+    if __debug__:
+        logger.debug("Creating css provider")
     provider = gtk.CssProvider()
 
-    logger.debug("Loading css")
+    if __debug__:
+        logger.debug("Loading css")
     provider.load_from_path(styles_output)
 
     gtk.StyleContext.add_provider_for_display(
@@ -35,9 +37,11 @@ def reload_css() -> None:
         return apply_css()
 
     compile_scss()
-    logger.debug("Reloading css")
+    if __debug__:
+        logger.debug("Reloading css")
     Globals.css_provider.load_from_path(styles_output)
-    logger.debug("Reloading css done")
+    if __debug__:
+        logger.debug("Reloading css done")
 
 
 def generate_scss_variables() -> None:
@@ -52,7 +56,8 @@ def generate_scss_variables() -> None:
 
 
 def compile_scss() -> None:
-    logger.debug("Compiling scss")
+    if __debug__:
+        logger.debug("Compiling scss")
     generate_scss_variables()
     command = [
         'sass',

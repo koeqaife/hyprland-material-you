@@ -174,7 +174,8 @@ class Notification(Signals):
         self.set_values(**kwargs)
 
     def close(self, reason: NotificationClosedReason) -> None:
-        logger.debug("Closing notification %s", self.id)
+        if __debug__:
+            logger.debug("Closing notification %s", self.id)
         self.watcher.signal_notification_closed(self.id, reason)
         if self.id in popups.value:
             del popups.value[self.id]
@@ -189,7 +190,8 @@ class Notification(Signals):
                 NotificationClosedReason.DISMISSED_BY_USER
             )
         else:
-            logger.debug("Dismissing notification %s", self.id)
+            if __debug__:
+                logger.debug("Dismissing notification %s", self.id)
 
     def action(self, action: str) -> None:
         self.watcher.signal_action_invoked(self.id, action)
@@ -287,11 +289,13 @@ class NotificationsWatcher:
         name: str,
         user_data: object = None
     ) -> None:
-        logger.debug("Notifications bus acquired")
+        if __debug__:
+            logger.debug("Notifications bus acquired")
         self.conn = conn
         for interface in self.ifaces:
             if interface.name == name:
-                logger.debug("Registering interface '%s'", name)
+                if __debug__:
+                    logger.debug("Registering interface '%s'", name)
                 conn.register_object(
                     PATH_WATCHER,
                     interface,
@@ -315,10 +319,12 @@ class NotificationsWatcher:
             case "GetAll":
                 invocation.return_value(glib.Variant("a{sv}", ()))
             case "GetCapabilities":
-                logger.debug("Asked for notification capabilities")
+                if __debug__:
+                    logger.debug("Asked for notification capabilities")
                 invocation.return_value(server_capabilities)
             case "GetServerInformation":
-                logger.debug("Asked for notification server info")
+                if __debug__:
+                    logger.debug("Asked for notification server info")
                 invocation.return_value(server_information)
             case "Notify":
                 new_id = self.notify(*params.unpack())
@@ -364,10 +370,11 @@ class NotificationsWatcher:
             "hints": hints
         })
         if replaces_id and replaces_id in notifications.value:
-            logger.debug(
-                "Got new notification from '%s'; Replacing %s",
-                app_name, replaces_id
-            )
+            if __debug__:
+                logger.debug(
+                    "Got new notification from '%s'; Replacing %s",
+                    app_name, replaces_id
+                )
             notification = notifications.value[replaces_id]
             notification.set_values(**kwargs)
             if (
@@ -387,10 +394,11 @@ class NotificationsWatcher:
             return replaces_id
 
         new_id = generate_new_id()
-        logger.debug(
-            "Got new notification from '%s'; Id: %s",
-            app_name, new_id
-        )
+        if __debug__:
+            logger.debug(
+                "Got new notification from '%s'; Id: %s",
+                app_name, new_id
+            )
         notification = Notification(new_id, self, **kwargs)
         notifications.value[new_id] = notification
         if (

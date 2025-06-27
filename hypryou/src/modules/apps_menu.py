@@ -139,7 +139,8 @@ class AppsBox(gtk.Box):
 
         self.last_highest: tuple[Application, AppItem] | None = None
 
-        weakref.finalize(self, lambda: logger.debug("AppsBox finalized"))
+        if __debug__:
+            weakref.finalize(self, lambda: logger.debug("AppsBox finalized"))
 
     def on_entry_enter(self, *args: t.Any) -> None:
         if self.last_highest:
@@ -244,7 +245,10 @@ class AppsWindow(widget.LayerWindow):
         )
         self.name = "apps_menu"
         self._child: AppsBox | None = None
-        weakref.finalize(self, lambda: logger.debug("AppsWindow finalized"))
+        if __debug__:
+            weakref.finalize(
+                self, lambda: logger.debug("AppsWindow finalized")
+            )
 
     def on_show(self) -> None:
         glib.idle_add(apps_reload)

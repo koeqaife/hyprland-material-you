@@ -27,10 +27,11 @@ def on_name_owner_changed(
     parameters: glib.Variant
 ) -> None:
     name, old_owner, new_owner = parameters.unpack()
-    logger.debug(
-        "NameOwnerChanged: %s, '%s' -> '%s'",
-        name, old_owner, new_owner
-    )
+    if __debug__:
+        logger.debug(
+            "NameOwnerChanged: %s, '%s' -> '%s'",
+            name, old_owner, new_owner
+        )
     name_owner_changed.notify(
         "notify",
         name, old_owner, new_owner
@@ -83,7 +84,9 @@ def cache_proxy_properties_finish(
         if not props_var:
             raise RuntimeError("Can't get the properties variant")
     except Exception as e:
-        return logger.debug("Can't update properties for player: %s", e)
+        if __debug__:
+            logger.debug("Can't update properties for player: %s", e)
+        return
 
     def unpack_properties(
         variant: glib.Variant

@@ -110,10 +110,11 @@ class Login1Manager:
         for inhibitor in inhibitors:
             i_what, who, why, mode, _uid, _pid = inhibitor
             if i_what == what and mode == "block":
-                logger.debug(
-                    "%s is blocked by: %s — %s",
-                    what, who, why
-                )
+                if __debug__:
+                    logger.debug(
+                        "%s is blocked by: %s — %s",
+                        what, who, why
+                    )
                 return True
 
         return False
@@ -141,5 +142,6 @@ def get_login_manager() -> Login1Manager:
 class Login1ManagerService(Service):
     def app_init(self) -> None:
         global _instance
-        logger.debug("Starting login1 manager proxy")
+        if __debug__:
+            logger.debug("Starting login1 manager proxy")
         _instance = Login1Manager()

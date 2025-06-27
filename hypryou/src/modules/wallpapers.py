@@ -69,7 +69,11 @@ class WallpapersWindow(widget.LayerWindow):
         self._child = WallpapersWidget()
         self.set_child(self._child)
         self.present()
-        weakref.finalize(self, lambda: logger.debug("Bar finalized"))
+        if __debug__:
+            weakref.finalize(
+                self,
+                lambda: logger.debug("WallpapersWindow finalized")
+            )
 
     def destroy(self) -> None:
         self._child.destroy()

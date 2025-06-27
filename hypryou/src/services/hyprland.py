@@ -585,7 +585,8 @@ async def init() -> None:
     global client
     client = HyprlandClient()
 
-    logger.debug("Loading variables")
+    if __debug__:
+        logger.debug("Loading hyprland variables")
     _active_workspace = await client.query("activeworkspace")
     active_workspace.value = int(_active_workspace["id"])
     active_workspace.ready()
@@ -614,7 +615,8 @@ async def init() -> None:
     except (ConnectionRefusedError, FileNotFoundError) as e:
         logger.error("Couldn't connect to hyprsunset", exc_info=e)
 
-    logger.debug("Creating hyprland watchers")
+    if __debug__:
+        logger.debug("Creating hyprland watchers")
     for attr in dir(EventCallbacks):
         if attr.startswith("on_"):
             callback = getattr(EventCallbacks, attr)
@@ -647,5 +649,6 @@ class HyprlandService(AsyncService):
 
     async def start(self) -> None:
         global client
-        logger.debug("Connecting to hyprland")
+        if __debug__:
+            logger.debug("Connecting to hyprland")
         await client.connect()

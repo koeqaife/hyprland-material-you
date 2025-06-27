@@ -13,7 +13,6 @@ PATCH_VERSION = 0
 
 VERSION = f"{MAJOR_VERSION}.{MINOR_VERSION}.{PATCH_VERSION}-beta"
 
-DEBUG = os.environ.get("HYPRYOU_DEBUG", 0)
 HOME = os.environ["HOME"]
 
 CACHE_PATH = os.getenv("XDG_CACHE_HOME", f"{HOME}/.cache")

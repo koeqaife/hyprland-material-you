@@ -227,7 +227,8 @@ class ClipHistoryBox(gtk.Box):
 
         self.last_highest: tuple[str, ClipItem] | None = None
 
-        weakref.finalize(self, lambda: logger.debug("AppsBox finalized"))
+        if __debug__:
+            weakref.finalize(self, lambda: logger.debug("AppsBox finalized"))
 
     def on_entry_enter(self, *args: t.Any) -> None:
         if self.last_highest:
@@ -324,9 +325,10 @@ class ClipHistoryWindow(widget.LayerWindow):
         self.name = "cliphist"
         self._child: ClipHistoryBox | None = None
 
-        weakref.finalize(
-            self, lambda: logger.debug("ClipHistoryWindow finalized")
-        )
+        if __debug__:
+            weakref.finalize(
+                self, lambda: logger.debug("ClipHistoryWindow finalized")
+            )
 
     def on_show(self) -> None:
         glib.idle_add(repopulate)

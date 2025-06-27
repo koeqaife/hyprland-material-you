@@ -22,6 +22,8 @@ LEGACY_APP_FREQUENCY = pjoin(CACHE_PATH, "ags", "apps", "apps_frequency.json")
 
 
 def launch_detached(exec: str) -> None:
+    if __debug__:
+        logger.debug("Running %s", exec)
     placeholders = ("%u", "%U", "%f", "%F", "%i", "%c", "%k", "%%")
     for placeholder in placeholders:
         exec = exec.replace(placeholder, "")

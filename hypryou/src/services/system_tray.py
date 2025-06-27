@@ -196,10 +196,11 @@ class StatusNotifierItem(Signals):
                 pid = get_pid(self.get_bus_name())
                 name = get_process_title(pid)
         except Exception as e:
-            logger.debug(
-                "Couldn't get name for '%s': %s",
-                self.identifier, e, exc_info=e
-            )
+            if __debug__:
+                logger.debug(
+                    "Couldn't get name for '%s': %s",
+                    self.identifier, e, exc_info=e
+                )
         self._cached_name = name
         return name
 
@@ -343,21 +344,25 @@ class StatusNotifierWatcher:
         new_owner: str
     ) -> None:
         if name in items.value and new_owner == "":
-            logger.debug("Tray item '%s' disappeared from bus.", name)
+            if __debug__:
+                logger.debug("Tray item '%s' disappeared from bus.", name)
             self.remove_item(items.value[name])
         elif old_owner in items.value and new_owner == "":
-            logger.debug("Tray item '%s' disappeared from bus.", name)
+            if __debug__:
+                logger.debug("Tray item '%s' disappeared from bus.", name)
             self.remove_item(items.value[old_owner])
 
     def on_bus_acquired(
         self, conn: gio.DBusConnection, name: str, user_data: object = None
     ) -> None:
-        logger.debug("System tray bus acquired")
+        if __debug__:
+            logger.debug("System tray bus acquired")
         name_owner_changed.watch("notify", self.on_name_owner_changed)
         self._conn = conn
         for interface in self.ifaces:
             if interface.name == name:
-                logger.debug("Registering interface '%s'", name)
+                if __debug__:
+                    logger.debug("Registering interface '%s'", name)
                 conn.register_object(
                     PATH_WATCHER,
                     interface,
@@ -397,17 +402,24 @@ class StatusNotifierWatcher:
                 prop_name = params[1] if len(params) >= 1 else None
                 match prop_name:
                     case "ProtocolVersion":
-                        logger.debug("Asked for ProtocolVersion; Returned 1")
+                        if __debug__:
+                            logger.debug(
+                                "Asked for ProtocolVersion; Returned 1"
+                            )
                         invocation.return_value(
                             glib.Variant("(v)", (glib.Variant("i", 1),))
                         )
                     case "IsStatusNotifierHostRegistered":
-                        logger.debug("Asked if host registered; Returned True")
+                        if __debug__:
+                            logger.debug(
+                                "Asked if host registered; Returned True"
+                            )
                         invocation.return_value(
                             glib.Variant("(v)", (glib.Variant("b", True),))
                         )
                     case "RegisteredStatusNotifierItems":
-                        logger.debug("Asked for registered items")
+                        if __debug__:
+                            logger.debug("Asked for registered items")
                         invocation.return_value(
                             glib.Variant(
                                 "(v)",
@@ -417,7 +429,8 @@ class StatusNotifierWatcher:
                     case _:
                         invocation.return_value(None)
             case "GetAll":
-                logger.debug("Asked for all properties")
+                if __debug__:
+                    logger.debug("Asked for all properties")
                 all_properties = {
                     "ProtocolVersion": glib.Variant("i", 1),
                     "IsStatusNotifierHostRegistered": glib.Variant("b", True),
@@ -447,7 +460,11 @@ class StatusNotifierWatcher:
         ):
             return
 
-        logger.debug("Registering tray item: '%s' (%s)", bus_path, bus_name)
+        if __debug__:
+            logger.debug(
+                "Registering tray item: '%s' (%s)",
+                bus_path, bus_name
+            )
         if not bus_path.startswith("/"):
             bus_path = "/StatusNotifierItem"
 
@@ -520,7 +537,8 @@ class StatusNotifierWatcher:
 
 class TrayService(Service):
     def start(self) -> None:
-        logger.debug("Starting system_tray dbus")
+        if __debug__:
+            logger.debug("Starting system_tray dbus")
         watcher = StatusNotifierWatcher()
         watcher.register()
 

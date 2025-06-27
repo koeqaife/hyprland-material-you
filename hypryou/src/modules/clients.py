@@ -51,7 +51,6 @@ class ClientItem(gtk.Box):
         self.add_controller(self.click_gesture)
 
         self.handler_id = self._item.watch("changed", self.on_changed)
-        # weakref.finalize(self, lambda: logger.debug("TrayWidget finalized"))
 
     def on_changed(self, *args: t.Any) -> None:
         self.title.set_label(self._item.title)
@@ -124,7 +123,10 @@ class ClientsBox(gtk.ScrolledWindow):
         )
         self.handler_id = clients.watch(self.update_items)
         self.update_items(clients.value)
-        weakref.finalize(self, lambda: logger.debug("ClientsBox finalized"))
+        if __debug__:
+            weakref.finalize(
+                self, lambda: logger.debug("ClientsBox finalized")
+            )
 
     def update_items(self, new_items: dict[str, Client]) -> None:
         existing_items = set(self.items.keys())
@@ -200,7 +202,10 @@ class ClientsWindow(widget.LayerWindow):
         self._child: ClientsBox | None = None
         self.once_handler = -1
 
-        weakref.finalize(self, lambda: logger.debug("ClientsWindow finalized"))
+        if __debug__:
+            weakref.finalize(
+                self, lambda: logger.debug("ClientsWindow finalized")
+            )
 
     def update_visible(self, is_opened: bool) -> None:
         is_visible = self.get_visible()

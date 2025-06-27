@@ -198,6 +198,7 @@ def download_image_async(
         for cb in callbacks:
             cb(path)
 
-    logger.debug("Downloading new image")
+    if __debug__:
+        logger.debug("Downloading new image")
     os.makedirs(cache_dir, exist_ok=True)
     download_file_async(url, temp_path, finish)

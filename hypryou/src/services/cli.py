@@ -161,7 +161,8 @@ async def handle_client(
     try:
         data = await reader.read(1024)
         message = data.decode()
-        logger.debug("Received message from socket: '%s'", message)
+        if __debug__:
+            logger.debug("Received message from socket: '%s'", message)
 
         response, post = await handle_request(message)
         writer.write(response.encode())
@@ -228,7 +229,8 @@ def create_socket_directory() -> None:
     socket_dir = os.path.dirname(socket_path)
     if not os.path.exists(socket_dir):
         os.makedirs(socket_dir)
-        logger.debug(f"Created directory for socket at {socket_dir}")
+        if __debug__:
+            logger.debug(f"Created directory for socket at {socket_dir}")
 
 
 class CliService(AsyncService):
@@ -257,7 +259,8 @@ class CliService(AsyncService):
         self.server = await asyncio.start_unix_server(
             handle_client, path=socket_path
         )
-        logger.debug("Listening socket on %s", socket_path)
+        if __debug__:
+            logger.debug("Listening socket on %s", socket_path)
 
         try:
             async with self.server:

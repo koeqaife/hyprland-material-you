@@ -68,7 +68,8 @@ def secure_clear() -> None:
     if os.path.exists(db_path):
         subprocess.run(["shred", "-u", db_path], check=True)
     else:
-        logger.debug("Cliphist db file not found, skipping shred.")
+        if __debug__:
+            logger.debug("Cliphist db file not found, skipping shred.")
 
 
 def clear() -> None:

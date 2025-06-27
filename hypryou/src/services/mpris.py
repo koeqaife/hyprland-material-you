@@ -382,19 +382,22 @@ class MprisWatcher:
         )
         player = MprisPlayer(proxy)
         players.value[name] = player
-        logger.debug("Added new mpris player: %s", name)
+        if __debug__:
+            logger.debug("Added new mpris player: %s", name)
 
     def remove_player(self, name: str) -> None:
         if name in players.value:
             player = players.value[name]
             player.finalize()
             del players.value[name]
-            logger.debug("Removed mpris player: %s", name)
+            if __debug__:
+                logger.debug("Removed mpris player: %s", name)
             update_current_player()
 
 
 class MprisService(Service):
     def start(self) -> None:
-        logger.debug("Starting mpris watcher")
+        if __debug__:
+            logger.debug("Starting mpris watcher")
         self.watcher = MprisWatcher()
         self.watcher.scan_existing_players()

@@ -339,7 +339,10 @@ class InfoWindow(widget.LayerWindow):
         )
         self._child: InfoStack | None = None
 
-        weakref.finalize(self, lambda: logger.debug("InfoWindow finalized"))
+        if __debug__:
+            weakref.finalize(
+                self, lambda: logger.debug("InfoWindow finalized")
+            )
 
     def on_show(self) -> None:
         self._child = InfoStack()
