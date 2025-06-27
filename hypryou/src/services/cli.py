@@ -149,6 +149,7 @@ async def handle_client(
         logger.debug("Cli command connection was closed with error: %s", e)
         if writer:
             writer.close()
+            await writer.wait_closed()
 
 
 async def handle_request(data: str) -> tuple[str, t.Callable[[], None] | None]:
