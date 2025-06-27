@@ -24,8 +24,8 @@ tooltip {
     background-color: $surfaceContainer;
     border-radius: 0.75rem;
     outline: none;
-    border: none;
     box-shadow: none;
+    border: 0.0625rem solid $layerBorderColor;
 }
 
 tooltip label {
