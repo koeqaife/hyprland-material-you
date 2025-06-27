@@ -36,7 +36,7 @@ key_binds = (
         Category.TOOLS
     ),
     KeyBind(
-        (main_mod, "X"),
+        (main_mod, "SPACE"),
         ("exec", "hypryouctl toggle_window apps_menu"),
         "App Launcher",
         Category.TOOLS
@@ -45,6 +45,12 @@ key_binds = (
         (main_mod, "W"),
         ("exec", "hypryouctl toggle_window sidebar"),
         "Sidebar",
+        Category.TOOLS
+    ),
+    KeyBind(
+        (main_mod, "A"),
+        ("exec", "hypryouctl toggle_window clients"),
+        "Opened windows",
         Category.TOOLS
     )
 )
