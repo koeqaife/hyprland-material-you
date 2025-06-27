@@ -22,24 +22,21 @@ screenshot_mode_args = {
 }
 
 HELP = {
-    "ping": "Pong!",
+    "ping": "Respond with Pong",
     "reload": "Reload UI",
     "exit": "Exit UI",
-    "sync_settings": "Sync changes in settings.json with UI",
-    "toggle_window": "Toggle window/popup",
+    "sync_settings": "Apply settings.json changes",
+    "toggle_window": "Toggle window/popup visibility",
     "open_window": "Open window/popup",
     "close_window": "Close window/popup",
-    "reload_css": "Reload styles",
-    "player": ("Mini playerctl, sub commands: " +
-               "play-pause, pause, next, previous, play"),
-    "apps": "Open app, available apps: files, editor, terminal, browser",
+    "reload_css": "Reload CSS styles",
+    "player": "Mini playerctl: play-pause, pause, next, prev, play",
+    "apps": "Launch apps: files, editor, terminal, browser",
     "lock": "Lock session",
-    "screenshot": ("Take a screenshot, available modes: " +
-                   "region, active, window. " +
-                   "Use freeze after mode to freeze the screen"),
-    "help": "This message"
+    "screenshot": ("Take screenshot: region, active, " +
+                   "window; add freeze to pause screen"),
+    "help": "Show this help"
 }
-HELP_CACHE = ""
 
 
 def launch_detached(exec: str) -> None:
@@ -149,23 +146,13 @@ class CliRequest:
         return "ok"
 
     def do_help(self, args: str) -> None:
-        global HELP_CACHE
-        if HELP_CACHE:
-            return HELP_CACHE
-        for attr in dir(CliRequest):
-            if attr.startswith("do_"):
-                cmd = attr.removeprefix("do_")
-                callback = getattr(self, attr)
-                if callable(callback) and cmd not in HELP.keys():
-                    logger.warning(f"Command {attr} doesn't have description!")
 
         max_cmd_len = max((len(cmd) for cmd in HELP), default=0)
         output = ""
         for cmd, help in HELP.items():
             padding = " " * (max_cmd_len - len(cmd))
             output += f"{cmd}{padding} -> {help}\n"
-        HELP_CACHE = output
-        return HELP_CACHE
+        return output
 
 
 async def handle_client(
@@ -247,6 +234,17 @@ def create_socket_directory() -> None:
 class CliService(AsyncService):
     def __init__(self) -> None:
         self.server: asyncio.Server | None = None
+
+    async def app_init(self) -> None:
+        for attr in dir(CliRequest):
+            if attr.startswith("do_"):
+                cmd = attr.removeprefix("do_")
+                if cmd not in HELP.keys():
+                    logger.warning(f"Command {attr} doesn't have description!")
+
+        for cmd in HELP.keys():
+            if not hasattr(CliRequest, "do_" + cmd):
+                logger.warning(f"Command {cmd} is not implemented!")
 
     async def start(self) -> None:
         if os.path.exists(socket_path):
