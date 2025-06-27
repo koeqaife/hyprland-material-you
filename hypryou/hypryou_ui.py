@@ -109,12 +109,17 @@ class HyprYou(gtk.Application):
     async def init_services(self) -> None:
         for service in services:
             try:
+                if __debug__:
+                    logger.debug(
+                        "Starting service %s",
+                        type(service).__name__
+                    )
                 if isinstance(service, AsyncService):
                     await service.app_init()
                 elif isinstance(service, Service):
                     service.app_init()
                 else:
-                    logger.critical(
+                    logger.error(
                         "Unknown type of service: %s; Couldn't init.",
                         service
                     )
@@ -146,11 +151,12 @@ class HyprYou(gtk.Application):
                 if colors.wallpaper == Settings().get("wallpaper"):
                     utils.apply_css()
                 else:
-                    logger.warning(
-                        "Settings wallpaper and " +
-                        "colors wallpaper are different. " +
-                        "Generating new colors."
-                    )
+                    if __debug__:
+                        logger.debug(
+                            "Settings wallpaper and " +
+                            "colors wallpaper are different. " +
+                            "Generating new colors."
+                        )
                     utils.colors.generate_by_last_wallpaper()
             else:
                 raise ValueError
@@ -167,6 +173,11 @@ class HyprYou(gtk.Application):
         self.update_monitors()
         for window_type in popups_types:
             try:
+                if __debug__:
+                    logger.debug(
+                        "Creating window %s",
+                        window_type.__name__
+                    )
                 self.add_window(window_type(self))
             except Exception as e:
                 logger.error(
