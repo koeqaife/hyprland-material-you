@@ -48,4 +48,3 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 
 - Settings
 - Greetd
-- Clients (Windows)
