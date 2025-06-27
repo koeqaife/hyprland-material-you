@@ -111,6 +111,9 @@ class CliRequest:
 
     def do_screenshot(self, _mode: str) -> str:
         mode = _mode.split()[0] if _mode else "region"
+        if mode not in screenshot_mode_args:
+            modes = ", ".join(screenshot_mode_args.keys())
+            return f"Couldn't find mode {mode}. All modes: {modes}"
         args = []
         args.append(screenshot_mode_args[mode])
         if "freeze" in _mode:
@@ -153,7 +156,9 @@ async def handle_client(
 
 
 async def handle_request(data: str) -> tuple[str, t.Callable[[], None] | None]:
-    command, args = data.split(" ", 1) if " " in data else (data, "")
+    parts = data.strip().split(" ", 1)
+    command = parts[0]
+    args = parts[1] if len(parts) > 1 else ""
     attr = "do_" + command
     post_attr = "post_" + command
     request = CliRequest()
