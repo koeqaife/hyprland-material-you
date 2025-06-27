@@ -8,6 +8,7 @@ import typing as t
 import json
 from config import HyprlandVars
 from utils.service import Signals, AsyncService
+from repository import gio, gtk, gdk
 
 active_workspace = Ref(0, name="workspace", delayed_init=True)
 active_layout = Ref("en", name="active_layout", delayed_init=True)
@@ -19,10 +20,15 @@ workspace_ids = Ref[set[int]](
     name="workspace_ids",
     delayed_init=True
 )
+clients = Ref[dict[str, "Client"]](
+    {},
+    name="hyprland_clients"
+)
+clients_use_counter = 0
 initialized = Ref(False)
 
 
-HyprlandQueryType = t.Literal[
+type HyprlandQueryType = t.Literal[
     "activewindow",
     "activeworkspace",
     "clients",
@@ -36,6 +42,215 @@ HyprlandQueryType = t.Literal[
     "splash",
     "workspaces"
 ]
+
+
+ClientWorkspace = t.TypedDict(
+    "ClientWorkspace",
+    {
+        "id": int,
+        "name": str
+    }
+)
+
+ClientDict = t.TypedDict(
+    "Client",
+    {
+        "address": str,
+        "mapped": bool,
+        "hidden": bool,
+        "at": list[int],
+        "size": list[int],
+        "workspace": ClientWorkspace,
+        "floating": bool,
+        "pseudo": bool,
+        "monitor": int,
+        "class": str,
+        "title": str,
+        "initialClass": str,
+        "initialTitle": str,
+        "pid": int,
+        "xwayland": bool,
+        "pinned": bool,
+        "fullscreen": int,
+        "fullscreenClient": int,
+        "grouped": list[str],
+        "tags": list[t.Any],
+        "swallowing": str,
+        "focusHistoryId": int,
+        "inhibitingIdle": bool,
+        "xdgTag": str,
+        "xdgDescription": str,
+    }
+)
+
+
+class Client(Signals):
+    def __init__(self, client: ClientDict) -> None:
+        super().__init__()
+        self._data = client
+
+    def sync(self) -> None:
+        async def async_task() -> None:
+            data = await get_client_dict_by_address(self.address)
+            if data is None:
+                await clients_full_sync()
+            else:
+                self._data = data
+                self.notify("changed")
+
+        asyncio.create_task(async_task)
+
+    def get_icon(self) -> gtk.IconPaintable | None:
+        app_id = self.initial_class
+        try:
+            app_ids = {
+                app_id.replace(" ", "-").lower(),
+                app_id.lower(),
+                str(app_id),
+                f"{app_id}.desktop",
+            }
+            desktop_file = None
+            for app_id in app_ids:
+                try:
+                    desktop_file = gio.DesktopAppInfo(app_id)
+                    if desktop_file is not None:
+                        break
+                except TypeError:
+                    continue
+
+            if not desktop_file:
+                for info in gio.AppInfo.get_all():
+                    if info.get_id().lower().startswith(app_id.lower()):
+                        desktop_file = info
+                        break
+
+            if not desktop_file:
+                return None
+
+            icon = desktop_file.get_icon()
+            icon_name = icon.to_string() if icon else app_id.lower()
+
+            display = gdk.Display.get_default()
+            theme = gtk.IconTheme.get_for_display(display)
+            return theme.lookup_icon(
+                icon_name,
+                None,
+                48,
+                1,
+                gtk.TextDirection.LTR,
+                gtk.IconLookupFlags.FORCE_SYMBOLIC,
+            )
+        except Exception as e:
+            logger.warning("Couldn't find icon for %s", app_id, exc_info=e)
+            return None
+
+    @property
+    def workspace_id(self) -> int:
+        return self._data["workspace"]["id"]
+
+    @property
+    def workspace_name(self) -> str:
+        return self._data["workspace"]["name"]
+
+    @property
+    def address(self) -> str:
+        return self._data["address"]
+
+    @property
+    def mapped(self) -> bool:
+        return self._data["mapped"]
+
+    @property
+    def hidden(self) -> bool:
+        return self._data["hidden"]
+
+    @property
+    def at(self) -> tuple[int, int]:
+        return tuple(self._data["at"])
+
+    @property
+    def size(self) -> tuple[int, int]:
+        return tuple(self._data["size"])
+
+    @property
+    def workspace(self) -> ClientWorkspace:
+        return self._data["workspace"]
+
+    @property
+    def floating(self) -> bool:
+        return self._data["floating"]
+
+    @property
+    def pseudo(self) -> bool:
+        return self._data["pseudo"]
+
+    @property
+    def monitor(self) -> int:
+        raise NotImplementedError("Not synced")
+
+    @property
+    def class_(self) -> str:
+        return self._data["class"]
+
+    @property
+    def title(self) -> str:
+        return self._data["title"]
+
+    @property
+    def initial_class(self) -> str:
+        return self._data["initialClass"]
+
+    @property
+    def initial_title(self) -> str:
+        return self._data["initialTitle"]
+
+    @property
+    def pid(self) -> int:
+        return self._data["pid"]
+
+    @property
+    def xwayland(self) -> bool:
+        return self._data["xwayland"]
+
+    @property
+    def pinned(self) -> bool:
+        return self._data["pinned"]
+
+    @property
+    def fullscreen(self) -> int:
+        raise NotImplementedError("Not synced")
+
+    @property
+    def fullscreen_client(self) -> int:
+        raise NotImplementedError("Not synced")
+
+    @property
+    def grouped(self) -> list[str]:
+        raise NotImplementedError("Not synced")
+
+    @property
+    def tags(self) -> list[t.Any]:
+        return self._data["tags"]
+
+    @property
+    def swallowing(self) -> str:
+        return self._data["swallowing"]
+
+    @property
+    def focus_history_id(self) -> int:
+        return self._data["focusHistoryId"]
+
+    @property
+    def inhibiting_idle(self) -> bool:
+        raise NotImplementedError("Not synced")
+
+    @property
+    def xdg_tag(self) -> str:
+        return self._data["xdgTag"]
+
+    @property
+    def xdg_description(self) -> str:
+        return self._data["xdgDescription"]
 
 
 class SocketType(int, Enum):
@@ -163,6 +378,88 @@ class EventCallbacks:
         if int(workspace_id) in workspace_ids.value:
             workspace_ids.value.remove(int(workspace_id))
 
+    @staticmethod
+    def on_openwindow(
+        window_address: str,
+        workspace_name: str,
+        window_class: str,
+        *_window_title: str
+    ) -> None:
+        if clients_use_counter == 0:
+            return
+
+        async def async_task() -> None:
+            client = await get_client_by_address(window_address)
+            if client is None:
+                await clients_full_sync()
+            else:
+                clients.value[window_address] = client
+
+        asyncio.create_task(async_task())
+
+    @staticmethod
+    def on_movewindowv2(
+        window_address: str,
+        workspace_id: str,
+        workspace_name: str
+    ) -> None:
+        if clients_use_counter == 0:
+            return
+
+        if window_address in clients.value.keys():
+            _client = clients.value[window_address]
+            _client._data["workspace"]["id"] = int(workspace_id)
+            _client._data["workspace"]["name"] = int(workspace_name)
+            _client.notify("changed")
+        else:
+            asyncio.create_task(clients_full_sync())
+
+    @staticmethod
+    def on_windowtitlev2(
+        window_address: str,
+        *_window_title: str
+    ) -> None:
+        if clients_use_counter == 0:
+            return
+
+        window_title = ",".join(_window_title)
+        if window_address in clients.value.keys():
+            _client = clients.value[window_address]
+            _client._data["title"] = window_title
+            _client.notify("changed")
+        else:
+            # NOTE: I would use clients_full_sync() here
+            # but Hyprland can sometimes send this event
+            # before openwindow event
+            pass
+
+    @staticmethod
+    def on_pin(
+        window_address: str,
+        pin_state: bool
+    ) -> None:
+        if clients_use_counter == 0:
+            return
+
+        if window_address in clients.value.keys():
+            _client = clients.value[window_address]
+            _client._data["pinned"] = pin_state
+            _client.notify("changed")
+        else:
+            asyncio.create_task(clients_full_sync())
+
+    @staticmethod
+    def on_closewindow(
+        window_address: str
+    ) -> None:
+        if clients_use_counter == 0:
+            return
+
+        if window_address in clients.value.keys():
+            clients.value.pop(window_address)
+        else:
+            asyncio.create_task(clients_full_sync())
+
 
 class Keyboard(t.TypedDict):
     address: str
@@ -226,6 +523,64 @@ def change_night_light(value: bool) -> None:
         )
 
 
+async def get_client_by_address(addr: str) -> Client | None:
+    output: list[ClientDict] = await client.query("clients")
+    if not addr.startswith("0x"):
+        addr = "0x" + addr
+
+    for _client in output:
+        if _client["address"] == addr:
+            return Client(_client)
+    return None
+
+
+async def get_client_dict_by_address(addr: str) -> ClientDict | None:
+    output: list[ClientDict] = await client.query("clients")
+
+    for _client in output:
+        if _client["address"] == addr:
+            return _client
+    return None
+
+
+async def clients_full_sync() -> None:
+    output: list[ClientDict] = await client.query("clients")
+    addresses: list[str] = []
+
+    for _client in output:
+        address = _client["address"].lstrip("0x")
+        if address in clients.value:
+            clients.value[address]._data = _client
+            clients.value[address].notify("changed")
+        else:
+            clients.value[address] = Client(_client)
+        addresses.append(address)
+
+    for client_address in set(clients.value.keys()):
+        if client_address not in addresses:
+            clients.value.pop(client_address)
+
+    clients._signals.notify("synced", clients.value)
+
+
+def acquire_clients() -> None:
+    global clients_use_counter
+    if clients_use_counter < 0:
+        clients_use_counter = 0
+        logger.warning("Acquire: Clients counter < 0")
+    clients_use_counter += 1
+    if clients_use_counter == 1:
+        asyncio.create_task(clients_full_sync())
+
+
+def release_clients() -> None:
+    global clients_use_counter
+    clients_use_counter -= 1
+    if clients_use_counter < 0:
+        clients_use_counter = 0
+        logger.warning("Release: Clients counter < 0")
+
+
 async def init() -> None:
     global client
     client = HyprlandClient()
@@ -243,6 +598,8 @@ async def init() -> None:
     workspace_ids.value = set(_active_workspaces)
     workspace_ids.ready()
 
+    await clients_full_sync()
+
     try:
         _temperature = await client.raw(
             "temperature", SocketType.HYPRSUNSET, 2.0
@@ -258,11 +615,12 @@ async def init() -> None:
         logger.error("Couldn't connect to hyprsunset", exc_info=e)
 
     logger.debug("Creating hyprland watchers")
-    client.watch("workspacev2", EventCallbacks.on_workspacev2)
-    client.watch("focusedmonv2", EventCallbacks.on_focusedmonv2)
-    client.watch("createworkspacev2", EventCallbacks.on_createworkspacev2)
-    client.watch("destroyworkspacev2", EventCallbacks.on_destroyworkspacev2)
-    client.watch("activelayout", EventCallbacks.on_activelayout)
+    for attr in dir(EventCallbacks):
+        if attr.startswith("on_"):
+            callback = getattr(EventCallbacks, attr)
+            if callable(callback):
+                event = attr[3:]
+                client.watch(event, callback)
 
     gaps_out_query = await client.query("getoption general:gaps_out")
     rounding_query = await client.query("getoption decoration:rounding")

@@ -51,6 +51,7 @@ from src.modules.popups import PopupsWindow
 from src.modules.audio import AudioWindow
 from src.modules.audio import MicsWindow
 from src.modules.info import InfoWindow
+from src.modules.clients import ClientsWindow
 
 START = time.perf_counter()
 
@@ -83,7 +84,8 @@ popups_types = (
     BrightnessWindow,
     AudioWindow,
     MicsWindow,
-    InfoWindow
+    InfoWindow,
+    ClientsWindow
 )
 
 windows_types = (
