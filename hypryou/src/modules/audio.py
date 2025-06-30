@@ -108,20 +108,15 @@ class EndpointItem(gtk.Box):
         self.popover.set_has_arrow(False)
         self.update_menu()
 
-        self.install_action("set_default", None, self.set_default)
-        self.install_action("mute", None, self.toggle_mute)
-
         self.update_scale_value()
         self.on_muted()
         self.on_default()
 
-    @staticmethod
-    def set_default(self: "EndpointItem", *args: t.Any) -> None:
+    def set_default(self, *args: t.Any) -> None:
         self.node.set_is_default(True)
         self.update_menu()
 
-    @staticmethod
-    def toggle_mute(self: "EndpointItem", *args: t.Any) -> None:
+    def toggle_mute(self, *args: t.Any) -> None:
         self.node.set_mute(not self.node.get_mute())
         self.update_menu()
 
@@ -203,6 +198,10 @@ class EndpointItem(gtk.Box):
         self.scale.disconnect(self.scale_handler)
         self.click_gesture.disconnect(self.gesture_conn)
         self.remove_controller(self.click_gesture)
+
+
+EndpointItem.install_action("set_default", None, EndpointItem.set_default)
+EndpointItem.install_action("mute", None, EndpointItem.toggle_mute)
 
 
 class StreamItem(gtk.Box):
