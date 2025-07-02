@@ -76,7 +76,7 @@ class WifiToggle(RowTemplate):
     def on_switch_changed(self, *args: t.Any) -> None:
         wifi = self.network.wifi
         if wifi:
-            wifi.enabled = not wifi.enabled
+            wifi.enabled = self.switch.get_active()
 
     def destroy(self) -> None:
         super().destroy()
