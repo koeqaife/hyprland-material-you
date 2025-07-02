@@ -4,6 +4,7 @@ from repository import gtk, gdk, gio, glib
 import time
 import typing as t
 import logging
+import os
 
 import utils
 from utils.logger import logger
@@ -265,6 +266,7 @@ def init() -> None:
         )
         exit(1)
 
+    os.nice(5)
     settings = Settings()
     asyncio.set_event_loop_policy(GLibEventLoopPolicy())
     display = gdk.Display.get_default()
