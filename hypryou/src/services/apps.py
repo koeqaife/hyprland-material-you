@@ -26,13 +26,13 @@ def launch_detached(exec: str) -> None:
         logger.debug("Running %s", exec)
 
     parts = exec.split(" -- ", maxsplit=1)
-    cmd_part = parts[0]
+    exec = parts[0]
 
     placeholders = (
         "%u", "%U", "%f", "%F", "%i", "%c", "%k", "%%", "@@u", "@@"
     )
     for placeholder in placeholders:
-        exec = cmd_part.replace(placeholder, "")
+        exec = exec.replace(placeholder, "")
     if __debug__:
         logger.debug("Running %s", exec)
 
