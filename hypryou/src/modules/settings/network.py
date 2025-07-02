@@ -331,6 +331,8 @@ class NetworkPage(gtk.ScrolledWindow):
         if not self.once_scan:
             self.scan_wifi()
             self.once_scan = True
+        if self.timeout_id != -1:
+            glib.source_remove(self.timeout_id)
         self.timeout_id = glib.timeout_add(60000, self.scan_wifi)
 
     def on_hide(self) -> None:
@@ -339,5 +341,6 @@ class NetworkPage(gtk.ScrolledWindow):
             self.timeout_id = -1
 
     def destroy(self) -> None:
+        self.on_hide()
         self.toggle.destroy()
         self.list.destroy()
