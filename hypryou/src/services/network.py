@@ -426,12 +426,11 @@ class Wifi(Signals):
 
     def on_access_point_removed(self, _: t.Any, ap: nm.AccessPoint) -> None:
         bssid = ap.get_bssid()
-        ssid = ap.get_ssid()
         if bssid in self.access_points:
             self.access_points[bssid].dispose()
             del self.access_points[bssid]
             self.notify("access-points")
-            self.notify("access-point-removed", ssid, bssid)
+            self.notify("access-point-removed", bssid)
 
     def on_active_connection(self, *_: t.Any) -> None:
         if self.connection_handler > 0 and self.active_connection:

@@ -186,6 +186,7 @@ class WifiList(gtk.Box):
     def __init__(self) -> None:
         self.network = get_network()
         self.wifi = self.network.wifi
+        self.bssid_ssid_map: dict[str, str] = {}
         super().__init__(
             css_classes=("wifi-list",),
             vexpand=True,
@@ -201,6 +202,7 @@ class WifiList(gtk.Box):
             return
         self.items: dict[str, AccessPointRow] = {}
         for ap in self.network.wifi.access_points.values():
+            self.bssid_ssid_map[ap.bssid] = ap.ssid
             if ap.ssid in self.items.keys():
                 self.items[ap.ssid].add_ap(ap)
                 continue
@@ -264,6 +266,9 @@ class WifiList(gtk.Box):
             )
 
     def on_ap_added(self, ap: AccessPoint, bssid: str) -> None:
+        if ap.ssid is None:
+            return
+        self.bssid_ssid_map[bssid] = ap.ssid
         if ap.ssid in self.items.keys():
             self.items[ap.ssid].add_ap(ap)
             return
@@ -271,14 +276,20 @@ class WifiList(gtk.Box):
         self.items[ap.ssid] = row
         self.append(row)
 
-    def on_ap_rem(self, ssid: str, bssid: str) -> None:
+    def on_ap_rem(self, bssid: str) -> None:
+        ssid = self.bssid_ssid_map.pop(bssid, None)
+        if ssid is None:
+            return
         if ssid not in self.items.keys():
             return
         row = self.items[ssid]
         left = row.rem_ap(bssid)
         if left <= 0:
+            if self._last_active_ap and row is self._last_active_ap[1]:
+                self._last_active_ap = None
             row.destroy()
             self.remove(row)
+            del self.items[ssid]
 
     def destroy(self) -> None:
         if not hasattr(self, "wifi_handlers"):
