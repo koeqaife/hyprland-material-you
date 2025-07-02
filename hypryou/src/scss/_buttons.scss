@@ -26,10 +26,16 @@ button.filled {
     &:active {
         background-color: color.mix($primary, $inverseOnSurface, 75%);
     }
+    &:disabled {
+        background-color: color.mix($onSurface, transparent, 12%);
+        label {
+            color: color.mix($onSurface, transparent, 38%);
+        }
+    }
 }
 
 button.elevated {
-    @include elevation(1);
+    @include elevation(2);
     border-radius: 2rem;
     min-height: 2rem;
     padding-left: 1.25rem;
@@ -47,10 +53,49 @@ button.elevated {
         font-variation-settings: "opsz" 20;
     }
     &:hover {
-        background-color: color.mix($surfaceContainerLow, $inverseOnSurface, 82%);
+        @include elevation(3);
+        background-color: color.mix($surfaceContainerLow, $primary, 92%);
     }
     &:active {
-        background-color: color.mix($surfaceContainerLow, $inverseOnSurface, 75%);
+        background-color: color.mix($surfaceContainerLow, $primary, 90%);
+    }
+    &:disabled {
+        box-shadow: none;
+        background-color: color.mix($onSurface, transparent, 12%);
+        label {
+            color: color.mix($onSurface, transparent, 38%);
+        }
+    }
+}
+
+button.text {
+    border-radius: 2rem;
+    min-height: 2rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    background-color: transparent;
+
+    label {
+        font-size: 1rem;
+        font-weight: 400;
+        color: $primary;
+    }
+    .icon {
+        font-weight: 500;
+        margin-right: 0.5rem;
+        font-variation-settings: "opsz" 20;
+    }
+    &:hover {
+        background-color: color.mix(transparent, $primary, 92%);
+    }
+    &:active {
+        background-color: color.mix(transparent, $primary, 90%);
+    }
+    &:disabled {
+        background-color: color.mix($onSurface, transparent, 12%);
+        label {
+            color: color.mix($onSurface, transparent, 38%);
+        }
     }
 }
 
@@ -72,10 +117,17 @@ button.outlined {
         font-variation-settings: "opsz" 20;
     }
     &:hover {
-        background-color: color.mix(transparent, $onSurfaceVariant, 92%);
+        background-color: color.mix($surfaceContainerLow, $primary, 92%);
     }
     &:active {
-        background-color: color.mix(transparent, $onSurfaceVariant, 90%);
+        background-color: color.mix($surfaceContainerLow, $primary, 90%);
+    }
+    &:disabled {
+        box-shadow: none;
+        border-color: color.mix($onSurface, transparent, 12%);
+        label {
+            color: color.mix($onSurface, transparent, 38%);
+        }
     }
 }
 
@@ -102,6 +154,13 @@ button.attention {
     &:active {
         background-color: color.mix($error, $inverseOnSurface, 75%);
     }
+    &:disabled {
+        box-shadow: none;
+        background-color: color.mix($error, transparent, 12%);
+        label {
+            color: color.mix($error, transparent, 38%);
+        }
+    }
 }
 
 button.attention-outlined {
@@ -127,6 +186,13 @@ button.attention-outlined {
     &:active {
         background-color: color.mix(transparent, $onSurfaceVariant, 90%);
     }
+    &:disabled {
+        box-shadow: none;
+        border-color: color.mix($error, transparent, 12%);
+        label {
+            color: color.mix($error, transparent, 38%);
+        }
+    }
 }
 
 button.icon-outlined {
@@ -146,6 +212,13 @@ button.icon-outlined {
     }
     &:active {
         background-color: color.mix(transparent, $onSurfaceVariant, 90%);
+    }
+    &:disabled {
+        box-shadow: none;
+        border-color: color.mix($onSurface, transparent, 12%);
+        label {
+            color: color.mix($onSurface, transparent, 38%);
+        }
     }
 }
 
@@ -167,6 +240,13 @@ button.icon-outlined-attention {
     &:active {
         background-color: color.mix(transparent, $onSurfaceVariant, 90%);
     }
+    &:disabled {
+        box-shadow: none;
+        border-color: color.mix($error, transparent, 12%);
+        label {
+            color: color.mix($error, transparent, 38%);
+        }
+    }
 }
 
 button.icon-default {
@@ -177,13 +257,46 @@ button.icon-default {
     label {
         font-size: 1.125rem;
         font-weight: 400;
-        color: $onSurface;
+        color: $primary;
     }
     &:hover {
-        background-color: color.mix(transparent, $onSurfaceVariant, 92%);
+        background-color: color.mix(transparent, $primary, 92%);
     }
     &:active {
-        background-color: color.mix(transparent, $onSurfaceVariant, 90%);
+        background-color: color.mix(transparent, $primary, 90%);
+    }
+    &:disabled {
+        background-color: color.mix($onSurface, transparent, 12%);
+        label {
+            color: color.mix($onSurface, transparent, 38%);
+        }
+    }
+}
+
+button.icon-elevated {
+    @include elevation(2);
+    min-height: 2rem;
+    min-width: 2rem;
+    border-radius: 2rem;
+
+    label {
+        font-size: 1.125rem;
+        font-weight: 400;
+        color: $primary;
+    }
+    &:hover {
+        @include elevation(3);
+        background-color: color.mix($surfaceContainerLow, $primary, 92%);
+    }
+    &:active {
+        background-color: color.mix($surfaceContainerLow, $primary, 90%);
+    }
+    &:disabled {
+        box-shadow: none;
+        background-color: color.mix($onSurface, transparent, 12%);
+        label {
+            color: color.mix($onSurface, transparent, 38%);
+        }
     }
 }
 
