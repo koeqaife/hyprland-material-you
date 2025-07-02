@@ -35,7 +35,7 @@ button.filled {
 }
 
 button.elevated {
-    @include elevation(2);
+    @include elevation(1);
     border-radius: 2rem;
     min-height: 2rem;
     padding-left: 1.25rem;
@@ -53,7 +53,7 @@ button.elevated {
         font-variation-settings: "opsz" 20;
     }
     &:hover {
-        @include elevation(3);
+        @include elevation(2);
         background-color: color.mix($surfaceContainerLow, $primary, 92%);
     }
     &:active {
@@ -274,10 +274,11 @@ button.icon-default {
 }
 
 button.icon-elevated {
-    @include elevation(2);
+    @include elevation(1);
     min-height: 2rem;
     min-width: 2rem;
     border-radius: 2rem;
+    background-color: $surfaceContainerLow;
 
     label {
         font-size: 1.125rem;
@@ -285,7 +286,7 @@ button.icon-elevated {
         color: $primary;
     }
     &:hover {
-        @include elevation(3);
+        @include elevation(2);
         background-color: color.mix($surfaceContainerLow, $primary, 92%);
     }
     &:active {
