@@ -46,5 +46,7 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 
 ## Things left to do
 
-- Settings
+- Settings (currently WIP)
+- Emoji picker
 - Greetd
+- PKGBUILD
