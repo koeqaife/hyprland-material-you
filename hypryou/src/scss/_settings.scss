@@ -46,10 +46,6 @@ window.settings {
                 &.icon-fill .icon {
                     font-variation-settings: "opsz" 20, "FILL" 1;
                 }
-                &:not(.icon-fill) .icon {
-                    font-weight: 500;
-                    font-variation-settings: "opsz" 20;
-                }
 
                 &:hover {
                     background-color: color.mix($secondaryContainer, $onSurfaceVariant, 88%);
