@@ -181,7 +181,7 @@ state_map = {
 
 
 class WifiList(gtk.Box):
-    __gtype_name__ = "WifiList"
+    __gtype_name__ = "SettingsWifiList"
 
     def __init__(self) -> None:
         self.network = get_network()
