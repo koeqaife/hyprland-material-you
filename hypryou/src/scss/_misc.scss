@@ -5,6 +5,7 @@
 
 * {
     transition: all 0.25s ease-in-out;
+    transition-property: background, background-color, color, border-color, outline-color;
 }
 
 window {
@@ -18,6 +19,12 @@ box {
     background-color: transparent;
     padding: 0;
     margin: 0;
+}
+
+separator {
+    background-color: $outlineVariant;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
 }
 
 tooltip {
@@ -100,5 +107,79 @@ scale {
         margin-bottom: -0.875rem;
         border-radius: 0.875rem;
         background-color: $primary;
+    }
+}
+
+switch {
+    border: 0.125rem solid;
+    min-height: 1.25rem;
+    border-radius: 1.5rem;
+    border-color: $outline;
+    background-color: $surfaceContainerHighest;
+
+    slider {
+        border-radius: 50%;
+        background-color: $outline;
+    }
+
+    &:disabled {
+        background-color: $surfaceContainerHighest;
+        border-color: $onSurface;
+        slider {
+            background-color: $onSurface;
+        }
+    }
+
+    &:hover {
+        background-color: color.mix($surfaceContainerHighest, $onSurface, 92%);
+
+        slider {
+            background-color: $onSurfaceVariant;
+        }
+    }
+
+    &:active {
+        background-color: color.mix($surfaceContainerHighest, $onSurface, 92%);
+
+        slider {
+            background-color: $onSurfaceVariant;
+        }
+    }
+
+    &:checked {
+        background-color: $primary;
+        border-color: $primary;
+
+        slider {
+            background-color: $onPrimary;
+        }
+
+        &:disabled {
+            background-color: $onSurface;
+            border-color: $onSurface;
+
+            slider {
+                background-color: $surface;
+            }
+        }
+
+        &:hover {
+            background-color: $primary;
+            border-color: $primary;
+
+            slider {
+                background-color: $primaryContainer;
+            }
+        }
+
+        &:active {
+            background-color: $primary;
+            border-color: $primary;
+
+            slider {
+                background-color: $primaryContainer;
+                border-color: $primaryContainer;
+            }
+        }
     }
 }
