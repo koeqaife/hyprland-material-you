@@ -12,13 +12,16 @@ items = Ref[dict[str, str]]({}, name="cliphist_items")
 
 
 def get() -> dict[str, str]:
-    result = subprocess.run(
-        ["cliphist", "list"],
-        capture_output=True,
-        text=True,
-        check=True,
-        encoding="utf-8",
-    )
+    try:
+        result = subprocess.run(
+            ["cliphist", "list"],
+            capture_output=True,
+            text=True,
+            check=True,
+            encoding="utf-8",
+        )
+    except subprocess.CalledProcessError:
+        return {}
 
     lines = result.stdout.strip().splitlines()[:250]
 
