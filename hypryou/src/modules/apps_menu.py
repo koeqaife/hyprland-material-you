@@ -161,6 +161,8 @@ class AppsBox(gtk.Box):
         for key, item in self._apps.items():
             item.destroy()
             self.list.remove(item)
+        for handler in self.entry_handlers:
+            self.entry.disconnect(handler)
         apps.unwatch(self.handler_id)
         cache_icon.cache_clear()
 
