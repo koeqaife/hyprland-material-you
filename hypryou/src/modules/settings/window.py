@@ -65,6 +65,12 @@ pages = {
         icon_fill=True,
         widget=NotImplementedYet
     ),
+    "monitors": Page(
+        title="Monitors",
+        icon="monitor",
+        icon_fill=True,
+        widget=NotImplementedYet
+    ),
     "sleep": Page(
         title="Sleep",
         icon="power_settings_circle",
@@ -74,6 +80,18 @@ pages = {
     "apps": Page(
         title="Apps",
         icon="settings_applications",
+        icon_fill=True,
+        widget=NotImplementedYet
+    ),
+    "hyprland": Page(
+        title="Hyprland",
+        icon="tune",
+        icon_fill=False,
+        widget=NotImplementedYet
+    ),
+    "keybinds": Page(
+        title="Keybinds",
+        icon="action_key",
         icon_fill=True,
         widget=NotImplementedYet
     ),
@@ -93,8 +111,12 @@ sidebar = (
     "wallpaper",
     "separator",
     "input",
+    "monitors",
     "sleep",
     "apps",
+    "separator",
+    "hyprland",
+    "keybinds",
     "separator",
     "info"
 )
