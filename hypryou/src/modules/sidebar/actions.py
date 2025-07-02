@@ -2,8 +2,7 @@ from repository import gtk, glib
 from utils import Ref
 import typing as t
 import subprocess
-from utils.logger import logger
-from src.services.state import close_window, open_window
+from src.services.state import close_window, open_window, open_settings
 from src import widget
 
 
@@ -19,8 +18,8 @@ def open_power_menu(*_: t.Any) -> None:
     open_window("power_menu")
 
 
-def open_settings(*_: t.Any) -> None:
-    logger.warning("Not implemented yet")
+def _open_settings(*_: t.Any) -> None:
+    open_settings()
 
 
 class ActionButton(gtk.Button):
@@ -59,7 +58,7 @@ class Actions(gtk.Box):
             "power_settings_new", open_power_menu
         )
         self.settings = ActionButton(
-            "settings", open_settings
+            "settings", _open_settings
         )
         self.children = (
             self.color_picker,

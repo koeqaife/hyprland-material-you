@@ -32,6 +32,7 @@ from src.services.login1 import Login1ManagerService
 from src.services.backlight import BacklightService
 from src.services.audio import AudioService
 from src.services.clock import ClockService
+from src.services.network import NetworkService, SecretPromptHandler
 
 import src.services.cliphist as cliphist
 
@@ -52,12 +53,15 @@ from src.modules.audio import AudioWindow
 from src.modules.audio import MicsWindow
 from src.modules.info import InfoWindow
 from src.modules.clients import ClientsWindow
+from src.modules.settings.window import SettingsWatcher
+from src.modules.wifi_secrets import SecretsDialog
 
 START = time.perf_counter()
 
 services: tuple[AsyncService | Service, ...] = (
     StateService(),
     DBusService(),
+    NetworkService(),
     HyprlandService(),
     HyprlandConfigService(),
     NotificationsService(),
@@ -105,6 +109,7 @@ class HyprYou(gtk.Application):
 
         self.hold()
         asyncio.create_task(self.start_app())
+        Globals.app = self
 
     async def init_services(self) -> None:
         for service in services:
@@ -185,6 +190,8 @@ class HyprYou(gtk.Application):
                     window_type.__name__, exc_info=e
                 )
         self.screen_lock = ScreenLock(self)
+        self.settings_watcher = SettingsWatcher(self)
+        SecretPromptHandler.set_widget(SecretsDialog)
 
         logger.info(
             "Started in " +
@@ -275,9 +282,7 @@ def main() -> None:
     if __debug__:
         logger.debug("Starting app")
     app = HyprYou(application_id="com.koeqaife.hypryou")
-
     app.run(None)
-    Globals.app = app
 
 
 if __name__ == "__main__":

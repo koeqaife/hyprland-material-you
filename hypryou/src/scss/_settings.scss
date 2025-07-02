@@ -1,0 +1,164 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "calculated" as *;
+@use "sass:color";
+
+window.settings {
+    @include nLayerBackground($background, 1);
+    min-width: 45rem;
+    min-height: 29.51rem;
+
+    .settings-sidebar {
+        @include nLayerBackground($surfaceContainer, 2);
+        min-width: 14rem;
+
+        .sidebar-button {
+            border-radius: 2.75rem;
+            min-height: 2.75rem;
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+            margin-right: 0.5rem;
+            margin-left: 0.5rem;
+            &:not(.next-separator) {
+                margin-bottom: 0.25rem;
+            }
+
+            &:last-child {
+                margin-bottom: 0.5rem;
+            }
+
+            label {
+                font-size: 1rem;
+                font-weight: 400;
+            }
+            .icon {
+                font-size: 1.25rem;
+                font-weight: 500;
+                margin-right: 0.5rem;
+                font-variation-settings: "opsz" 20;
+            }
+
+            &.active {
+                background-color: $secondaryContainer;
+                label {
+                    color: $onSecondaryContainer;
+                }
+                &.icon-fill .icon {
+                    font-variation-settings: "opsz" 20, "FILL" 1;
+                }
+                &:not(.icon-fill) .icon {
+                    font-weight: 500;
+                    font-variation-settings: "opsz" 20;
+                }
+
+                &:hover {
+                    background-color: color.mix($secondaryContainer, $onSurfaceVariant, 88%);
+                }
+                &:active {
+                    background-color: color.mix($secondaryContainer, $onSurfaceVariant, 80%);
+                }
+            }
+
+            &:not(.active) {
+                background-color: transparent;
+                label {
+                    color: $onSurface;
+                }
+
+                &:hover {
+                    background-color: color.mix(transparent, $onSurfaceVariant, 92%);
+                }
+                &:active {
+                    background-color: color.mix(transparent, $onSurfaceVariant, 90%);
+                }
+            }
+        }
+    }
+    .close {
+        margin-right: 0.25rem;
+    }
+    .page-title {
+        font-size: 1.125rem;
+        font-weight: 400;
+        color: $onSurface;
+        margin: 0.5rem 1.25rem;
+    }
+    .settings-title {
+        font-size: 1.5rem;
+        font-weight: 400;
+        color: $onSurface;
+        margin: 0.5rem 1.25rem;
+    }
+
+    .settings-row {
+        @include elevation(1);
+        @include nLayerBackground($surfaceContainer, 2);
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+
+        padding: 0.5rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        border-radius: max(calc($hyprlandRounding - 0.5rem), 0.25rem);
+
+        .label {
+            font-size: 1rem;
+            font-weight: 400;
+            color: $onSurface;
+        }
+        .description {
+            font-size: 0.825rem;
+            font-weight: 300;
+            color: $onSurfaceVariant;
+            font-family: "Google Sans Text";
+        }
+
+        &:hover {
+            background-color: color.mix($surfaceContainer, $onSurfaceVariant, 95%);
+        }
+        &:active {
+            background-color: color.mix($surfaceContainer, $onSurfaceVariant, 88%);
+        }
+        &:focus-within {
+            background-color: color.mix($surfaceContainer, $onSurfaceVariant, 88%);
+            outline: none;
+        }
+    }
+
+    .network-page {
+        .scan-button {
+            margin-left: 0.5rem;
+        }
+        .wifi-access-point {
+            .icon {
+                font-size: 1.25rem;
+                font-weight: 500;
+                font-variation-settings: "opsz" 20;
+                color: $onSurface;
+                &.is-secure {
+                    color: $primary;
+                }
+                &.wifi-strength {
+                    margin-right: 0.5rem;
+                }
+            }
+            &.active .wifi-strength {
+                color: $primary;
+            }
+        }
+        label.not-available {
+            font-size: 0.825rem;
+            color: $onSurfaceVariant;
+            font-family: "Google Sans Text";
+            font-weight: 300;
+        }
+    }
+
+    .default-label {
+        font-size: 1rem;
+        font-weight: 300;
+        color: $onSurfaceVariant;
+        padding-bottom: 3rem;
+    }
+}

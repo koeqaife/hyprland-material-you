@@ -16,6 +16,11 @@ current_wallpaper = Ref[gdk.Texture | None](
 )
 is_locked = Ref(False, name="is_locked")
 is_idle_locked = Ref(False, name="is_idle_locked")
+settings_page = Ref[str | None](
+    None,
+    name="settings_page",
+    types=(str, NoneType)
+)
 
 
 class OpenedWindowsWatcher(Signals):
@@ -52,6 +57,10 @@ class OpenedWindowsWatcher(Signals):
 
 
 opened_windows = OpenedWindowsWatcher()
+
+
+def open_settings(page: str = "default") -> None:
+    settings_page.value = page
 
 
 def open_window(window_name: str) -> None:

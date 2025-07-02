@@ -78,7 +78,9 @@ class LayerWindow(gtk.ApplicationWindow):
 
         if hide_on_esc:
             self.key_controller = gtk.EventControllerKey()
-            self.key_controller.connect("key-pressed", self.on_key_press)
+            self.key_handler = self.key_controller.connect(
+                "key-pressed", self.on_key_press
+            )
             self.add_controller(self.key_controller)
 
         if name:
@@ -129,6 +131,7 @@ class LayerWindow(gtk.ApplicationWindow):
 
     def destroy(self) -> None:
         if getattr(self, "key_controller", None):
+            self.key_controller.disconnect(self.key_handler)
             self.remove_controller(self.key_controller)
         if getattr(self, "window_handler", None):
             state.opened_windows.unwatch(self.window_handler)
@@ -142,7 +145,9 @@ class Icon(gtk.Label):
         self, icon: str | Ref[str],
         **props: t.Any
     ) -> None:
-        super().__init__(**props)
+        super().__init__(
+            **props
+        )
         self.add_css_class("material-icon")
         self.add_css_class("icon")
         self.icon = icon

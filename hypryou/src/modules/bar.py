@@ -18,7 +18,7 @@ from config import Settings
 from src.services.mpris import MprisPlayer, current_player
 import weakref
 from src.services.network import get_network
-from src.services.state import toggle_window
+from src.services.state import toggle_window, open_settings
 from src.services.upower import get_upower, BatteryLevel, BatteryState
 from src.services.backlight import get_backlight_manager, BacklightDeviceView
 import src.services.audio as audio
@@ -821,7 +821,11 @@ class Applets(gtk.Box):
             MicApplet(),
             AudioApplet(),
             BluetoothApplet(),
-            Applet("wifi", get_network().icon, lambda: None),
+            Applet(
+                "wifi",
+                get_network().icon,
+                lambda: open_settings("network")
+            ),
             BrightnessApplet(),
         )
         for child in self.children:
