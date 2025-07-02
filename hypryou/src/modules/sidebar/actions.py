@@ -20,6 +20,7 @@ def open_power_menu(*_: t.Any) -> None:
 
 def _open_settings(*_: t.Any) -> None:
     open_settings()
+    close_window("sidebar")
 
 
 class ActionButton(gtk.Button):
