@@ -5,7 +5,7 @@
 
 * {
     transition: all 0.25s ease-in-out;
-    transition-property: background, background-color, color, border-color, outline-color;
+    transition-property: background, background-color, color, border-color, outline-color, box-shadow;
 }
 
 window {
@@ -120,6 +120,7 @@ switch {
     slider {
         border-radius: 50%;
         background-color: $outline;
+        box-shadow: none;
     }
 
     &:disabled {
