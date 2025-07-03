@@ -84,7 +84,7 @@ class LayerWindow(gtk.ApplicationWindow):
             self.add_controller(self.key_controller)
 
         if name:
-            layer_shell.set_namespace(self, name)
+            layer_shell.set_namespace(self, f"hypryou-{name}")
         else:
             logger.warning(f"No name specified for window: {self}")
 

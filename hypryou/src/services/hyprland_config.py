@@ -10,6 +10,19 @@ import os
 
 generated_config = os.path.join(config_path, "hyprland_generated.conf")
 
+noanim_layers = [
+    "hypryou-notifications.*",
+    "hypryou-popups.*",
+    "hypryou-wallpapers.*"
+]
+
+
+def generate_noanim() -> str:
+    return "\n".join(
+        f"layerrule = noanim, {layer}"
+        for layer in noanim_layers
+    ) + "\n"
+
 
 def generate_cursor_settings() -> str:
     settings = Settings()
@@ -18,7 +31,7 @@ def generate_cursor_settings() -> str:
 
     return (
         f"env = XCURSOR_SIZE,{cursor_size}\n" +
-        f"exec-once = hyprctl setcursor {cursor} {cursor_size}\n\n"
+        f"exec-once = hyprctl setcursor {cursor} {cursor_size}\n"
     )
 
 
@@ -50,7 +63,7 @@ def generate_binds() -> str:
         else:
             output += f"bind = {bind_str}\n"
 
-    return output + "\n"
+    return output
 
 
 def generate_env() -> str:
@@ -70,11 +83,20 @@ def generate_env() -> str:
     return output + "\n"
 
 
+funcs = (
+    generate_env,
+    generate_binds,
+    generate_cursor_settings,
+    generate_noanim
+)
+
+
 def generate_config() -> None:
     output = ""
-    output += generate_env()
-    output += generate_binds()
-    output += generate_cursor_settings()
+    for func in funcs:
+        name = func.__name__
+        output += f"\n# -- {name} --\n"
+        output += func()
     with open(generated_config, "w") as f:
         f.write(output)
 
