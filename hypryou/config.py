@@ -55,6 +55,7 @@ default_settings: dict[str, t.Any] = {
     "gtk4_theme": True,
     "gtk3_theme": True,
     "secure_cliphist": False,
+    "floating_sidebar": False,
 
     "blur": True,
     "blur_xray": True,

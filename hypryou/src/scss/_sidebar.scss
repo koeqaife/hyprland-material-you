@@ -7,7 +7,14 @@ window.sidebar {
     @include nLayerBackground($surfaceContainerLowest, 1);
     border: none;
     min-width: 29.125rem;
-    border-left: 0.0625rem solid $layerBorderColor;
+
+    &.floating {
+        border: 0.0625rem solid $layerBorderColor;
+        border-radius: $hyprlandRounding;
+    }
+    &:not(.floating) {
+        border-left: 0.0625rem solid $layerBorderColor;
+    }
 
     .info-box {
         padding-left: 0.75rem;

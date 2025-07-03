@@ -1,4 +1,6 @@
+from config import HyprlandVars, Settings
 from utils.logger import logger
+from utils import toggle_css_class
 from repository import gtk, layer_shell
 import weakref
 from src.modules.sidebar.management import ManagementBox
@@ -31,6 +33,13 @@ class SidebarBox(gtk.Box):
             self.remove(child)
 
 
+edges = (
+    layer_shell.Edge.TOP,
+    layer_shell.Edge.BOTTOM,
+    layer_shell.Edge.RIGHT,
+)
+
+
 class Sidebar(widget.LayerWindow):
     __gtype_name__ = "SidebarWindow"
 
@@ -51,8 +60,23 @@ class Sidebar(widget.LayerWindow):
         )
         self._child: SidebarBox | None = None
 
+        self.settings = Settings()
+        self.settings_handler = self.settings.watch(
+            "floating_sidebar", self.change_floating
+        )
+
         if __debug__:
             weakref.finalize(self, lambda: logger.debug("Sidebar finalized"))
+
+    def change_floating(self, value: bool) -> None:
+        toggle_css_class(self, "floating", value)
+        if value:
+            gap = HyprlandVars.gap
+            for edge in edges:
+                layer_shell.set_margin(self, edge, gap)
+        else:
+            for edge in edges:
+                layer_shell.set_margin(self, edge, 0)
 
     def present(self) -> None:
         if self._child:
@@ -70,4 +94,5 @@ class Sidebar(widget.LayerWindow):
             self._child.notifications.freeze()
 
     def destroy(self) -> None:
+        self.settings.unwatch(self.settings_handler)
         super().destroy()
