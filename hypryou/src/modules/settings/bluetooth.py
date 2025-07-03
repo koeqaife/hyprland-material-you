@@ -321,6 +321,7 @@ class BluetoothPage(gtk.ScrolledWindow):
         self.list = BluetoothList()
         self.toggle = BluetoothToggle()
         self.box.append(self.toggle)
+        self.box.append(gtk.Separator())
         self.box.append(self.list)
 
         self.timeout_id = -1

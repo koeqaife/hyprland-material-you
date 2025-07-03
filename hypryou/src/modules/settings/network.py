@@ -315,6 +315,7 @@ class NetworkPage(gtk.ScrolledWindow):
         self.list = WifiList()
         self.toggle = WifiToggle()
         self.box.append(self.toggle)
+        self.box.append(gtk.Separator())
         self.box.append(self.list)
 
         self.timeout_id = -1

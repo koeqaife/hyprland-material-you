@@ -168,6 +168,13 @@ window.settings {
         }
     }
 
+    .settings-page separator.horizontal {
+        margin: 0.25rem;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+        opacity: 0.5;
+    }
+
     .default-label {
         font-size: 1rem;
         font-weight: 300;
