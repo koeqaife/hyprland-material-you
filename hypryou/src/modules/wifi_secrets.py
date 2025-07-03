@@ -1,4 +1,5 @@
 from src.services.network import UserCanceled
+from src.services.network import SecretPromptHandler
 from src.variables import Globals
 import typing as t
 import weakref
@@ -15,6 +16,11 @@ def truncate_with_ellipsis(text: str, max_length: int) -> str:
 
 
 class SecretsDialog(gtk.ApplicationWindow):
+    @staticmethod
+    def register(app: gtk.Application) -> type["SecretsDialog"]:
+        SecretPromptHandler.set_widget(SecretsDialog)
+        return SecretsDialog
+
     def __init__(
         self,
         ssid: str,

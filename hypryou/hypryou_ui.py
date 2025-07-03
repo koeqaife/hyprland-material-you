@@ -33,7 +33,8 @@ from src.services.login1 import Login1ManagerService
 from src.services.backlight import BacklightService
 from src.services.audio import AudioService
 from src.services.clock import ClockService
-from src.services.network import NetworkService, SecretPromptHandler
+from src.services.network import NetworkService
+from src.services.bluetooth_agent import BluetoothAgentService
 
 import src.services.cliphist as cliphist
 
@@ -56,6 +57,7 @@ from src.modules.info import InfoWindow
 from src.modules.clients import ClientsWindow
 from src.modules.settings.window import SettingsWatcher
 from src.modules.wifi_secrets import SecretsDialog
+from src.modules.bluetooth_pin import PinDialog
 
 START = time.perf_counter()
 
@@ -76,7 +78,8 @@ services: tuple[AsyncService | Service, ...] = (
     IdleInhibitorService(),
     BacklightService(),
     AudioService(),
-    ClockService()
+    ClockService(),
+    BluetoothAgentService()
 )
 
 popups_types = (
@@ -100,6 +103,14 @@ windows_types = (
     PopupsWindow,
 )
 
+type RegisterType = t.Callable[["HyprYou"], type[t.Any] | object]
+module_register_types: dict[str, RegisterType] = {
+    "wifi_secrets": SecretsDialog.register,
+    "screen_lock": ScreenLock.register,
+    "settings_watcher": SettingsWatcher.register,
+    "bluetooth_pin": PinDialog.register
+}
+
 
 class HyprYou(gtk.Application):
     __gtype_name__ = "HyprYou"
@@ -107,6 +118,7 @@ class HyprYou(gtk.Application):
     def do_activate(self) -> None:
         self.windows: dict[gdk.Monitor, list[gtk.ApplicationWindow]] = {}
         self.corners: dict[gdk.Monitor, list[Corner]] = {}
+        self.registered: dict[str, t.Any] = []
 
         self.hold()
         asyncio.create_task(self.start_app())
@@ -190,9 +202,10 @@ class HyprYou(gtk.Application):
                     "Couldn't add window %s.",
                     window_type.__name__, exc_info=e
                 )
-        self.screen_lock = ScreenLock(self)
-        self.settings_watcher = SettingsWatcher(self)
-        SecretPromptHandler.set_widget(SecretsDialog)
+
+        for key, register_method in module_register_types.items():
+            returned = register_method(self)
+            self.registered[key] = returned
 
         logger.info(
             "Started in " +

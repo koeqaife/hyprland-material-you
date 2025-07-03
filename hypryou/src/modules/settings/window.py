@@ -360,6 +360,10 @@ class SettingsWindow(gtk.ApplicationWindow):
 
 
 class SettingsWatcher:
+    @classmethod
+    def register(cls, app: gtk.Application) -> None:
+        return cls(app)
+
     def __init__(
         self,
         app: gtk.Application

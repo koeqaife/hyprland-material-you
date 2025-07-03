@@ -500,6 +500,10 @@ class ScreenLockNotifications(Notifications):
 
 
 class ScreenLock:
+    @classmethod
+    def register(cls, app: gtk.Application) -> "ScreenLock":
+        return cls(app)
+
     def __init__(self, app: gtk.Application) -> None:
         self.app = app
         self.lock_instance = session_lock.Instance.new()
