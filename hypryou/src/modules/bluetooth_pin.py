@@ -42,13 +42,13 @@ class PinDialog(gtk.ApplicationWindow):
         )
         if show_buttons:
             self.title.set_text("Pairing Confirmation")
-            self.description.set_text(
+            self.description.set_markup(
                 f"Verify that the code on your device matches: <b>{pin}</b>" +
                 "\nDoes this code match?"
             )
         else:
             self.title.set_text("Enter PIN Code")
-            self.description.set_text(
+            self.description.set_markup(
                 "Please enter this PIN code on the other device:" +
                 f"\n<b>{pin}</b>"
             )
