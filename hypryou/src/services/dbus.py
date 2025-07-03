@@ -15,7 +15,7 @@ dbus_proxy = gio.DBusProxy.new_sync(
     "org.freedesktop.DBus",
     None
 )
-name_owner_changed = Signals(True)
+name_owner_changed = Signals()
 
 
 def on_name_owner_changed(

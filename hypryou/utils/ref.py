@@ -102,6 +102,13 @@ class ReactiveList(MutableSequence[L], t.Generic[L]):
         if self._ref.is_ready:
             self._ref._trigger_watchers()
 
+    def append(self, value: L) -> None:
+        self._check_type(value)
+        self._data.append(value)
+
+        if self._ref.is_ready:
+            self._ref._trigger_watchers()
+
     def __contains__(self, value: object) -> bool:
         return value in self._data
 
@@ -224,10 +231,13 @@ class Ref(t.Generic[T]):
         deep: bool = False,
         types: tuple[type, ...] | None = None
     ) -> None:
-        self._signals = Signals()
+        self._signals = Signals({"changed"})
         self.deep = deep
         self.is_ready = not delayed_init
         self.types = types
+
+        # It's links (refs) to objects that doesn't have to be removed by GC
+        self.links: dict[int, t.Any] = {}
 
         self._value: T = self._wrap_if_mutable(value)
 
@@ -335,6 +345,60 @@ class Ref(t.Generic[T]):
 
             self._value = new_value
             self._trigger_watchers(log=False)
+
+    def unpack(self) -> T:
+        def _unpack(value: t.Any) -> t.Any:
+            if isinstance(value, ReactiveList):
+                return [_unpack(item) for item in value]
+            if isinstance(value, ReactiveSet):
+                return {_unpack(item) for item in value}
+            if isinstance(value, ReactiveDict):
+                return {key: _unpack(val) for key, val in value.items()}
+            return value
+
+        return _unpack(self._value)
+
+    def create_ref(self, object: t.Any) -> int:
+        if self.links:
+            new_id = list(self.links.keys())[-1] + 2
+        else:
+            new_id = 0
+        self.links[new_id] = object
+
+    def remove_ref(self, id: int) -> None:
+        del self.links[id]
+
+    def handlers_signal(self, signal_name: str) -> list[int]:
+        return self._signals.handlers(signal_name)
+
+    def handlers(self) -> list[int]:
+        return self._signals.handlers("changed")
+
+    def block_changed(self) -> None:
+        self._signals.block("changed")
+
+    def unblock_changed(self) -> None:
+        self._signals.unblock("changed")
+
+    def notify_signal(
+        self,
+        signal_name: str,
+        *args: t.Any
+    ) -> None:
+        self._signals.notify(signal_name, *args)
+
+    def watch_signal(
+        self,
+        signal_name: str,
+        callback: t.Callable[[T], None],
+        **kwargs: t.Any
+    ) -> int:
+        return self._signals.watch(signal_name, callback, **kwargs)
+
+    def unwatch_signal(
+        self, handler_id: int
+    ) -> int:
+        return self._signals.unwatch(handler_id)
 
     def watch(self, callback: t.Callable[[T], None], **kwargs: t.Any) -> int:
         if __debug__:

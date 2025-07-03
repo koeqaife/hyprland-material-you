@@ -12,13 +12,16 @@ Wrapper = t.Callable[..., bool | None]
 
 
 class Signals:
-    def __init__(self, no_idle_pending: bool = False) -> None:
+    def __init__(
+        self,
+        idle_signals: set[str] = set()
+    ) -> None:
         self._signals: dict[str, dict[int, Wrapper]] = {}
         self._handler_signals: dict[int, str] = {}
         self._blocked: set[str] = set()
         self._lock = threading.RLock()
         self._pending_idle: set[str] = set()
-        self._no_idle_pending = no_idle_pending
+        self._idle_signals = idle_signals
 
     def watch(
         self,
@@ -104,7 +107,7 @@ class Signals:
                 self._handler_signals.pop(handler_id, None)
 
     def _idle_notify(self, signal_name: str, *args: t.Any) -> bool:
-        if not self._no_idle_pending:
+        if signal_name in self._idle_signals:
             with self._lock:
                 self._pending_idle.discard(signal_name)
         self.notify_sync(signal_name, *args)
@@ -115,7 +118,7 @@ class Signals:
         signal_name: str,
         *args: t.Any
     ) -> None:
-        if not self._no_idle_pending:
+        if signal_name in self._idle_signals:
             with self._lock:
                 if signal_name in self._pending_idle:
                     return

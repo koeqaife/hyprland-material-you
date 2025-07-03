@@ -4,6 +4,7 @@ import json
 import typing as t
 import sys
 from utils.service import Signals
+from utils.ref import Ref
 
 T = t.TypeVar('T')
 
@@ -92,45 +93,79 @@ class Settings:
 
     def __init__(self) -> None:
         if not hasattr(self, '_initialized'):
-            self._signals = Signals(True)
+            self._signals = Signals()
             self._initialized = True
-            self._values = {}
+            self._values: dict[str, Ref[t.Any]] = {}
+            self._allow_saving = False
             try:
                 with open(settings_path, 'r') as f:
-                    self._values = json.load(f)
+                    self._update_values(json.load(f))
             except FileNotFoundError:
                 with open(settings_path, 'w') as f:
                     f.write("{}")
+            self._add_default()
+            self._allow_saving = True
+
+    def _create_ref(self, key: str, value: t.Any) -> None:
+        def wrapper(new_value: str) -> None:
+            self.save()
+            self.notify_changed(key, new_value)
+
+        ref = Ref(value, name=f"settings.{key}")
+        ref.watch(wrapper)
+        ref.create_ref(wrapper)
+        self._values[key] = ref
+
+    def _add_default(self) -> None:
+        for key, value in default_settings.items():
+            if key not in self._values.keys():
+                self._create_ref(key, value)
+
+    def _update_values(self, new: dict[str, t.Any]) -> None:
+        for key, value in new.items():
+            if key in self._values.keys():
+                ref = self._values[key]
+                ref.value = value
+            else:
+                self._create_ref(key, value)
+
+        for key, ref in self._values.items():
+            if key not in new.keys():
+                self._values[key].value = default_settings[key]
 
     def save(self) -> None:
+        if not self._allow_saving:
+            return
         with open(settings_path, 'w') as f:
-            json.dump(self._values, f)
+            json.dump(self.unpack(), f)
 
     def sync(self) -> None:
-        old_values = self._values.copy()
         try:
             with open(settings_path, 'r') as f:
-                self._values = json.load(f)
+                self._update_values(json.load(f))
         except FileNotFoundError:
             with open(settings_path, 'w') as f:
                 f.write("{}")
-        for key, value in self._values.items():
-            if key not in old_values or old_values[key] != value:
-                self._signals.notify(f"changed::{key}", value)
-                self._signals.notify("changed", key, value)
+
+    def notify_changed(self, key: str, value: t.Any) -> None:
+        self._signals.notify(f"changed::{key}", value)
+        self._signals.notify("changed", key, value)
+
+    def unpack(self) -> dict[str, t.Any]:
+        _dict = {}
+        for key, ref in self._values.items():
+            _dict[key] = ref.unpack()
+        return _dict
 
     def reset(self, name: str) -> None:
         self.set(name, default_settings[name])
 
     def set(self, name: str, value: t.Any) -> None:
-        self._values[name] = value
-        self.save()
-        self._signals.notify(f"changed::{name}", value)
-        self._signals.notify("changed", name, value)
+        self._values[name].value = value
 
     def get(self, name: str) -> t.Any:
-        if name in self._values:
-            return self._values[name]
+        if name in self._values.keys():
+            return self._values[name].value
         else:
             return default_settings.get(name)
 

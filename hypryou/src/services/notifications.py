@@ -167,7 +167,7 @@ class Notification(Signals):
         watcher: NotificationsWatcher,
         **kwargs: t.Unpack[NotificationArgs]
     ) -> None:
-        super().__init__()
+        super().__init__({"changed"})
         self.id = id
         self.watcher = watcher
         self.cached_app_icon: tuple[str, gio.Icon | str | None] | None = None

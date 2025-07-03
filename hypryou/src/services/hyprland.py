@@ -260,7 +260,7 @@ class SocketType(int, Enum):
 
 class HyprlandClient(Signals):
     def __init__(self) -> None:
-        super().__init__(True)
+        super().__init__()
         runtime_dir = os.environ.get("XDG_RUNTIME_DIR", "/run/user/1000")
         instance = os.environ["HYPRLAND_INSTANCE_SIGNATURE"]
 
@@ -560,7 +560,7 @@ async def clients_full_sync() -> None:
         if client_address not in addresses:
             clients.value.pop(client_address)
 
-    clients._signals.notify("synced", clients.value)
+    clients.notify_signal("synced", clients.value)
 
 
 def acquire_clients() -> None:

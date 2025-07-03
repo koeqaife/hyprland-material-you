@@ -44,7 +44,7 @@ def repopulate() -> None:
     if not new_keys and not removed_keys:
         return
 
-    items._signals.block("changed")
+    items.block_changed()
 
     for key in new_keys:
         items.value[key] = history[key]
@@ -52,8 +52,8 @@ def repopulate() -> None:
     for key in removed_keys:
         del items.value[key]
 
-    items._signals.unblock("changed")
-    items._signals.notify("changed", items.value)
+    items.unblock_changed()
+    items.notify_signal("changed", items.value)
 
 
 def copy_by_id(item_id: str) -> None:

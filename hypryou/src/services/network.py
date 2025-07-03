@@ -232,7 +232,7 @@ class AccessPoint(Signals):
         client: nm.Client,
         device: nm.Device
     ) -> None:
-        super().__init__(True)
+        super().__init__()
         self.ap = ap
         self.client = client
         self.device = device
@@ -356,7 +356,7 @@ class Wifi(Signals):
         device: nm.DeviceWifi,
         client: nm.Client
     ) -> None:
-        super().__init__(True)
+        super().__init__()
         self.device = device
         self.client = client
         self.active_connection: nm.ActiveConnection | None = None

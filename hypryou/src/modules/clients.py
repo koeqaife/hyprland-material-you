@@ -211,7 +211,7 @@ class ClientsWindow(widget.LayerWindow):
         is_visible = self.get_visible()
 
         if is_opened and not is_visible:
-            self.once_handler = clients._signals.watch(
+            self.once_handler = clients.watch_signal(
                 "synced", lambda *_: self.present(), once=True
             )
             acquire_clients()
@@ -224,15 +224,17 @@ class ClientsWindow(widget.LayerWindow):
             self.set_child(self._child)
 
     def on_hide(self) -> None:
-        if self.once_handler in clients._signals.handlers("synced"):
-            clients._signals.unwatch(self.once_handler)
+        self.remove_handler()
         if self._child:
             self._child.destroy()
             release_clients()
         self.set_child(None)
         self._child = None
 
+    def remove_handler(self) -> None:
+        if self.once_handler in clients.handlers_signal("synced"):
+            clients.unwatch_signal(self.once_handler)
+
     def destroy(self) -> None:
-        if self.once_handler in clients._signals.handlers("synced"):
-            clients._signals.unwatch(self.once_handler)
+        self.remove_handler()
         super().destroy()
