@@ -101,48 +101,50 @@ class Client(Signals):
         asyncio.create_task(async_task)
 
     def get_icon(self) -> gtk.IconPaintable | None:
-        app_id = self.initial_class
-        try:
-            app_ids = {
-                app_id.replace(" ", "-").lower(),
-                app_id.lower(),
-                str(app_id),
-                f"{app_id}.desktop",
-            }
-            desktop_file = None
-            for app_id in app_ids:
-                try:
-                    desktop_file = gio.DesktopAppInfo(app_id)
-                    if desktop_file is not None:
-                        break
-                except TypeError:
-                    continue
+        original_app_id = self.initial_class
+        possible_ids = [
+            original_app_id.replace(" ", "-").lower(),
+            original_app_id.lower(),
+            str(original_app_id),
+            f"{original_app_id}.desktop",
+        ]
 
-            if not desktop_file:
-                for info in gio.AppInfo.get_all():
-                    if info.get_id().lower().startswith(app_id.lower()):
-                        desktop_file = info
-                        break
+        desktop_file = None
+        for app_id_candidate in possible_ids:
+            if not app_id_candidate:
+                continue
+            try:
+                desktop_file = gio.DesktopAppInfo.new(app_id_candidate)
+            except TypeError:
+                continue
+            if desktop_file:
+                break
 
-            if not desktop_file:
-                return None
+        if not desktop_file:
+            lower_original = original_app_id.lower()
+            for info in gio.AppInfo.get_all():
+                if info.get_id().lower().startswith(lower_original):
+                    desktop_file = info
+                    break
 
-            icon = desktop_file.get_icon()
-            icon_name = icon.to_string() if icon else app_id.lower()
-
-            display = gdk.Display.get_default()
-            theme = gtk.IconTheme.get_for_display(display)
-            return theme.lookup_icon(
-                icon_name,
-                None,
-                48,
-                1,
-                gtk.TextDirection.LTR,
-                gtk.IconLookupFlags.FORCE_SYMBOLIC,
-            )
-        except Exception as e:
-            logger.warning("Couldn't find icon for %s", app_id, exc_info=e)
+        if not desktop_file:
             return None
+
+        icon = desktop_file.get_icon()
+        icon_name = icon.to_string() if icon else original_app_id.lower()
+
+        display = gdk.Display.get_default()
+        theme = gtk.IconTheme.get_for_display(display)
+
+        icon_info = theme.lookup_icon(
+            icon_name,
+            None,
+            48,
+            1,
+            gtk.TextDirection.RTL,
+            gtk.IconLookupFlags.FORCE_SYMBOLIC,
+        )
+        return icon_info
 
     @property
     def workspace_id(self) -> int:
@@ -598,8 +600,6 @@ async def init() -> None:
     _active_workspaces = await get_active_workspaces(client)
     workspace_ids.value = set(_active_workspaces)
     workspace_ids.ready()
-
-    await clients_full_sync()
 
     try:
         _temperature = await client.raw(

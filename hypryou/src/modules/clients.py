@@ -1,4 +1,4 @@
-from repository import layer_shell, gtk, gdk, pango
+from repository import layer_shell, gtk, gdk, pango, glib
 import weakref
 import src.widget as widget
 from config import HyprlandVars
@@ -39,7 +39,7 @@ class ClientItem(gtk.Box):
             self.workspace
         )
         self.on_changed()
-        self.update_image()
+        glib.idle_add(self.update_image)
         for child in self.children:
             self.append(child)
 
