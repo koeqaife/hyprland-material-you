@@ -183,3 +183,27 @@ switch {
         }
     }
 }
+
+popover contents {
+    background-color: $surfaceContainer;
+    border: 0.0625rem solid $layerBorderColor;
+    border-radius: 0.25rem;
+    min-height: 0;
+    min-width: 12rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+
+    modelbutton {
+        border-radius: 0;
+        min-height: 2.5rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
+
+        &:hover {
+            background: color.mix($surfaceContainer, $onSurface, 90%);
+        }
+        &:active {
+            background: color.mix($surfaceContainer, $onSurface, 82%);
+        }
+    }
+}
