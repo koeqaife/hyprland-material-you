@@ -244,7 +244,7 @@ class BluetoothAgent:
                 self.conn.unregister_object(self.reg_id)
                 logger.debug("BluetoothAgent released.")
             case "Cancel":
-                for handler in self.active_handlers.values():
+                for handler in set(self.active_handlers.values()):
                     handler.cancel()
                 self.active_handlers.clear()
 

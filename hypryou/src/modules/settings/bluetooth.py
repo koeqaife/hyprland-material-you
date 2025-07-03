@@ -200,8 +200,11 @@ class BluetoothDevice(RowTemplate):
                 adapter.set_pairable(True)
 
                 def pair_async():
-                    self.device.pair()
-                    self.device.connect_device()
+                    try:
+                        self.device.pair()
+                        self.device.connect_device()
+                    except glib.Error:
+                        pass
 
                 threading.Thread(target=pair_async, daemon=True).start()
 
