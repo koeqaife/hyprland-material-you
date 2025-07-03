@@ -116,10 +116,6 @@ window.settings {
         &:active {
             background-color: color.mix($surfaceContainer, $onSurfaceVariant, 88%);
         }
-        &:focus-within {
-            background-color: color.mix($surfaceContainer, $onSurfaceVariant, 88%);
-            outline: none;
-        }
     }
 
     .network-page {
@@ -148,6 +144,29 @@ window.settings {
             color: $onSurfaceVariant;
             font-family: "Google Sans Text";
             font-weight: 300;
+        }
+    }
+
+    .bluetooth-page {
+        .discover-button {
+            margin-left: 0.5rem;
+        }
+        .bluetooth-device {
+            .icon {
+                font-size: 1.25rem;
+                font-weight: 500;
+                font-variation-settings: "opsz" 20;
+                color: $onSecondary;
+                background-color: $secondary;
+                margin-right: 0.5rem;
+                border-radius: 0.25rem;
+                min-height: 1.825rem;
+                min-width: 1.825rem;
+            }
+            &.active .icon {
+                color: $onPrimary;
+                background-color: $primary;
+            }
         }
     }
 

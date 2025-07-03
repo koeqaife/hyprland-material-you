@@ -8,6 +8,7 @@ from src.services.state import settings_page
 
 # Pages
 from src.modules.settings.network import NetworkPage
+from src.modules.settings.bluetooth import BluetoothPage
 
 
 class Page(t.NamedTuple):
@@ -45,7 +46,7 @@ pages = {
         title="Bluetooth",
         icon="settings_bluetooth",
         icon_fill=False,
-        widget=NotImplementedYet
+        widget=BluetoothPage
     ),
     "appearance": Page(
         title="Appearance",
