@@ -100,12 +100,8 @@ class Settings:
             self._initialized = True
             self._values: dict[str, Ref[t.Any]] = {}
             self._allow_saving = False
-            try:
-                with open(settings_path, 'r') as f:
-                    self._update_values(json.load(f))
-            except FileNotFoundError:
-                with open(settings_path, 'w') as f:
-                    f.write("{}")
+            self._file_dict = {}
+            self.sync()
             self._add_default()
             self._allow_saving = True
 
@@ -139,13 +135,17 @@ class Settings:
     def save(self) -> None:
         if not self._allow_saving:
             return
-        with open(settings_path, 'w') as f:
-            json.dump(self.unpack(), f, indent=4)
+        new_dict = self.unpack()
+        if new_dict != self._file_dict:
+            with open(settings_path, 'w') as f:
+                self._file_dict = new_dict
+                json.dump(self._file_dict, f, indent=4)
 
     def sync(self) -> None:
         try:
             with open(settings_path, 'r') as f:
-                self._update_values(json.load(f))
+                self._file_dict = dict(json.load(f))
+                self._update_values(self._file_dict)
         except FileNotFoundError:
             with open(settings_path, 'w') as f:
                 f.write("{}")
@@ -157,7 +157,11 @@ class Settings:
     def unpack(self) -> dict[str, t.Any]:
         _dict = {}
         for key, ref in self._values.items():
-            _dict[key] = ref.unpack()
+            if (
+                not (value := ref.unpack()) == default_settings[key]
+                or key in self._file_dict
+            ):
+                _dict[key] = value
         return _dict
 
     def reset(self, name: str) -> None:
