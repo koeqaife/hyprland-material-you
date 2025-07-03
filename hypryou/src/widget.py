@@ -1,3 +1,4 @@
+import weakref
 from repository import gtk, layer_shell, gdk
 from utils.ref import Ref
 from utils.logger import logger
@@ -7,6 +8,7 @@ from math import pi
 from config import HyprlandVars
 
 import src.services.state as state
+from utils import toggle_css_class
 
 
 __all__ = [
@@ -202,6 +204,39 @@ class StackButton(gtk.Button):
     def destroy(self) -> None:
         self.disconnect(self.handler)
         self.on_click = None  # type: ignore
+
+
+class Switch(gtk.Switch):
+    __gtype_name__ = "HyprYouSwitch"
+
+    def __init__(self, *args, **kwargs) -> None:
+        # NOTE: I used weakref just to not create destroy() method
+        super().__init__(*args, **kwargs)
+        _weak_self = weakref.ref(self)
+        self.connect(
+            "notify::active",
+            lambda *_: self._on_active()
+            if (self := _weak_self()) else None
+        )
+        self.connect(
+            "activate",
+            lambda *_: self._is_changing()
+            if (self := _weak_self()) else None
+        )
+        gesture = gtk.GestureClick.new()
+        gesture.connect(
+            "released",
+            lambda *_: self._is_changing()
+            if (self := _weak_self()) else None
+        )
+        self.add_controller(gesture)
+
+    def _is_changing(self, *args: t.Any) -> None:
+        toggle_css_class(self, "is-changing", True)
+
+    def _on_active(self, *args: t.Any) -> None:
+        toggle_css_class(self, "is-changing", False)
+        toggle_css_class(self, "active", self.get_active())
 
 
 class RoundedCorner(gtk.DrawingArea):

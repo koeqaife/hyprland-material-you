@@ -18,7 +18,7 @@ class WifiToggle(RowTemplate):
             "Find and connect to Wi-Fi networks",
             css_classes=("wifi-toggle-row",)
         )
-        self.switch = gtk.Switch(
+        self.switch = widget.Switch(
             valign=gtk.Align.CENTER,
             tooltip_text="Toggle",
         )

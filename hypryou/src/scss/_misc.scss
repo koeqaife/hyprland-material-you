@@ -116,15 +116,26 @@ switch {
     border-radius: 1.5rem;
     border-color: $outline;
     background-color: $surfaceContainerHighest;
+    min-width: 0;
+    min-height: 0;
+    padding: 0.125rem;
+    transition: all 0.25s ease-out;
+    > * {
+        transition: all 0.25s ease-out;
+    }
 
     slider {
         border-radius: 50%;
         background-color: $outline;
         box-shadow: none;
+        min-width: 1.125rem;
+        min-height: 1.125rem;
+        outline: $surfaceContainerHighest solid 0.1875rem;
+        outline-offset: -0.125rem;
     }
 
     &:disabled {
-        background-color: $surfaceContainerHighest;
+        background: $surfaceContainerHighest;
         border-color: $onSurface;
         slider {
             background-color: $onSurface;
@@ -132,54 +143,61 @@ switch {
     }
 
     &:hover {
-        background-color: color.mix($surfaceContainerHighest, $onSurface, 92%);
+        background: color.mix($surfaceContainerHighest, $onSurface, 92%);
 
         slider {
             background-color: $onSurfaceVariant;
+            outline-color: color.mix($surfaceContainerHighest, $onSurface, 92%);
         }
     }
 
     &:active {
-        background-color: color.mix($surfaceContainerHighest, $onSurface, 92%);
+        background: color.mix($surfaceContainerHighest, $onSurface, 92%);
 
         slider {
             background-color: $onSurfaceVariant;
+            outline-color: color.mix($surfaceContainerHighest, $onSurface, 92%);
         }
     }
 
-    &:checked {
-        background-color: $primary;
+    &.active:not(.is-changing),
+    &:not(.active).is-changing {
+        background: $primary;
         border-color: $primary;
 
         slider {
             background-color: $onPrimary;
+            outline-color: $primary;
+            outline-offset: 0;
         }
 
         &:disabled {
-            background-color: $onSurface;
+            background: $onSurface;
             border-color: $onSurface;
 
             slider {
                 background-color: $surface;
+                outline-color: $onSurface;
             }
         }
 
         &:hover {
-            background-color: $primary;
+            background: $primary;
             border-color: $primary;
 
             slider {
                 background-color: $primaryContainer;
+                outline-color: $primary;
             }
         }
 
         &:active {
-            background-color: $primary;
+            background: $primary;
             border-color: $primary;
 
             slider {
                 background-color: $primaryContainer;
-                border-color: $primaryContainer;
+                outline-color: $primary;
             }
         }
     }

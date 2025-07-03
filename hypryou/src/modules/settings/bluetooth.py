@@ -18,7 +18,7 @@ class BluetoothToggle(RowTemplate):
             "Toggle Bluetooth and find nearby devices",
             css_classes=("bluetooth-toggle-row",)
         )
-        self.switch = gtk.Switch(
+        self.switch = widget.Switch(
             valign=gtk.Align.CENTER,
             tooltip_text="Toggle",
         )
