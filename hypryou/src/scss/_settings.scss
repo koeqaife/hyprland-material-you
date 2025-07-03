@@ -87,11 +87,9 @@ window.settings {
     }
 
     .settings-row {
-        @include elevation(1);
-        @include nLayerBackground($surfaceContainer, 2);
+        background-color: transparent;
         margin-left: 0.5rem;
         margin-right: 0.5rem;
-        margin-bottom: 0.5rem;
 
         padding: 0.5rem;
         padding-left: 0.825rem;
@@ -111,10 +109,10 @@ window.settings {
         }
 
         &:hover {
-            background-color: color.mix($surfaceContainer, $onSurfaceVariant, 95%);
+            background-color: color.mix(transparent, $onSurfaceVariant, 95%);
         }
         &:active {
-            background-color: color.mix($surfaceContainer, $onSurfaceVariant, 88%);
+            background-color: color.mix(transparent, $onSurfaceVariant, 88%);
         }
     }
 
