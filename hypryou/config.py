@@ -47,7 +47,7 @@ default_settings: dict[str, t.Any] = {
     "corners": True,
     "dark_icons": "Tela-nord-dark",
     "light_icons": "Tela-nord-light",
-    "opacity": 1,
+    "opacity": 1.0,
     "wallpaper": f"{CONFIG_DIR}/assets/default_wallpaper.jpg",
     "separated_workspaces": False,
     "one_popup_at_time": True,
@@ -55,6 +55,9 @@ default_settings: dict[str, t.Any] = {
     "gtk4_theme": True,
     "gtk3_theme": True,
     "secure_cliphist": False,
+
+    "blur": True,
+    "blur_xray": True,
 
     "browser": "firefox",
     "editor": "code",
@@ -137,7 +140,7 @@ class Settings:
         if not self._allow_saving:
             return
         with open(settings_path, 'w') as f:
-            json.dump(self.unpack(), f)
+            json.dump(self.unpack(), f, indent=4)
 
     def sync(self) -> None:
         try:

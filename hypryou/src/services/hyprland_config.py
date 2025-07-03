@@ -16,6 +16,31 @@ noanim_layers = [
     "hypryou-wallpapers.*"
 ]
 
+BLUR = """
+decoration {{
+    blur {{
+        enabled = true
+        xray = {}
+    }}
+}}
+"""
+
+
+def generate_blur() -> str:
+    settings = Settings()
+    blur = settings.get("blur")
+    if not blur:
+        return "# Blur is disabled by settings \n"
+
+    xray = settings.get("blur_xray")
+
+    output = (
+        "layerrule = blur, hypryou-.*",
+        "layerrule = ignorealpha 0.85, hypryou-.*",
+        BLUR.format("true" if xray else "false")
+    )
+    return "\n".join(output) + "\n"
+
 
 def generate_noanim() -> str:
     return "\n".join(
@@ -87,7 +112,8 @@ funcs = (
     generate_env,
     generate_binds,
     generate_cursor_settings,
-    generate_noanim
+    generate_noanim,
+    generate_blur
 )
 
 
