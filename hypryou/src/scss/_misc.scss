@@ -226,3 +226,42 @@ popover contents {
         }
     }
 }
+
+scrollbar {
+    background: transparent;
+    color: rgb($primary, 0.5);
+    border-radius: 0.25rem;
+    min-width: 0.25rem;
+    min-height: 0.25rem;
+    margin-right: -0.25rem;
+    margin-left: 0.25rem;
+
+    &:hover {
+        color: rgb($primary, 0.5);
+        slider {
+            background-color: rgba($primary, 0.5);
+        }
+    }
+
+    &:active {
+        color: rgb($primary, 0.7);
+        slider {
+            background-color: rgba($primary, 1);
+        }
+    }
+
+    slider {
+        background-color: rgba($primary, 0.25);
+        border-radius: 1rem;
+        min-width: 0.25rem;
+        min-height: 0.25rem;
+
+        &:hover {
+            background-color: rgba($primary, 0.5);
+        }
+
+        &:active {
+            background-color: rgba($primary, 1);
+        }
+    }
+}
