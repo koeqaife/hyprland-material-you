@@ -591,7 +591,7 @@ class BluetoothApplet(Applet):
         super().__init__(
             "bluetooth",
             "bluetooth_disabled",
-            lambda: None
+            lambda: open_settings("bluetooth")
         )
         self.on_update()
         self.handler = self.bluetooth.connect("notify", self.on_update)

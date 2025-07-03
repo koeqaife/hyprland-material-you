@@ -8,6 +8,7 @@ from utils import colors
 from src.services.idle_inhibitor import inhibited, get_inhibitor
 from src.services.notifications import dnd
 from src.services.hyprland import night_light
+from src.services.state import open_settings, close_window
 from src import widget
 
 dnd_icon = Ref("do_not_disturb_off", name="dnd_icon")
@@ -15,6 +16,11 @@ dnd_icon.bind(
     dnd,
     lambda bool: "do_not_disturb_on" if bool else "do_not_disturb_off"
 )
+
+
+def open_settings_and_close(page: str) -> None:
+    open_settings(page)
+    close_window("sidebar")
 
 
 class ManagementButton(gtk.Box):
@@ -157,7 +163,7 @@ class InternetButton(ManagementButton):
             "UNKNOWN",
             False,
             self.toggle_wifi,
-            on_right_click=lambda: None
+            lambda: open_settings_and_close("network")
         )
         self.on_update()
         network.watch("primary-changed", self.on_update)
@@ -205,7 +211,7 @@ class BluetoothButton(ManagementButton):
             "UNKNOWN",
             False,
             self.toggle_bluetooth,
-            on_right_click=lambda: None
+            lambda: open_settings_and_close("bluetooth")
         )
         self.on_update()
         self.handler = self.bluetooth.connect("notify", self.on_update)
