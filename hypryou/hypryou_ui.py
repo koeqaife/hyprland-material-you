@@ -118,7 +118,7 @@ class HyprYou(gtk.Application):
     def do_activate(self) -> None:
         self.windows: dict[gdk.Monitor, list[gtk.ApplicationWindow]] = {}
         self.corners: dict[gdk.Monitor, list[Corner]] = {}
-        self.registered: dict[str, t.Any] = []
+        self.registered: dict[str, t.Any] = {}
 
         self.hold()
         asyncio.create_task(self.start_app())

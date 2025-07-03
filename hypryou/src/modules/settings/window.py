@@ -361,7 +361,7 @@ class SettingsWindow(gtk.ApplicationWindow):
 
 class SettingsWatcher:
     @classmethod
-    def register(cls, app: gtk.Application) -> None:
+    def register(cls, app: gtk.Application) -> "SettingsWatcher":
         return cls(app)
 
     def __init__(
