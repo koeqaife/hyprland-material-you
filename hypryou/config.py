@@ -41,7 +41,7 @@ info = {
 }
 
 default_settings: dict[str, t.Any] = {
-    "time_format": "24",
+    "is_24hr_clock": True,
     "always_show_battery": False,
     "corners": True,
     "dark_icons": "Tela-nord-dark",

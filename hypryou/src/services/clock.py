@@ -14,20 +14,19 @@ class ClockService(AsyncService):
     async def start(self) -> None:
         settings = Settings()
 
-        is_12_hour = False
+        is_24hr_clock = True
 
-        def settings_update(time_format: str) -> None:
-            nonlocal is_12_hour
-
-            is_12_hour = time_format != "24"
+        def settings_update(_is_24hr_clock: bool) -> None:
+            nonlocal is_24hr_clock
+            is_24hr_clock = _is_24hr_clock
             update_time_date(datetime.datetime.now())
 
         def update_time_date(_date: datetime.datetime) -> None:
-            time.value = get_formatted_time(_date, is_12_hour)
+            time.value = get_formatted_time(_date, not is_24hr_clock)
             date.value = get_formatted_date(_date)
             full_date.value = get_full_date(_date)
 
-        settings.watch("time_format", settings_update)
+        settings.watch("is_24hr_clock", settings_update)
 
         while True:
             now = datetime.datetime.now()
