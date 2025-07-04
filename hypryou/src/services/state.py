@@ -1,3 +1,4 @@
+import threading
 from config import Settings
 from utils.ref import Ref
 from utils.styles import reload_css
@@ -83,9 +84,13 @@ def toggle_window(window_name: str) -> None:
 def generate_wallpaper_texture() -> None:
     settings = Settings()
     path = settings.get("wallpaper")
-    file = gio.File.new_for_path(path)
-    texture = gdk.Texture.new_from_file(file)
-    current_wallpaper.value = texture
+
+    def worker() -> None:
+        file = gio.File.new_for_path(path)
+        texture = gdk.Texture.new_from_file(file)
+        current_wallpaper.value = texture
+
+    threading.Thread(target=worker, daemon=True).start()
 
 
 def on_wallpapers_changed(*args: t.Any) -> None:
