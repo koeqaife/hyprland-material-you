@@ -1,5 +1,7 @@
 from repository import gtk, gdk
 import typing as t
+from config import Settings
+import src.widget as widget
 
 
 class RowTemplate(gtk.Box):
@@ -9,7 +11,7 @@ class RowTemplate(gtk.Box):
         self,
         label: str,
         description: str | None,
-        css_classes: tuple[str, ...],
+        css_classes: tuple[str, ...] = (),
         **props: t.Any
     ) -> None:
         super().__init__(
@@ -84,3 +86,73 @@ class RowTemplate(gtk.Box):
     def destroy(self) -> None:
         self.click_gesture.disconnect(self.gesture_conn)
         self.remove_controller(self.click_gesture)
+
+
+class SwitchRowTemplate(RowTemplate):
+    __gtype_name__ = "SettingsSwitchRowTemplate"
+
+    def __init__(
+        self,
+        label: str,
+        description: str | None,
+        css_classes: tuple[str, ...] = (),
+        **props: t.Any
+    ) -> None:
+        super().__init__(label, description, css_classes, **props)
+        self.switch = widget.Switch(
+            valign=gtk.Align.CENTER,
+            tooltip_text="Toggle",
+        )
+        self.append(self.switch)
+        self.switch_handler = self.switch.connect(
+            "notify::active", self.on_switch_changed
+        )
+
+    def on_click(self) -> None:
+        self.switch.activate()
+
+    def on_switch_changed(self, *args: t.Any) -> None:
+        ...
+
+    def switch_set_active(self, value: bool) -> None:
+        self.switch.handler_block(self.switch_handler)
+        self.switch.set_active(value)
+        self.switch.handler_unblock(self.switch_handler)
+
+    def destroy(self) -> None:
+        self.switch.disconnect(self.switch_handler)
+        super().destroy()
+
+
+class SettingsBoolRow(SwitchRowTemplate):
+    __gtype_name__ = "SettingsBoolRow"
+
+    def __init__(
+        self,
+        label: str,
+        description: str | None,
+        key: str,
+        css_classes: tuple[str, ...] = (),
+        **props: t.Any
+    ) -> None:
+        super().__init__(label, description, css_classes, **props)
+        self.key = key
+        self.settings = Settings()
+        self.settings_handler = self.settings.watch(
+            key, self.switch_set_active, True
+        )
+
+    def on_switch_changed(self, *args: t.Any) -> None:
+        self.settings.set(self.key, self.switch.get_active())
+
+
+class Category(gtk.Label):
+    __gtype_name__ = "SettingsCategoryLabel"
+
+    def __init__(self, text: str) -> None:
+        super().__init__(
+            css_classes=("settings-category",),
+            label=text,
+            hexpand=True,
+            xalign=0
+        )
