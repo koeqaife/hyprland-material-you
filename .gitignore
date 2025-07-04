@@ -5,4 +5,5 @@ venv/
 *.pyd
 *.so
 
-build/
+*/build/
+-build/
