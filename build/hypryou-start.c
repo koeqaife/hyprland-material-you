@@ -8,6 +8,7 @@
 #include <pwd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <signal.h>
 
 #define MAX_RETRIES 5
 #define RETRY_TIMEOUT 10
@@ -213,6 +214,16 @@ int main(void)
             printf("App exited with %d, retrying (%d/%d)...\n",
                    code, retry_count, MAX_RETRIES);
             sleep(1);
+        }
+        else if (WIFSIGNALED(status))
+        {
+            int sig = WTERMSIG(status);
+            fprintf(stderr, "App terminated by signal %d\n", sig);
+
+            show_crash_dialog(sig);
+            retry_count++;
+            sleep(1);
+            continue;
         }
         else
         {
