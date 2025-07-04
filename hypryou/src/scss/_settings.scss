@@ -96,6 +96,10 @@ window.settings {
         padding-right: 0.825rem;
         border-radius: max(calc($hyprlandRounding - 0.5rem), 0.25rem);
 
+        &:last-child {
+            margin-bottom: 0.5rem;
+        }
+
         .label {
             font-size: 1rem;
             font-weight: 400;
@@ -180,5 +184,46 @@ window.settings {
         font-weight: 300;
         color: $onSurfaceVariant;
         padding-bottom: 3rem;
+    }
+
+    .entry-box {
+        border-radius: 0.5rem;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        min-width: 0;
+        border: 0.0625rem solid $outline;
+
+        &:focus-within {
+            border-color: $primary;
+        }
+
+        .icon {
+            font-size: 1.125rem;
+            font-variation-settings: "opsz" 20;
+            font-weight: 500;
+            color: $onSurface;
+        }
+
+        .entry {
+            color: $onSurface;
+            min-height: 0;
+            min-width: 5px;
+            padding: 0;
+            outline: none;
+            background-color: transparent;
+            placeholder {
+                opacity: 1;
+                color: $onSurfaceVariant;
+            }
+        }
+    }
+
+    .settings-category {
+        font-size: 0.85rem;
+        font-weight: 300;
+        color: $primary;
+        margin: 1.25rem;
+        margin-top: 0.125rem;
+        margin-bottom: 0.125rem;
     }
 }
