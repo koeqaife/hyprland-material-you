@@ -89,6 +89,8 @@ class Workspaces(gtk.Box):
                 button.destroy()
                 self.remove(button)
             self.buttons.clear()
+        if self._old_active:
+            self._old_active = 0
         settings = Settings()
         monitor_multiplier = (
             self.monitor_id + 1 if settings.get("separated_workspaces") else 1
