@@ -550,3 +550,41 @@ spinbutton {
         border-radius: 0;
     }
 }
+
+window.hypryou-crashed {
+    background-color: $surfaceContainer;
+    padding: 20px;
+
+    .title {
+        font-size: 20px;
+        font-weight: 400;
+        color: $onSurface;
+    }
+
+    .description {
+        font-size: 16px;
+        font-weight: 300;
+        color: $onSurfaceVariant;
+    }
+
+    button {
+        border-radius: 32px;
+        min-height: 32px;
+        padding: 0;
+        padding-left: 20px;
+        padding-right: 20px;
+        background-color: transparent;
+
+        label {
+            font-size: 16px;
+            font-weight: 400;
+            color: $primary;
+        }
+        &:hover {
+            background-color: color.mix(transparent, $primary, 92%);
+        }
+        &:active {
+            background-color: color.mix(transparent, $primary, 90%);
+        }
+    }
+}

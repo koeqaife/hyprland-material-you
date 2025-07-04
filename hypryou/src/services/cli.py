@@ -77,6 +77,10 @@ class CliRequest:
         Settings().sync()
         return "ok"
 
+    def do_settings(self, page: str) -> None:
+        state.open_settings(page or "default")
+        return "ok"
+
     def do_toggle_window(self, window_name: str) -> str:
         state.toggle_window(window_name)
         return "ok"
