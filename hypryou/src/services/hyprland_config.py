@@ -118,13 +118,19 @@ funcs = (
 
 
 def generate_config() -> None:
-    output = ""
-    for func in funcs:
-        name = func.__name__
-        output += f"\n# -- {name} --\n"
-        output += func()
-    with open(generated_config, "w") as f:
-        f.write(output)
+    output = "\n".join(
+        f"# -- {func.__name__} --\n{func()}" for func in funcs
+    )
+
+    try:
+        with open(generated_config, "r") as f:
+            current_content = f.read()
+    except FileNotFoundError:
+        current_content = ""
+
+    if current_content != output:
+        with open(generated_config, "w") as f:
+            f.write(output)
 
 
 @sync_debounce(100)
