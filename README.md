@@ -32,8 +32,8 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 - Install all dependencies from depends.txt
 - Build Cython code by using `build.sh` in `hypryou/`
     > If you want you can delete `hypryou/utils_cy/build` to remove temp files
-- Then you will have to copy `hypryou` to `/opt/hypryou`
-- Use `build.sh` in `build`
+- Then copy `hypryou` to `/opt/hypryou`
+- The use `build.sh` in `build`
 - Move `hypryouctl`, `hypryou-start`, `hypryou-crash-dialog` to `/usr/bin`
 - In `~/.config/hypr/hyprland.conf` write `source = /opt/hypryou/assets/configs/hyprland/main.conf`
 
