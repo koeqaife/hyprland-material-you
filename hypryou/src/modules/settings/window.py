@@ -9,6 +9,7 @@ from src.services.state import settings_page
 # Pages
 from src.modules.settings.network import NetworkPage
 from src.modules.settings.bluetooth import BluetoothPage
+from src.modules.settings.appearance import AppearancePage
 
 
 class Page(t.NamedTuple):
@@ -52,7 +53,7 @@ pages = {
         title="Appearance",
         icon="palette",
         icon_fill=True,
-        widget=NotImplementedYet
+        widget=AppearancePage
     ),
     "wallpaper": Page(
         title="Wallpaper",
@@ -310,6 +311,7 @@ class SettingsBox(gtk.Box):
             page.on_show()
 
     def destroy(self) -> None:
+        self.close_button.disconnect(self.close_handler)
         for page in self.pages.values():
             if hasattr(page, "destroy"):
                 page.destroy()
