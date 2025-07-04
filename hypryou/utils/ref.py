@@ -222,6 +222,12 @@ class ReactiveDict(dict[K, V], t.Generic[K, V]):
 
 
 class Ref(t.Generic[T]):
+    __slots__ = (
+        "_signals", "deep", "is_ready",
+        "types", "links", "_value",
+        "name", "asyncio_lock"
+    )
+
     def __init__(
         self,
         value: T,

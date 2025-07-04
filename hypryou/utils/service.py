@@ -12,6 +12,12 @@ Wrapper = t.Callable[..., bool | None]
 
 
 class Signals:
+    __slots__ = (
+        "_signals", "_handler_signals",
+        "_blocked", "_lock",
+        "_pending_idle", "_idle_signals"
+    )
+
     def __init__(
         self,
         idle_signals: set[str] = set()

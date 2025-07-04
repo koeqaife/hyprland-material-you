@@ -73,6 +73,11 @@ def get_color(color_name: str) -> DynamicColor | None:
 
 
 class ColorsCache:
+    __slots__ = (
+        "colors", "wallpaper", "original_color",
+        "contrast_level", "is_dark"
+    )
+
     def __init__(
         self,
         colors: DynamicScheme | dict[str, str],

@@ -74,6 +74,11 @@ def finalize_image_file(temp_path: str) -> str:
 
 
 class DownloadState:
+    __slots__ = (
+        "stream", "temp_path",
+        "on_complete", "file"
+    )
+
     def __init__(
         self,
         stream: gio.FileInputStream,

@@ -88,6 +88,11 @@ class HyprlandVars:
 
 
 class Settings:
+    __slots__ = (
+        "_signals", "_initialized",
+        "_values", "_allow_saving",
+        "_file_dict"
+    )
     _instance: t.Optional['Settings'] = None
 
     def __new__(cls) -> 'Settings':
