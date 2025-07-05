@@ -156,3 +156,6 @@ class Category(gtk.Label):
             hexpand=True,
             xalign=0
         )
+
+    def destroy(self) -> None:
+        ...
