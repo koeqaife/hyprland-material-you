@@ -183,10 +183,15 @@ int main(void)
             {
                 free(output_buf);
                 if (code == 100)
+                {
                     printf("App asked for reload (exit code: %d)\n", code);
+                    continue;
+                }
                 else
+                {
                     printf("App exited normally.\n");
-                continue;
+                    break;
+                }
             }
 
             FILE *log_file = fopen(log_path, "w");
