@@ -4,6 +4,7 @@ dart-sass
 python-materialyoucolor-git
 libastal-bluetooth-git
 libastal-wireplumber-git
+ttf-material-symbols-variable-git
 
 Sync:
 python
