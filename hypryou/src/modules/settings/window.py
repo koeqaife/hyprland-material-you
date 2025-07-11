@@ -12,6 +12,7 @@ from src.modules.settings.bluetooth import BluetoothPage
 from src.modules.settings.appearance import AppearancePage
 from src.modules.settings.wallpapers import WallpapersPage
 from src.modules.settings.sleep import SleepPage
+from src.modules.settings.apps import AppsPage
 
 
 class Page(t.NamedTuple):
@@ -85,7 +86,7 @@ pages = {
         title="Apps",
         icon="settings_applications",
         icon_fill=True,
-        widget=NotImplementedYet
+        widget=AppsPage
     ),
     "hyprland": Page(
         title="Hyprland",
