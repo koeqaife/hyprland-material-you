@@ -256,12 +256,21 @@ window.settings {
         }
     }
 
-    .settings-category {
+    .settings-category,
+    .settings-hint {
         font-size: 0.85rem;
         font-weight: 300;
         color: $primary;
         margin: 1.25rem;
         margin-top: 0.125rem;
         margin-bottom: 0.125rem;
+    }
+
+    .settings-category {
+        color: $primary;
+    }
+
+    .settings-hint {
+        color: $onSurfaceVariant;
     }
 }

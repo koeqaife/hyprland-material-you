@@ -255,3 +255,19 @@ class Category(gtk.Label):
 
     def destroy(self) -> None:
         ...
+
+
+class Hint(gtk.Label):
+    __gtype_name__ = "SettingsHintLabel"
+
+    def __init__(self, text: str) -> None:
+        super().__init__(
+            css_classes=("settings-hint",),
+            label=text,
+            hexpand=True,
+            halign=gtk.Align.CENTER,
+            justify=gtk.Justification.CENTER
+        )
+
+    def destroy(self) -> None:
+        ...

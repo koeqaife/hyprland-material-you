@@ -1,6 +1,7 @@
 from repository import gtk
 from src.modules.settings.base import SettingsTextRow
 from src.modules.settings.base import Category
+from src.modules.settings.base import Hint
 
 
 class SleepPage(gtk.ScrolledWindow):
@@ -67,6 +68,10 @@ class SleepPage(gtk.ScrolledWindow):
                 test_text=lambda v: v.isdigit(),
                 transform2_fn=lambda v: int(v),
                 max_length=4
+            ),
+            Hint(
+                "Timers are cumulative.\n" +
+                "Example: Sleep = Lock + Screen off + Sleep"
             )
         )
         for child in self.box_children:
