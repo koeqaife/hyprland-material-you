@@ -157,12 +157,14 @@ class Workspaces(gtk.Box):
             return
         if self._old_active == new_value:
             return
-        if self._old_active:
+        if self._old_active in self.buttons.keys():
             toggle_css_class(self.buttons[self._old_active], "active", False)
+            self._old_active = new_value
+        else:
+            self._old_active = new_value
         if new_value not in self.buttons.keys():
             return
         toggle_css_class(self.buttons[new_value], "active", True)
-        self._old_active = new_value
 
     def update_empty(
         self,
