@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import atexit
 import threading
 from repository import gtk, gdk, gio, glib
 import time
@@ -387,6 +388,17 @@ def handle_fatal_signal(signum: int, frame: "sys.FrameType") -> None:
         except Exception as e:
             logger.exception("Error while stopping executor", exc_info=e)
 
+    cleanup()
+
+    signal.signal(signum, signal.SIG_DFL)
+    signal.raise_signal(signum)
+
+    # To exit if SIG_DFL didn't kill the process
+    time.sleep(0.1)
+    exit(1)
+
+
+def cleanup() -> None:
     if Settings().get("secure_cliphist"):
         cliphist.secure_clear()
     for service in services:
@@ -397,24 +409,12 @@ def handle_fatal_signal(signum: int, frame: "sys.FrameType") -> None:
                 "Error while stopping service %s",
                 type(service).__name__, exc_info=e
             )
+    logger.warning("Bye!")
 
-    signal.signal(signum, signal.SIG_DFL)
-    signal.raise_signal(signum)
 
-    # To exit if SIG_DFL didn't kill the process
-    time.sleep(0.1)
-    exit(1)
+atexit.register(cleanup)
 
 
 if __name__ == "__main__":
-    try:
-        init()
-        main()
-    except KeyboardInterrupt:
-        logger.warning("Bye!")
-        exit(0)
-    finally:
-        if Settings().get("secure_cliphist"):
-            cliphist.secure_clear()
-        for service in services:
-            service.on_close()
+    init()
+    main()
