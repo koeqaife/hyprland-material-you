@@ -1079,7 +1079,7 @@ class Bar(widget.LayerWindow):
         )
 
         self.set_child(self.center_box)
-        self.present()
+        self.show()
         if __debug__:
             weakref.finalize(self, lambda: logger.debug("Bar finalized"))
 
@@ -1141,7 +1141,7 @@ class Corner:
 
         self.application.add_window(self.window)
 
-        self.window.present()
+        self.window.show()
         surface = self.window.get_surface()
         if surface:
             surface.set_input_region(dummy_region)  # type: ignore[arg-type]

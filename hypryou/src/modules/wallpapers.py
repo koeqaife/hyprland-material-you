@@ -68,7 +68,7 @@ class WallpapersWindow(widget.LayerWindow):
 
         self._child = WallpapersWidget()
         self.set_child(self._child)
-        self.present()
+        self.show()
         if __debug__:
             weakref.finalize(
                 self,

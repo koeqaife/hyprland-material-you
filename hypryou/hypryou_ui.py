@@ -287,7 +287,6 @@ class HyprYou(gtk.Application):
                 ]
                 self.windows[monitor] = windows
                 self.corners[monitor] = corners
-                windows[0].present()
 
 
 def init() -> None:

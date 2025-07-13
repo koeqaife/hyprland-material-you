@@ -113,7 +113,7 @@ class LayerWindow(gtk.ApplicationWindow):
         is_visible = self.get_visible()
 
         if is_opened and not is_visible:
-            glib.idle_add(self.present)
+            glib.idle_add(self.show)
         elif not is_opened and is_visible:
             self.hide()
 
@@ -127,8 +127,8 @@ class LayerWindow(gtk.ApplicationWindow):
         super().hide()
         self.on_hide()
 
-    def present(self) -> None:
-        super().present()
+    def show(self) -> None:
+        super().show()
         self.on_show()
 
     def destroy(self) -> None:

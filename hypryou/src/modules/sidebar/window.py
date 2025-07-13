@@ -78,10 +78,10 @@ class SidebarWindow(widget.LayerWindow):
             for edge in edges:
                 layer_shell.set_margin(self, edge, 0)
 
-    def present(self) -> None:
+    def show(self) -> None:
         if self._child:
             self._child.notifications.unfreeze()
-        super().present()
+        super().show()
 
     def on_show(self) -> None:
         if not self._child:

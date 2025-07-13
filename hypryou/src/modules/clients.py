@@ -212,7 +212,7 @@ class ClientsWindow(widget.LayerWindow):
 
         if is_opened and not is_visible:
             self.once_handler = clients.watch_signal(
-                "synced", lambda *_: self.present(), once=True
+                "synced", lambda *_: self.show(), once=True
             )
             acquire_clients()
         elif not is_opened and is_visible:
