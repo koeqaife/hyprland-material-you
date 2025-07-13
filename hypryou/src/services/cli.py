@@ -37,7 +37,9 @@ HELP = {
     "screenshot": ("Take screenshot: region, active, " +
                    "window; add freeze to pause screen"),
     "help": "Show this help",
-    "settings": "Open settings"
+    "settings": "Open settings",
+    "wallpaper": ("Change wallpapers. " +
+                  "Use 'random' instead of path to pick random")
 }
 
 
@@ -154,8 +156,10 @@ class CliRequest:
             launch_detached(command)
         return "ok"
 
-    def do_wallpaper(self, wallpaper: str) -> None:
-        if wallpaper == "random":
+    def do_wallpaper(self, wallpaper: str) -> str:
+        if not wallpaper:
+            return "Usage: wallpaper <path>/random"
+        elif wallpaper == "random":
             set_random_wallpaper()
         else:
             if os.path.isfile(wallpaper):
