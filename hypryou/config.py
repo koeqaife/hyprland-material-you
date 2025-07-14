@@ -129,7 +129,7 @@ class Settings:
     __slots__ = (
         "_signals", "_initialized",
         "_values", "_allow_saving",
-        "_file_dict"
+        "_file_dict", "_views"
     )
     _instance: t.Optional['Settings'] = None
 
@@ -145,9 +145,16 @@ class Settings:
             self._values: dict[str, Ref[t.Any]] = {}
             self._allow_saving = False
             self._file_dict: dict[str, t.Any] = {}
+            self._views: dict[str, SettingsView] = {}
             self.sync()
-            self._add_default()
             self._allow_saving = True
+
+    def _ensure_ref(self, key: str) -> None:
+        if key not in self._values:
+            self._create_ref(
+                key,
+                self._file_dict.get(key, default_settings.get(key))
+            )
 
     def _create_ref(self, key: str, value: t.Any) -> None:
         def wrapper(new_value: str) -> None:
@@ -208,41 +215,121 @@ class Settings:
                 _dict[key] = value
         return _dict
 
-    def reset(self, name: str) -> None:
-        self.set(name, default_settings[name])
+    def reset(self, key: str) -> None:
+        self._ensure_ref(key)
+        self.set(key, default_settings[key])
 
-    def set(self, name: str, value: t.Any) -> None:
-        self._values[name].value = value
+    def set(self, key: str, value: t.Any) -> None:
+        self._ensure_ref(key)
+        self._values[key].value = value
 
-    def get(self, name: str) -> t.Any:
-        if name in self._values.keys():
-            return self._values[name].value
+    def get(self, key: str) -> t.Any:
+        self._ensure_ref(key)
+        if key in self._values.keys():
+            return self._values[key].value
         else:
-            return default_settings.get(name)
+            return default_settings.get(key)
 
-    def toggle(self, name: str) -> None:
-        value = self.get(name)
+    def toggle(self, key: str) -> None:
+        self._ensure_ref(key)
+        value = self.get(key)
         if isinstance(value, bool):
-            self.set(name, not value)
+            self.set(key, not value)
         else:
-            raise ValueError(f"{name} is not bool!")
+            raise ValueError(f"{key} is not bool!")
 
-    def toggle_between(self, name: str, first: T, second: T) -> None:
-        value = self.get(name)
+    def toggle_between(self, key: str, first: T, second: T) -> None:
+        self._ensure_ref(key)
+        value = self.get(key)
         if value == first:
-            self.set(name, second)
+            self.set(key, second)
         elif value == second:
-            self.set(name, first)
+            self.set(key, first)
 
     def watch(
-        self, name: str,
+        self, key: str,
         callback: t.Callable[[t.Any], None],
         init_call: bool = True,
         **kwargs: t.Any
     ) -> int:
+        self._ensure_ref(key)
         if init_call:
-            callback(self.get(name))
-        return self._signals.watch(f"changed::{name}", callback, **kwargs)
+            callback(self.get(key))
+        return self._signals.watch(f"changed::{key}", callback, **kwargs)
 
     def unwatch(self, handler_id: int) -> None:
         self._signals.unwatch(handler_id)
+
+    def get_view_for(self, key: str) -> "SettingsView":
+        if key in self._views.keys():
+            return self._views[key]
+        else:
+            view = SettingsView(key, self)
+            self._views[key] = view
+            return view
+
+
+class SettingsView:
+    __slots__ = ("_prefix", "_instance")
+
+    def __init__(
+        self,
+        prefix: str,
+        instance: Settings
+    ) -> None:
+        self._prefix = prefix
+        self._instance = instance
+
+    def save(self) -> None:
+        self._instance.save()
+
+    def sync(self) -> None:
+        self._instance.sync()
+
+    def notify_changed(self, key: str, value: str) -> None:
+        key = f"{self._prefix}.{key}"
+        self._instance.notify_changed(key, value)
+
+    def unpack(self) -> dict[str, t.Any]:
+        return self._instance.unpack()
+
+    def reset(self, key: str) -> None:
+        key = f"{self._prefix}.{key}"
+        self._instance.reset(key)
+
+    def set(self, key: str, value: t.Any) -> None:
+        key = f"{self._prefix}.{key}"
+        self._instance.set(key, value)
+
+    def get(self, key: str) -> t.Any:
+        return self._instance.get(key)
+
+    def toggle(self, key: str) -> None:
+        key = f"{self._prefix}.{key}"
+        self._instance.toggle(key)
+
+    def toggle_between(self, key: str, first: T, second: T) -> None:
+        key = f"{self._prefix}.{key}"
+        self._instance.toggle_between(key, first, second)
+
+    def watch(
+        self,
+        key: str,
+        callback: t.Callable[[t.Any], None],
+        init_call: bool = True,
+        **kwargs: t.Any
+    ) -> int:
+        key = f"{self._prefix}.{key}"
+        return self._instance.watch(
+            key,
+            callback,
+            init_call,
+            **kwargs
+        )
+
+    def unwatch(self, handler_id: int) -> None:
+        self._instance.unwatch(handler_id)
+
+    def get_view_for(self, key: str) -> "SettingsView":
+        key = f"{self._prefix}.{key}"
+        return self._instance.get_view_for(key)
