@@ -51,6 +51,8 @@ info = {
     "ko-fi": "https://ko-fi.com/koeqaife"
 }
 
+# TODO: Format names better (e.g. dark_icons -> icons.dark)
+# TODO: Add "enable" for every hyprland config generated category
 default_settings: dict[str, t.Any] = {
     "is_24hr_clock": True,
     "always_show_battery": False,
@@ -85,7 +87,30 @@ default_settings: dict[str, t.Any] = {
     "ac_sleep": 0,
     "battery_lock": 60,
     "battery_dpms": 60,
-    "battery_sleep": 60
+    "battery_sleep": 60,
+
+    # Input
+    "input.enabled": True,
+    "input.kb_model": "",
+    "input.kb_layout": ["us"],
+    "input.kb_variant": "",
+    "input.kb_options": "",
+    "input.kb_rules": "",
+    "input.numlock_by_default": False,
+    "input.resolve_binds_by_sym": False,
+    "input.repeat_rate": 25,
+    "input.repeat_delay": 600,
+    "input.sensitivity": 0,
+    "input.accel_profile": "",
+    "input.force_no_accel": False,
+    "input.left_handed": False,
+    "input.scroll_method": "",
+    "input.natural_scroll": False,
+    "input.follow_mouse": 1,
+    "input.follow_mouse_threshold": 0.0,
+    "input.focus_on_close": 0,
+    "input.mouse_refocus": True,
+    "input.float_switch_override_focus": 1
 }
 
 os.makedirs(config_dir, exist_ok=True)
