@@ -44,9 +44,6 @@ class AppsPage(gtk.ScrolledWindow):
         for child in self.box_children:
             self.box.append(child)
 
-        self.timeout_id = -1
-        self.once_scan = False
-
     def destroy(self) -> None:
         for child in self.box_children:
             child.destroy()
