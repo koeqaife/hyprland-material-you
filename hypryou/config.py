@@ -110,7 +110,22 @@ default_settings: dict[str, t.Any] = {
     "input.follow_mouse_threshold": 0.0,
     "input.focus_on_close": 0,
     "input.mouse_refocus": True,
-    "input.float_switch_override_focus": 1
+    "input.float_switch_override_focus": 1,
+
+    # Input touchpad
+    "input.touchpad.enabled": False,
+    "input.touchpad.disable_while_typing": True,
+    "input.touchpad.natural_scroll": False,
+    "input.touchpad.scroll_factor": 1.0,
+    "input.touchpad.middle_button_emulation": False,
+    "input.touchpad.tap_button_map": "lrm",
+    "input.touchpad.clickfinger_behavior": False,
+    "input.touchpad.tap_to_click": True,
+    "input.touchpad.drag_lock": 2,
+    "input.touchpad.tap_and_drag": True,
+    "input.touchpad.flip_x": False,
+    "input.touchpad.flip_y": False,
+    "input.touchpad.drag_3fg": 0
 }
 
 os.makedirs(config_dir, exist_ok=True)
@@ -157,6 +172,9 @@ class Settings:
             )
 
     def _create_ref(self, key: str, value: t.Any) -> None:
+        if key in self._values.keys():
+            return
+
         def wrapper(new_value: str) -> None:
             self.save()
             self.notify_changed(key, new_value)
