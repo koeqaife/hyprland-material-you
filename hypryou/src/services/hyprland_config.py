@@ -5,8 +5,9 @@ from src.services.hyprland_keybinds import key_binds
 from src.services.hyprland_keybinds.common import (
     KeyBind, KeyBindHint
 )
-from config import config_dir, Settings
+from config import config_dir, Settings, SettingsView
 import os
+import typing as t
 
 generated_config = os.path.join(config_dir, "hyprland_generated.conf")
 
@@ -24,6 +25,141 @@ decoration {{
     }}
 }}
 """
+
+
+type HyprlandConfigGroupKeys = list[str | tuple[str, str]]
+
+
+class HyprlandConfigGroup(t.TypedDict):
+    str: HyprlandConfigGroupKeys
+    bool: HyprlandConfigGroupKeys
+    digit: HyprlandConfigGroupKeys
+
+
+input_keys = t.cast(HyprlandConfigGroup, {
+    "str": [
+        "kb_model",
+        "kb_layout",
+        "kb_variant",
+        "kb_rules",
+        "accel_profile",
+        "scroll_method"
+    ],
+    "bool": [
+        "numlock_by_default",
+        "resolve_binds_by_sym",
+        "force_no_accel",
+        "left_handed",
+        "natural_scroll",
+        "mouse_refocus"
+    ],
+    "digit": [
+        "repeat_rate",
+        "repeat_delay",
+        "sensitivity",
+        "follow_mouse",
+        "follow_mouse_threshold",
+        "focus_on_close",
+        "float_switch_override_focus"
+    ]
+})
+
+input_touchpad_keys = t.cast(HyprlandConfigGroup, {
+    "str": [
+        "tap_button_map",
+    ],
+    "bool": [
+        "disable_while_typing",
+        "natural_scroll",
+        "middle_button_emulation",
+        "clickfinger_behavior",
+        ("tap_to_click", "tap-to-click"),
+        ("tap_and_drag", "tap-and-drag"),
+        "flip_x",
+        "flip_y"
+    ],
+    "digit": [
+        "scroll_factor"
+    ]
+})
+
+
+def generate_keys(
+    keys: HyprlandConfigGroupKeys,
+    settings: SettingsView | Settings,
+    transform_fn: t.Callable[[t.Any], str] | None = None,
+    prefix: str = ""
+) -> str:
+    output = ""
+    for _value in keys:
+        if isinstance(_value, tuple):
+            key, replace = _value
+        else:
+            key, replace = _value, _value
+
+        value = settings.get(key)
+        transformed = transform_fn(value) if transform_fn else value
+        if transformed is not None:
+            output += f"{prefix}{replace} = {transformed}\n"
+    return output
+
+
+def bool_convert(value: t.Any) -> str:
+    return "true" if value else "false"
+
+
+def generate_input() -> str:
+    indent = "    "
+    settings = Settings().get_view_for("input")
+    if not settings.get("enabled"):
+        return "# Disabled by settings"
+
+    output = "\n"
+    output += generate_keys(
+        input_keys["str"], settings,
+        prefix=indent
+    )
+    output += generate_keys(
+        input_keys["bool"], settings,
+        transform_fn=bool_convert,
+        prefix=indent
+    )
+    output += generate_keys(
+        input_keys["digit"], settings,
+        prefix=indent
+    )
+
+    options = str(settings.get("kb_options")).strip()
+    change_layout = str(settings.get("change_layout")).strip()
+    if change_layout:
+        if options:
+            options += f", {change_layout}"
+        else:
+            options = change_layout
+    output += f"{indent}kb_options = {options}\n"
+
+    touchpad_settings = settings.get_view_for("touchpad")
+    if touchpad_settings.get("enabled"):
+        indent2 = indent * 2
+        output2 = ""
+        output2 += generate_keys(
+            input_touchpad_keys["str"], touchpad_settings,
+            prefix=indent2
+        )
+        output2 += generate_keys(
+            input_touchpad_keys["bool"], touchpad_settings,
+            transform_fn=bool_convert,
+            prefix=indent2
+        )
+        output2 += generate_keys(
+            input_touchpad_keys["digit"], touchpad_settings,
+            prefix=indent2
+        )
+        output += f"{indent}touchpad {{\n{output2}{indent}}}\n"
+    else:
+        output += f"{indent}# Touchpad settings disabled by settings\n"
+
+    return f"input {{{output}}}\n"
 
 
 def generate_blur() -> str:
@@ -113,7 +249,8 @@ funcs = (
     generate_binds,
     generate_cursor_settings,
     generate_noanim,
-    generate_blur
+    generate_blur,
+    generate_input
 )
 
 

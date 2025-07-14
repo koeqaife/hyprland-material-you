@@ -92,9 +92,10 @@ default_settings: dict[str, t.Any] = {
     # Input
     "input.enabled": True,
     "input.kb_model": "",
-    "input.kb_layout": ["us"],
+    "input.kb_layout": "us",
     "input.kb_variant": "",
     "input.kb_options": "",
+    "input.change_layout": "",
     "input.kb_rules": "",
     "input.numlock_by_default": False,
     "input.resolve_binds_by_sym": False,
@@ -121,11 +122,9 @@ default_settings: dict[str, t.Any] = {
     "input.touchpad.tap_button_map": "lrm",
     "input.touchpad.clickfinger_behavior": False,
     "input.touchpad.tap_to_click": True,
-    "input.touchpad.drag_lock": 2,
     "input.touchpad.tap_and_drag": True,
     "input.touchpad.flip_x": False,
     "input.touchpad.flip_y": False,
-    "input.touchpad.drag_3fg": 0
 }
 
 os.makedirs(config_dir, exist_ok=True)
@@ -320,6 +319,7 @@ class SettingsView:
         self._instance.set(key, value)
 
     def get(self, key: str) -> t.Any:
+        key = f"{self._prefix}.{key}"
         return self._instance.get(key)
 
     def toggle(self, key: str) -> None:
