@@ -209,14 +209,17 @@ popover contents {
     border-radius: 0.25rem;
     min-height: 0;
     min-width: 12rem;
+    padding: 0;
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
 
-    modelbutton {
+    modelbutton, row {
         border-radius: 0;
         min-height: 2.5rem;
+        padding: 0;
         padding-left: 2rem;
         padding-right: 2rem;
+        margin: 0;
 
         &:hover {
             background: color.mix($surfaceContainer, $onSurface, 90%);
