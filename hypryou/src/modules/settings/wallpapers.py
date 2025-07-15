@@ -104,7 +104,8 @@ class WallpaperCard(gtk.Button):
             css_classes=("wallpaper",),
             child=self.box,
             tooltip_text=path.basename(file),
-            hexpand=False
+            valign=gtk.Align.START,
+            hexpand=True
         )
         self.image = gtk.Picture(
             css_classes=("image",),
