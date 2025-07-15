@@ -13,6 +13,7 @@ from src.modules.settings.appearance import AppearancePage
 from src.modules.settings.wallpapers import WallpapersPage
 from src.modules.settings.sleep import SleepPage
 from src.modules.settings.apps import AppsPage
+from src.modules.settings.input import InputPage
 
 
 class Page(t.NamedTuple):
@@ -68,7 +69,7 @@ pages = {
         title="Input",
         icon="keyboard",
         icon_fill=True,
-        widget=NotImplementedYet
+        widget=InputPage
     ),
     "monitors": Page(
         title="Monitors",
