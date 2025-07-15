@@ -1,4 +1,4 @@
-from repository import gtk, gdk
+from repository import gtk, gdk, gio, gobject
 import typing as t
 from config import Settings
 import src.widget as widget
@@ -146,6 +146,9 @@ class SettingsBoolRow(SwitchRowTemplate):
     def on_switch_changed(self, *args: t.Any) -> None:
         self.settings.set(self.key, self.switch.get_active())
 
+    def destroy(self) -> None:
+        self.settings.unwatch(self.settings_handler)
+
 
 class SettingsTextRow(RowTemplate):
     __gtype_name__ = "SettingsTextRow"
@@ -162,6 +165,7 @@ class SettingsTextRow(RowTemplate):
         transform2_fn: t.Callable[[str], t.Any] | None = None,
         test_text: t.Callable[[str], bool] | None = None,
         css_classes: tuple[str, ...] = (),
+        max_width_chars: int | None = None,
         **props: t.Any
     ) -> None:
         self.key = key
@@ -180,7 +184,9 @@ class SettingsTextRow(RowTemplate):
         )
         if max_length:
             self.entry.set_max_length(max_length)
-            self.entry.set_max_width_chars(max_length)
+
+        if max_length or max_width_chars:
+            self.entry.set_max_width_chars(max_length or max_width_chars)
 
         self.entry_box.append(self.entry)
         if left_icon:
@@ -219,6 +225,7 @@ class SettingsTextRow(RowTemplate):
     def destroy(self) -> None:
         super().destroy()
         self.entry.disconnect(self.entry_handler)
+        self.settings.unwatch(self.settings_handler)
 
     def text_changed(self, *args: t.Any) -> None:
         text = self.entry.get_text()
@@ -240,6 +247,103 @@ class SettingsTextRow(RowTemplate):
             else text
         )
         self.settings.set(self.key, value)
+
+
+class DropdownItem(gobject.Object):
+    def __init__(
+        self,
+        value: t.Any,
+        label: str,
+        tooltip: str | None = None
+    ) -> None:
+        super().__init__()
+        self.label = label
+        self.value = value
+        self.tooltip = tooltip
+
+
+class SettingsDropdownRow(RowTemplate):
+    __gtype_name__ = "SettingsDropdownRow"
+
+    def __init__(
+        self,
+        label: str,
+        description: str | None,
+        key: str,
+        items: list[DropdownItem],
+        css_classes: tuple[str, ...] = (),
+        **props: t.Any
+    ) -> None:
+        self.key = key
+        self.settings = Settings()
+        super().__init__(label, description, css_classes, **props)
+
+        self.items = gio.ListStore.new(DropdownItem)
+        for item in items:
+            self.items.append(item)
+
+        self.factory = gtk.SignalListItemFactory()
+        self.factory_handlers = (
+            self.factory.connect("setup", self.on_setup),
+            self.factory.connect("bind", self.on_bind)
+        )
+
+        self.dropdown = gtk.DropDown(
+            model=self.items,
+            factory=self.factory
+        )
+
+        self.dropdown_handler = self.dropdown.connect(
+            "notify::selected",
+            self.on_item_selected
+        )
+
+        self.append(self.dropdown)
+
+        self.settings_handler = self.settings.watch(
+            key, self.setting_updated
+        )
+
+    def on_click(self) -> None:
+        self.dropdown.activate()
+
+    def on_setup(
+        self,
+        factory: gtk.SignalListItemFactory,
+        list_item: gtk.ListItem
+    ) -> None:
+        label = gtk.Label(xalign=0)
+        list_item.set_child(label)
+
+    def on_bind(
+        self,
+        factory: gtk.SignalListItemFactory,
+        list_item: gtk.ListItem
+    ) -> None:
+        item = t.cast(DropdownItem, list_item.get_item())
+        label = t.cast(gtk.Label, list_item.get_child())
+        label.set_text(item.label)
+        if item.tooltip:
+            label.set_tooltip_text(item.tooltip)
+
+    def setting_updated(self, new_value: str) -> None:
+        model = self.dropdown.get_model()
+        for i in range(model.get_n_items()):
+            item = t.cast(DropdownItem, model.get_item(i))
+            if item.value == new_value:
+                self.dropdown.set_selected(i)
+                break
+
+    def destroy(self) -> None:
+        super().destroy()
+        for handler in self.factory_handlers:
+            self.factory.disconnect(handler)
+        self.dropdown.disconnect(self.dropdown_handler)
+        self.settings.unwatch(self.settings_handler)
+
+    def on_item_selected(self, *args: t.Any) -> None:
+        item = t.cast(DropdownItem, self.dropdown.get_selected_item())
+        self.settings.set(self.key, item.value)
 
 
 class Category(gtk.Label):

@@ -256,6 +256,26 @@ window.settings {
         }
     }
 
+    dropdown button {
+        border-radius: 0.5rem;
+        padding: 0;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        min-width: 0;
+        border: 0.0625rem solid $outline;
+
+        arrow {
+            color: $onSurface;
+        }
+
+        label {
+            color: $onSurface;
+            font-size: 1rem;
+            font-weight: 400;
+            font-family: "Google Sans Display";
+        }
+    }
+
     .settings-category,
     .settings-hint {
         font-size: 0.85rem;
