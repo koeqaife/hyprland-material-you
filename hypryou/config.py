@@ -101,7 +101,7 @@ default_settings: dict[str, t.Any] = {
     "input.resolve_binds_by_sym": False,
     "input.repeat_rate": 25,
     "input.repeat_delay": 600,
-    "input.sensitivity": 0,
+    "input.sensitivity": 0.0,
     "input.accel_profile": "",
     "input.force_no_accel": False,
     "input.left_handed": False,
@@ -165,6 +165,8 @@ class Settings:
 
     def _ensure_ref(self, key: str) -> None:
         if key not in self._values:
+            if key not in default_settings:
+                raise KeyError(f"{key} doesn't exist in settings")
             self._create_ref(
                 key,
                 self._file_dict.get(key, default_settings.get(key))
