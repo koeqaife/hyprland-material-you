@@ -5,8 +5,8 @@
 
 window.settings {
     @include nLayerBackground($background, 1);
-    min-width: 45rem;
-    min-height: 29.51rem;
+    min-width: 48rem;
+    min-height: 31rem;
 
     .settings-sidebar {
         @include nLayerBackground($surfaceContainer, 2);
