@@ -224,7 +224,7 @@ class NotificationItem(gtk.Box):
         self.time.set_label(
             get_formatted_time(
                 _datetime,
-                settings.get("time_format") == "12"
+                not settings.get("is_24hr_clock")
             )
         )
         toggle_css_class(self, "critical", self.item.urgency == 2)
