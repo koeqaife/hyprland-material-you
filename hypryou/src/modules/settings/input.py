@@ -4,26 +4,7 @@ from src.modules.settings.base import SettingsTextRow
 from src.modules.settings.base import SettingsBoolRow
 from src.modules.settings.base import Hint
 from src.modules.settings.base import Category
-
-int_kwargs = {
-    "transform_fn": lambda v: str(v),
-    "transform2_fn": lambda v: int(v),
-    "test_text": lambda v: str(v).isdecimal()
-}
-
-float_kwargs = {
-    "transform_fn": lambda v: str(v),
-    "transform2_fn": lambda v: float(v),
-    "test_text": lambda v: _is_float(v)
-}
-
-
-def _is_float(value: str) -> bool:
-    try:
-        float(value)
-        return True
-    except ValueError:
-        return False
+from src.modules.settings.base import int_kwargs, float_kwargs
 
 
 class InputPage(gtk.ScrolledWindow):

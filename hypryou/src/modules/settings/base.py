@@ -5,6 +5,27 @@ import src.widget as widget
 from utils import sync_debounce, toggle_css_class
 
 
+def _is_float(value: str) -> bool:
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
+
+
+int_kwargs = {
+    "transform_fn": lambda v: str(v),
+    "transform2_fn": lambda v: int(v),
+    "test_text": lambda v: str(v).isdecimal()
+}
+
+float_kwargs = {
+    "transform_fn": lambda v: str(v),
+    "transform2_fn": lambda v: float(v),
+    "test_text": _is_float
+}
+
+
 class RowTemplate(gtk.Box):
     __gtype_name__ = "SettingsRowTemplate"
 
