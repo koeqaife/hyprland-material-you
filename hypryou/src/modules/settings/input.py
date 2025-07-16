@@ -13,8 +13,16 @@ int_kwargs = {
 float_kwargs = {
     "transform_fn": lambda v: str(v),
     "transform2_fn": lambda v: float(v),
-    "test_text": lambda v: str(v).lstrip("-").isdigit()
+    "test_text": lambda v: _is_float(v)
 }
+
+
+def _is_float(value: str) -> bool:
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
 
 
 class InputPage(gtk.ScrolledWindow):
