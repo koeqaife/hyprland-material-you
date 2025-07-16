@@ -2,7 +2,7 @@ from repository import gtk, gdk, gio, gobject
 import typing as t
 from config import Settings
 import src.widget as widget
-from utils import sync_debounce
+from utils import sync_debounce, toggle_css_class
 
 
 class RowTemplate(gtk.Box):
@@ -230,16 +230,9 @@ class SettingsTextRow(RowTemplate):
     def text_changed(self, *args: t.Any) -> None:
         text = self.entry.get_text()
         if self.test_text and not self.test_text(text):
-            new_value = self.settings.get(self.key)
-            value = (
-                self.transform_fn(new_value)
-                if self.transform_fn
-                else new_value
-            )
-            self.entry.handler_block(self.entry_handler)
-            self.entry.set_text(value)
-            self.entry.handler_unblock(self.entry_handler)
+            toggle_css_class(self.entry_box, "incorrect", True)
             return
+        toggle_css_class(self.entry_box, "incorrect", False)
 
         value = (
             self.transform2_fn(text)

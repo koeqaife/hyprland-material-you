@@ -236,6 +236,10 @@ window.settings {
             border-color: $primary;
         }
 
+        &.incorrect {
+            border-color: $error;
+        }
+
         .icon {
             font-size: 1.125rem;
             font-variation-settings: "opsz" 20;
