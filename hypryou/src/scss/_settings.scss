@@ -112,11 +112,13 @@ window.settings {
             font-family: "Google Sans Text";
         }
 
-        &:hover {
-            background-color: color.mix(transparent, $onSurfaceVariant, 95%);
-        }
-        &:active {
-            background-color: color.mix(transparent, $onSurfaceVariant, 88%);
+        &.clickable {
+            &:hover {
+                background-color: color.mix(transparent, $onSurfaceVariant, 95%);
+            }
+            &:active {
+                background-color: color.mix(transparent, $onSurfaceVariant, 88%);
+            }
         }
     }
 

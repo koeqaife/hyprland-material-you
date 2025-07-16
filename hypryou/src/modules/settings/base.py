@@ -13,12 +13,14 @@ class RowTemplate(gtk.Box):
         label: str,
         description: str | None,
         css_classes: tuple[str, ...] = (),
+        clickable: bool = True,
         **props: t.Any
     ) -> None:
         super().__init__(
             css_classes=css_classes,
             **props
         )
+        toggle_css_class(self, "clickable", clickable)
         if "valign" not in props:
             self.set_valign(gtk.Align.START)
         if "hexpand" not in props:
