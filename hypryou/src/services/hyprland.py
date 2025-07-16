@@ -84,6 +84,35 @@ ClientDict = t.TypedDict(
 )
 
 
+class MonitorDict(t.TypedDict):
+    id: int
+    name: str
+    description: str
+    make: str
+    model: str
+    serial: str
+    width: int
+    height: int
+    refreshRate: float
+    x: int
+    y: int
+    activeWorkspace: ClientWorkspace
+    specialWorkspace: ClientWorkspace
+    reversed: list[int]
+    scale: float
+    transform: int
+    focused: bool
+    dpmsStatus: bool
+    vrr: bool
+    solitary: str
+    activelyTearing: bool
+    directScanoutTo: str
+    disabled: bool
+    currentFormat: str
+    mirrorOf: str
+    availableModes: list[str]
+
+
 class Client(Signals):
     def __init__(self, client: ClientDict) -> None:
         super().__init__()
@@ -588,6 +617,10 @@ def release_clients() -> None:
     if clients_use_counter < 0:
         clients_use_counter = 0
         logger.warning("Release: Clients counter < 0")
+
+
+async def get_monitors() -> list[MonitorDict]:
+    return t.cast(list[MonitorDict], await client.query("monitors"))
 
 
 async def init() -> None:
