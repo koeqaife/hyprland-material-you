@@ -3,6 +3,7 @@ from src.modules.settings.base import SettingsDropdownRow, DropdownItem
 from src.modules.settings.base import SettingsTextRow
 from src.modules.settings.base import SettingsBoolRow
 from src.modules.settings.base import Hint
+from src.modules.settings.base import Category
 
 int_kwargs = {
     "transform_fn": lambda v: str(v),
@@ -39,7 +40,7 @@ class InputPage(gtk.ScrolledWindow):
             hscrollbar_policy=gtk.PolicyType.NEVER
         )
         self.box_children = (
-            # TODO: Add categories
+            Category("Keyboard"),
             SettingsTextRow(
                 "Keyboard model",
                 "Specifies the physical model of the keyboard",
@@ -110,6 +111,8 @@ class InputPage(gtk.ScrolledWindow):
                 max_width_chars=6,
                 **int_kwargs
             ),
+
+            Category("Mouse & Pointer"),
             SettingsTextRow(
                 "Mouse sensitivity",
                 "Cursor speed adjustment",
@@ -232,6 +235,75 @@ class InputPage(gtk.ScrolledWindow):
                     DropdownItem(
                         2, "Plus float",
                         "Also follows cursor on floating switches"
+                    )
+                ]
+            ),
+
+            Category("Touchpad"),
+            SettingsBoolRow(
+                "Touchpad settings enabled",
+                "If disabled hyprland's default settings will be used",
+                "input.touchpad.enabled"
+            ),
+            SettingsBoolRow(
+                "Disable while typing",
+                "Touchpad won't work when you're typing",
+                "input.touchpad.disable_while_typing"
+            ),
+            SettingsBoolRow(
+                "Natural scrolling",
+                "Invert touchpad scroll direction for intuitive movement",
+                "input.touchpad.natural_scroll"
+            ),
+            SettingsBoolRow(
+                "Middle button emulation",
+                "Left and right click would be interpreted as a middle click",
+                "input.touchpad.middle_button_emulation"
+            ),
+            SettingsBoolRow(
+                "Clickfinger behavior",
+                "Map 1-3 finger taps to left, right, and middle click",
+                "input.touchpad.clickfinger_behavior"
+            ),
+            SettingsBoolRow(
+                "Tap-to-click",
+                "Tap with 1-3 fingers to click left, right, or middle button",
+                "input.touchpad.tap_to_click"
+            ),
+            SettingsBoolRow(
+                "Tap-to-drag",
+                "Enable dragging by tapping and holding",
+                "input.touchpad.tap_and_drag"
+            ),
+            SettingsBoolRow(
+                "Flip X",
+                "Reverse horizontal movement direction",
+                "input.touchpad.flip_x"
+            ),
+            SettingsBoolRow(
+                "Flip Y",
+                "Reverse vertical movement direction",
+                "input.touchpad.flip_y"
+            ),
+            SettingsTextRow(
+                "Scroll factor",
+                "Multiplier applied to the amount of scroll movement",
+                "input.touchpad.scroll_factor",
+                **float_kwargs,
+                max_width_chars=4
+            ),
+            SettingsDropdownRow(
+                "Tap button map",
+                "Assign buttons to fingers taps",
+                "input.touchpad.tap_button_map",
+                items=[
+                    DropdownItem(
+                        "lrm", "LRM",
+                        "Left, Right, Middle (default)"
+                    ),
+                    DropdownItem(
+                        "lmr", "LMR",
+                        "Left, Middle, Right"
                     )
                 ]
             ),
