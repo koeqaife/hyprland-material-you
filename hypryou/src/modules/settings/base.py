@@ -3,6 +3,7 @@ import typing as t
 from config import Settings
 import src.widget as widget
 from utils import sync_debounce, toggle_css_class
+import weakref
 
 
 def _is_float(value: str) -> bool:
@@ -256,6 +257,11 @@ class DropdownRowTemplate(RowTemplate):
 
         self.append(self.dropdown)
 
+    def set_items(self, items: list[DropdownItem]) -> None:
+        self.items.remove_all()
+        for item in items:
+            self.items.append(item)
+
     def on_click(self) -> None:
         self.dropdown.activate()
 
@@ -314,19 +320,21 @@ class Row(RowTemplate):
     ):
         if clickable is None:
             clickable = on_click is not None or on_secondary_click is not None
-        self._on_click = on_click
-        self._on_secondary_click = on_secondary_click
+        self._on_click = weakref.WeakMethod(on_click)
+        self._on_secondary_click = weakref.WeakMethod(on_secondary_click)
         super().__init__(label, description, css_classes, clickable, **props)
 
     def on_click(self) -> None:
         super().on_click()
-        if callable(self._on_click):
-            self._on_click(self)
+        method = self._on_click()
+        if callable(method):
+            method(self)
 
     def on_secondary_click(self) -> None:
         super().on_secondary_click()
-        if callable(self._on_secondary_click):
-            self._on_secondary_click(self)
+        method = self._on_secondary_click()
+        if callable(method):
+            method(self)
 
 
 class TextRow(TextRowTemplate):
@@ -344,7 +352,7 @@ class TextRow(TextRowTemplate):
         max_width_chars: int | None = None,
         **props: t.Any
     ) -> None:
-        self._on_text_changed = on_text_changed
+        self._on_text_changed = weakref.WeakMethod(on_text_changed)
         super().__init__(
             label, description, left_icon, right_icon,
             max_length, css_classes, max_width_chars,
@@ -352,8 +360,9 @@ class TextRow(TextRowTemplate):
         )
 
     def on_text_changed(self, *args: t.Any):
-        if callable(self._on_text_changed):
-            self._on_text_changed(self, self.entry.get_text())
+        method = self._on_text_changed()
+        if callable(method()):
+            method(self, self.entry.get_text())
 
 
 class DropdownRow(DropdownRowTemplate):
@@ -368,13 +377,14 @@ class DropdownRow(DropdownRowTemplate):
         on_selected: t.Callable[[t.Self, DropdownItem], None] | None = None,
         **props: t.Any
     ) -> None:
-        self._on_selected = on_selected
+        self._on_selected = weakref.WeakMethod(on_selected)
         super().__init__(label, description, items, css_classes, **props)
 
     def on_item_selected(self, *args: t.Any) -> None:
         super().on_item_selected(*args)
-        if callable(self._on_selected):
-            self._on_selected(self, self.get_current())
+        method = self._on_selected()
+        if callable(method):
+            method(self, self.get_current())
 
 
 class SettingsBoolRow(SwitchRowTemplate):
