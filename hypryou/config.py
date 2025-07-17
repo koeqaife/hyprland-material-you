@@ -125,6 +125,8 @@ default_settings: dict[str, t.Any] = {
     "input.touchpad.tap_and_drag": True,
     "input.touchpad.flip_x": False,
     "input.touchpad.flip_y": False,
+
+    "monitors": []
 }
 
 os.makedirs(config_dir, exist_ok=True)

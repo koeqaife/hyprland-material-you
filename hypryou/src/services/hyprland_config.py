@@ -162,6 +162,19 @@ def generate_input() -> str:
     return f"input {{{output}}}\n"
 
 
+def generate_monitors() -> str:
+    output = ""
+    monitors: list[str] = Settings().get("monitors")
+    if len(monitors) == 0:
+        output += "monitor = , preferred, auto, 1\n"
+    else:
+        for monitor in monitors:
+            if not isinstance(monitor, str):
+                continue
+            output += f"monitor = {monitor}\n"
+    return output
+
+
 def generate_blur() -> str:
     settings = Settings()
     blur = settings.get("blur")
@@ -175,7 +188,7 @@ def generate_blur() -> str:
         "layerrule = ignorealpha 0.85, hypryou-.*",
         BLUR.format("true" if xray else "false")
     )
-    return "\n".join(output) + "\n"
+    return "\n".join(output)
 
 
 def generate_noanim() -> str:
@@ -250,7 +263,8 @@ funcs = (
     generate_cursor_settings,
     generate_noanim,
     generate_blur,
-    generate_input
+    generate_input,
+    generate_monitors
 )
 
 
