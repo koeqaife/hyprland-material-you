@@ -250,6 +250,11 @@ class HyprYou(gtk.Application):
                         monitor.get_model()
                     )
                 for window in self.windows[monitor]:
+                    if __debug__:
+                        logger.debug(
+                            "Removing window: %s",
+                            type(window).__name__
+                        )
                     window.destroy()
                 self.windows[monitor].clear()
                 del self.windows[monitor]
