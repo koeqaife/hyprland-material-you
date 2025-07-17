@@ -182,7 +182,7 @@ class Settings:
             self.save()
             self.notify_changed(key, new_value)
 
-        ref = Ref(value, name=f"settings.{key}")
+        ref = Ref(value, name=f"settings.{key}", deep=True)
         ref.watch(wrapper)
         ref.create_ref(wrapper)
         self._values[key] = ref
