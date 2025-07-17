@@ -367,7 +367,7 @@ class TextRow(TextRowTemplate):
 
     def on_text_changed(self, *args: t.Any):
         method = self._on_text_changed()
-        if callable(method()):
+        if callable(method):
             method(self, self.entry.get_text())
 
 
