@@ -164,14 +164,21 @@ def generate_input() -> str:
 
 def generate_monitors() -> str:
     output = ""
-    monitors: list[str] = Settings().get("monitors")
+    monitors: list[dict[str, str]] = Settings().get("monitors")
     if len(monitors) == 0:
         output += "monitor = , preferred, auto, 1\n"
     else:
         for monitor in monitors:
-            if not isinstance(monitor, str):
+            if isinstance(monitor, str):
+                output += f"monitor = {monitor}\n"
                 continue
-            output += f"monitor = {monitor}\n"
+            if not isinstance(monitor, dict):
+                continue
+
+            output += "monitorv2 {\n"
+            for key, value in monitor.items():
+                output += f"    {key} = {value}\n"
+            output += "}\n"
     return output
 
 
