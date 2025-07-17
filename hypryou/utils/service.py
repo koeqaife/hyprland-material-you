@@ -12,6 +12,20 @@ Callback = t.Callable[..., None]
 Wrapper = t.Callable[..., bool | None]
 
 
+class Counter:
+    def __init__(self) -> None:
+        self.id = 0
+        self.lock = threading.RLock()
+
+    def acquire_new_id(self) -> int:
+        with self.lock:
+            self.id += 1
+            return self.id
+
+
+global_counter = Counter()
+
+
 class Signals:
     __slots__ = (
         "_signals", "_handler_signals",
@@ -61,7 +75,7 @@ class Signals:
                 wrapper = one_shot
 
             callbacks = self._signals.setdefault(signal_name, {})
-            base_id = max(self._handler_signals.keys(), default=0) + 1
+            base_id = global_counter.acquire_new_id()
             handler_id = base_id + priority * 0x10000
             callbacks[handler_id] = wrapper
             self._handler_signals[handler_id] = signal_name
