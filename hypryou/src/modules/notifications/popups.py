@@ -125,7 +125,8 @@ class Notifications(widget.LayerWindow):
         self.set_child(self.popups)
 
     def destroy(self) -> None:
-        self.popups.destroy()
+        if self.popups is not None:
+            self.popups.destroy()
         self.popups = None  # type: ignore
         self.set_child(None)
         return super().destroy()

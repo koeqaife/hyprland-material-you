@@ -98,7 +98,7 @@ class BrightnessPopup(Popup):
         self.device = BacklightDeviceView(device)
         super().__init__(device.icon, num, 512)
 
-        self.handler = device.watch(
+        self.handler = self.device.watch(
             "changed-external",
             self.update_scale_value
         )
