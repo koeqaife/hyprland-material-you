@@ -15,7 +15,7 @@ def open_hyprpicker(*_: t.Any) -> None:
             stdout=subprocess.DEVNULL
         )
     close_window("sidebar")
-    glib.timeout_add(250, start)
+    glib.timeout_add(500, start)
 
 
 def open_power_menu(*_: t.Any) -> None:
