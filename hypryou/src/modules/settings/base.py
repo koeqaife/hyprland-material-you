@@ -201,6 +201,12 @@ class TextRowTemplate(RowTemplate):
             self.entry.connect("notify::text", self.debounced_text_changed)
         )
 
+    def entry_update_text(self, value: str) -> None:
+        if self.entry.get_text() != value:
+            self.entry.handler_block(self.entry_handler)
+            self.entry.set_text(value)
+            self.entry.handler_unblock(self.entry_handler)
+
     def destroy(self) -> None:
         super().destroy()
         self.entry.disconnect(self.entry_handler)
@@ -451,10 +457,7 @@ class SettingsTextRow(TextRowTemplate):
             if self.transform_fn
             else str(new_value)
         )
-        if self.entry.get_text() != value:
-            self.entry.handler_block(self.entry_handler)
-            self.entry.set_text(value)
-            self.entry.handler_unblock(self.entry_handler)
+        self.entry_update_text(value)
 
     def destroy(self) -> None:
         super().destroy()
