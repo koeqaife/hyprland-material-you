@@ -246,10 +246,11 @@ class Settings:
 
     def get(self, key: str) -> t.Any:
         self._ensure_ref(key)
-        if key in self._values.keys():
-            return self._values[key].value
-        else:
-            return default_settings.get(key)
+        return self._values[key].value
+
+    def get_ref(self, key: str) -> Ref[t.Any]:
+        self._ensure_ref(key)
+        return self._values[key]
 
     def toggle(self, key: str) -> None:
         self._ensure_ref(key)
@@ -325,6 +326,10 @@ class SettingsView:
     def get(self, key: str) -> t.Any:
         key = f"{self._prefix}.{key}"
         return self._instance.get(key)
+
+    def get_ref(self, key: str) -> Ref[t.Any]:
+        key = f"{self._prefix}.{key}"
+        return self._instance.get_ref(key)
 
     def toggle(self, key: str) -> None:
         key = f"{self._prefix}.{key}"
