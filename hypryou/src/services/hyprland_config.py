@@ -177,6 +177,8 @@ def generate_monitors() -> str:
 
             output += "monitorv2 {\n"
             for key, value in monitor.items():
+                if not value:
+                    continue
                 output += f"    {key} = {value}\n"
             output += "}\n"
     return output
