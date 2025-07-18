@@ -1,3 +1,4 @@
+import types
 from utils.ref import Ref
 from utils import toggle_css_class
 from repository import gtk, glib
@@ -227,6 +228,10 @@ class MonitorsPage(gtk.Box):
                     "sRGB primaries (default)"
                 ),
                 DropdownItem(
+                    "wide", "Wide",
+                    "wide color gamut, BT2020 primaries"
+                ),
+                DropdownItem(
                     "edid", "Edid",
                     "Primaries from edid (known to be inaccurate)"
                 ),
@@ -277,6 +282,14 @@ class MonitorsPage(gtk.Box):
             on_text_changed=self.make_text_handler("mirror")
         )
 
+        self.bitdepth = TextRow(
+            "Bitdepth",
+            "Number of bits used per color channel (e.g. 8, 10)",
+            on_text_changed=self.on_bitdepth,
+            max_length=4,
+            max_width_chars=3
+        )
+
         self.children = (
             self.monitor_selector,
             gtk.Separator(),
@@ -288,7 +301,8 @@ class MonitorsPage(gtk.Box):
             self.color_management,
             self.transform,
             self.mirror,
-            self.vrr
+            self.vrr,
+            self.bitdepth
         )
 
         self.actions_box = gtk.Box(
@@ -453,19 +467,29 @@ class MonitorsPage(gtk.Box):
 
         self.update_setting("scale", float(value) / 100)
 
+    def on_bitdepth(self, row: TextRow, value: str):
+        if not value.isdigit():
+            toggle_css_class(row.entry_box, "incorrect", True)
+            return
+        toggle_css_class(row.entry_box, "incorrect", False)
+
+        self.update_setting("bitdepth", value)
+
     # Private handler generators
 
     def make_text_handler(self, key: str) -> t.Callable[[TextRow, str], None]:
-        def handler(row: TextRow, text: str) -> None:
-            self.update_setting(key, text)
-        return handler
+        def handler(this: MonitorsPage, row: TextRow, text: str) -> None:
+            this.update_setting(key, text)
+        return types.MethodType(handler, self)
 
     def make_dropdown_handler(
         self, key: str
     ) -> t.Callable[[DropdownRow, str], None]:
-        def handler(row: DropdownRow, item: DropdownItem) -> None:
-            self.update_setting(key, item.value)
-        return handler
+        def handler(
+            this: MonitorsPage, row: DropdownRow, item: DropdownItem
+        ) -> None:
+            this.update_setting(key, item.value)
+        return types.MethodType(handler, self)
 
     # Update widgets
 
@@ -479,7 +503,12 @@ class MonitorsPage(gtk.Box):
         self.update_mirror(monitor)
         self.update_vrr(monitor)
         self.update_transform(monitor)
+        self.update_bitdepth(monitor)
         glib.idle_add(self.sync_finished)
+
+    def update_bitdepth(self, monitor: MonitorDict) -> None:
+        bitdepth = self.get_setting("bitdepth", monitor) or ""
+        self.bitdepth.entry_update_text(bitdepth)
 
     def update_vrr(self, monitor: MonitorDict) -> None:
         vrr = self.get_setting("vrr", monitor) or ""
