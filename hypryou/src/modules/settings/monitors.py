@@ -382,7 +382,6 @@ class MonitorsPage(gtk.Box):
 
     def sync_finished(self) -> None:
         self._finished = True
-        print("Finish")
 
     def update_setting(self, key: str, value: str) -> None:
         if not self._finished:
@@ -390,7 +389,6 @@ class MonitorsPage(gtk.Box):
         current = self.settings[self.current_monitor]
         current[key] = value
         self.save_button.set_sensitive(True)
-        print(f"Update: {key} = {value}")
 
     def get_setting(
         self,
@@ -431,7 +429,6 @@ class MonitorsPage(gtk.Box):
         self.custom_mode.set_visible(item.value == "custom")
         if item.value != "custom":
             self.update_setting("mode", item.value)
-        print(f"Mode: {item.value}")
 
     def on_select_monitor(self, row: DropdownRow, item: DropdownItem) -> None:
         if item is None:
@@ -441,7 +438,6 @@ class MonitorsPage(gtk.Box):
         if monitor_name == self.current_monitor:
             return
         self.current_monitor = monitor_name
-        print(f"Monitor: {monitor_name}")
 
         monitor = self.monitors.get(monitor_name)
         if monitor is None:
