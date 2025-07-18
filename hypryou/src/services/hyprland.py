@@ -620,7 +620,7 @@ def release_clients() -> None:
 
 
 async def get_monitors() -> list[MonitorDict]:
-    return t.cast(list[MonitorDict], await client.query("monitors"))
+    return t.cast(list[MonitorDict], await client.query("monitors all"))
 
 
 async def init() -> None:
