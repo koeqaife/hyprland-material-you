@@ -6,7 +6,7 @@ from utils import sync_debounce, toggle_css_class
 import weakref
 
 
-def _is_float(value: str) -> bool:
+def test_float(value: str) -> bool:
     try:
         float(value)
         return True
@@ -23,7 +23,7 @@ int_kwargs = {
 float_kwargs = {
     "transform_fn": lambda v: str(v),
     "transform2_fn": lambda v: float(v),
-    "test_text": _is_float
+    "test_text": test_float
 }
 
 
@@ -341,6 +341,27 @@ class Row(RowTemplate):
         method = self._on_secondary_click()
         if callable(method):
             method(self)
+
+
+class SwitchRow(SwitchRowTemplate):
+    __gtype_name__ = "SettingsSwitchRow2"
+
+    def __init__(
+        self,
+        label: str,
+        description: str | None,
+        css_classes: tuple[str, ...] = (),
+        on_changed: t.Callable[[t.Self, bool], None] = None,
+        **props: t.Any
+    ) -> None:
+        self._on_changed = weakref.WeakMethod(on_changed)
+        super().__init__(label, description, css_classes, **props)
+
+    def on_switch_changed(self, *args: t.Any) -> None:
+        super().on_switch_changed(*args)
+        method = self._on_changed()
+        if callable(method):
+            method(self, self.switch.get_active())
 
 
 class TextRow(TextRowTemplate):
