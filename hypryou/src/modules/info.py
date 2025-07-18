@@ -5,14 +5,10 @@ import weakref
 from utils.logger import logger
 from utils import toggle_css_class
 import utils.system as system
+from utils.system import STATIC_SYSTEM_INFO as STATIC
 import webbrowser
 
 ICON_SIZE = 22
-STATIC = {
-    "total_ram": int(system.get_memory_total()),
-    "cpu": f"{system.get_cpu_name()} ({system.get_cpu_counts()})",
-    "kernel": " ".join(system.get_kernel_info())
-}
 
 
 class InfoPage(gtk.Box):

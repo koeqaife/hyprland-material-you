@@ -124,3 +124,23 @@ def get_swap_usage() -> tuple[float, float, float]:
     percent = 100.0 * used / total if total > 0 else 0.0
 
     return total / 1024, used / 1024, percent
+
+
+def get_distro() -> str:
+    try:
+        with open("/etc/os-release", "r", encoding="utf-8") as f:
+            lines = f.readlines()
+        for line in lines:
+            if line.startswith("PRETTY_NAME="):
+                return line.strip().split("=")[1].strip('"')
+    except Exception:
+        pass
+    return "Unknown"
+
+
+STATIC_SYSTEM_INFO = {
+    "total_ram": int(get_memory_total()),
+    "cpu": f"{get_cpu_name()} ({get_cpu_counts()})",
+    "kernel": " ".join(get_kernel_info()),
+    "distro": get_distro()
+}
