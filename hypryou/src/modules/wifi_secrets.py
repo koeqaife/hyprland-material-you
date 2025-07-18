@@ -33,7 +33,7 @@ class SecretsDialog(gtk.ApplicationWindow):
         super().__init__(
             application=Globals.app,
             name="secrets-dialog",
-            css_classes=("secrets-dialog",),
+            css_classes=("secrets-dialog", "misc--dialog"),
             title="Wifi password",
             child=self.box
         )

@@ -27,7 +27,7 @@ class PinDialog(gtk.ApplicationWindow):
         super().__init__(
             application=Globals.app,
             name="pin-dialog",
-            css_classes=("pin-dialog",),
+            css_classes=("pin-dialog", "misc--dialog"),
             title="Pairing Confirmation",
             child=self.box
         )
