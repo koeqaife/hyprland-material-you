@@ -318,10 +318,10 @@ class Row(RowTemplate):
         self,
         label: str,
         description: str,
+        on_click: t.Callable[[t.Self], None] | None,
+        on_secondary_click: t.Callable[[t.Self], None] | None,
         css_classes: tuple[str, ...] = (),
         clickable: bool | None = None,
-        on_click: t.Callable[[t.Self], None] | None = None,
-        on_secondary_click: t.Callable[[t.Self], None] | None = None,
         **props: t.Any
     ):
         if clickable is None:
@@ -350,8 +350,8 @@ class SwitchRow(SwitchRowTemplate):
         self,
         label: str,
         description: str | None,
+        on_changed: t.Callable[[t.Self, bool], None],
         css_classes: tuple[str, ...] = (),
-        on_changed: t.Callable[[t.Self, bool], None] = None,
         **props: t.Any
     ) -> None:
         self._on_changed = weakref.WeakMethod(on_changed)
@@ -371,10 +371,10 @@ class TextRow(TextRowTemplate):
         self,
         label: str,
         description: str | None,
+        on_text_changed: t.Callable[[t.Self, str], None],
         left_icon: str | None = None,
         right_icon: str | None = None,
         max_length: int | None = None,
-        on_text_changed: t.Callable[[t.Self, str], None] = None,
         css_classes: tuple[str, ...] = (),
         max_width_chars: int | None = None,
         **props: t.Any
@@ -400,8 +400,8 @@ class DropdownRow(DropdownRowTemplate):
         label: str,
         description: str | None,
         items: list[DropdownItem],
+        on_selected: t.Callable[[t.Self, DropdownItem], None],
         css_classes: tuple[str, ...] = (),
-        on_selected: t.Callable[[t.Self, DropdownItem], None] | None = None,
         **props: t.Any
     ) -> None:
         self._on_selected = weakref.WeakMethod(on_selected)
