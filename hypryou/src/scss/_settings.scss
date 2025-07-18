@@ -222,6 +222,33 @@ window.settings {
         }
     }
 
+    .info-page {
+        .info-row {
+            .logo {
+                font-size: 2.25rem;
+                border-radius: 50%;
+                background-color: $primary;
+                color: $onPrimary;
+                font-family: "Google Sans Display";
+                min-height: 4.5rem;
+                min-width: 4.5rem;
+                margin-right: 0.5rem;
+            }
+            .title {
+                font-size: 1.25rem;
+                font-weight: 500;
+                color: $onSurface;
+                margin-bottom: 0.25rem;
+            }
+            .author,
+            .version {
+                font-size: 1rem;
+                font-weight: 400;
+                color: $onSurfaceVariant;
+            }
+        }
+    }
+
     .settings-page separator.horizontal {
         margin: 0.25rem;
         margin-left: 0.5rem;

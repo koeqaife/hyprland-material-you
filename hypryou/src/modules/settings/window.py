@@ -15,6 +15,7 @@ from src.modules.settings.sleep import SleepPage
 from src.modules.settings.apps import AppsPage
 from src.modules.settings.input import InputPage
 from src.modules.settings.monitors import MonitorsPage
+from src.modules.settings.info import InfoPage
 
 
 class Page(t.NamedTuple):
@@ -106,7 +107,7 @@ pages = {
         title="Info",
         icon="info",
         icon_fill=True,
-        widget=NotImplementedYet
+        widget=InfoPage
     )
 }
 
