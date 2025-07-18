@@ -14,6 +14,7 @@ from src.services import state
 import shutil
 import traceback
 import typing as t
+from utils.handler import exit_reload
 
 
 screenshot_mode_args = {
@@ -72,7 +73,7 @@ class CliRequest:
             return "Not running in watchdog, skipped...", False
 
     def post_reload(self, args: str) -> None:
-        exit(100)
+        exit_reload()
 
     def do_exit(self, args: str) -> str:
         return "ok"

@@ -1,5 +1,5 @@
 import weakref
-from repository import gtk, layer_shell, gdk, glib
+from repository import gtk, layer_shell, gdk
 from utils.ref import Ref
 from utils.logger import logger
 import typing as t
@@ -113,7 +113,7 @@ class LayerWindow(gtk.ApplicationWindow):
         is_visible = self.get_visible()
 
         if is_opened and not is_visible:
-            glib.idle_add(self.show)
+            self.show()
         elif not is_opened and is_visible:
             self.hide()
 

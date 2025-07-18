@@ -10,6 +10,7 @@ import os
 import signal
 import traceback
 import sys
+import types
 
 import utils
 from utils.logger import logger
@@ -18,6 +19,7 @@ from config import Settings, ORIGINAL_DIR
 
 from gi.events import GLibEventLoopPolicy  # type: ignore[import-untyped]
 import asyncio
+from utils.handler import exit_hung, set_fatal_handler, ExitSignals
 
 # Services
 from utils.service import AsyncService, Service
@@ -304,8 +306,7 @@ def init() -> None:
         exit(1)
 
     os.nice(5)
-    for sig in (signal.SIGUSR1, signal.SIGTERM, signal.SIGINT, signal.SIGABRT):
-        signal.signal(sig, handle_fatal_signal)
+    set_fatal_handler(handle_fatal_signal)
 
     settings = Settings()
     asyncio.set_event_loop_policy(GLibEventLoopPolicy())
@@ -355,7 +356,7 @@ def watchdog(timeout: float) -> None:
                     "".join(traceback.format_stack(frame))
                 )
 
-            signal.raise_signal(signal.SIGUSR1)
+            exit_hung()
             exit(1)
         time.sleep(timeout)
 
@@ -369,29 +370,27 @@ def start_watchdog(timeout: float = 5.0) -> threading.Thread:
     return thread
 
 
-def handle_fatal_signal(signum: int, frame: "sys.FrameType") -> None:
+def handle_fatal_signal(signum: int, frame: types.FrameType) -> None:
     logger.setLevel(logging.DEBUG)
 
-    signame = signal.Signals(signum).name
+    sigmap = {
+        ExitSignals.SIGERROR: "SIGERROR",
+        ExitSignals.SIGRELOAD: "SIGRELOAD",
+        ExitSignals.SIGHUNG: "SIGHUNG",
+    }
+    if signum in sigmap:
+        signame = sigmap[signum]
+    else:
+        signame = signal.Signals(signum).name
     logger.critical(
         f"Received fatal signal {signame} ({signum}), cleaning up..."
     )
 
-    if signum == signal.SIGUSR1:
+    if signum == ExitSignals.SIGERROR or signum == ExitSignals.SIGHUNG:
         save_state()
-    stack_str = ''.join(traceback.format_stack(frame))
-    logger.debug("Stack at signal:\n%s", stack_str)
-
-    for executor in (utils.colors.executor, wallpaper_executor):
-        try:
-            if executor:
-                if hasattr(executor, "_processes") and executor._processes:
-                    for p in executor._processes.values():
-                        p.kill()
-
-                executor.shutdown(wait=False, cancel_futures=True)
-        except Exception as e:
-            logger.exception("Error while stopping executor", exc_info=e)
+    if signum != ExitSignals.SIGRELOAD:
+        stack_str = ''.join(traceback.format_stack(frame))
+        logger.debug("Stack at signal:\n%s", stack_str)
 
     cleanup()
 
@@ -404,6 +403,16 @@ def handle_fatal_signal(signum: int, frame: "sys.FrameType") -> None:
 
 
 def cleanup() -> None:
+    for executor in (utils.colors.executor, wallpaper_executor):
+        try:
+            if executor:
+                if hasattr(executor, "_processes") and executor._processes:
+                    for p in executor._processes.values():
+                        p.kill()
+
+                executor.shutdown(wait=False, cancel_futures=True)
+        except Exception as e:
+            logger.exception("Error while stopping executor", exc_info=e)
     if Settings().get("secure_cliphist"):
         cliphist.secure_clear()
     for service in services:

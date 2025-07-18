@@ -8,22 +8,23 @@
 #include <pwd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
 #include <sys/prctl.h>
 #include <signal.h>
 
 #define MAX_RETRIES 5
-#define RETRY_TIMEOUT 60
+#define RETRY_TIMEOUT 300
 #define WORKING_DIR "/opt/hypryou"
+
+#define SIGERROR (SIGRTMIN + 1 + 128)
+#define SIGHUNG (SIGRTMIN + 2 + 128)
+#define SIGRELOAD (SIGRTMIN + 3 + 128)
 
 enum SignalExitCode
 {
     EXIT_SIGSEGV = 128 + SIGSEGV,
     EXIT_SIGTERM = 128 + SIGTERM,
     EXIT_SIGINT = 128 + SIGINT,
-    EXIT_SIGUSR1 = 128 + SIGUSR1,
-    EXIT_SIGKILL = 128 + SIGKILL,
-    EXIT_CUSTOM_RELOAD = 100,
+    EXIT_SIGKILL = 128 + SIGKILL
 };
 
 static int mkdir_p(const char *path, mode_t mode)
@@ -199,10 +200,10 @@ int main(void)
             else
                 code = -1;
 
-            if (code == 0 || code == EXIT_CUSTOM_RELOAD || code == EXIT_SIGTERM || code == EXIT_SIGKILL || code == EXIT_SIGINT)
+            if (code == 0 || code == SIGRELOAD || code == EXIT_SIGTERM || code == EXIT_SIGKILL || code == EXIT_SIGINT)
             {
                 free(output_buf);
-                if (code == EXIT_CUSTOM_RELOAD)
+                if (code == SIGRELOAD)
                 {
                     printf("App asked for reload (exit code: %d)\n", code);
                     usleep(100000);

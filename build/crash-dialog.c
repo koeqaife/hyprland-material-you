@@ -1,5 +1,10 @@
 #include <gtk/gtk.h>
 #include <stdlib.h>
+#include <signal.h>
+
+#define SIGERROR (SIGRTMIN + 1 + 128)
+#define SIGHUNG (SIGRTMIN + 2 + 128)
+#define SIGRELOAD (SIGRTMIN + 3 + 128)
 
 static void
 on_close_clicked(GtkButton *button, gpointer user_data)
@@ -7,6 +12,25 @@ on_close_clicked(GtkButton *button, gpointer user_data)
     (void)button;
     GtkWindow *win = GTK_WINDOW(user_data);
     gtk_window_destroy(win);
+}
+
+char *get_error_description(int exit_code) {
+    if (exit_code >= 128 && !(exit_code >= SIGRTMIN || exit_code <= SIGRTMAX)) {
+        int sig = exit_code - 128;
+        const char *desc = strsignal(sig);
+        if (desc) {
+            return g_strdup(desc);
+        }
+    }
+
+    if (exit_code == SIGERROR || exit_code == 1)
+        return g_strdup("Internal error");
+    else if (exit_code == SIGHUNG)
+        return g_strdup("Loop went to lunch. Never came back...");
+    else if (exit_code == -2)
+        return g_strdup("Watchdog error");
+    else
+        return g_strdup("Unknown");
 }
 
 static void
@@ -43,9 +67,16 @@ static void
 activate(GtkApplication *app, gpointer user_data)
 {
     int exit_code = GPOINTER_TO_INT(user_data);
+    char *err_desc = get_error_description(exit_code);
     char *desc_text = g_strdup_printf(
-        "The UI crashed with exit code %d. A crash log was saved.\nTry restarting from terminal.",
-        exit_code);
+        "The UI crashed with exit code %d."
+        "\nExit code description: %s"
+        "\nCrash logs are usually saved to ~/.cache/hypryou/crashes."
+        "\nFor opening terminal you can use Super+K.",
+        exit_code,
+        err_desc);
+
+    g_free(err_desc);
 
     GtkWidget *win = gtk_application_window_new(app);
     gtk_widget_add_css_class(GTK_WIDGET(win), "hypryou-crashed");
