@@ -475,12 +475,14 @@ class MonitorsPage(gtk.Box):
 
         self.update_setting("bitdepth", value)
 
-    # Private handler generators
+    # Handler generators
 
     def make_text_handler(self, key: str) -> t.Callable[[TextRow, str], None]:
         def handler(this: MonitorsPage, row: TextRow, text: str) -> None:
             this.update_setting(key, text)
-        return types.MethodType(handler, self)
+        func = types.MethodType(handler, self)
+        setattr(self, f"on_{key}_handler", func)
+        return func
 
     def make_dropdown_handler(
         self, key: str
@@ -489,7 +491,9 @@ class MonitorsPage(gtk.Box):
             this: MonitorsPage, row: DropdownRow, item: DropdownItem
         ) -> None:
             this.update_setting(key, item.value)
-        return types.MethodType(handler, self)
+        func = types.MethodType(handler, self)
+        setattr(self, f"on_{key}_handler", func)
+        return func
 
     # Update widgets
 
