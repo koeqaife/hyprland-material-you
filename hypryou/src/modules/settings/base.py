@@ -318,26 +318,36 @@ class Row(RowTemplate):
         self,
         label: str,
         description: str,
-        on_click: t.Callable[[t.Self], None] | None,
-        on_secondary_click: t.Callable[[t.Self], None] | None,
+        on_click: t.Callable[[t.Self], None] | None = None,
+        on_secondary_click: t.Callable[[t.Self], None] | None = None,
         css_classes: tuple[str, ...] = (),
         clickable: bool | None = None,
         **props: t.Any
     ):
         if clickable is None:
             clickable = on_click is not None or on_secondary_click is not None
-        self._on_click = weakref.WeakMethod(on_click)
-        self._on_secondary_click = weakref.WeakMethod(on_secondary_click)
+        self._on_click = (
+            weakref.WeakMethod(on_click)
+            if on_click else None
+        )
+        self._on_secondary_click = (
+            weakref.WeakMethod(on_secondary_click)
+            if on_secondary_click else None
+        )
         super().__init__(label, description, css_classes, clickable, **props)
 
     def on_click(self) -> None:
         super().on_click()
+        if self._on_click is None:
+            return
         method = self._on_click()
         if callable(method):
             method(self)
 
     def on_secondary_click(self) -> None:
         super().on_secondary_click()
+        if self._on_secondary_click is None:
+            return
         method = self._on_secondary_click()
         if callable(method):
             method(self)
