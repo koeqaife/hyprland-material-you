@@ -273,7 +273,7 @@ class MonitorsPage(gtk.Box):
                 DropdownItem("2", "Fullscreen only"),
                 DropdownItem("3", "Fullscreen Games/Video")
             ],
-            on_selected=self.make_text_handler("vrr")
+            on_selected=self.make_dropdown_handler("vrr")
         )
 
         self.mirror = TextRow(
