@@ -56,7 +56,7 @@ key_binds = (
     KeyBind(
         (main_mod, "D"),
         ("exec", "hypryouctl settings"),
-        "Opened windows",
+        "Open settings",
         Category.TOOLS
     )
 )
