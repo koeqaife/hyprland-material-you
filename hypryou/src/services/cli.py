@@ -122,10 +122,10 @@ class CliRequest:
     def do_apps(self, app: str) -> str:
         settings = Settings()
         apps = {
-            "files": settings.get("files"),
-            "editor": settings.get("editor"),
-            "terminal": settings.get("terminal"),
-            "browser": settings.get("browser"),
+            "files": settings.get("apps.files"),
+            "editor": settings.get("apps.editor"),
+            "terminal": settings.get("apps.terminal"),
+            "browser": settings.get("apps.browser"),
         }
         exec = apps.get(app)
         if exec is not None:
