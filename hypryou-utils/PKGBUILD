@@ -1,0 +1,22 @@
+# Maintainer: koeqaife
+pkgname=hypryou-utils
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Replacement for hyprland-qtutils as part of HyprYou project"
+arch=('x86_64')
+url="https://github.com/koeqaife/hyprland-material-you"
+license=('GPL3')
+depends=('gtk4')
+provides=('hyprland-qtutils')
+conflicts=('hyprland-qtutils')
+replaces=('hyprland-qtutils')
+source=("hyprland-dialog.c")
+md5sums=('SKIP')
+
+build () {
+    gcc "$srcdir/hyprland-dialog.c" -o "$srcdir/hyprland-dialog" $(pkg-config --cflags --libs gtk4) -Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wcast-align -Wconversion -Wstrict-overflow=5 -O2
+}
+
+package() {
+    install -Dm755 "$srcdir/hyprland-dialog" "$pkgdir/usr/bin/hyprland-dialog"
+}
