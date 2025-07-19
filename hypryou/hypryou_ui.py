@@ -234,7 +234,7 @@ class HyprYou(gtk.Application):
             "ms"
         )
         self.release()
-        restore_state()
+        glib.timeout_add(1000, restore_state)
         await asyncio.gather(*self.tasks)
 
     def get_monitors(self) -> gio.ListModel:
