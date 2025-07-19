@@ -52,5 +52,11 @@ key_binds = (
         ("exec", "hypryouctl toggle_window clients"),
         "Opened windows",
         Category.TOOLS
+    ),
+    KeyBind(
+        (main_mod, "D"),
+        ("exec", "hypryouctl settings"),
+        "Opened windows",
+        Category.TOOLS
     )
 )
