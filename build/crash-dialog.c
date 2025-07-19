@@ -79,7 +79,7 @@ activate(GtkApplication *app, gpointer user_data)
     g_free(err_desc);
 
     GtkWidget *win = gtk_application_window_new(app);
-    gtk_widget_add_css_class(GTK_WIDGET(win), "hypryou-crashed");
+    gtk_widget_add_css_class(GTK_WIDGET(win), "hypryou-dialog");
     gtk_window_set_title(GTK_WINDOW(win), "HyprYou crashed...");
     gtk_window_set_default_size(GTK_WINDOW(win), 450, 150);
     gtk_window_set_resizable(GTK_WINDOW(win), FALSE);
@@ -122,7 +122,7 @@ activate(GtkApplication *app, gpointer user_data)
     gtk_css_provider_load_from_string(provider,
                                       ".title { font-size: 20px; font-weight: 400; }"
                                       ".description { font-size: 16px; font-weight: 300; }"
-                                      ".hypryou-crashed { padding: 20px; }");
+                                      ".hypryou-dialog { padding: 20px; }");
 
     gtk_style_context_add_provider_for_display(
         gdk_display_get_default(),
