@@ -455,11 +455,11 @@ def update_settings() -> None:
     if not dark_mode.value:
         gsettings.set_string("gtk-theme", "adw-gtk3")
         gsettings.set_string("color-scheme", "prefer-light")
-        gsettings.set_string("icon-theme", settings.get("light_icons"))
+        gsettings.set_string("icon-theme", settings.get("icons.light"))
     else:
         gsettings.set_string("gtk-theme", "adw-gtk3-dark")
         gsettings.set_string("color-scheme", "prefer-dark")
-        gsettings.set_string("icon-theme", settings.get("dark_icons"))
+        gsettings.set_string("icon-theme", settings.get("icons.dark"))
 
 
 @t.overload
@@ -570,11 +570,11 @@ def update_gtk(
 
 
 def update_gtk3() -> None:
-    update_gtk("gtk3_theme", gtk3_css, GTK3_PATH)
+    update_gtk("themes.gtk3", gtk3_css, GTK3_PATH)
 
 
 def update_gtk4() -> None:
-    update_gtk("gtk4_theme", gtk4_css, GTK4_PATH)
+    update_gtk("themes.gtk4", gtk4_css, GTK4_PATH)
 
 
 def default_on_complete() -> None:

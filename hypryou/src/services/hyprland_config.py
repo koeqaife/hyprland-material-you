@@ -186,11 +186,11 @@ def generate_monitors() -> str:
 
 def generate_blur() -> str:
     settings = Settings()
-    blur = settings.get("blur")
+    blur = settings.get("blur.enabled")
     if not blur:
         return "# Blur is disabled by settings \n"
 
-    xray = settings.get("blur_xray")
+    xray = settings.get("blur.xray")
 
     output = (
         "layerrule = blur, hypryou-.*",
@@ -209,8 +209,8 @@ def generate_noanim() -> str:
 
 def generate_cursor_settings() -> str:
     settings = Settings()
-    cursor = settings.get("cursor")
-    cursor_size = settings.get("cursor_size")
+    cursor = settings.get("cursor.name")
+    cursor_size = settings.get("cursor.size")
 
     return (
         f"env = XCURSOR_SIZE,{cursor_size}\n" +
@@ -251,19 +251,25 @@ def generate_binds() -> str:
 
 def generate_env() -> str:
     settings = Settings()
-    env_vars = {
-        "BROWSER": settings.get("browser"),
-        "TERMINAL": settings.get("terminal"),
-        "EDITOR": settings.get("editor"),
-        "FILEMANAGER": settings.get("files"),
+    env_vars = {}
+    output = ""
+    if settings.get("apps.enabled"):
+        env_vars = {
+            "BROWSER": settings.get("apps.browser"),
+            "TERMINAL": settings.get("apps.terminal"),
+            "EDITOR": settings.get("apps.editor"),
+            "FILEMANAGER": settings.get("apps.files"),
 
-        "XDG_UTILS_BROWSER": settings.get("browser"),
-        "XDG_UTILS_TERMINAL": settings.get("terminal"),
-        "XDG_UTILS_FILEMANAGER": settings.get("files")
-    }
+            "XDG_UTILS_BROWSER": settings.get("apps.browser"),
+            "XDG_UTILS_TERMINAL": settings.get("apps.terminal"),
+            "XDG_UTILS_FILEMANAGER": settings.get("apps.files")
+        }
+    else:
+        output += "# Apps env vars were disabled by settings\n"
     lines = [f"env = {key}, {value}" for key, value in env_vars.items()]
-    output = "\n".join(lines)
-    return output + "\n"
+    if len(lines) > 0:
+        output += "\n".join(lines) + "\n"
+    return output
 
 
 funcs = (

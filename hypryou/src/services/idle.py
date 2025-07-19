@@ -31,8 +31,8 @@ with open(WATCHER_XML_PATH) as f:
     WATCHER_XML = f.read()
 
 SETTINGS_KEYS = (
-    "ac_lock", "ac_dpms", "ac_sleep",
-    "battery_lock", "battery_dpms", "battery_sleep"
+    "idle.ac.lock", "idle.ac.dpms", "idle.ac.sleep",
+    "idle.battery.lock", "idle.battery.dpms", "idle.battery.sleep"
 )
 
 
@@ -183,14 +183,15 @@ class ScreenSaver:
         settings = Settings()
         upower = get_upower()
 
+        base_view = settings.get_view_for("idle")
         if not upower.is_battery or upower.state != BatteryState.DISCHARGING:
-            lock_timeout = settings.get("ac_lock")
-            dpms_timeout = settings.get("ac_dpms")
-            sleep_timeout = settings.get("ac_sleep")
+            view = base_view.get_view_for("ac")
         else:
-            lock_timeout = settings.get("battery_lock")
-            dpms_timeout = settings.get("battery_dpms")
-            sleep_timeout = settings.get("battery_sleep")
+            view = base_view.get_view_for("battery")
+
+        lock_timeout = view.get("lock")
+        dpms_timeout = view.get("dpms")
+        sleep_timeout = view.get("sleep")
 
         if __debug__:
             logger.debug("Lock timeout: %d", lock_timeout)

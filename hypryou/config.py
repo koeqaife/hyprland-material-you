@@ -51,43 +51,44 @@ info = {
     "ko-fi": "https://ko-fi.com/koeqaife"
 }
 
-# TODO: Format names better (e.g. dark_icons -> icons.dark)
-# TODO: Add "enable" for every hyprland config generated category
 default_settings: dict[str, t.Any] = {
     "is_24hr_clock": True,
     "always_show_battery": False,
     "corners": True,
-    "dark_icons": "Tela-nord-dark",
-    "light_icons": "Tela-nord-light",
     "opacity": 1.0,
     "wallpaper": f"{ORIGINAL_DIR}/assets/default_wallpaper.jpg",
     "separated_workspaces": False,
     "one_popup_at_time": True,
     "power_menu_cancel_button": True,
-    "gtk4_theme": True,
-    "gtk3_theme": True,
     "secure_cliphist": False,
     "floating_sidebar": False,
     "hide_empty_workspaces": False,
     "color": "",
 
-    "blur": True,
-    "blur_xray": True,
+    "themes.gtk3": True,
+    "themes.gtk4": True,
 
-    "browser": "firefox",
-    "editor": "code",
-    "files": "nautilus",
-    "terminal": "alacritty",
+    "icons.dark": "Tela-nord-dark",
+    "icons.light": "Tela-nord-light",
 
-    "cursor": "Bibata-Modern-Ice",
-    "cursor_size": "24",
+    "blur.enabled": True,
+    "blur.xray": True,
 
-    "ac_lock": 300,
-    "ac_dpms": 60,
-    "ac_sleep": 0,
-    "battery_lock": 60,
-    "battery_dpms": 60,
-    "battery_sleep": 60,
+    "apps.enabled": True,
+    "apps.browser": "firefox",
+    "apps.editor": "code",
+    "apps.files": "nautilus",
+    "apps.terminal": "alacritty",
+
+    "cursor.name": "Bibata-Modern-Ice",
+    "cursor.size": "24",
+
+    "idle.ac.lock": 300,
+    "idle.ac.dpms": 60,
+    "idle.ac.sleep": 0,
+    "idle.battery.lock": 60,
+    "idle.battery.dpms": 60,
+    "idle.battery.sleep": 60,
 
     # Input
     "input.enabled": True,
@@ -194,6 +195,8 @@ class Settings:
 
     def _update_values(self, new: dict[str, t.Any]) -> None:
         for key, value in new.items():
+            if key not in default_settings.keys():
+                continue
             if key in self._values.keys():
                 ref = self._values[key]
                 ref.value = value

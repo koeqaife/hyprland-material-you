@@ -22,7 +22,7 @@ class SleepPage(gtk.ScrolledWindow):
             SettingsTextRow(
                 "Lock",
                 "Lock screen after inactivity (sec)",
-                "ac_lock",
+                "idle.ac.lock",
                 test_text=lambda v: v.isdigit(),
                 transform2_fn=lambda v: int(v),
                 max_length=4
@@ -30,7 +30,7 @@ class SleepPage(gtk.ScrolledWindow):
             SettingsTextRow(
                 "Turn off screen",
                 "Turn off display after inactivity (sec)",
-                "ac_dpms",
+                "idle.ac.dpms",
                 test_text=lambda v: v.isdigit(),
                 transform2_fn=lambda v: int(v),
                 max_length=4
@@ -38,7 +38,7 @@ class SleepPage(gtk.ScrolledWindow):
             SettingsTextRow(
                 "Sleep",
                 "Sleep after inactivity (sec)",
-                "ac_sleep",
+                "idle.ac.sleep",
                 test_text=lambda v: v.isdigit(),
                 transform2_fn=lambda v: int(v),
                 max_length=4
@@ -48,7 +48,7 @@ class SleepPage(gtk.ScrolledWindow):
             SettingsTextRow(
                 "Lock",
                 "Lock screen on battery after inactivity (sec)",
-                "battery_lock",
+                "idle.battery.lock",
                 test_text=lambda v: v.isdigit(),
                 transform2_fn=lambda v: int(v),
                 max_length=4
@@ -56,7 +56,7 @@ class SleepPage(gtk.ScrolledWindow):
             SettingsTextRow(
                 "Turn off screen",
                 "Turn off display on battery after inactivity (sec)",
-                "battery_dpms",
+                "idle.battery.dpms",
                 test_text=lambda v: v.isdigit(),
                 transform2_fn=lambda v: int(v),
                 max_length=4
@@ -64,7 +64,7 @@ class SleepPage(gtk.ScrolledWindow):
             SettingsTextRow(
                 "Sleep",
                 "Sleep on battery after inactivity (sec)",
-                "battery_sleep",
+                "idle.battery.sleep",
                 test_text=lambda v: v.isdigit(),
                 transform2_fn=lambda v: int(v),
                 max_length=4

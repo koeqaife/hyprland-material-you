@@ -20,22 +20,22 @@ class AppsPage(gtk.ScrolledWindow):
             SettingsTextRow(
                 "Browser",
                 "Default browser",
-                "browser"
+                "apps.browser"
             ),
             SettingsTextRow(
                 "Editor",
                 "Editor to use for opening files",
-                "editor"
+                "apps.editor"
             ),
             SettingsTextRow(
                 "Files",
                 "File manager to use for opening files",
-                "files"
+                "apps.files"
             ),
             SettingsTextRow(
                 "Terminal",
                 "Terminal to open when pressing keybind",
-                "terminal"
+                "apps.terminal"
             ),
             Hint(
                 "It is recommended to restart the session"

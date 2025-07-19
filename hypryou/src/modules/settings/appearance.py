@@ -56,12 +56,12 @@ class AppearancePage(gtk.ScrolledWindow):
             SettingsBoolRow(
                 "Blur",
                 "Adds blur to windows and to UI",
-                "blur"
+                "blur.enabled"
             ),
             SettingsBoolRow(
                 "Blur XRay",
                 "Adds xray effect to blur",
-                "blur_xray"
+                "blur.xray"
             ),
             SettingsTextRow(
                 "UI Opacity",
