@@ -9,6 +9,45 @@ typedef struct
     gchar *buttons_raw;
 } DialogOptions;
 
+static gchar *strip_markup_and_convert_br(const gchar *input)
+{
+    GString *out = g_string_new("");
+    const gchar *p = input;
+
+    while (*p)
+    {
+        if (g_ascii_strncasecmp(p, "<br", 3) == 0)
+        {
+            const char *gt = strchr(p, '>');
+            if (gt)
+            {
+                g_string_append_c(out, '\n');
+                p = gt + 1;
+                continue;
+            }
+        }
+
+        if (*p == '<')
+        {
+            const char *gt = strchr(p, '>');
+            if (gt)
+            {
+                p = gt + 1;
+            }
+            else
+            {
+                p++;
+            }
+        }
+        else
+        {
+            g_string_append_c(out, *p++);
+        }
+    }
+
+    return g_string_free(out, FALSE);
+}
+
 static void
 on_button_clicked(GtkButton *button, gpointer user_data)
 {
@@ -46,7 +85,8 @@ activate(GtkApplication *app, gpointer user_data)
 
     if (opts->text)
     {
-        GtkWidget *description = gtk_label_new(opts->text);
+        char *text = strip_markup_and_convert_br(opts->text);
+        GtkWidget *description = gtk_label_new(text);
         gtk_label_set_wrap(GTK_LABEL(description), TRUE);
         gtk_label_set_justify(GTK_LABEL(description), GTK_JUSTIFY_LEFT);
         gtk_label_set_xalign(GTK_LABEL(description), 0);
@@ -54,6 +94,7 @@ activate(GtkApplication *app, gpointer user_data)
         gtk_box_append(GTK_BOX(box), description);
         gtk_widget_set_vexpand(GTK_WIDGET(description), true);
         gtk_widget_set_hexpand(GTK_WIDGET(description), true);
+        g_free(text);
     }
 
     if (opts->buttons_raw)
