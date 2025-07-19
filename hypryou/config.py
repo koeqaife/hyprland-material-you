@@ -135,6 +135,7 @@ os.makedirs(color_templates, exist_ok=True)
 os.makedirs(APP_CACHE_DIR, exist_ok=True)
 os.makedirs(TEMP_DIR, exist_ok=True)
 os.makedirs(state_dir, exist_ok=True)
+os.makedirs(wallpaper_dirs[0], exist_ok=True)
 
 
 class HyprlandVars:
