@@ -5,6 +5,7 @@ import os
 import platform
 from utils.system import STATIC_SYSTEM_INFO as STATIC
 from utils.system import get_swap_total
+import webbrowser
 
 from src.modules.settings.base import Row
 
@@ -12,6 +13,7 @@ USER = os.environ.get("USER") or os.environ.get("USERNAME")
 HOSTNAME = os.environ.get("HOSTNAME") or os.uname().nodename
 SHELL = os.environ.get("SHELL", "Unknown")
 GTK_VERSION = f"{gtk.MAJOR_VERSION}.{gtk.MINOR_VERSION}.{gtk.MICRO_VERSION}"
+ICON_SIZE = 18
 
 
 class InfoRow(gtk.Box):
@@ -60,6 +62,37 @@ class InfoRow(gtk.Box):
         ...
 
 
+class LinkButton(gtk.Button):
+    __gtype_name__ = "SettingsInfoPageLink"
+
+    def __init__(
+        self,
+        icon_name: str,
+        label: str,
+        css_classes: tuple[str, ...] = ()
+    ) -> None:
+        self.box = gtk.Box(
+            halign=gtk.Align.CENTER,
+        )
+        self.label = gtk.Label(
+            label=label,
+            css_classes=("label",)
+        )
+        self.icon = gtk.Image(
+            icon_name=icon_name,
+            css_classes=("icon",)
+        )
+        self.icon.set_pixel_size(ICON_SIZE)
+        self.box.append(self.label)
+        self.box.append(self.icon)
+        super().__init__(
+            css_classes=css_classes + ("link-btn",),
+            child=self.box,
+            vexpand=True,
+            hexpand=True
+        )
+
+
 class InfoPage(gtk.ScrolledWindow):
     __gtype_name__ = "SettingsInfoPage"
 
@@ -74,8 +107,27 @@ class InfoPage(gtk.ScrolledWindow):
             hscrollbar_policy=gtk.PolicyType.NEVER
         )
         total_swap = int(get_swap_total())
+
+        self.github_button = LinkButton(
+            "github-symbolic", "Github"
+        )
+        self.discord_button = LinkButton(
+            "discord-symbolic", "Discord"
+        )
+        self.kofi_button = LinkButton(
+            "kofi-symbolic", "Ko-Fi"
+        )
+        self.links_box = gtk.Box(
+            css_classes=("links-box",),
+            homogeneous=True
+        )
+        self.links_box.append(self.github_button)
+        self.links_box.append(self.discord_button)
+        self.links_box.append(self.kofi_button)
+
         self.box_children = (
             InfoRow(),
+            self.links_box,
             gtk.Separator(),
             Row("WM", f"Hyprland {hyprland.client.version}"),
             Row("CPU", str(STATIC["cpu"])),
@@ -92,7 +144,21 @@ class InfoPage(gtk.ScrolledWindow):
         for child in self.box_children:
             self.box.append(child)
 
+        self.button_handlers = {
+            self.github_button: self.github_button.connect(
+                "clicked", lambda *_: webbrowser.open(info["github"])
+            ),
+            self.discord_button: self.discord_button.connect(
+                "clicked", lambda *_: webbrowser.open(info["discord"])
+            ),
+            self.kofi_button: self.kofi_button.connect(
+                "clicked", lambda *_: webbrowser.open(info["ko-fi"])
+            )
+        }
+
     def destroy(self) -> None:
         for child in self.box_children:
             if hasattr(child, "destroy"):
                 child.destroy()
+        for btn, handler_id in self.button_handlers.items():
+            btn.disconnect(handler_id)
