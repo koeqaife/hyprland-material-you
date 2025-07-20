@@ -6,17 +6,6 @@ import weakref
 from src.services.state import settings_page
 import typing as t
 
-# Pages
-from src.modules.settings.network import NetworkPage
-from src.modules.settings.bluetooth import BluetoothPage
-from src.modules.settings.appearance import AppearancePage
-from src.modules.settings.wallpapers import WallpapersPage
-from src.modules.settings.sleep import SleepPage
-from src.modules.settings.apps import AppsPage
-from src.modules.settings.input import InputPage
-from src.modules.settings.monitors import MonitorsPage
-from src.modules.settings.info import InfoPage
-
 
 class Page(t.NamedTuple):
     title: str
@@ -42,74 +31,94 @@ class NotImplementedYet(gtk.Label):
         super().__init__(label="Not Implemented Yet")
 
 
-pages = {
-    "network": Page(
-        title="Network",
-        icon="network_manage",
-        icon_fill=False,
-        widget=NetworkPage
-    ),
-    "bluetooth": Page(
-        title="Bluetooth",
-        icon="settings_bluetooth",
-        icon_fill=False,
-        widget=BluetoothPage
-    ),
-    "appearance": Page(
-        title="Appearance",
-        icon="palette",
-        icon_fill=True,
-        widget=AppearancePage
-    ),
-    "wallpaper": Page(
-        title="Wallpaper",
-        icon="wallpaper",
-        icon_fill=False,
-        widget=WallpapersPage
-    ),
-    "input": Page(
-        title="Input",
-        icon="keyboard",
-        icon_fill=True,
-        widget=InputPage
-    ),
-    "monitors": Page(
-        title="Monitors",
-        icon="monitor",
-        icon_fill=True,
-        widget=MonitorsPage
-    ),
-    "sleep": Page(
-        title="Sleep",
-        icon="power_settings_circle",
-        icon_fill=True,
-        widget=SleepPage
-    ),
-    "apps": Page(
-        title="Apps",
-        icon="settings_applications",
-        icon_fill=True,
-        widget=AppsPage
-    ),
-    "hyprland": Page(
-        title="Hyprland",
-        icon="tune",
-        icon_fill=False,
-        widget=NotImplementedYet
-    ),
-    "keybinds": Page(
-        title="Keybinds",
-        icon="action_key",
-        icon_fill=True,
-        widget=NotImplementedYet
-    ),
-    "info": Page(
-        title="Info",
-        icon="info",
-        icon_fill=True,
-        widget=InfoPage
-    )
-}
+pages: dict[str, Page] | None = None
+
+
+def get_pages() -> dict[str, Page]:
+    global pages
+    if pages is not None:
+        return pages
+
+    from src.modules.settings.network import NetworkPage
+    from src.modules.settings.bluetooth import BluetoothPage
+    from src.modules.settings.appearance import AppearancePage
+    from src.modules.settings.wallpapers import WallpapersPage
+    from src.modules.settings.sleep import SleepPage
+    from src.modules.settings.apps import AppsPage
+    from src.modules.settings.input import InputPage
+    from src.modules.settings.monitors import MonitorsPage
+    from src.modules.settings.info import InfoPage
+
+    pages = {
+        "network": Page(
+            title="Network",
+            icon="network_manage",
+            icon_fill=False,
+            widget=NetworkPage
+        ),
+        "bluetooth": Page(
+            title="Bluetooth",
+            icon="settings_bluetooth",
+            icon_fill=False,
+            widget=BluetoothPage
+        ),
+        "appearance": Page(
+            title="Appearance",
+            icon="palette",
+            icon_fill=True,
+            widget=AppearancePage
+        ),
+        "wallpaper": Page(
+            title="Wallpaper",
+            icon="wallpaper",
+            icon_fill=False,
+            widget=WallpapersPage
+        ),
+        "input": Page(
+            title="Input",
+            icon="keyboard",
+            icon_fill=True,
+            widget=InputPage
+        ),
+        "monitors": Page(
+            title="Monitors",
+            icon="monitor",
+            icon_fill=True,
+            widget=MonitorsPage
+        ),
+        "sleep": Page(
+            title="Sleep",
+            icon="power_settings_circle",
+            icon_fill=True,
+            widget=SleepPage
+        ),
+        "apps": Page(
+            title="Apps",
+            icon="settings_applications",
+            icon_fill=True,
+            widget=AppsPage
+        ),
+        "hyprland": Page(
+            title="Hyprland",
+            icon="tune",
+            icon_fill=False,
+            widget=NotImplementedYet
+        ),
+        "keybinds": Page(
+            title="Keybinds",
+            icon="action_key",
+            icon_fill=True,
+            widget=NotImplementedYet
+        ),
+        "info": Page(
+            title="Info",
+            icon="info",
+            icon_fill=True,
+            widget=InfoPage
+        )
+    }
+    return pages
+
 
 sidebar = (
     "network",
@@ -253,7 +262,7 @@ class SettingsBox(gtk.Box):
         self.titles: dict[str, str] = {}
         self.cur_page = ""
 
-        for key, page in pages.items():
+        for key, page in get_pages().items():
             self.pages_widgets[key] = t.cast("type[PageType]", page.widget)
             self.buttons[key] = SidebarButton(
                 key,
