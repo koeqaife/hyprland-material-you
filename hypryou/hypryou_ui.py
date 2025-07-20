@@ -70,6 +70,7 @@ from src.modules.bluetooth_pin import PinDialog
 
 from src.modules.settings.wallpapers import executor as wallpaper_executor
 
+APP_START = time.perf_counter()
 loop: glib.MainLoop
 
 services: tuple[AsyncService | Service, ...] = (
@@ -230,8 +231,8 @@ class HyprYou(gtk.Application):
 
         logger.info(
             "Started in " +
-            f"{round((time.perf_counter() - START) * 1000)}" +
-            "ms"
+            f"{int((APP_START - START) * 1000)}ms + " +
+            f"{int((time.perf_counter() - APP_START) * 1000)}ms"
         )
         self.release()
         glib.timeout_add(100, restore_state)
