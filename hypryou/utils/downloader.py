@@ -1,9 +1,7 @@
 import os
 import typing as t
-import uuid
 
 from repository import gio, glib
-from PIL import Image, ImageFilter
 from config import APP_CACHE_DIR
 from utils.logger import logger
 import threading
@@ -25,6 +23,7 @@ def resize_image(
     size: tuple[int, int],
     with_unsharp: bool = True
 ) -> str:
+    from PIL import Image, ImageFilter
     target_w, target_h = size
 
     with Image.open(filepath) as img:
@@ -62,6 +61,8 @@ def resize_image(
 
 
 def finalize_image_file(temp_path: str) -> str:
+    from PIL import Image
+    import uuid
     dir_path = os.path.dirname(temp_path)
     unique_path = os.path.join(dir_path, str(uuid.uuid4()))
     os.rename(temp_path, unique_path)

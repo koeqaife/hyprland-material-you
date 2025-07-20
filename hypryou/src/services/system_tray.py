@@ -22,16 +22,12 @@ WATCHER_XML_PATH = os.path.join(
 )
 BUS_WATCHER = "org.kde.StatusNotifierWatcher"
 PATH_WATCHER = "/StatusNotifierWatcher"
-with open(WATCHER_XML_PATH) as f:
-    WATCHER_XML = f.read()
 
 ITEM_XML_PATH = os.path.join(
     ORIGINAL_DIR, "assets", "dbus", "org.kde.StatusNotifierItem.xml"
 )
 BUS_ITEM = "org.kde.StatusNotifierItem"
 PATH_ITEM = "/StatusNotifierItem"
-with open(ITEM_XML_PATH) as f:
-    ITEM_XML = f.read()
 
 
 items = Ref[dict[str, "StatusNotifierItem"]]({}, name="tray_items")
@@ -321,8 +317,6 @@ class StatusNotifierItem(Signals):
 class StatusNotifierWatcher:
     def __init__(self) -> None:
         self._conn: gio.DBusConnection | None = None
-        self.node_info = gio.DBusNodeInfo.new_for_xml(WATCHER_XML)
-        self.ifaces = self.node_info.interfaces
         self.host_registered = True
 
     def register(self) -> int:
@@ -357,8 +351,15 @@ class StatusNotifierWatcher:
     ) -> None:
         if __debug__:
             logger.debug("System tray bus acquired")
+
         name_owner_changed.watch("notify", self.on_name_owner_changed)
         self._conn = conn
+
+        with open(WATCHER_XML_PATH) as f:
+            watcher_xml = f.read()
+        node_info = gio.DBusNodeInfo.new_for_xml(watcher_xml)
+        self.ifaces = node_info.interfaces
+
         for interface in self.ifaces:
             if interface.name == name:
                 if __debug__:

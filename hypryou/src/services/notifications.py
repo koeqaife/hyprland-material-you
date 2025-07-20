@@ -18,8 +18,6 @@ WATCHER_XML_PATH = os.path.join(
 )
 BUS_WATCHER = "org.freedesktop.Notifications"
 PATH_WATCHER = "/org/freedesktop/Notifications"
-with open(WATCHER_XML_PATH) as f:
-    WATCHER_XML = f.read()
 
 
 # Server name, vendor, version, protocol version
@@ -265,9 +263,6 @@ class Notification(Signals):
 class NotificationsWatcher:
     def __init__(self) -> None:
         self.conn: gio.DBusConnection
-        self.node_info = gio.DBusNodeInfo.new_for_xml(WATCHER_XML)
-        self.ifaces = self.node_info.interfaces
-
         self.expiry_manager = ExpiryManager()
         self._expiry_timer_id: int | None = None
 
@@ -292,7 +287,13 @@ class NotificationsWatcher:
         if __debug__:
             logger.debug("Notifications bus acquired")
         self.conn = conn
-        for interface in self.ifaces:
+
+        with open(WATCHER_XML_PATH) as f:
+            watcher_xml = f.read()
+        node_info = gio.DBusNodeInfo.new_for_xml(watcher_xml)
+        ifaces = node_info.interfaces
+
+        for interface in ifaces:
             if interface.name == name:
                 if __debug__:
                     logger.debug("Registering interface '%s'", name)

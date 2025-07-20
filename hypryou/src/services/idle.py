@@ -1,3 +1,4 @@
+from __future__ import annotations
 import asyncio
 import os
 from config import ORIGINAL_DIR
@@ -7,10 +8,6 @@ from utils.logger import logger
 import typing as t
 from pywayland.client.display import Display
 from pywayland.protocol.wayland.wl_seat import WlSeat
-from pywayland.protocol.wayland.wl_registry import WlRegistryProxy
-from pywayland.protocol.ext_idle_notify_v1.ext_idle_notification_v1 import (
-    ExtIdleNotificationV1Proxy as Notification
-)
 from pywayland.protocol.ext_idle_notify_v1.ext_idle_notifier_v1 import (
     ExtIdleNotifierV1, ExtIdleNotifierV1Proxy as Notifier
 )
@@ -21,14 +18,18 @@ from src.services.login1 import get_login_manager
 from src.services.mpris import players
 from config import Settings
 
+if t.TYPE_CHECKING:
+    from pywayland.protocol.wayland.wl_registry import WlRegistryProxy
+    from pywayland.protocol.ext_idle_notify_v1.ext_idle_notification_v1 import (  # noqa: E501
+        ExtIdleNotificationV1Proxy as Notification
+    )
+
 
 WATCHER_XML_PATH = os.path.join(
     ORIGINAL_DIR, "assets", "dbus", "org.freedesktop.ScreenSaver.xml"
 )
 BUS_WATCHER = "org.freedesktop.ScreenSaver"
 PATH_WATCHER = "/org/freedesktop/ScreenSaver"
-with open(WATCHER_XML_PATH) as f:
-    WATCHER_XML = f.read()
 
 SETTINGS_KEYS = (
     "idle.ac.lock", "idle.ac.dpms", "idle.ac.sleep",
@@ -40,18 +41,16 @@ class ScreenSaver:
     def __init__(self) -> None:
         upower = get_upower()
         self._conn: gio.DBusConnection | None = None
-        self.node_info = gio.DBusNodeInfo.new_for_xml(WATCHER_XML)
-        self.ifaces = self.node_info.interfaces
         self.items: dict[int, tuple[str, str]] = {}
         self.next_id = 100
         self.last_battery_state = upower.state
 
         self.display = Display()
         self.display.connect()
-        self.registry: WlRegistryProxy = self.display.get_registry()
+        self.registry: "WlRegistryProxy" = self.display.get_registry()
         self.idle_notifier: Notifier | None = None
         self.seat: WlSeat | None = None
-        self.notifications: list[Notification] = []
+        self.notifications: list["Notification"] = []
         self.notifier_set = False
 
     def on_settings_changed(self, key: str, value: str) -> None:
@@ -94,8 +93,8 @@ class ScreenSaver:
     def create_idle_notification(
         self,
         timeout: int,
-        on_idle: t.Callable[[Notification], None],
-        on_resume: t.Callable[[Notification], None] | None = None
+        on_idle: t.Callable[["Notification"], None],
+        on_resume: t.Callable[["Notification"], None] | None = None
     ) -> None:
         if timeout == 0:
             return
@@ -103,8 +102,10 @@ class ScreenSaver:
             logger.critical("IdleNotifier proxy is None")
             return
         timeout *= 1000
-        notification: Notification = self.idle_notifier.get_idle_notification(
-            timeout=timeout, seat=self.seat
+        notification: "Notification" = (
+            self.idle_notifier.get_idle_notification(
+                timeout=timeout, seat=self.seat
+            )
         )
         self.notifications.append(notification)
         notification.dispatcher["idled"] = on_idle
@@ -217,7 +218,7 @@ class ScreenSaver:
 
     def global_handler(
         self,
-        registry: WlRegistryProxy,
+        registry: "WlRegistryProxy",
         name: int,
         interface: str,
         version: int
@@ -239,7 +240,13 @@ class ScreenSaver:
         if __debug__:
             logger.debug("Screen saver bus acquired")
         self._conn = conn
-        for interface in self.ifaces:
+
+        with open(WATCHER_XML_PATH) as f:
+            watcher_xml = f.read()
+        node_info = gio.DBusNodeInfo.new_for_xml(watcher_xml)
+        ifaces = node_info.interfaces
+
+        for interface in ifaces:
             if interface.name == name:
                 if __debug__:
                     logger.debug("Registering interface '%s'", name)

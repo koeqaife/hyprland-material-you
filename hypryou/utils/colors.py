@@ -1,40 +1,30 @@
-import functools
 import os
 import json
 import subprocess
 import threading
-from PIL import Image
-import concurrent
 import concurrent.futures
-from materialyoucolor.quantize import QuantizeCelebi  # type: ignore
 from materialyoucolor.score.score import Score  # type: ignore
-from materialyoucolor.hct import Hct  # type: ignore
 from materialyoucolor.dynamiccolor.material_dynamic_colors import DynamicColor  # type: ignore # noqa
 from materialyoucolor.dynamiccolor.material_dynamic_colors import MaterialDynamicColors  # noqa
 from materialyoucolor.scheme.dynamic_scheme import DynamicScheme  # type: ignore # noqa
 from materialyoucolor.scheme.scheme_tonal_spot import SchemeTonalSpot  # type: ignore # noqa
 import hashlib
-import pickle
-import numpy as np
 import re
 import typing as t
 from config import color_templates, ORIGINAL_DIR, CONFIG_DIR
 from utils.logger import logger
-from utils.styles import reload_css
 from utils.ref import Ref
 from repository import gio, glib
 from config import Settings
-import shutil
 from pathlib import Path
+from os.path import join
+from utils.styles import reload_css
 
 
 # I dropped support of color schemes
 # Because it's just easier when there's only 1 of them
 
 executor: concurrent.futures.ProcessPoolExecutor | None = None
-
-join = os.path.join
-gsettings = gio.Settings.new("org.gnome.desktop.interface")
 
 
 TEMPLATES_DIR = join(ORIGINAL_DIR, "assets", "templates")
@@ -412,6 +402,11 @@ def process_image(
     quality: int = 2,
     num_colors: int = 128
 ) -> int:
+    from PIL import Image
+    from materialyoucolor.quantize import QuantizeCelebi  # type: ignore
+    import numpy as np
+    import pickle
+
     def get_cache_path(image_path: str) -> str:
         cache_path = join(CACHE_PATH, "cached_colors")
         hash_object = hashlib.md5(image_path.encode())
@@ -451,6 +446,7 @@ def process_image(
 
 def update_settings() -> None:
     settings = Settings()
+    gsettings = gio.Settings.new("org.gnome.desktop.interface")
 
     if not dark_mode.value:
         gsettings.set_string("gtk-theme", "adw-gtk3")
@@ -488,6 +484,8 @@ def generate_colors_sync(
     is_dark: bool = True,
     contrast_level: int = 0
 ) -> None:
+    from materialyoucolor.hct import Hct  # type: ignore
+
     if use_color is None and image_path is not None:
         color = process_image(image_path, 4, 1024)
     elif use_color is not None and image_path is None:
@@ -526,6 +524,7 @@ def generate_colors_sync(
         allowed_actions
     )
 
+    processes: list[subprocess.Popen] = []
     for file_path, actions in post.items():
         for action in actions:
             if action.startswith("compile_scss"):
@@ -540,19 +539,22 @@ def generate_colors_sync(
                     "compiled",
                     file_name
                 )
-                compile_scss(file_path, output)
+                processes.append(compile_scss(file_path, output))
+
+    for proc in processes:
+        proc.wait(15)
 
 
-def compile_scss(path: str, output: str) -> None:
+def compile_scss(path: str, output: str) -> subprocess.Popen:
     if __debug__:
-        logger.debug("Compiling scss")
+        logger.debug("Compiling scss: %s", repr(path))
     command = [
         'sass',
         path,
         output
     ]
 
-    subprocess.Popen(command)
+    return subprocess.Popen(command)
 
 
 def update_gtk(
@@ -560,6 +562,8 @@ def update_gtk(
     src_path: str,
     dst_dir: str
 ) -> None:
+    import shutil
+
     if not Settings().get(theme_key):
         return
     if os.path.isfile(src_path):
@@ -592,6 +596,7 @@ def generate_colors(
     contrast_level: int = 0,
     on_complete: t.Callable[[], None] | None = None
 ) -> None:
+    import functools
     global executor
 
     def _callback(future: concurrent.futures.Future[None]) -> None:
@@ -760,6 +765,7 @@ def set_dark_mode(
     try:
         with open(colors_json) as f:
             content = get_cache_object(f.read())
+        dark_mode.value = is_dark
         generate_colors(
             content.wallpaper,
             content.original_color,

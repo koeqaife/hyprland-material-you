@@ -206,7 +206,7 @@ int main(void)
                 if (code == SIGRELOAD)
                 {
                     printf("App asked for reload (exit code: %d)\n", code);
-                    usleep(100000);
+                    usleep(50000);
                     continue;
                 }
                 else
@@ -240,7 +240,12 @@ int main(void)
 
             printf("App exited with %d, retrying (%d/%d)...\n",
                    code, retry_count, MAX_RETRIES);
-            sleep(1);
+            if (retry_count > 3)
+                sleep(3);
+            else if (retry_count > 1)
+                sleep(1);
+            else
+                usleep(50000);
         }
         else
         {

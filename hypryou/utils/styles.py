@@ -1,4 +1,4 @@
-from repository import gtk, gdk
+from repository import gtk, gdk, glib
 import subprocess
 from config import (
     styles_output, main_scss,
@@ -8,20 +8,16 @@ from config import (
 )
 from src.variables import Globals
 from utils.logger import logger
+import typing as t
 
 
 def apply_css() -> None:
     if hasattr(Globals, "css_provider"):
         return
-    compile_scss()
 
     if __debug__:
         logger.debug("Creating css provider")
     provider = gtk.CssProvider()
-
-    if __debug__:
-        logger.debug("Loading css")
-    provider.load_from_path(styles_output)
 
     gtk.StyleContext.add_provider_for_display(
         gdk.Display.get_default(),
@@ -31,17 +27,27 @@ def apply_css() -> None:
 
     Globals.css_provider = provider
 
+    def load_css(*args: t.Any) -> None:
+        if __debug__:
+            logger.debug("Loading css")
+        provider.load_from_path(styles_output)
+    try:
+        load_css()
+    except Exception:
+        compile_scss(load_css)
+
 
 def reload_css() -> None:
     if not hasattr(Globals, "css_provider"):
         return apply_css()
 
-    compile_scss()
-    if __debug__:
-        logger.debug("Reloading css")
-    Globals.css_provider.load_from_path(styles_output)
-    if __debug__:
-        logger.debug("Reloading css done")
+    def on_compile(pid: int, status: int, user_data: None) -> None:
+        if __debug__:
+            logger.debug("Reloading css")
+        Globals.css_provider.load_from_path(styles_output)
+        if __debug__:
+            logger.debug("Reloading css done")
+    compile_scss(on_compile)
 
 
 def generate_scss_variables() -> None:
@@ -55,10 +61,11 @@ def generate_scss_variables() -> None:
             f.write(f"${key}: {value};\n")
 
 
-def compile_scss() -> None:
+def compile_scss(
+    callback: t.Callable[[int, int, None], None]
+) -> None:
     if __debug__:
         logger.debug("Compiling scss")
-    generate_scss_variables()
     command = [
         'sass',
         f'--load-path={color_templates}',
@@ -67,7 +74,8 @@ def compile_scss() -> None:
         styles_output
     ]
 
-    subprocess.run(command, check=True)
+    proc = subprocess.Popen(command)
+    glib.child_watch_add(proc.pid, callback, None)
 
 
 def toggle_css_class(

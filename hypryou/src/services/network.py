@@ -15,8 +15,6 @@ AGENT_XML_PATH = os.path.join(
     ORIGINAL_DIR, "assets", "dbus",
     "org.freedesktop.NetworkManager.SecretAgent.xml"
 )
-with open(AGENT_XML_PATH) as f:
-    AGENT_XML = f.read()
 
 SECRET_AGENT_FAILED = "org.freedesktop.NetworkManager.SecretAgent.Error.Failed"
 
@@ -779,17 +777,20 @@ class SecretAgent:
         client: nm.Client
     ) -> None:
         self.client = client
-        self.node_info = gio.DBusNodeInfo.new_for_xml(AGENT_XML)
-        self.iface = self.node_info.interfaces[0]
         self.active_prompts: dict[str, SecretPromptHandler] = {}
 
     def register(self) -> None:
+        with open(AGENT_XML_PATH) as f:
+            agent_xml = f.read()
+        node_info = gio.DBusNodeInfo.new_for_xml(agent_xml)
+        iface = node_info.interfaces[0]
+
         if __debug__:
-            logger.debug("Registering interface '%s'", self.iface.name)
+            logger.debug("Registering interface '%s'", iface.name)
 
         system_bus.register_object(
             "/org/freedesktop/NetworkManager/SecretAgent",
-            self.iface,
+            iface,
             self.handle_bus_call
         )
 
