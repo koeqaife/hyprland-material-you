@@ -1,8 +1,3 @@
-import utils.ref as ref
-import utils.format as format
-import utils.downloader as downloader
-import utils.colors as colors
-
 from utils.ref import Ref
 from utils.logger import setup_logger
 from utils.styles import (
@@ -25,9 +20,7 @@ from utils.debounce import (
 
 __all__ = [
     "cliphist",
-    "widget",
     "Ref",
-    "ref",
     "setup_logger",
     "apply_css",
     "reload_css",
@@ -36,11 +29,8 @@ __all__ = [
     "get_formatted_time",
     "get_full_date",
     "toggle_css_class",
-    "format",
     "debounce",
-    "downloader",
     "escape_markup",
-    "colors",
     "format_seconds",
     "sync_debounce",
     "capitalize_first"

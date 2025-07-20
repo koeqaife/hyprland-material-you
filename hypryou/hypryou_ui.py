@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from __start__ import START
 import atexit
 import threading
 from repository import gtk, gdk, gio, glib
@@ -69,7 +70,6 @@ from src.modules.bluetooth_pin import PinDialog
 
 from src.modules.settings.wallpapers import executor as wallpaper_executor
 
-START = time.perf_counter()
 loop: glib.MainLoop
 
 services: tuple[AsyncService | Service, ...] = (
