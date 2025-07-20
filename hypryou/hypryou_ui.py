@@ -47,7 +47,7 @@ from src.services.bluetooth_agent import BluetoothAgentService
 import src.services.cliphist as cliphist
 
 # Modules
-from src.modules.bar import Bar, Corner
+from src.modules.bar import Bar, Corners
 from src.modules.tray import TrayWindow
 from src.modules.notifications.popups import Notifications
 from src.modules.sidebar.window import SidebarWindow
@@ -128,7 +128,7 @@ class HyprYou(gtk.Application):
 
     def do_activate(self) -> None:
         self.windows: dict[gdk.Monitor, list[gtk.ApplicationWindow]] = {}
-        self.corners: dict[gdk.Monitor, list[Corner]] = {}
+        self.corners: dict[gdk.Monitor, Corners] = {}
         self.registered: dict[str, t.Any] = {}
 
         self.hold()
@@ -268,9 +268,7 @@ class HyprYou(gtk.Application):
                         "Removing corners for monitor: %s",
                         monitor.get_model()
                     )
-                for corner in self.corners[monitor]:
-                    corner.destroy_window()
-                self.corners[monitor].clear()
+                self.corners[monitor].destroy_windows()
                 del self.corners[monitor]
 
         for i, monitor in enumerate(list(monitors)):  # type: ignore[assignment]  # noqa
@@ -289,12 +287,8 @@ class HyprYou(gtk.Application):
                             "Couldn't add window %s.",
                             window_type.__name__, exc_info=e
                         )
-                corners = [
-                    Corner(self, monitor, "left"),
-                    Corner(self, monitor, "right")
-                ]
                 self.windows[monitor] = windows
-                self.corners[monitor] = corners
+                self.corners[monitor] = Corners(self, monitor)
 
 
 def init() -> None:

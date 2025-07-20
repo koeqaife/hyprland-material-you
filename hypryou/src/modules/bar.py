@@ -1102,59 +1102,55 @@ class Bar(widget.LayerWindow):
         super().destroy()
 
 
-class Corner:
+class Corners:
     def __init__(
         self,
         application: gtk.Application,
-        monitor: gdk.Monitor,
-        position: t.Literal["left", "right"]
+        monitor: gdk.Monitor
     ) -> None:
-        self.position = position
         self.settings = Settings()
         self.application = application
         self.monitor = monitor
 
-        self.window: widget.LayerWindow | None = None
-        self.corner: widget.RoundedCorner | None = None
+        self.windows: list[widget.LayerWindow] = []
 
         self.settings.watch("corners", self.update_visible, True)
 
-    def create_window(self) -> None:
-        is_on_left = self.position == "left"
+    def create_windows(self) -> None:
+        for is_on_left in (True, False):
+            window = widget.LayerWindow(
+                application=self.application,
+                monitor=self.monitor,
+                anchors={
+                    "top": True,
+                    "left": is_on_left,
+                    "right": not is_on_left
+                },
+                css_classes=("transparent",),
+                name="corner"
+            )
+            self.windows.append(window)
 
-        self.window = widget.LayerWindow(
-            application=self.application,
-            monitor=self.monitor,
-            anchors={
-                "top": True,
-                "left": is_on_left,
-                "right": not is_on_left
-            },
-            css_classes=("transparent",),
-            name="corner"
-        )
+            corner = widget.RoundedCorner(
+                f"top-{"left" if is_on_left else "right"}"
+            )
+            window.set_child(corner)
 
-        self.corner = widget.RoundedCorner(
-            f"top-{self.position}"
-        )
-        self.window.set_child(self.corner)
+            self.application.add_window(window)
 
-        self.application.add_window(self.window)
+            window.show()
+            surface = window.get_surface()
+            if surface:
+                surface.set_input_region(
+                    dummy_region  # type: ignore[arg-type]
+                )
 
-        self.window.show()
-        surface = self.window.get_surface()
-        if surface:
-            surface.set_input_region(dummy_region)  # type: ignore[arg-type]
-
-    def destroy_window(self) -> None:
-        if self.window:
-            self.window.destroy()
-            self.window = None
-        if self.corner:
-            self.corner = None
+    def destroy_windows(self) -> None:
+        for window in self.windows:
+            window.destroy()
 
     def update_visible(self, value: bool) -> None:
         if value:
-            self.create_window()
+            self.create_windows()
         else:
-            self.destroy_window()
+            self.destroy_windows()
