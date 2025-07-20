@@ -215,7 +215,8 @@ class Settings:
         if new_dict != self._file_dict:
             with open(settings_path, 'w') as f:
                 self._file_dict = new_dict
-                json.dump(self._file_dict, f, indent=4)
+                data = json.dumps(self._file_dict, indent=4)
+                f.write(data)
 
     def sync(self) -> None:
         try:
