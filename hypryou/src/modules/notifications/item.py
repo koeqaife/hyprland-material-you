@@ -3,7 +3,8 @@ from src.services.notifications import Notification, NotificationClosedReason
 from src.services.notifications import Category, NotificationUrgency
 from src import widget
 import typing as t
-from utils import get_formatted_time, toggle_css_class
+from utils.format import get_formatted_time
+from utils.styles import toggle_css_class
 from config import Settings
 import datetime
 import json

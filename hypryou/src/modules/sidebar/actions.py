@@ -1,5 +1,5 @@
 from repository import gtk, glib
-from utils import Ref
+from utils.ref import Ref
 import typing as t
 import subprocess
 from src.services.state import close_window, open_window, open_settings

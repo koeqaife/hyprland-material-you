@@ -1,20 +1,20 @@
 import os
 import asyncio
+import socket
 from config import socket_path
 from utils.logger import logger
-import socket
-from config import Settings
-from utils import reload_css
+from utils.styles import reload_css
+from utils.handler import exit_reload
 from utils.service import AsyncService
 from src.services.mpris import current_player
 from src.services.state import set_random_wallpaper
+from src.services import state
+from config import Settings
 import subprocess
 import shlex
-from src.services import state
 import shutil
 import traceback
 import typing as t
-from utils.handler import exit_reload
 
 
 screenshot_mode_args = {

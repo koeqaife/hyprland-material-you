@@ -1,10 +1,10 @@
 from repository import gtk
-import typing as t
 import src.widget as widget
-from utils import toggle_css_class
+from utils.styles import toggle_css_class
 from utils.logger import logger
 import weakref
 from src.services.state import settings_page
+import typing as t
 
 # Pages
 from src.modules.settings.network import NetworkPage

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from src.services.dbus import session_bus
 from repository import gio, glib
-from utils import Ref
+from utils.ref import Ref
 from utils.logger import logger
 from utils.service import Service
 

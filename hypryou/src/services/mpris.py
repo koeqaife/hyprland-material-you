@@ -6,7 +6,7 @@ import typing as t
 from src.services.dbus import dbus_proxy, session_bus, cache_proxy_properties
 from src.services.dbus import name_owner_changed
 from utils.logger import logger
-from utils import Ref
+from utils.ref import Ref
 from utils.service import Signals, Service
 
 MPRIS_PREFIX = "org.mpris.MediaPlayer2."

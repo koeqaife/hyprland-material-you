@@ -1,4 +1,4 @@
-from utils import capitalize_first
+from utils.format import capitalize_first
 from utils.logger import logger
 from repository import gtk, layer_shell, gdk, glib
 from src.services.system_tray import StatusNotifierItem, items

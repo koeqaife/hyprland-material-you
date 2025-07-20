@@ -1,4 +1,4 @@
-from utils import toggle_css_class
+from utils.styles import toggle_css_class
 from utils.logger import logger
 from repository import gtk, layer_shell
 from src.services.backlight import (

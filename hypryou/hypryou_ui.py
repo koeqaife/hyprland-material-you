@@ -13,8 +13,9 @@ import traceback
 import sys
 import types
 
-import utils
-from utils.logger import logger
+import utils.colors
+from utils.styles import apply_css
+from utils.logger import logger, setup_logger
 from src.variables import Globals
 from config import Settings, ORIGINAL_DIR
 
@@ -201,7 +202,7 @@ class HyprYou(gtk.Application):
 
         cache_ok = utils.colors.generate_by_settings()
         if cache_ok:
-            utils.apply_css()
+            apply_css()
 
         self.tasks: list[asyncio.Task[t.Any]] = []
         await self.start_services()
@@ -293,7 +294,7 @@ class HyprYou(gtk.Application):
 
 
 def init() -> None:
-    utils.setup_logger(logging.DEBUG if __debug__ else logging.INFO)
+    setup_logger(logging.DEBUG if __debug__ else logging.INFO)
     if is_socket_exists():
         logger.critical(
             "Other HyprYou is running on the same hyprland instance!"

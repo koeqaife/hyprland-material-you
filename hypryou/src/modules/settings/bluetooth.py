@@ -3,7 +3,7 @@ from repository import gtk, bluetooth, gdk, gio, glib
 from src.modules.settings.base import RowTemplate
 from src.services.apps import launch_detached
 import typing as t
-from utils import toggle_css_class
+from utils.styles import toggle_css_class
 import src.widget as widget
 from collections import defaultdict
 

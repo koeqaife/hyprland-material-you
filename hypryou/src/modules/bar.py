@@ -1,28 +1,28 @@
-from dataclasses import dataclass
-
-import cairo
-from utils import Ref, downloader
-from utils import toggle_css_class, escape_markup
-from utils.logger import logger
-from src.services.clock import date, time
 from repository import gtk, gdk, pango, bluetooth
-from src.services import hyprland
-from src.services.hyprland import active_workspace, workspace_ids
-from src.services.hyprland import active_layout, show_layout
-from utils import format
+from dataclasses import dataclass
+from utils.ref import Ref
+from utils.styles import toggle_css_class
+from utils.format import escape_markup
+from utils.logger import logger
+from utils import format, downloader
 import asyncio
 from time import perf_counter
-import typing as t
 from config import Settings
-from src.services.mpris import MprisPlayer, current_player
 import weakref
+import cairo
 from src.services.network import get_network
 from src.services.state import toggle_window, open_settings
 from src.services.upower import get_upower, BatteryLevel, BatteryState
 from src.services.backlight import get_backlight_manager, BacklightDeviceView
-import src.services.audio as audio
-from src import widget
+from src.services.clock import date, time
 from src.services.apps import launch_detached
+from src.services import hyprland
+from src.services.hyprland import active_workspace, workspace_ids
+from src.services.hyprland import active_layout, show_layout
+from src.services.mpris import MprisPlayer, current_player
+from src.services import audio
+from src import widget
+import typing as t
 
 
 dummy_region = cairo.Region()

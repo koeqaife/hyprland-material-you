@@ -3,7 +3,7 @@ from repository import nm, glib, gio, gtk
 from utils.logger import logger
 import typing as t
 from utils.service import Signals, Service
-from utils import Ref
+from utils.ref import Ref
 from config import ORIGINAL_DIR
 import os
 from src.services.dbus import system_bus

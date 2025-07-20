@@ -3,7 +3,7 @@ from config import HyprlandVars, VERSION, info
 import src.widget as widget
 import weakref
 from utils.logger import logger
-from utils import toggle_css_class
+from utils.styles import toggle_css_class
 import utils.system as system
 from utils.system import STATIC_SYSTEM_INFO as STATIC
 import webbrowser

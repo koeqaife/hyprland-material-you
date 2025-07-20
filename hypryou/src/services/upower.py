@@ -3,7 +3,7 @@ from enum import Enum
 
 from src.services.dbus import cache_proxy_properties, system_bus
 from repository import gio, glib
-from utils import Ref
+from utils.ref import Ref
 from utils.logger import logger
 from utils.service import Service, Signals
 import typing as t

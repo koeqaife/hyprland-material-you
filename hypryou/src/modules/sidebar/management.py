@@ -1,10 +1,11 @@
 from repository import gtk, pango, gdk, bluetooth
-from utils import Ref, toggle_css_class
+from utils import colors
+from utils.ref import Ref
+from utils.styles import toggle_css_class
 import typing as t
 from src.services.clock import full_date
 from src.services.network import get_network, Primary
 import os
-from utils import colors
 from src.services.idle_inhibitor import inhibited, get_inhibitor
 from src.services.notifications import dnd
 from src.services.hyprland import night_light

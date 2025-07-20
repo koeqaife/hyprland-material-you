@@ -1,7 +1,8 @@
 from functools import lru_cache
 from repository import gtk, gdk, layer_shell, glib, pango
 from src.services.apps import Application, apps, reload as apps_reload
-from utils import sync_debounce, toggle_css_class
+from utils.debounce import sync_debounce
+from utils.styles import toggle_css_class
 from utils.logger import logger
 from config import HyprlandVars
 import weakref

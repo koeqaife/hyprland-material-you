@@ -1,8 +1,11 @@
 from dataclasses import dataclass
-from utils import downloader, toggle_css_class, Ref, sync_debounce
-from utils import format_seconds
+from utils.styles import toggle_css_class
+from utils.debounce import sync_debounce
+from utils.ref import Ref
+from utils.format import format_seconds
 from utils.service import Signals
 from utils.logger import logger
+import utils.downloader as downloader
 from repository import gtk, layer_shell, pango, glib, gobject
 from src.services.mpris import players, MprisPlayer, current_player
 from config import HyprlandVars

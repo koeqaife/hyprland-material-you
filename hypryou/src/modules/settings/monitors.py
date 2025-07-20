@@ -1,6 +1,6 @@
 import types
 from utils.ref import Ref
-from utils import toggle_css_class
+from utils.styles import toggle_css_class
 from repository import gtk, glib
 from config import Settings
 import typing as t

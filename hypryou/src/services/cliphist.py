@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import subprocess
 from pathlib import Path
-from utils import Ref
 import os
 from config import APP_CACHE_DIR, CACHE_DIR
 from utils.logger import logger
+from utils.ref import Ref
 
 TEMP_PATH = os.path.join(APP_CACHE_DIR, "cliphist")
 items = Ref[dict[str, str]]({}, name="cliphist_items")

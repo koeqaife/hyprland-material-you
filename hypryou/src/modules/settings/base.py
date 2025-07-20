@@ -2,7 +2,8 @@ from repository import gtk, gdk, gio, gobject
 import typing as t
 from config import Settings
 import src.widget as widget
-from utils import sync_debounce, toggle_css_class
+from utils.styles import toggle_css_class
+from utils.debounce import sync_debounce
 import weakref
 
 

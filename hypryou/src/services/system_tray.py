@@ -8,7 +8,7 @@ from utils.logger import logger
 from src.services.dbus import dbus_proxy, cache_proxy_properties
 from src.services.dbus import name_owner_changed
 import typing as t
-from utils import Ref
+from utils.ref import Ref
 from utils.service import Signals, Service
 
 # it won't reproduce the all possibilities of tray

@@ -1,6 +1,6 @@
 from config import HyprlandVars, Settings
 from utils.logger import logger
-from utils import toggle_css_class
+from utils.styles import toggle_css_class
 from repository import gtk, layer_shell
 import weakref
 from src.modules.sidebar.management import ManagementBox

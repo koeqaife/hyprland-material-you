@@ -4,7 +4,7 @@ from repository import gio
 from utils_cy.levenshtein import compute_score
 from utils.service import Service
 from utils.logger import logger
-from utils import Ref
+from utils.ref import Ref
 from config import APP_CACHE_DIR, CACHE_DIR
 from os.path import join as pjoin
 import os.path as path

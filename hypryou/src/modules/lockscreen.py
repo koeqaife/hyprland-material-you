@@ -1,22 +1,23 @@
-import threading
-from src.services.state import is_locked, current_wallpaper
-from src.services.state import is_idle_locked
 from repository import session_lock, gtk, gdk, glib
-import typing as t
-import weakref
 from utils.logger import logger
-from utils import toggle_css_class, Ref
+from utils.styles import toggle_css_class
+from utils.ref import Ref
 from src.services.clock import time, full_date
 from src.services.hyprland import active_layout, show_layout
-from src.modules.players import Player
 from src.services.mpris import current_player, MprisPlayer
 from src.services.upower import get_upower
+from src.services.state import is_idle_locked
+from src.services.state import is_locked, current_wallpaper
 from src.modules.notifications.list import Notifications
+from src.modules.players import Player
+from src import widget
 import pwd
 import os
 from pam import pam  # type: ignore [import-untyped]
 from time import monotonic
-from src import widget
+import weakref
+import threading
+import typing as t
 
 username = pwd.getpwuid(os.getuid()).pw_name
 close_player = Ref(False, name="lock_close_player")

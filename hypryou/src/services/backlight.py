@@ -1,12 +1,12 @@
 
 from src.services.login1 import get_login_manager
 from utils.service import Service, Signals
-from utils import Ref
-from repository import gio
-import typing as t
+from utils.ref import Ref
 from utils.logger import logger
-import os
+from repository import gio
 from math import ceil
+import typing as t
+import os
 
 NAMESPACE_DIR = "/sys/class/backlight"
 

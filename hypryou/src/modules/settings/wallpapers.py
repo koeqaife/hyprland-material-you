@@ -7,7 +7,7 @@ import hashlib
 import concurrent.futures
 import functools
 from utils.logger import logger
-from utils import toggle_css_class
+from utils.styles import toggle_css_class
 import threading
 import typing as t
 import weakref

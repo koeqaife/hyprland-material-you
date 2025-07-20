@@ -1,4 +1,4 @@
-from utils import sync_debounce
+from utils.debounce import sync_debounce
 from utils.service import Service
 from utils.logger import logger
 from src.services.hyprland_keybinds import key_binds

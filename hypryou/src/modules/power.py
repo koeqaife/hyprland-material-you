@@ -1,16 +1,16 @@
 from repository import gtk, layer_shell
-from utils import sync_debounce
+from utils.debounce import sync_debounce
 from utils.logger import logger
-import typing as t
-from config import HyprlandVars, Settings
-import weakref
 from src.services.login1 import get_login_manager
 from src.services.state import is_locked, close_window
-from src.services import hyprland
 from src.services.mpris import players
-import asyncio
+from src.services import hyprland
 import src.services.cliphist as cliphist
+from config import HyprlandVars, Settings
 from src import widget
+import weakref
+import asyncio
+import typing as t
 
 
 class ActionButton(gtk.Button):

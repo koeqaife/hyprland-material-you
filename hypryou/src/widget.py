@@ -2,13 +2,12 @@ import weakref
 from repository import gtk, layer_shell, gdk
 from utils.ref import Ref
 from utils.logger import logger
+from utils.styles import toggle_css_class
 import typing as t
 import cairo
 from math import pi
 from config import HyprlandVars
-
 import src.services.state as state
-from utils import toggle_css_class
 
 
 __all__ = [

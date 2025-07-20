@@ -1,13 +1,13 @@
-import src.widget as widget
-from utils import toggle_css_class
-from utils.logger import logger
 from repository import gtk, layer_shell, wp, pango, gio, gdk
+import src.widget as widget
+from utils.styles import toggle_css_class
+from utils.ref import Ref
+from utils.logger import logger
 from config import HyprlandVars
 from src.services.audio import ICON_THRESHOLDS
 import src.services.audio as audio
 import typing as t
 import weakref
-from utils.ref import Ref
 
 
 type NodeItem = "EndpointItem | StreamItem"
