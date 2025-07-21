@@ -9,6 +9,7 @@ from config import (
 from src.variables import Globals
 from utils.logger import logger
 import typing as t
+import os
 
 
 def apply_css() -> None:
@@ -31,9 +32,9 @@ def apply_css() -> None:
         if __debug__:
             logger.debug("Loading css")
         provider.load_from_path(styles_output)
-    try:
+    if os.path.isfile(styles_output):
         load_css()
-    except Exception:
+    else:
         compile_scss(load_css)
 
 
@@ -66,6 +67,7 @@ def compile_scss(
 ) -> None:
     if __debug__:
         logger.debug("Compiling scss")
+    generate_scss_variables()
     command = [
         'sass',
         f'--load-path={color_templates}',
