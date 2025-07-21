@@ -32,10 +32,14 @@ def apply_css() -> None:
         if __debug__:
             logger.debug("Loading css")
         provider.load_from_path(styles_output)
+
     if os.path.isfile(styles_output):
-        load_css()
-    else:
-        compile_scss(load_css)
+        try:
+            load_css()
+            return
+        except Exception as e:
+            logger.exception("Error while loading css", exc_info=e)
+    compile_scss(load_css)
 
 
 def reload_css() -> None:
