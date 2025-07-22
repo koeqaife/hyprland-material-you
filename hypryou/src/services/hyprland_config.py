@@ -1,15 +1,17 @@
 from utils.debounce import sync_debounce
 from utils.service import Service
 from utils.logger import logger
+from utils.ref import unpack_reactive
 from src.services.hyprland_keybinds import key_binds
 from src.services.hyprland_keybinds.common import (
-    KeyBind, KeyBindHint
+    KeyBind, KeyBindHint, KeyBindOverride
 )
 from config import config_dir, Settings, SettingsView
 import os
 import typing as t
 
 generated_config = os.path.join(config_dir, "hyprland_generated.conf")
+keybind_overrides: dict[str, KeyBindOverride] = {}
 
 noanim_layers = [
     "hypryou-notifications.*",
@@ -218,13 +220,49 @@ def generate_cursor_settings() -> str:
     )
 
 
+type KeybindOverridesRaw = list[dict[str, list[str] | str]]
+
+
+def generate_overrides(raw: KeybindOverridesRaw) -> dict[str, KeyBindOverride]:
+    overrides: dict[str, KeyBindOverride] = {}
+    for override in raw:
+        if not isinstance(override, dict):
+            continue
+        if not isinstance(override.get("id"), str):
+            continue
+        if (
+            not isinstance(override.get("bind"), list)
+            and len(override["bind"]) > 3
+        ):
+            continue
+        if "action" not in override:
+            continue
+        action = unpack_reactive(override["action"])
+        overrides[override["id"]] = KeyBindOverride(
+            id=override["id"],
+            bind=tuple(override["bind"]),
+            action=(
+                tuple(override["action"])
+                if isinstance(action, list)
+                else str(action)
+            )
+        )
+    return overrides
+
+
 def generate_binds() -> str:
     output = ""
-    for bind in key_binds:
-        if isinstance(bind, KeyBindHint):
+
+    for _bind in key_binds:
+        if isinstance(_bind, KeyBindHint):
             continue
-        elif not isinstance(bind, KeyBind):
+        elif not isinstance(_bind, KeyBind):
             continue
+
+        if _bind.id in keybind_overrides.keys():
+            bind = keybind_overrides[_bind.id]
+        else:
+            bind = _bind
 
         if len(bind.bind) == 2:
             key_str = ", ".join(bind.bind)
@@ -304,12 +342,18 @@ def on_settings_changed(key: str, value: str) -> None:
     generate_config()
 
 
+def keybind_overrides_changed(value: KeybindOverridesRaw) -> None:
+    global keybind_overrides
+    keybind_overrides = generate_overrides(value)
+
+
 class HyprlandConfigService(Service):
     def __init__(self) -> None:
         pass
 
     def app_init(self) -> None:
+        settings = Settings()
+        settings._signals.watch("changed", on_settings_changed)
+        settings.watch("keybinds_overrides", keybind_overrides_changed, False)
+        keybind_overrides_changed(settings.get("keybinds_overrides"))
         generate_config()
-
-    def start(self) -> None:
-        Settings()._signals.watch("changed", on_settings_changed)

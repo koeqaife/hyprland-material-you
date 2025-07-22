@@ -20,6 +20,17 @@ class KeyBind:
     description: str | None = None
     category: Category | None = None
 
+    @property
+    def id(self) -> str:
+        return "_".join(self.bind)
+
+
+@dataclass
+class KeyBindOverride:
+    id: str
+    bind: tuple[str, ...]
+    action: tuple[str, ...] | str
+
 
 @dataclass
 class KeyBindHint:

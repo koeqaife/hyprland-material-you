@@ -127,7 +127,8 @@ default_settings: dict[str, t.Any] = {
     "input.touchpad.flip_x": False,
     "input.touchpad.flip_y": False,
 
-    "monitors": []
+    "monitors": [],
+    "keybinds_overrides": []
 }
 
 os.makedirs(config_dir, exist_ok=True)
