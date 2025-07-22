@@ -221,6 +221,19 @@ class ReactiveDict(dict[K, V], t.Generic[K, V]):
             self._ref._trigger_watchers()
 
 
+def unpack_reactive(value: T) -> T:
+    def _unpack(value: t.Any) -> t.Any:
+        if isinstance(value, ReactiveList):
+            return [_unpack(item) for item in value]
+        if isinstance(value, ReactiveSet):
+            return {_unpack(item) for item in value}
+        if isinstance(value, ReactiveDict):
+            return {key: _unpack(val) for key, val in value.items()}
+        return value
+
+    return t.cast(T, _unpack(value))
+
+
 class Ref(t.Generic[T]):
     __slots__ = (
         "_signals", "deep", "is_ready",
