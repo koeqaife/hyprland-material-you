@@ -231,20 +231,26 @@ def generate_overrides(raw: KeybindOverridesRaw) -> dict[str, KeyBindOverride]:
         if not isinstance(override.get("id"), str):
             continue
         if (
-            not isinstance(override.get("bind"), list)
+            "bind" in override.keys()
+            and not isinstance(override["bind"], list)
             and len(override["bind"]) > 3
         ):
             continue
-        if "action" not in override:
-            continue
-        action = unpack_reactive(override["action"])
+        bind = unpack_reactive(override.get("bind"))
+        action = unpack_reactive(override.get("action"))
         overrides[override["id"]] = KeyBindOverride(
             id=override["id"],
-            bind=tuple(override["bind"]),
+            bind=(
+                tuple(bind)
+                if bind is not None
+                else None
+            ),
             action=(
                 tuple(override["action"])
                 if isinstance(action, list)
                 else str(action)
+                if action is not None
+                else None
             )
         )
     return overrides
@@ -253,32 +259,36 @@ def generate_overrides(raw: KeybindOverridesRaw) -> dict[str, KeyBindOverride]:
 def generate_binds() -> str:
     output = ""
 
-    for _bind in key_binds:
-        if isinstance(_bind, KeyBindHint):
+    for bind in key_binds:
+        if isinstance(bind, KeyBindHint):
             continue
-        elif not isinstance(_bind, KeyBind):
+        elif not isinstance(bind, KeyBind):
             continue
 
-        if _bind.id in keybind_overrides.keys():
-            bind = keybind_overrides[_bind.id]
-        else:
-            bind = _bind
+        key = bind.bind
+        action = bind.action
+        if bind.id in keybind_overrides.keys():
+            override = keybind_overrides[bind.id]
+            if override.bind:
+                key = override.bind
+            if override.action:
+                action = override.action
 
-        if len(bind.bind) == 2:
-            key_str = ", ".join(bind.bind)
-        elif len(bind.bind) == 3:
-            key_str = f"{bind.bind[0]} {bind.bind[1]}, {bind.bind[2]}"
-        elif len(bind.bind) == 1:
-            key_str = f",{bind.bind[0]}"
+        if len(key) == 2:
+            key_str = ", ".join(key)
+        elif len(key) == 3:
+            key_str = f"{key[0]} {key[1]}, {key[2]}"
+        elif len(key) == 1:
+            key_str = f",{key[0]}"
         else:
             logger.warning(f"Bind {bind} has wrong length of bind")
             continue
 
-        if isinstance(bind.action, tuple):
-            action = ", ".join(bind.action)
+        if isinstance(action, tuple):
+            action_str = ", ".join(action)
         else:
-            action = bind.action
-        bind_str = f"{key_str}, {action}"
+            action_str = action
+        bind_str = f"{key_str}, {action_str}"
         if "mouse" in key_str:
             output += f"bindm = {bind_str}\n"
         else:

@@ -28,8 +28,8 @@ class KeyBind:
 @dataclass
 class KeyBindOverride:
     id: str
-    bind: tuple[str, ...]
-    action: tuple[str, ...] | str
+    bind: tuple[str, ...] | None
+    action: tuple[str, ...] | str | None
 
 
 @dataclass
