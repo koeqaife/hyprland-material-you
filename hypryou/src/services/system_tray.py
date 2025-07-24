@@ -10,7 +10,7 @@ from src.services.dbus import name_owner_changed
 import typing as t
 from utils.ref import Ref
 from utils.service import Signals, Service
-import numpy as np
+from utils_cy.helpers import argb_to_rgba
 
 # it won't reproduce the all possibilities of tray
 # I'll just use it as for running background services
@@ -40,16 +40,6 @@ type Category = t.Literal[
     "SystemServices", "Hardware"
 ]
 type Pixmaps = list[tuple[int, int, bytearray]]
-
-
-def argb_to_rgba(data: bytearray) -> bytearray:
-    arr = np.frombuffer(data, dtype=np.uint8).reshape(-1, 4)
-    rgba = np.empty_like(arr)
-    rgba[:, 0] = arr[:, 1]
-    rgba[:, 1] = arr[:, 2]
-    rgba[:, 2] = arr[:, 3]
-    rgba[:, 3] = arr[:, 0]
-    return bytearray(rgba.tobytes())
 
 
 def get_process_title(pid: int) -> str | None:
