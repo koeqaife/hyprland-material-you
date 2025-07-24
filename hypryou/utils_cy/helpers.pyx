@@ -2,12 +2,12 @@ cimport cython
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef list downsample_image_rgb(str path, int quality):
+cpdef list[tuple[int, int, int]] downsample_image_rgb(str path, int quality):
     from PIL import Image
     cdef:
         int x, y, width, height
-        tuple rgb
-        list result = []
+        int r, g, b
+        list[tuple[int, int, int]] result = []
 
     img = Image.open(path).convert('RGB')
     width, height = img.size
@@ -15,8 +15,8 @@ cpdef list downsample_image_rgb(str path, int quality):
 
     for y in range(0, height, quality):
         for x in range(0, width, quality):
-            rgb = pix[x, y]
-            result.append(rgb)
+            r, g, b = pix[x, y]
+            result.append((r, g, b))
 
     return result
 
