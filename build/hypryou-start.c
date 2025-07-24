@@ -139,7 +139,7 @@ int main(void)
             dup2(pipefd[1], STDOUT_FILENO);
             dup2(pipefd[1], STDERR_FILENO);
             close(pipefd[1]);
-            execlp("python", "python", "-OO", "hypryou_ui.py", NULL);
+            execlp("python", "python", "-O", "hypryou_ui.py", NULL);
             perror("exec failed");
             exit(127);
         }
