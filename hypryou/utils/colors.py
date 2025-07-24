@@ -3,7 +3,6 @@ import json
 import subprocess
 import threading
 import concurrent.futures
-from materialyoucolor.score.score import Score  # type: ignore
 from materialyoucolor.dynamiccolor.material_dynamic_colors import DynamicColor  # type: ignore # noqa
 from materialyoucolor.dynamiccolor.material_dynamic_colors import MaterialDynamicColors  # noqa
 from materialyoucolor.scheme.dynamic_scheme import DynamicScheme  # type: ignore # noqa
@@ -403,9 +402,6 @@ def process_image(
     quality: int = 2,
     num_colors: int = 128
 ) -> int:
-    from materialyoucolor.quantize import QuantizeCelebi  # type: ignore
-    import pickle
-
     def get_cache_path(image_path: str) -> str:
         cache_path = join(CACHE_PATH, "cached_colors")
         hash_object = hashlib.md5(image_path.encode())
@@ -415,11 +411,13 @@ def process_image(
 
     def load_from_cache(cache_path: str) -> t.Any:
         if os.path.exists(cache_path):
+            import pickle
             with open(cache_path, 'rb') as f:
                 return pickle.load(f)
         return None
 
     def save_to_cache(cache_path: str, data: t.Any) -> None:
+        import pickle
         with open(cache_path, 'wb') as f:
             pickle.dump(data, f)
 
@@ -428,6 +426,9 @@ def process_image(
     cached_result = load_from_cache(cache_path)
     if cached_result is not None:
         return int(cached_result)
+
+    from materialyoucolor.quantize import QuantizeCelebi  # type: ignore
+    from materialyoucolor.score.score import Score  # type: ignore
 
     pixel_array = downsample_image_rgb(image_path, quality)
 
