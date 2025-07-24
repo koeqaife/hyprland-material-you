@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from enum import Enum
-import heapq
 import time
 from config import ORIGINAL_DIR
 import os
@@ -487,6 +486,7 @@ class ExpiryManager:
         self._entry_finder: dict[int, TimeoutEntry] = {}
 
     def schedule(self, notif_id: int, timeout_ms: int, dismiss: bool) -> None:
+        import heapq
         expiry = time.time() + timeout_ms / 1000.0
         entry = TimeoutEntry(expiry, notif_id, dismiss)
         self._entry_finder[notif_id] = entry
@@ -497,6 +497,7 @@ class ExpiryManager:
             del self._entry_finder[notif_id]
 
     def pop_expired(self) -> list[TimeoutEntry]:
+        import heapq
         now = time.time()
         expired: list[TimeoutEntry] = []
         while self._heap and self._heap[0].expiry <= now:

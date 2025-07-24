@@ -1,6 +1,5 @@
 import os
 import json
-import subprocess
 import threading
 import concurrent.futures
 from materialyoucolor.dynamiccolor.material_dynamic_colors import DynamicColor  # type: ignore # noqa
@@ -19,7 +18,8 @@ from pathlib import Path
 from os.path import join
 from utils.styles import reload_css
 from utils_cy.helpers import downsample_image_rgb
-
+if t.TYPE_CHECKING:
+    import subprocess
 
 # I dropped support of color schemes
 # Because it's just easier when there's only 1 of them
@@ -521,7 +521,7 @@ def generate_colors_sync(
         allowed_actions
     )
 
-    processes: list[subprocess.Popen] = []
+    processes: list["subprocess.Popen"] = []
     for file_path, actions in post.items():
         for action in actions:
             if action.startswith("compile_scss"):
@@ -542,7 +542,8 @@ def generate_colors_sync(
         proc.wait(15)
 
 
-def compile_scss(path: str, output: str) -> subprocess.Popen:
+def compile_scss(path: str, output: str) -> "subprocess.Popen":
+    import subprocess
     if __debug__:
         logger.debug("Compiling scss: %s", repr(path))
     command = [

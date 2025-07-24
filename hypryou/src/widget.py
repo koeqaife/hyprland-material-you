@@ -4,10 +4,11 @@ from utils.ref import Ref
 from utils.logger import logger
 from utils.styles import toggle_css_class
 import typing as t
-import cairo
 from math import pi
 from config import HyprlandVars
 import src.services.state as state
+if t.TYPE_CHECKING:
+    import cairo
 
 
 __all__ = [
@@ -258,7 +259,7 @@ class RoundedCorner(gtk.DrawingArea):
     def on_draw(
         self,
         widget: t.Self,
-        cr: cairo.Context,  # type: ignore[type-arg]
+        cr: "cairo.Context",  # type: ignore[type-arg]
         width: int,
         height: int
     ) -> None:

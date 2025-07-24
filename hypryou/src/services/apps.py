@@ -9,8 +9,6 @@ from config import APP_CACHE_DIR, CACHE_DIR
 from os.path import join as pjoin
 import os.path as path
 import json
-import shlex
-import subprocess
 import os
 
 apps = Ref[list["Application"]]([], name="applications", delayed_init=True)
@@ -22,6 +20,9 @@ LEGACY_APP_FREQUENCY = pjoin(CACHE_DIR, "ags", "apps", "apps_frequency.json")
 
 
 def launch_detached(exec: str) -> None:
+    import shlex
+    import subprocess
+
     if __debug__:
         logger.debug("Running %s", exec)
 

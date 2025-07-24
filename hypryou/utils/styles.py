@@ -1,5 +1,4 @@
 from repository import gtk, gdk, glib
-import subprocess
 from config import (
     styles_output, main_scss,
     scss_variables, HyprlandVars,
@@ -69,6 +68,8 @@ def generate_scss_variables() -> None:
 def compile_scss(
     callback: t.Callable[[int, int, None], None]
 ) -> None:
+    import subprocess
+
     if __debug__:
         logger.debug("Compiling scss")
     generate_scss_variables()

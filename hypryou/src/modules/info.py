@@ -6,9 +6,13 @@ from utils.logger import logger
 from utils.styles import toggle_css_class
 import utils.system as system
 from utils.system import STATIC_SYSTEM_INFO as STATIC
-import webbrowser
 
 ICON_SIZE = 22
+
+
+def open_link(url: str) -> None:
+    import webbrowser
+    webbrowser.open(url)
 
 
 class InfoPage(gtk.Box):
@@ -90,13 +94,13 @@ class InfoPage(gtk.Box):
 
         self.handlers = {
             self.github_button: self.github_button.connect(
-                "clicked", lambda *_: webbrowser.open(info["github"])
+                "clicked", lambda *_: open_link(info["github"])
             ),
             self.discord_button: self.discord_button.connect(
-                "clicked", lambda *_: webbrowser.open(info["discord"])
+                "clicked", lambda *_: open_link(info["discord"])
             ),
             self.kofi_button: self.kofi_button.connect(
-                "clicked", lambda *_: webbrowser.open(info["ko-fi"])
+                "clicked", lambda *_: open_link(info["ko-fi"])
             )
         }
 

@@ -1,12 +1,13 @@
 from repository import gtk, glib
 from utils.ref import Ref
 import typing as t
-import subprocess
 from src.services.state import close_window, open_window, open_settings
 from src import widget
 
 
 def open_hyprpicker(*_: t.Any) -> None:
+    import subprocess
+
     def start() -> None:
         subprocess.Popen(
             ["hyprpicker", "-a"],

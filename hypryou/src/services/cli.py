@@ -10,9 +10,6 @@ from src.services.mpris import current_player
 from src.services.state import set_random_wallpaper
 from src.services import state
 from config import Settings
-import subprocess
-import shlex
-import shutil
 import traceback
 import typing as t
 
@@ -45,6 +42,9 @@ HELP = {
 
 
 def launch_detached(exec: str) -> None:
+    import shlex
+    import subprocess
+
     cmd = shlex.split(exec)
     cwd = os.path.expanduser("~")
 
@@ -140,6 +140,8 @@ class CliRequest:
         return "ok"
 
     def do_screenshot(self, _mode: str) -> str:
+        import shutil
+
         mode = _mode.split()[0] if _mode else "region"
         if mode not in screenshot_mode_args:
             modes = ", ".join(screenshot_mode_args.keys())

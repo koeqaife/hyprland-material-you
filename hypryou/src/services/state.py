@@ -14,7 +14,6 @@ from os.path import join, exists
 from config import state_dir
 import os
 from os import path
-import gc
 
 STATE_FILE_VERSION = 1
 WALLPAPER_EXTENSIONS = {
@@ -122,6 +121,7 @@ def set_random_wallpaper() -> None:
 
 
 def generate_wallpaper_texture() -> None:
+    import gc
     settings = Settings()
     path = settings.get("wallpaper")
 

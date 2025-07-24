@@ -13,7 +13,6 @@ from src.modules.players import Player
 from src import widget
 import pwd
 import os
-from pam import pam  # type: ignore [import-untyped]
 from time import monotonic
 import weakref
 import threading
@@ -25,6 +24,7 @@ blocked_input = Ref(False, name="lock_blocked_input")
 
 
 def check_password(username: str, password: str) -> bool:
+    from pam import pam  # type: ignore [import-untyped]
     p = pam()
     return bool(p.authenticate(username, password))
 

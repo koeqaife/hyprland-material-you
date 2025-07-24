@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 import os
 from config import APP_CACHE_DIR, CACHE_DIR
@@ -12,6 +11,7 @@ items = Ref[dict[str, str]]({}, name="cliphist_items")
 
 
 def get() -> dict[str, str]:
+    import subprocess
     try:
         result = subprocess.run(
             ["cliphist", "list"],
@@ -57,6 +57,7 @@ def repopulate() -> None:
 
 
 def copy_by_id(item_id: str) -> None:
+    import subprocess
     with subprocess.Popen(
         ["cliphist", "decode", item_id], stdout=subprocess.PIPE
     ) as decode_proc, subprocess.Popen(
@@ -67,6 +68,7 @@ def copy_by_id(item_id: str) -> None:
 
 
 def secure_clear() -> None:
+    import subprocess
     db_path = os.path.join(CACHE_DIR, "cliphist/db")
     if os.path.exists(db_path):
         subprocess.run(["shred", "-u", db_path], check=True)
@@ -76,10 +78,12 @@ def secure_clear() -> None:
 
 
 def clear() -> None:
+    import subprocess
     subprocess.run(["cliphist", "wipe"], check=True)
 
 
 def save_cache_file(item_id: str) -> str:
+    import subprocess
     output_file = Path(f"{TEMP_PATH}/{item_id}.png")
     output_file.parent.mkdir(parents=True, exist_ok=True)
 
