@@ -238,6 +238,8 @@ class StatusNotifierItem(Signals):
         if (pixbuf := self._pixbufs.get((width, height))):
             return pixbuf
 
+        if not self._proxy:
+            return
         variant = self._proxy.get_cached_property("IconPixmap")
         if variant is None or variant.n_children() == 0:
             return None
