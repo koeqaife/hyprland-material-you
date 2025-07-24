@@ -1,5 +1,5 @@
 
-cpdef argb_to_rgba(bytearray data):
+cpdef bytearray argb_to_rgba(bytearray data):
     cdef Py_ssize_t i, size = len(data)
     cdef unsigned char tmp
 
