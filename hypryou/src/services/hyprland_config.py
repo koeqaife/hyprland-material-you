@@ -1,7 +1,7 @@
 from utils.debounce import sync_debounce
 from utils.service import Service
 from utils.logger import logger
-from utils.ref import unpack_reactive
+from utils.ref import unpack_reactive, Ref
 from src.services.hyprland_keybinds import key_binds
 from src.services.hyprland_keybinds.common import (
     KeyBind, KeyBindHint, KeyBindOverride
@@ -11,7 +11,10 @@ import os
 import typing as t
 
 generated_config = os.path.join(config_dir, "hyprland_generated.conf")
-keybind_overrides: dict[str, KeyBindOverride] = {}
+keybind_overrides = Ref[dict[str, KeyBindOverride]](
+    {}, name="keybind_overrides",
+    delayed_init=True
+)
 
 noanim_layers = [
     "hypryou-notifications.*",
@@ -267,8 +270,8 @@ def generate_binds() -> str:
 
         key = bind.bind
         action = bind.action
-        if bind.id in keybind_overrides.keys():
-            override = keybind_overrides[bind.id]
+        if bind.id in keybind_overrides.value.keys():
+            override = keybind_overrides.value[bind.id]
             if override.bind:
                 key = override.bind
             if override.action:
@@ -353,8 +356,7 @@ def on_settings_changed(key: str, value: str) -> None:
 
 
 def keybind_overrides_changed(value: KeybindOverridesRaw) -> None:
-    global keybind_overrides
-    keybind_overrides = generate_overrides(value)
+    keybind_overrides.value = generate_overrides(value)
 
 
 class HyprlandConfigService(Service):
@@ -366,4 +368,5 @@ class HyprlandConfigService(Service):
         settings._signals.watch("changed", on_settings_changed)
         settings.watch("keybinds_overrides", keybind_overrides_changed, False)
         keybind_overrides_changed(settings.get("keybinds_overrides"))
+        keybind_overrides.ready()
         generate_config()
