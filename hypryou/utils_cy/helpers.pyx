@@ -1,3 +1,24 @@
+cimport cython
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cpdef list downsample_image_rgb(str path, int quality):
+    from PIL import Image
+    cdef:
+        int x, y, width, height
+        tuple rgb
+        list result = []
+
+    img = Image.open(path).convert('RGB')
+    width, height = img.size
+    pix = img.load()
+
+    for y in range(0, height, quality):
+        for x in range(0, width, quality):
+            rgb = pix[x, y]
+            result.append(rgb)
+
+    return result
 
 cpdef bytearray argb_to_rgba(bytearray data):
     cdef Py_ssize_t i, size = len(data)

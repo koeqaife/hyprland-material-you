@@ -19,6 +19,7 @@ from config import Settings
 from pathlib import Path
 from os.path import join
 from utils.styles import reload_css
+from utils_cy.helpers import downsample_image_rgb
 
 
 # I dropped support of color schemes
@@ -402,9 +403,7 @@ def process_image(
     quality: int = 2,
     num_colors: int = 128
 ) -> int:
-    from PIL import Image
     from materialyoucolor.quantize import QuantizeCelebi  # type: ignore
-    import numpy as np
     import pickle
 
     def get_cache_path(image_path: str) -> str:
@@ -430,10 +429,7 @@ def process_image(
     if cached_result is not None:
         return int(cached_result)
 
-    image = Image.open(image_path).convert('RGB')
-
-    image_data = np.array(image)
-    pixel_array = image_data[::quality, ::quality].reshape(-1, 3)
+    pixel_array = downsample_image_rgb(image_path, quality)
 
     result = QuantizeCelebi(pixel_array, num_colors)
 

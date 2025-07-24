@@ -18,7 +18,6 @@ dbus-glib
 python-pillow
 cairo
 libnm
-python-numpy
 cython
 hyprsunset
 upower
@@ -45,7 +44,6 @@ Versions:
 - python-pillow: Used 11.2.1-1
 - cairo: Used 1.18.4-1
 - libnm: Used 1.52.0-1
-- python-numpy: Used 2.2.5-1
 - cython: Used 3.0.12-1
 - hyprsunset: Used 0.2.0-4
 - python-pam: Used 2.0.2-4
