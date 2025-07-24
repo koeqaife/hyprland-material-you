@@ -207,10 +207,10 @@ window.bar {
                 }
                 &:not(.play-pause) {
                     &:hover {
-                        background-color: color.mix($surfaceContainer, $onSurfaceVariant, 92%);
+                        background-color: color.mix($surfaceContainerHigh, $onSurfaceVariant, 92%);
                     }
                     &:active {
-                        background-color: color.mix($surfaceContainer, $onSurfaceVariant, 86%);
+                        background-color: color.mix($surfaceContainerHigh, $onSurfaceVariant, 86%);
                     }
                 }
             }
