@@ -10,6 +10,7 @@ from src.services.dbus import name_owner_changed
 import typing as t
 from utils.ref import Ref
 from utils.service import Signals, Service
+import numpy as np
 
 # it won't reproduce the all possibilities of tray
 # I'll just use it as for running background services
@@ -39,6 +40,16 @@ type Category = t.Literal[
     "SystemServices", "Hardware"
 ]
 type Pixmaps = list[tuple[int, int, bytearray]]
+
+
+def argb_to_rgba(data: bytearray) -> bytearray:
+    arr = np.frombuffer(data, dtype=np.uint8).reshape(-1, 4)
+    rgba = np.empty_like(arr)
+    rgba[:, 0] = arr[:, 1]
+    rgba[:, 1] = arr[:, 2]
+    rgba[:, 2] = arr[:, 3]
+    rgba[:, 3] = arr[:, 0]
+    return bytearray(rgba.tobytes())
 
 
 def get_process_title(pid: int) -> str | None:
@@ -237,40 +248,51 @@ class StatusNotifierItem(Signals):
         if (pixbuf := self._pixbufs.get((width, height))):
             return pixbuf
 
-        pixmaps = self.prop("IconPixmap")
-        if not pixmaps:
+        variant = self._proxy.get_cached_property("IconPixmap")
+        if variant is None or variant.n_children() == 0:
             return None
 
-        nearest_pixmap = min(
-            pixmaps,
-            key=lambda x: (x[0] - width) ** 2 + (x[1] - height) ** 2,
-        )
+        nearest = None
+        nearest_score = float("inf")
 
-        data_bytearray = bytearray(nearest_pixmap[2])
-        for i in range(0, len(data_bytearray), 4):
-            data_bytearray[i:i+4] = (
-                data_bytearray[i+1:i+4] + data_bytearray[i:i+1]
-            )
+        for i in range(variant.n_children()):
+            item = variant.get_child_value(i)
+            w = item.get_child_value(0).get_int32()
+            h = item.get_child_value(1).get_int32()
+            score = (w - width) ** 2 + (h - height) ** 2
+            if score < nearest_score:
+                nearest = item
+                nearest_score = score
+
+        if nearest is None:
+            return None
+
+        w = nearest.get_child_value(0).get_int32()
+        h = nearest.get_child_value(1).get_int32()
+        data_variant = nearest.get_child_value(2)
+        try:
+            glib_bytes = data_variant.get_data_as_bytes()
+            data_bytes = bytearray(glib_bytes.get_data())
+        except MemoryError:
+            return None
+
+        data_bytes = argb_to_rgba(data_bytes)
 
         pixbuf = gdk_pixbuf.Pixbuf.new_from_bytes(
-            glib.Bytes.new(data_bytearray),
+            glib.Bytes.new(data_bytes),
             gdk_pixbuf.Colorspace.RGB,
             True,
             8,
-            nearest_pixmap[0],
-            nearest_pixmap[1],
-            nearest_pixmap[0] * 4,
+            w,
+            h,
+            w * 4,
         )
 
         if not pixbuf:
             return None
 
-        if width != nearest_pixmap[0] or height != nearest_pixmap[1]:
-            pixbuf = pixbuf.scale_simple(
-                width,
-                height,
-                resize_method
-            )
+        if width != w or height != h:
+            pixbuf = pixbuf.scale_simple(width, height, resize_method)
 
         self._pixbufs[(width, height)] = pixbuf
         return pixbuf
