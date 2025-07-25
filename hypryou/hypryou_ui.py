@@ -237,6 +237,7 @@ class HyprYou(gtk.Application):
         )
         self.release()
         glib.timeout_add(100, restore_state)
+        os.nice(5)
         await asyncio.gather(*self.tasks)
 
     def get_monitors(self) -> gio.ListModel:
@@ -301,7 +302,6 @@ def init() -> None:
         )
         exit(1)
 
-    os.nice(5)
     set_fatal_handler(handle_fatal_signal)
 
     settings = Settings()
