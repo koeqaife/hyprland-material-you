@@ -28,8 +28,7 @@ REPLACEMENTS: dict[str, str] = {
     "[": "LEFTBRRACKET",
     "]": "RIGHTBRACKET",
     "\\": "BACKSLASH",
-    "'": "APOSTROPHE",
-    "*": "ASTERISK"
+    "'": "APOSTROPHE"
 }
 
 
