@@ -289,11 +289,12 @@ class KeybindsPage(gtk.Box):
         }
         for id, to_change in self.overrides.items():
             if id not in _map:
-                _map[id] = {
+                _map[id] = overrides._wrap_if_mutable({
                     "id": id
-                }
+                })
                 overrides.value.append(_map[id])
 
+            print(type(_map[id]))
             if "bind" in to_change:
                 if to_change["bind"] is None:
                     if "bind" in _map[id]:
@@ -308,8 +309,6 @@ class KeybindsPage(gtk.Box):
                 else:
                     _map[id]["action"] = to_change["action"]
 
-        # Wrap all mutable
-        overrides.value = overrides.value
         self.overrides.clear()
         self.save_button.set_sensitive(False)
 
