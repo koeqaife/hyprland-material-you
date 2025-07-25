@@ -139,9 +139,10 @@ class KeybindRow(RowTemplate):
         if override is not None:
             if override.bind:
                 bind = override.bind
+                self.reset.set_sensitive(True)
             if override.action:
                 action = override.action
-            self.reset.set_sensitive(True)
+                self.reset.set_sensitive(True)
 
         self.bind_entry.handler_block(self.handlers[self.bind_entry])
         self.action_entry.handler_block(self.handlers[self.action_entry])
