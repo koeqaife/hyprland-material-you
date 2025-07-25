@@ -48,6 +48,7 @@ def get_pages() -> dict[str, Page]:
     from src.modules.settings.input import InputPage
     from src.modules.settings.monitors import MonitorsPage
     from src.modules.settings.info import InfoPage
+    from src.modules.settings.keybinds import KeybindsPage
 
     pages = {
         "network": Page(
@@ -108,7 +109,7 @@ def get_pages() -> dict[str, Page]:
             title="Keybinds",
             icon="action_key",
             icon_fill=True,
-            widget=NotImplementedYet
+            widget=KeybindsPage
         ),
         "info": Page(
             title="Info",

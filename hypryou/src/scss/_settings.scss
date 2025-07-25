@@ -277,6 +277,61 @@ window.settings {
         }
     }
 
+    .keybinds-page {
+        .reset-button {
+            margin-left: 0.5rem;
+        }
+
+        .entries-box {
+            margin-top: 0.5rem;
+        }
+
+        .keybind-row {
+            @include nLayerBackground($surfaceContainerLow, 2);
+            margin-bottom: 0.5rem;
+
+            &:focus-within {
+                background-color: color.mix($surfaceContainerLow, $onSurfaceVariant, 95%);
+            }
+        }
+
+        entry {
+            margin: 0;
+            border-radius: 0.5rem;
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+            min-width: 0;
+            border: 0.0625rem solid $outline;
+
+            color: $onSurface;
+            min-height: 2rem;
+            outline: none;
+            background-color: transparent;
+
+            placeholder {
+                opacity: 1;
+                color: $onSurfaceVariant;
+            }
+
+            &:focus-within {
+                border-color: $primary;
+            }
+
+            &.incorrect {
+                border-color: $error;
+            }
+        }
+        .bind-entry {
+            margin-right: 0.25rem;
+        }
+        .action-entry {
+            margin-left: 0.25rem;
+        }
+        .actions-box {
+            padding: 0.325rem;
+        }
+    }
+
     .settings-page separator.horizontal {
         margin: 0.25rem;
         margin-left: 0.5rem;
