@@ -294,7 +294,6 @@ class KeybindsPage(gtk.Box):
                 })
                 overrides.value.append(_map[id])
 
-            print(type(_map[id]))
             if "bind" in to_change:
                 if to_change["bind"] is None:
                     if "bind" in _map[id]:
