@@ -25,8 +25,8 @@ REPLACEMENTS: dict[str, str] = {
     ";": "SEMICOLON",
     "`": "GRAVE",
     "=": "EQUAL",
-    "[": "LEFTBRRACKET",
-    "]": "RIGHTBRACKET",
+    "[": "BRACKETLEFT",
+    "]": "BRACKETRIGHT",
     "\\": "BACKSLASH",
     "'": "APOSTROPHE"
 }
