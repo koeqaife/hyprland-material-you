@@ -150,6 +150,10 @@ def on_opacity_changed(new_value: float) -> None:
     reload_css()
 
 
+def on_rounding_changed(new_value: float) -> None:
+    reload_css()
+
+
 def on_color_changed(new_value: str) -> None:
     generate_by_settings()
 
@@ -233,4 +237,7 @@ class StateService(Service):
         settings.watch("wallpaper", on_wallpapers_changed, False)
         settings.watch("opacity", on_opacity_changed, False)
         settings.watch("color", on_color_changed, False)
+        settings.watch(
+            "hyprland.decoration.rounding", on_rounding_changed, False
+        )
         glib.idle_add(generate_wallpaper_texture)
