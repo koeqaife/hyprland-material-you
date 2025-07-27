@@ -55,10 +55,11 @@ def reload_css() -> None:
 
 
 def generate_scss_variables() -> None:
-    decoration = Settings().get_view_for("hyprland.decoration")
+    hyprland = Settings().get_view_for("hyprland")
+    decoration = hyprland.get_view_for("decoration")
     variables = {
         "hyprlandRounding": f"{decoration.get("rounding")}px",
-        "hyprlandGap": f"{decoration.get("gaps_out")}px",
+        "hyprlandGap": f"{hyprland.get("gaps_out")}px",
         "layerOpacity": f"{Settings().get("opacity")}"
     }
     with open(scss_variables, 'w') as f:
