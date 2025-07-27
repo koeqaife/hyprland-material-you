@@ -6,7 +6,6 @@ from utils.ref import Ref
 from utils.logger import logger
 import typing as t
 import json
-from config import HyprlandVars
 from utils.service import Signals, AsyncService
 from repository import gio, gtk, gdk
 
@@ -667,24 +666,6 @@ async def init() -> None:
             if callable(callback):
                 event = attr[3:]
                 client.watch(event, callback)
-
-    gaps_out_query = await client.query("getoption general:gaps_out")
-    rounding_query = await client.query("getoption decoration:rounding")
-
-    try:
-        if isinstance(gaps_out_query, dict):
-            if gaps_out_query.get("int"):
-                HyprlandVars.gap = int(gaps_out_query["int"])
-            elif gaps_out_query.get("custom"):
-                HyprlandVars.gap = int(gaps_out_query["custom"].split()[0])
-
-        if isinstance(rounding_query, dict) and rounding_query.get("int"):
-            HyprlandVars.rounding = rounding_query["int"]
-    except Exception as e:
-        logger.error(
-            "Error while parsing gaps_out or rounding: %s",
-            e, exc_info=e
-        )
 
 
 class HyprlandService(AsyncService):

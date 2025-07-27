@@ -1,4 +1,4 @@
-from config import HyprlandVars, Settings
+from config import Settings
 from utils.logger import logger
 from utils.styles import toggle_css_class
 from repository import gtk, layer_shell
@@ -71,7 +71,7 @@ class SidebarWindow(widget.LayerWindow):
     def change_floating(self, value: bool) -> None:
         toggle_css_class(self, "floating", value)
         if value:
-            gap = HyprlandVars.gap
+            gap = self.settings.get("hyprland.gaps_out")
             for edge in edges:
                 layer_shell.set_margin(self, edge, gap)
         else:

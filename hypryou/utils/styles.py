@@ -1,7 +1,7 @@
 from repository import gtk, gdk, glib
 from config import (
     styles_output, main_scss,
-    scss_variables, HyprlandVars,
+    scss_variables,
     TEMP_DIR, color_templates,
     Settings
 )
@@ -55,9 +55,10 @@ def reload_css() -> None:
 
 
 def generate_scss_variables() -> None:
+    decoration = Settings().get_view_for("hyprland.decoration")
     variables = {
-        "hyprlandRounding": f"{HyprlandVars.rounding}px",
-        "hyprlandGap": f"{HyprlandVars.gap}px",
+        "hyprlandRounding": f"{decoration.get("rounding")}px",
+        "hyprlandGap": f"{decoration.get("gaps_out")}px",
         "layerOpacity": f"{Settings().get("opacity")}"
     }
     with open(scss_variables, 'w') as f:
@@ -66,7 +67,7 @@ def generate_scss_variables() -> None:
 
 
 def compile_scss(
-    callback: t.Callable[[int, int, None], None]
+    callback: t.Callable[[int, int, None], None] | None = None
 ) -> None:
     import subprocess
 
@@ -82,7 +83,8 @@ def compile_scss(
     ]
 
     proc = subprocess.Popen(command)
-    glib.child_watch_add(proc.pid, callback, None)
+    if callable(callback):
+        glib.child_watch_add(proc.pid, callback, None)
 
 
 def toggle_css_class(

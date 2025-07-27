@@ -1,5 +1,5 @@
 from repository import layer_shell, gtk, glib, pango
-from config import HyprlandVars, VERSION, info
+from config import VERSION, info
 import src.widget as widget
 import weakref
 from utils.logger import logger
@@ -323,10 +323,6 @@ class InfoWindow(widget.LayerWindow):
             anchors={
                 "top": True,
                 "left": True
-            },
-            margins={
-                "top": HyprlandVars.gap,
-                "left": HyprlandVars.gap
             },
             css_classes=("info",),
             keymode=layer_shell.KeyboardMode.ON_DEMAND,

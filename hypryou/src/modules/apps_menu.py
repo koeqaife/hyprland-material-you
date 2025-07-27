@@ -4,7 +4,6 @@ from src.services.apps import Application, apps, reload as apps_reload
 from utils.debounce import sync_debounce
 from utils.styles import toggle_css_class
 from utils.logger import logger
-from config import HyprlandVars
 import weakref
 import typing as t
 from src.services.state import close_window
@@ -232,10 +231,6 @@ class AppsWindow(widget.LayerWindow):
             anchors={
                 "top": True,
                 "left": True
-            },
-            margins={
-                "top": HyprlandVars.gap,
-                "left": HyprlandVars.gap
             },
             css_classes=("apps-menu",),
             keymode=layer_shell.KeyboardMode.ON_DEMAND,

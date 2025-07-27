@@ -1109,12 +1109,34 @@ class Corners:
         monitor: gdk.Monitor
     ) -> None:
         self.settings = Settings()
+        self.decoration = self.settings.get_view_for("hyprland.decoration")
         self.application = application
         self.monitor = monitor
 
         self.windows: list[widget.LayerWindow] = []
+        self.corners: list[widget.RoundedCorner] = []
 
-        self.settings.watch("corners", self.update_visible, True)
+        self.handlers = (
+            self.settings.watch(
+                "corners", self.update_visible, True
+            ),
+            self.settings.watch(
+                "hyprland.gaps_out", self.update_rounding, False
+            ),
+            self.decoration.watch(
+                "rounding", self.update_rounding, False
+            )
+        )
+
+    def get_radius(self) -> int:
+        gap = self.settings.get("hyprland.gaps_out")
+        rounding = self.decoration.get("rounding")
+        return int(gap + rounding)
+
+    def update_rounding(self, *args: t.Any) -> None:
+        if self.windows:
+            self.destroy_windows()
+        self.create_windows()
 
     def create_windows(self) -> None:
         for is_on_left in (True, False):
@@ -1132,8 +1154,10 @@ class Corners:
             self.windows.append(window)
 
             corner = widget.RoundedCorner(
-                f"top-{"left" if is_on_left else "right"}"
+                f"top-{"left" if is_on_left else "right"}",
+                radius=self.get_radius()
             )
+            self.corners.append(corner)
             window.set_child(corner)
 
             self.application.add_window(window)
@@ -1145,12 +1169,19 @@ class Corners:
                     dummy_region  # type: ignore[arg-type]
                 )
 
+    def destroy(self) -> None:
+        self.destroy_windows()
+        for handler in self.handlers:
+            self.settings.unwatch(handler)
+
     def destroy_windows(self) -> None:
         for window in self.windows:
             window.destroy()
+        self.windows.clear()
+        self.corners.clear()
 
     def update_visible(self, value: bool) -> None:
-        if value:
+        if value and not self.windows:
             self.create_windows()
-        else:
+        elif self.windows:
             self.destroy_windows()

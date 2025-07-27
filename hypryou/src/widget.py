@@ -5,7 +5,7 @@ from utils.logger import logger
 from utils.styles import toggle_css_class
 import typing as t
 from math import pi
-from config import HyprlandVars
+from config import Settings
 import src.services.state as state
 if t.TYPE_CHECKING:
     import cairo
@@ -91,11 +91,21 @@ class LayerWindow(gtk.ApplicationWindow):
             logger.warning(f"No name specified for window: {self}")
 
         if setup_popup:
+            if margins is None:
+                self.gaps_out_handler = Settings().watch(
+                    "hyprland.gaps_out", self.on_gaps_out,
+                    True
+                )
             self.window_handler = state.opened_windows.watch(
                 f"changed::{self.name}",
                 self.update_visible
             )
             self.update_visible(False)
+
+    def on_gaps_out(self, value: int) -> None:
+        for edge in (layer_shell.Edge.BOTTOM, layer_shell.Edge.TOP,
+                     layer_shell.Edge.LEFT, layer_shell.Edge.RIGHT):
+            layer_shell.set_margin(self, edge, value)
 
     def on_key_press(
         self,
@@ -132,11 +142,13 @@ class LayerWindow(gtk.ApplicationWindow):
         self.on_show()
 
     def destroy(self) -> None:
-        if getattr(self, "key_controller", None):
+        if hasattr(self, "key_controller"):
             self.key_controller.disconnect(self.key_handler)
             self.remove_controller(self.key_controller)
-        if getattr(self, "window_handler", None):
+        if hasattr(self, "window_handler"):
             state.opened_windows.unwatch(self.window_handler)
+        if hasattr(self, "gaps_out_handler"):
+            Settings().unwatch(self.gaps_out_handler)
         super().destroy()
 
 
@@ -246,10 +258,8 @@ class RoundedCorner(gtk.DrawingArea):
         radius: int | None = None,
         **props: t.Any
     ) -> None:
-        if radius is None:
-            radius = HyprlandVars.gap + HyprlandVars.rounding
         super().__init__(**props)
-        self.radius = radius
+        self.radius = radius or 1
         self.place = place
         self.set_draw_func(self.on_draw)
         self.set_content_height(radius)

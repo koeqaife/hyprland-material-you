@@ -2,7 +2,6 @@ from utils.format import capitalize_first
 from utils.logger import logger
 from repository import gtk, layer_shell, gdk, glib
 from src.services.system_tray import StatusNotifierItem, items
-from config import HyprlandVars
 import weakref
 import typing as t
 from src import widget
@@ -206,10 +205,6 @@ class TrayWindow(widget.LayerWindow):
             anchors={
                 "top": True,
                 "right": True
-            },
-            margins={
-                "top": HyprlandVars.gap,
-                "right": HyprlandVars.gap
             },
             css_classes=("tray",),
             keymode=layer_shell.KeyboardMode.ON_DEMAND,

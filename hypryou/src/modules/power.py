@@ -6,7 +6,7 @@ from src.services.state import is_locked, close_window
 from src.services.mpris import players
 from src.services import hyprland
 import src.services.cliphist as cliphist
-from config import HyprlandVars, Settings
+from config import Settings
 from src import widget
 import weakref
 import asyncio
@@ -117,10 +117,6 @@ class PowerMenuWindow(widget.LayerWindow):
             anchors={
                 "top": True,
                 "right": True
-            },
-            margins={
-                "top": HyprlandVars.gap,
-                "right": HyprlandVars.gap
             },
             css_classes=("power-menu",),
             keymode=layer_shell.KeyboardMode.ON_DEMAND,

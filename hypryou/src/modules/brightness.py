@@ -5,7 +5,6 @@ from src.services.backlight import (
     BacklightDevice, get_backlight_manager,
     BacklightDeviceView
 )
-from config import HyprlandVars
 import weakref
 import typing as t
 from src import widget
@@ -143,10 +142,6 @@ class BrightnessWindow(widget.LayerWindow):
             anchors={
                 "top": True,
                 "right": True
-            },
-            margins={
-                "top": HyprlandVars.gap,
-                "right": HyprlandVars.gap
             },
             css_classes=("brightness",),
             keymode=layer_shell.KeyboardMode.ON_DEMAND,

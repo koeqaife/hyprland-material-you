@@ -127,6 +127,14 @@ default_settings: dict[str, t.Any] = {
     "input.touchpad.flip_x": False,
     "input.touchpad.flip_y": False,
 
+    # Hyprland
+    "hyprland.gaps_in": 5,
+    "hyprland.gaps_out": 12,
+    "hyprland.border_size": 0,
+    "hyprland.layout": "dwindle",
+    "hyprland.decoration.rounding": 16,
+    "hyprland.decoration.rounding_power": 2.0,
+
     "monitors": [],
     "keybinds_overrides": []
 }
@@ -137,11 +145,6 @@ os.makedirs(APP_CACHE_DIR, exist_ok=True)
 os.makedirs(TEMP_DIR, exist_ok=True)
 os.makedirs(state_dir, exist_ok=True)
 os.makedirs(wallpaper_dirs[0], exist_ok=True)
-
-
-class HyprlandVars:
-    gap = 14
-    rounding = 20
 
 
 class Settings:

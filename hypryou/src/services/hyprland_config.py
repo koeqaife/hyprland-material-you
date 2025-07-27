@@ -323,6 +323,22 @@ def generate_env() -> str:
     return output
 
 
+def generate_general() -> str:
+    settings = Settings().get_view_for("hyprland")
+    output = ""
+    for key in ("gaps_in", "gaps_out", "border_size", "layout"):
+        output += f"   {key} = {settings.get(key)}\n"
+    return f"general {{\n{output}}}\n"
+
+
+def generate_decoration() -> str:
+    settings = Settings().get_view_for("hyprland.decoration")
+    output = ""
+    for key in ("rounding", "rounding_power"):
+        output += f"   {key} = {settings.get(key)}\n"
+    return f"decoration {{\n{output}}}\n"
+
+
 funcs = (
     generate_env,
     generate_binds,
@@ -330,7 +346,9 @@ funcs = (
     generate_noanim,
     generate_blur,
     generate_input,
-    generate_monitors
+    generate_monitors,
+    generate_general,
+    generate_decoration
 )
 
 

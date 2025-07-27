@@ -8,7 +8,6 @@ from utils.logger import logger
 import utils.downloader as downloader
 from repository import gtk, layer_shell, pango, glib, gobject
 from src.services.mpris import players, MprisPlayer, current_player
-from config import HyprlandVars
 import weakref
 import typing as t
 from src import widget
@@ -399,10 +398,6 @@ class PlayersWindow(widget.LayerWindow):
             anchors={
                 "top": True,
                 "left": True
-            },
-            margins={
-                "top": HyprlandVars.gap,
-                "left": HyprlandVars.gap
             },
             css_classes=("players",),
             keymode=layer_shell.KeyboardMode.ON_DEMAND,

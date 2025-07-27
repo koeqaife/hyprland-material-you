@@ -1,7 +1,6 @@
 from utils.ref import Ref
 import src.widget as widget
 from repository import gtk, gdk, glib
-from config import HyprlandVars
 from src.services.backlight import (
     get_backlight_manager, BacklightDevice,
     BacklightDeviceView
@@ -192,9 +191,6 @@ class PopupsWindow(widget.LayerWindow):
         self.timeout: int | None = None
         super().__init__(
             app,
-            margins={
-                "top": HyprlandVars.gap
-            },
             anchors={
                 "top": True
             },

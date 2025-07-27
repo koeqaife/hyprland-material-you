@@ -3,7 +3,6 @@ from src.services.notifications import popups
 from src.modules.notifications.item import NotificationItem
 from src.modules.notifications.item import NotificationRevealer
 import typing as t
-from config import HyprlandVars
 from src.services.state import opened_windows, is_locked
 from src import widget
 
@@ -111,10 +110,6 @@ class Notifications(widget.LayerWindow):
             anchors={
                 "top": True,
                 "right": True
-            },
-            margins={
-                "top": HyprlandVars.gap,
-                "right": HyprlandVars.gap
             },
             css_classes=("notifications", "transparent"),
             name=f"notifications{monitor_id}",

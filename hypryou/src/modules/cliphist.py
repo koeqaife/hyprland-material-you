@@ -9,7 +9,6 @@ from utils.styles import toggle_css_class
 from utils.debounce import sync_debounce
 from utils.logger import logger
 from src import widget
-from config import HyprlandVars
 import weakref
 import re
 import typing as t
@@ -309,10 +308,6 @@ class ClipHistoryWindow(widget.LayerWindow):
             anchors={
                 "top": True,
                 "right": True
-            },
-            margins={
-                "top": HyprlandVars.gap,
-                "right": HyprlandVars.gap
             },
             css_classes=("cliphist",),
             keymode=layer_shell.KeyboardMode.ON_DEMAND,

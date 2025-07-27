@@ -3,7 +3,6 @@ import src.widget as widget
 from utils.styles import toggle_css_class
 from utils.ref import Ref
 from utils.logger import logger
-from config import HyprlandVars
 from src.services.audio import ICON_THRESHOLDS
 import src.services.audio as audio
 import typing as t
@@ -524,10 +523,6 @@ class AudioWindow(widget.LayerWindow):
                 "top": True,
                 "right": True
             },
-            margins={
-                "top": HyprlandVars.gap,
-                "right": HyprlandVars.gap
-            },
             setup_popup=True,
             hide_on_esc=True,
             keymode=layer_shell.KeyboardMode.ON_DEMAND,
@@ -556,10 +551,6 @@ class MicsWindow(widget.LayerWindow):
             anchors={
                 "top": True,
                 "right": True
-            },
-            margins={
-                "top": HyprlandVars.gap,
-                "right": HyprlandVars.gap
             },
             setup_popup=True,
             hide_on_esc=True,

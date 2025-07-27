@@ -1,7 +1,6 @@
 from repository import layer_shell, gtk, gdk, pango, glib
 import weakref
 import src.widget as widget
-from config import HyprlandVars
 from utils.logger import logger
 from src.services.hyprland import clients, Client
 from src.services.hyprland import acquire_clients, release_clients
@@ -185,10 +184,6 @@ class ClientsWindow(widget.LayerWindow):
             anchors={
                 "top": True,
                 "left": True
-            },
-            margins={
-                "top": HyprlandVars.gap,
-                "left": HyprlandVars.gap
             },
             css_classes=("clients",),
             keymode=layer_shell.KeyboardMode.ON_DEMAND,
