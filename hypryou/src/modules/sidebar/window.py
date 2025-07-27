@@ -44,6 +44,7 @@ class SidebarWindow(widget.LayerWindow):
     __gtype_name__ = "SidebarWindow"
 
     def __init__(self, app: gtk.Application) -> None:
+        self.settings = Settings()
         super().__init__(
             application=app,
             anchors={
@@ -60,13 +61,15 @@ class SidebarWindow(widget.LayerWindow):
         )
         self._child: SidebarBox | None = None
 
-        self.settings = Settings()
         self.settings_handler = self.settings.watch(
             "floating_sidebar", self.change_floating
         )
 
         if __debug__:
             weakref.finalize(self, lambda: logger.debug("Sidebar finalized"))
+
+    def on_gaps_out(self, value: int) -> None:
+        self.change_floating(self.settings.get("floating_sidebar"))
 
     def change_floating(self, value: bool) -> None:
         toggle_css_class(self, "floating", value)
