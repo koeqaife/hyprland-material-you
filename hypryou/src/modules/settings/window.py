@@ -49,6 +49,7 @@ def get_pages() -> dict[str, Page]:
     from src.modules.settings.monitors import MonitorsPage
     from src.modules.settings.info import InfoPage
     from src.modules.settings.keybinds import KeybindsPage
+    from src.modules.settings.hyprland import HyprlandPage
 
     pages = {
         "network": Page(
@@ -103,7 +104,7 @@ def get_pages() -> dict[str, Page]:
             title="Hyprland",
             icon="tune",
             icon_fill=False,
-            widget=NotImplementedYet
+            widget=HyprlandPage
         ),
         "keybinds": Page(
             title="Keybinds",

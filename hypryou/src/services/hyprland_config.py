@@ -325,10 +325,33 @@ def generate_env() -> str:
 
 def generate_general() -> str:
     settings = Settings().get_view_for("hyprland")
+    snap = settings.get_view_for("snap")
+
     output = ""
     for key in ("gaps_in", "gaps_out", "border_size", "layout"):
-        output += f"   {key} = {settings.get(key)}\n"
+        output += f"    {key} = {settings.get(key)}\n"
+
+    snap_output = ""
+    for key in ("enabled", "window_gap", "monitor_gap",
+                "border_overlap", "respect_gaps"):
+        _value = snap.get(key)
+        value = str(_value).lower() if isinstance(_value, bool) else _value
+        snap_output += f"        {key} = {value}\n"
+        if key == "enabled" and not _value:
+            break
+    output += f"    snap {{\n{snap_output}    }}\n"
+
     return f"general {{\n{output}}}\n"
+
+
+def generate_misc() -> str:
+    settings = Settings().get_view_for("hyprland.misc")
+    output = ""
+    for key in ("vrr", "middle_click_paste"):
+        _value = settings.get(key)
+        value = str(_value).lower() if isinstance(_value, bool) else _value
+        output += f"   {key} = {value}\n"
+    return f"misc {{\n{output}}}\n"
 
 
 def generate_decoration() -> str:
@@ -348,7 +371,8 @@ funcs = (
     generate_input,
     generate_monitors,
     generate_general,
-    generate_decoration
+    generate_decoration,
+    generate_misc
 )
 
 

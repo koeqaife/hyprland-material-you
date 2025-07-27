@@ -135,6 +135,17 @@ default_settings: dict[str, t.Any] = {
     "hyprland.decoration.rounding": 16,
     "hyprland.decoration.rounding_power": 2.0,
 
+    # Hyprland misc
+    "hyprland.misc.vrr": 0,
+    "hyprland.misc.middle_click_paste": True,
+
+    # Hyprland snap
+    "hyprland.snap.enabled": False,
+    "hyprland.snap.window_gap": 10,
+    "hyprland.snap.monitor_gap": 10,
+    "hyprland.snap.border_overlap": False,
+    "hyprland.snap.respect_gaps": False,
+
     "monitors": [],
     "keybinds_overrides": []
 }
