@@ -2,6 +2,7 @@ from utils import colors
 from src.modules.settings.base import SwitchRowTemplate
 from src.modules.settings.base import SettingsBoolRow, SettingsTextRow
 from src.modules.settings.base import Category
+from src.modules.settings.base import int_kwargs, float_kwargs
 import typing as t
 from repository import gtk
 
@@ -72,6 +73,20 @@ class AppearancePage(gtk.ScrolledWindow):
                 transform_fn=lambda v: str(round(float(v) * 100)),
                 transform2_fn=lambda v: min(max(float(v) / 100, 0.85), 1.0),
                 test_text=lambda v: v.isdigit()
+            ),
+            SettingsTextRow(
+                "Rounding",
+                "Rounded corners' radius (in layout px)",
+                "hyprland.decoration.rounding",
+                max_width_chars=3,
+                **int_kwargs
+            ),
+            SettingsTextRow(
+                "Rounding Power",
+                "Adjusts the curve used for rounding corners",
+                "hyprland.decoration.rounding_power",
+                max_width_chars=3,
+                **float_kwargs
             ),
 
             Category("Layout"),
