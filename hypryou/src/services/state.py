@@ -1,6 +1,7 @@
 import threading
 import time
 from config import Settings, wallpaper_dirs, ORIGINAL_DIR
+from config import color_templates, CONFIG_DIR
 from utils.ref import Ref
 from utils.styles import reload_css
 from utils.service import Service
@@ -230,6 +231,46 @@ def restore_state() -> None:
         open_window(popup)
 
 
+THEMES_CONFIGS = {
+    "alacritty": (
+        f"{color_templates}/alacritty.toml",
+        f"{CONFIG_DIR}/alacritty/alacritty.toml"
+    ),
+    "kitty": (
+        f"{color_templates}/kitty.conf",
+        f"{CONFIG_DIR}/kitty/kitty.conf"
+    ),
+    "wezterm": (
+        f"{color_templates}/wezterm.lua",
+        f"{CONFIG_DIR}/wezterm.lua"
+    )
+}
+
+
+def update_theme_link(enabled: bool, key: str) -> None:
+    path = THEMES_CONFIGS[key][0]
+    dest = THEMES_CONFIGS[key][1]
+    if enabled:
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        if os.path.lexists(dest):
+            os.replace(dest, dest + '.hypryou-bak')
+        os.symlink(path, dest)
+    else:
+        if os.path.islink(dest):
+            os.unlink(dest)
+        bak = dest + '.hypryou-bak'
+        if os.path.exists(bak):
+            os.replace(bak, dest)
+
+
+def on_settings_changed(key: str, value: t.Any) -> None:
+    if key.startswith("themes."):
+        key = key.lstrip("themes.")
+        if key in THEMES_CONFIGS.keys():
+            update_theme_link(value, key)
+            generate_by_settings(force=True)
+
+
 class StateService(Service):
     def start(self) -> None:
         opened_windows.init()
@@ -240,4 +281,5 @@ class StateService(Service):
         settings.watch(
             "hyprland.decoration.rounding", on_rounding_changed, False
         )
+        settings._signals.watch("changed", on_settings_changed)
         glib.idle_add(generate_wallpaper_texture)
