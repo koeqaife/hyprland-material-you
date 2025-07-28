@@ -10,7 +10,7 @@ import hashlib
 import re
 import typing as t
 from config import color_templates, ORIGINAL_DIR, CONFIG_DIR
-from config import config_dir
+from config import config_dir, TEMP_DIR
 from utils.logger import logger
 from utils.ref import Ref
 from repository import gio, glib
@@ -573,7 +573,7 @@ def generate_colors_sync(
         )
         json.dump(colors_dict(object), f, indent=2)
 
-    allowed_actions = ("compile_scss",)
+    allowed_actions = ("compile_scss", "mark")
     post = generate_templates(
         TEMPLATES_DIR,
         CACHE_PATH,
@@ -596,6 +596,7 @@ def generate_colors_sync(
             allowed_actions
         ))
 
+    marked: dict[str, str] = {}
     processes: list["subprocess.Popen"] = []
     for file_path, actions in post.items():
         for action in actions:
@@ -612,9 +613,36 @@ def generate_colors_sync(
                     file_name
                 )
                 processes.append(compile_scss(file_path, output))
+            elif action.startswith("mark"):
+                name = action.split(".", 1)[1]
+                marked[name] = file_path
+
+    post_actions(marked, object)
 
     for proc in processes:
         proc.wait(15)
+
+
+def generate_telegram_theme(path: str, bg: str) -> None:
+    import zipfile
+    from PIL import Image
+
+    image = Image.new("RGB", (16, 16), bg)
+    image_path = join(TEMP_DIR, "telegram", "background.png")
+    os.makedirs(os.path.dirname(image_path), exist_ok=True)
+    image.save(image_path)
+    theme_path = join(CACHE_PATH, "theme.tdesktop-theme")
+
+    with zipfile.ZipFile(theme_path, "w") as zip:
+        zip.write(path, "colors.tdesktop-theme")
+        zip.write(image_path, "background.png")
+    os.remove(image_path)
+
+
+def post_actions(marked: dict[str, str], colors: ColorsCache) -> None:
+    if "telegram" in marked.keys():
+        path = marked["telegram"]
+        generate_telegram_theme(path, colors.colors["background"])
 
 
 def compile_scss(path: str, output: str) -> "subprocess.Popen":

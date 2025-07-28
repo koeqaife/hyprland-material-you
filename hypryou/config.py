@@ -70,6 +70,7 @@ default_settings: dict[str, t.Any] = {
     "themes.kitty": False,
     "themes.wezterm": False,
     "themes.alacritty": False,
+    "themes.telegram": False,
 
     "icons.dark": "Tela-nord-dark",
     "icons.light": "Tela-nord-light",
