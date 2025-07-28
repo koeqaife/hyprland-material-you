@@ -704,30 +704,6 @@ def generate_by_color(
         )
 
 
-def generate_by_last_wallpaper(
-    on_complete: t.Callable[[], None] | None = None
-) -> None:
-    try:
-        with open(colors_json) as f:
-            content = get_cache_object(f.read())
-        wallpaper = Settings().get("wallpaper")
-        generate_colors(
-            wallpaper,
-            None,
-            content.is_dark,
-            contrast_level=content.contrast_level,
-            on_complete=on_complete
-        )
-    except (FileNotFoundError, AssertionError, json.JSONDecodeError):
-        generate_colors(
-            None,
-            0x0000FF,
-            True,
-            0,
-            on_complete=on_complete
-        )
-
-
 def generate_by_settings(
     on_complete: t.Callable[[], None] | None = None,
     force: bool = False
