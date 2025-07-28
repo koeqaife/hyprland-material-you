@@ -4,12 +4,12 @@ foreground = '<onBackground>'
 
 
 [colors.cursor]
-text = '#1E1E2E' 
-cursor = '#F5E0DC' 
+text = '<onPrimary>' 
+cursor = '<primary>' 
 
 [colors.vi_mode_cursor]
-text = '#1E1E2E' 
-cursor = '#B4BEFE' 
+text = '<onSecondary>' 
+cursor = '<secondary>' 
 
 
 [colors.search.matches]
@@ -35,8 +35,8 @@ background = '#A6ADC8'
 
 
 [colors.selection]
-text = '#1E1E2E' 
-background = '#F5E0DC' 
+text = '<onSecondaryContainer>' 
+background = '<secondaryContainer>' 
 
 
 [colors.normal]
