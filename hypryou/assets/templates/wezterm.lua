@@ -1,3 +1,4 @@
+-- <settings:themes.wezterm>
 local wezterm = require 'wezterm'
 local config = {}
 

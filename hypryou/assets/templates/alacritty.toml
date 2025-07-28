@@ -1,3 +1,5 @@
+# <settings:themes.alacritty>
+
 [general]
 import = [
     "<var:outputFolder>/alacritty-<var:colorScheme>.toml"

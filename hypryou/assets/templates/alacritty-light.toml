@@ -1,3 +1,4 @@
+# <settings:themes.alacritty>
 [colors.primary]
 background = '<background>'
 foreground = '<onBackground>'

@@ -273,11 +273,13 @@ class TemplateFormatter:
         return result
 
     def format(self, text: str) -> tuple[str, list[str]]:
+        settings = Settings()
         pattern = r'<(?:(\w+):)?(\w+)(?:\.([^>]+?))?>'
         matches = re.finditer(pattern, text)
         result = []
         actions = []
         last_end = 0
+        break_on_end = False
 
         for match in matches:
             full_match = match.group(0)
@@ -296,6 +298,13 @@ class TemplateFormatter:
             elif tag_type == 'post' and key in self.post_actions:
                 value = f"Post action: {key}"
                 actions.append(f"{key}.{transformations_str}")
+            elif tag_type == "settings":
+                settings_key = f"{key}.{transformations_str}"
+                if settings.get(settings_key):
+                    value = "Enabled by settings"
+                else:
+                    value = "Disabled by settings"
+                    break_on_end = True
             elif not tag_type and key in self.color_map:
                 value = self.color_map[key]
 
@@ -307,6 +316,10 @@ class TemplateFormatter:
                     value = self.apply_transformations(value, transformations)
                 result.append(value)
                 last_end = start_index + len(full_match)
+
+            if break_on_end:
+                last_end = len(text)
+                break
 
         result.append(text[last_end:])
 
