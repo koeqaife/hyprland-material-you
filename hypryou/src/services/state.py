@@ -147,18 +147,6 @@ def on_wallpapers_changed(*args: t.Any) -> None:
     glib.idle_add(generate_wallpaper_texture)
 
 
-def on_opacity_changed(new_value: float) -> None:
-    reload_css()
-
-
-def on_rounding_changed(new_value: float) -> None:
-    reload_css()
-
-
-def on_color_changed(new_value: str) -> None:
-    generate_by_settings()
-
-
 def save_state() -> None:
     if time.time() - restored_on < 60:
         return
@@ -269,6 +257,12 @@ def on_settings_changed(key: str, value: t.Any) -> None:
         if key in THEMES_CONFIGS.keys():
             update_theme_link(value, key)
             generate_by_settings(force=True)
+    elif key == "hyprland.decoration.rounding":
+        reload_css()
+    elif key == "opacity":
+        reload_css()
+    elif key == "color":
+        generate_by_settings()
 
 
 class StateService(Service):
@@ -276,10 +270,5 @@ class StateService(Service):
         opened_windows.init()
         settings = Settings()
         settings.watch("wallpaper", on_wallpapers_changed, False)
-        settings.watch("opacity", on_opacity_changed, False)
-        settings.watch("color", on_color_changed, False)
-        settings.watch(
-            "hyprland.decoration.rounding", on_rounding_changed, False
-        )
         settings._signals.watch("changed", on_settings_changed)
         glib.idle_add(generate_wallpaper_texture)
