@@ -224,6 +224,28 @@ class TemplateFormatter:
                     continue
                 percent = int(matched.group())
                 value = self.adjust_brightness(value, -percent)
+            elif transform.startswith("mix"):
+                matched = re.search(
+                    r'mix\(([^,]+),\s*(0\.\d+|1(?:\.0*)?)\)',
+                    transform
+                )
+                print(transform)
+                if not matched:
+                    continue
+                color_ref = matched.group(1).strip()
+                ratio = float(matched.group(2))
+                print(color_ref, ratio)
+                if color_ref in self.color_map:
+                    other_color = self.color_map[color_ref]
+                elif re.match(
+                    r'^#?[0-9a-fA-F]{3,6}$',
+                    color_ref
+                ):
+                    other_color = color_ref
+                else:
+                    continue
+
+                value = self.mix_colors(value, other_color, ratio)
 
         for transform in final_transforms:
             if transform.startswith("strip"):
@@ -250,6 +272,32 @@ class TemplateFormatter:
 
         return f'#{r:02X}{g:02X}{b:02X}'.lower()
 
+    def mix_colors(self, color1: str, color2: str, ratio: float) -> str:
+        color1 = color1.lstrip('#')
+        color2 = color2.lstrip('#')
+
+        if len(color1) == 3:
+            color1 = ''.join(c * 2 for c in color1)
+        if len(color2) == 3:
+            color2 = ''.join(c * 2 for c in color2)
+
+        r1, g1, b1 = (
+            int(color1[0:2], 16),
+            int(color1[2:4], 16),
+            int(color1[4:6], 16)
+        )
+        r2, g2, b2 = (
+            int(color2[0:2], 16),
+            int(color2[2:4], 16),
+            int(color2[4:6], 16)
+        )
+
+        r = round(r1 * (1 - ratio) + r2 * ratio)
+        g = round(g1 * (1 - ratio) + g2 * ratio)
+        b = round(b1 * (1 - ratio) + b2 * ratio)
+
+        return f'#{r:02x}{g:02x}{b:02x}'
+
     def hex_to_rgb(
         self,
         hex_color: str
@@ -262,11 +310,12 @@ class TemplateFormatter:
         self,
         transformations_str: str
     ) -> list[str]:
-        transformations = re.findall(
-            r'(\w+)(?:\((\d*)\))?', transformations_str
+        matches = re.findall(
+            r'(\w+)(?:\(\s*([^)]+?)\s*\))?',
+            transformations_str
         )
-        result = []
-        for command, arg in transformations:
+        result: list[str] = []
+        for command, arg in matches:
             if command:
                 if arg:
                     result.append(f"{command}({arg})")
