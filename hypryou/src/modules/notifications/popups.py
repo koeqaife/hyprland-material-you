@@ -5,6 +5,7 @@ from src.modules.notifications.item import NotificationRevealer
 import typing as t
 from src.services.state import opened_windows, is_locked
 from src import widget
+from config import Settings
 
 T = t.TypeVar("T")
 
@@ -118,6 +119,11 @@ class Notifications(widget.LayerWindow):
 
         self.popups = NotificationPopups(self)
         self.set_child(self.popups)
+
+        self.gaps_out_handler = Settings().watch(
+            "hyprland.gaps_out", self.on_gaps_out,
+            True
+        )
 
     def destroy(self) -> None:
         if self.popups is not None:
