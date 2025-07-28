@@ -67,6 +67,9 @@ default_settings: dict[str, t.Any] = {
 
     "themes.gtk3": True,
     "themes.gtk4": True,
+    "themes.kitty": False,
+    "themes.wezterm": False,
+    "themes.alacritty": False,
 
     "icons.dark": "Tela-nord-dark",
     "icons.light": "Tela-nord-light",
