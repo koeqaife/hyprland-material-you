@@ -10,6 +10,7 @@ import hashlib
 import re
 import typing as t
 from config import color_templates, ORIGINAL_DIR, CONFIG_DIR
+from config import config_dir
 from utils.logger import logger
 from utils.ref import Ref
 from repository import gio, glib
@@ -28,6 +29,7 @@ executor: concurrent.futures.ProcessPoolExecutor | None = None
 
 
 TEMPLATES_DIR = join(ORIGINAL_DIR, "assets", "templates")
+USER_TEMPLATES_DIR = join(config_dir, "templates")
 CACHE_PATH = color_templates
 
 GTK3_PATH = join(CONFIG_DIR, "gtk-3.0")
@@ -533,6 +535,17 @@ def generate_colors_sync(
         image_path,
         allowed_actions
     )
+    if os.path.isdir(USER_TEMPLATES_DIR):
+        post.update(generate_templates(
+            USER_TEMPLATES_DIR,
+            CACHE_PATH,
+            scheme,
+            dark_scheme,
+            light_scheme,
+            is_dark,
+            image_path,
+            allowed_actions
+        ))
 
     processes: list["subprocess.Popen"] = []
     for file_path, actions in post.items():
