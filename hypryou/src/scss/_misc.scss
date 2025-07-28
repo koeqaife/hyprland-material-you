@@ -213,7 +213,8 @@ popover contents {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
 
-    modelbutton, row {
+    modelbutton,
+    row {
         border-radius: 0;
         min-height: 2.5rem;
         padding: 0;
@@ -227,6 +228,10 @@ popover contents {
         &:active {
             background: color.mix($surfaceContainer, $onSurface, 82%);
         }
+    }
+
+    label {
+        color: $onSurface;
     }
 }
 
@@ -268,7 +273,6 @@ scrollbar {
         }
     }
 }
-
 
 window.misc--dialog {
     @include nLayerBackground($surfaceContainer, 1);
