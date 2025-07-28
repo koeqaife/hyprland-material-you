@@ -14,7 +14,7 @@ from src.services.network import get_network
 from src.services.state import toggle_window, open_settings
 from src.services.upower import get_upower, BatteryLevel, BatteryState
 from src.services.backlight import get_backlight_manager, BacklightDeviceView
-from src.services.clock import date, time
+from src.services.clock import date, full_date, time
 from src.services.apps import launch_detached
 from src.services import hyprland
 from src.services.hyprland import active_workspace, workspace_ids
@@ -185,20 +185,25 @@ class Clock(gtk.Label):
     def __init__(self) -> None:
         super().__init__(
             css_classes=("clock", "bar-applet"),
-            label=time.value,
-            tooltip_text=date.value
+            label=time.value
         )
 
         self.ref_handlers = {
             time: time.watch(self.update_time),
-            date: date.watch(self.update_date)
+            # We know that clock.date is updated as well
+            # Cause Signals uses glib.idle_add
+            # And just for case we watch full_date
+            # as it's updated after clock.date
+            full_date: full_date.watch(self.update_date)
         }
 
     def update_time(self, new: str) -> None:
         self.set_label(new)
 
-    def update_date(self, new: str) -> None:
-        self.set_tooltip_text(new)
+    def update_date(self, *args: t.Any) -> None:
+        self.set_tooltip_text(
+            f"{full_date.value}\n{date.value}"
+        )
 
     def destroy(self) -> None:
         for ref, handler_id in self.ref_handlers.items():
