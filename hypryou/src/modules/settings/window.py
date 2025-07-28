@@ -50,6 +50,7 @@ def get_pages() -> dict[str, Page]:
     from src.modules.settings.info import InfoPage
     from src.modules.settings.keybinds import KeybindsPage
     from src.modules.settings.hyprland import HyprlandPage
+    from src.modules.settings.configs import ConfigsPage
 
     pages = {
         "network": Page(
@@ -100,6 +101,12 @@ def get_pages() -> dict[str, Page]:
             icon_fill=True,
             widget=AppsPage
         ),
+        "configs": Page(
+            title="Configs",
+            icon="files",
+            icon_fill=True,
+            widget=ConfigsPage
+        ),
         "hyprland": Page(
             title="Hyprland",
             icon="tune",
@@ -134,6 +141,7 @@ sidebar = (
     "sleep",
     "apps",
     "separator",
+    "configs",
     "hyprland",
     "keybinds",
     "separator",
