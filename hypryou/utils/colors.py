@@ -716,7 +716,8 @@ def generate_by_last_wallpaper(
 
 
 def generate_by_settings(
-    on_complete: t.Callable[[], None] | None = None
+    on_complete: t.Callable[[], None] | None = None,
+    force: bool = False
 ) -> bool:
     try:
         settings = Settings()
@@ -727,13 +728,13 @@ def generate_by_settings(
         if use_color:
             cached_color = content.original_color
             color_int = int(color, 16)
-            if color_int != cached_color:
+            if color_int != cached_color or force:
                 generate_by_color(color_int, on_complete=on_complete)
                 return False
         else:
             wallpaper = str(settings.get("wallpaper"))
             cached_wallpaper = content.wallpaper
-            if wallpaper != cached_wallpaper:
+            if wallpaper != cached_wallpaper or force:
                 generate_by_wallpaper(wallpaper, on_complete=on_complete)
                 return False
         dark_mode.value = content.is_dark
