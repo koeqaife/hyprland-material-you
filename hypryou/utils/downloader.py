@@ -27,6 +27,9 @@ def resize_image(
     target_w, target_h = size
 
     with Image.open(filepath) as img:
+        # Determine the original format
+        original_format = img.format
+        
         src_w, src_h = img.size
         tgt_ratio = target_w / target_h
         src_ratio = src_w / src_h
@@ -53,9 +56,19 @@ def resize_image(
             sharpened = resized.filter(
                 ImageFilter.UnsharpMask(radius=1, percent=5, threshold=3)
             )
-            sharpened.save(filepath, quality=95)
+            # Explicitly specify format when saving
+            if original_format:
+                sharpened.save(filepath, format=original_format, quality=95)
+            else:
+                # Fallback to JPEG if format is unknown
+                sharpened.save(filepath, format='JPEG', quality=95)
         else:
-            resized.save(filepath, quality=95)
+            # Explicitly specify format when saving
+            if original_format:
+                resized.save(filepath, format=original_format, quality=95)
+            else:
+                # Fallback to JPEG if format is unknown
+                resized.save(filepath, format='JPEG', quality=95)
 
     return filepath
 
@@ -67,9 +80,10 @@ def finalize_image_file(temp_path: str) -> str:
     unique_path = os.path.join(dir_path, str(uuid.uuid4()))
     os.rename(temp_path, unique_path)
     with Image.open(unique_path) as img:
-        ext = img.format.lower()
+        ext = img.format.lower() if img.format else 'jpeg'
         final_path = os.path.join(dir_path, f"image.{ext}")
-        img.save(final_path)
+        # Explicitly specify format when saving
+        img.save(final_path, format=img.format or 'JPEG')
     os.remove(unique_path)
     return final_path
 
