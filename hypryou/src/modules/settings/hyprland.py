@@ -4,6 +4,7 @@ from src.modules.settings.base import SettingsTextRow
 from src.modules.settings.base import SettingsBoolRow
 from src.modules.settings.base import SettingsDropdownRow, DropdownItem
 from src.modules.settings.base import Category
+from src.modules.settings.base import Hint
 
 
 class HyprlandPage(gtk.ScrolledWindow):
@@ -99,7 +100,22 @@ class HyprlandPage(gtk.ScrolledWindow):
                 "Middle click paste",
                 "Paste from clipboard on middle click",
                 "hyprland.misc.middle_click_paste"
-            )
+            ),
+
+            Category("Cursor"),
+            SettingsTextRow(
+                "Cursor name",
+                "Name of cursor that will be used",
+                "cursor.name"
+            ),
+            SettingsTextRow(
+                "Cursor size",
+                "Size of cursor in pixels",
+                "cursor.size",
+                max_width_chars=3,
+                **int_kwargs
+            ),
+            Hint("Changing cursor settings requires session restart")
         )
         for child in self.box_children:
             self.box.append(child)

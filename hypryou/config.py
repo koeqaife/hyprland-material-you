@@ -85,7 +85,7 @@ default_settings: dict[str, t.Any] = {
     "apps.terminal": "alacritty",
 
     "cursor.name": "Bibata-Modern-Ice",
-    "cursor.size": "24",
+    "cursor.size": 24,
 
     "idle.ac.lock": 300,
     "idle.ac.dpms": 60,
