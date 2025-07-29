@@ -1,6 +1,24 @@
 from repository import gtk
+from config import info
+
 from src.modules.settings.base import SettingsBoolRow
+from src.modules.settings.base import Row
 from src.modules.settings.base import Category
+
+
+def open_link(url: str) -> None:
+    import webbrowser
+    webbrowser.open(url)
+
+
+class WikiButton(gtk.Button):
+    def __init__(self, url: str) -> None:
+        super().__init__(
+            css_classes=("outlined", "wiki-button"),
+            label="Wiki",
+            valign=gtk.Align.CENTER
+        )
+        self.connect("clicked", lambda *_: open_link(url))
 
 
 class ConfigsPage(gtk.ScrolledWindow):
@@ -15,6 +33,23 @@ class ConfigsPage(gtk.ScrolledWindow):
             css_classes=("configs-page", "settings-page",),
             child=self.box,
             hscrollbar_policy=gtk.PolicyType.NEVER
+        )
+        self.children_with_wiki = (
+            (
+                SettingsBoolRow(
+                    "Telegram",
+                    "Generate theme for Telegram",
+                    "themes.telegram"
+                ),
+                f"{info["github"]}/wiki/More-themes#telegram-theme"
+            ),
+            (
+                Row(
+                    "Discord",
+                    "Theme for Discord",
+                ),
+                f"{info["github"]}/wiki/More-themes#discord-theme"
+            ),
         )
         self.box_children = (
             Category("Hyprland"),
@@ -60,7 +95,13 @@ class ConfigsPage(gtk.ScrolledWindow):
                 "Theme for Wezterm",
                 "themes.wezterm"
             ),
+            self.children_with_wiki[1][0],
+            self.children_with_wiki[0][0]
         )
+
+        for child, url in self.children_with_wiki:
+            child.insert_child_after(WikiButton(url), child.info_box)
+
         for child in self.box_children:
             self.box.append(child)
 

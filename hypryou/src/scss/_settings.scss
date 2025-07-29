@@ -332,6 +332,12 @@ window.settings {
         }
     }
 
+    .configs-page {
+        .wiki-button:not(:last-child) {
+            margin-right: 0.5rem;
+        }
+    }
+
     .settings-page separator.horizontal {
         margin: 0.25rem;
         margin-left: 0.5rem;
