@@ -208,11 +208,6 @@ class Settings:
         ref.create_ref(wrapper)
         self._values[key] = ref
 
-    def _add_default(self) -> None:
-        for key, value in default_settings.items():
-            if key not in self._values.keys():
-                self._create_ref(key, value)
-
     def _update_values(self, new: dict[str, t.Any]) -> None:
         for key, value in new.items():
             if key not in default_settings.keys():
@@ -220,8 +215,6 @@ class Settings:
             if key in self._values.keys():
                 ref = self._values[key]
                 ref.value = value
-            else:
-                self._create_ref(key, value)
 
         for key, ref in self._values.items():
             if key not in new.keys():
@@ -252,6 +245,9 @@ class Settings:
 
     def unpack(self) -> dict[str, t.Any]:
         _dict = {}
+        for key, value in self._file_dict.items():
+            _dict[key] = value
+
         for key, ref in self._values.items():
             if (
                 not (value := ref.unpack()) == default_settings[key]
@@ -269,8 +265,10 @@ class Settings:
         self._values[key].value = value
 
     def get(self, key: str) -> t.Any:
-        self._ensure_ref(key)
-        return self._values[key].value
+        if key in self._values.keys():
+            return self._values[key].value
+        else:
+            return self._file_dict.get(key, default_settings[key])
 
     def get_ref(self, key: str) -> Ref[t.Any]:
         self._ensure_ref(key)
