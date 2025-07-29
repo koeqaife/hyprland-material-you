@@ -1,5 +1,7 @@
 from repository import gtk
 from src.modules.settings.base import SettingsTextRow
+from src.modules.settings.base import SettingsBoolRow
+from src.modules.settings.base import Category
 from src.modules.settings.base import Hint
 
 
@@ -17,6 +19,14 @@ class AppsPage(gtk.ScrolledWindow):
             hscrollbar_policy=gtk.PolicyType.NEVER
         )
         self.box_children = (
+            Category("Cliphist"),
+            SettingsBoolRow(
+                "Secure Cliphist (Clipboard History)",
+                "Delete cliphist.db when session starts/ends",
+                "secure_cliphist"
+            ),
+
+            Category("Default Apps"),
             SettingsTextRow(
                 "Browser",
                 "Default browser",
