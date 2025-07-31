@@ -89,7 +89,8 @@ class MprisPlayer(Signals):
         self._bus_path = proxy.get_object_path()
         self._conn = proxy.get_connection()
 
-        self._last_known_position: float = -1
+        self._last_position_cached = -1.0
+        self._last_known_position = -1.0
         self._pos_changed_time = time.monotonic()
         self._playback_status = self.playback_status
 
@@ -266,11 +267,13 @@ class MprisPlayer(Signals):
         Returns:
             float: Position in seconds
         """
+        now = time.monotonic()
         if self._last_known_position == -1:
-            self._last_known_position = self.cached_position / 1_000_000
+            delta = now - self._last_position_cached
+            real_position = self.cached_position / 1_000_000 + delta
+            self._last_known_position = real_position
             self._pos_changed_time = time.monotonic()
         if self._playback_status == "Playing":
-            now = time.monotonic()
             delta = now - self._pos_changed_time
             return self._last_known_position + delta
         return self._last_known_position
@@ -327,6 +330,8 @@ class MprisPlayer(Signals):
         changed: list[str] | None = None,
         *args: t.Any
     ) -> None:
+        if changed is None or "Position" in changed:
+            self._last_position_cached = time.monotonic()
         if changed and "PlaybackStatus" in changed:
             self._last_known_position = self.position
             self._pos_changed_time = time.monotonic()
