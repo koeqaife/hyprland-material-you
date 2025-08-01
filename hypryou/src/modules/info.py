@@ -1,5 +1,5 @@
 from repository import layer_shell, gtk, glib, pango
-from config import VERSION, info
+from config import get_version, info
 import src.widget as widget
 import weakref
 from utils.logger import logger
@@ -43,7 +43,7 @@ class InfoPage(gtk.Box):
         )
         self.version = gtk.Label(
             css_classes=("version",),
-            label=VERSION
+            label=get_version()
         )
         self.logo_box.append(self.logo)
         self.logo_box.append(self.name)

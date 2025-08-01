@@ -8,12 +8,6 @@ from utils.ref import Ref
 
 T = t.TypeVar('T')
 
-MAJOR_VERSION = 2
-MINOR_VERSION = 0
-PATCH_VERSION = 0
-
-VERSION = f"{MAJOR_VERSION}.{MINOR_VERSION}.{PATCH_VERSION}-beta"
-
 HOME = os.environ["HOME"]
 
 CACHE_DIR = os.getenv("XDG_CACHE_HOME", f"{HOME}/.cache")
@@ -160,6 +154,15 @@ os.makedirs(APP_CACHE_DIR, exist_ok=True)
 os.makedirs(TEMP_DIR, exist_ok=True)
 os.makedirs(state_dir, exist_ok=True)
 os.makedirs(wallpaper_dirs[0], exist_ok=True)
+
+
+def get_version() -> str:
+    if ver := getattr(get_version, "_version", None):
+        return str(ver)
+    with open(pjoin(ORIGINAL_DIR, "version.txt")) as f:
+        version = f.read()
+    setattr(get_version, "_version", version)
+    return version
 
 
 class Settings:

@@ -1,5 +1,5 @@
 from repository import gtk
-from config import info, VERSION
+from config import info, get_version
 import src.services.hyprland as hyprland
 import os
 import platform
@@ -47,7 +47,7 @@ class InfoRow(gtk.Box):
                 halign=gtk.Align.START
             ),
             gtk.Label(
-                label=f"Version: {VERSION}",
+                label=f"Version: {get_version()}",
                 css_classes=("version",),
                 halign=gtk.Align.START
             )
