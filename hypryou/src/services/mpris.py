@@ -141,11 +141,19 @@ class MprisPlayer(Signals):
         changed_properties_variant: glib.Variant,
         invalid_properties: list[str]
     ) -> None:
-        changed_properties = t.cast(
-            dict[str, str],
-            changed_properties_variant.unpack()
+        changed_properties: list[str] = list(
+            changed_properties_variant.unpack().keys()
         )
-        self._cache_properties(list(changed_properties.keys()))
+        if "Metadata" in changed_properties:
+            # Invalidate whole cache just for case
+            self._last_position_cached = -1.0
+            self._last_known_position = -1.0
+            self._pos_changed_time = time.monotonic()
+            self._playback_status = self.playback_status
+            self._last_changed_time = time.monotonic()
+            self._cache_properties()
+        else:
+            self._cache_properties(changed_properties)
 
     def prop(self, property_name: str) -> t.Any:
         value = self._proxy.get_cached_property(property_name)
