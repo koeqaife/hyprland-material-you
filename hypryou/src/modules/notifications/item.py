@@ -19,13 +19,24 @@ safe_categories: tuple[Category, ...] = (
 )
 
 messengers_file = pjoin(ORIGINAL_DIR, "assets", "messengers.json")
-try:
-    with open(messengers_file, "r") as f:
-        messengers = list(json.load(f))
-except Exception:
-    messengers = []
-
 message_prefixes = ("im", "call", "email")
+
+
+def get_messengers() -> list[str]:
+    cached = t.cast(
+        list[str] | None,
+        getattr(get_messengers, "_cached", None)
+    )
+    if cached is not None:
+        return cached
+    else:
+        try:
+            with open(messengers_file, "r") as f:
+                messengers = list(json.load(f))
+        except Exception:
+            messengers = []
+        setattr(get_messengers, "_cached", messengers)
+        return messengers
 
 
 def get_is_sensitive(item: "NotificationItem") -> bool:
@@ -195,7 +206,7 @@ class NotificationItem(gtk.Box):
                 self._cached_detected = "messages"
                 return "messages"
 
-        if any(m in self.item.app_name.lower() for m in messengers):
+        if any(m in self.item.app_name.lower() for m in get_messengers()):
             self._cached_detected = "messages"
             return "messages"
 
