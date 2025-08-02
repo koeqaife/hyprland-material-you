@@ -6,6 +6,7 @@ from utils.ref import Ref
 from utils.styles import reload_css
 from utils.service import Service
 from utils.colors import generate_by_settings
+from utils.logger import logger
 from repository import gdk, glib, gio
 import random
 import typing as t
@@ -15,6 +16,11 @@ from os.path import join, exists
 from config import state_dir
 import os
 from os import path
+import asyncio
+import src.services.hyprland as hyprland
+from src.services.mpris import players
+from src.services.login1 import get_login_manager
+from src.services.upower import lid_is_closed
 
 STATE_FILE_VERSION = 1
 WALLPAPER_EXTENSIONS = {
@@ -265,10 +271,45 @@ def on_settings_changed(key: str, value: t.Any) -> None:
         generate_by_settings()
 
 
+def on_lid_closed(is_closed: bool) -> None:
+    if not is_closed:
+        asyncio.create_task(
+            hyprland.client.raw("dispatch dpms on")
+        )
+        return
+
+    action = Settings().get("lid_action")
+    if not action:
+        return
+
+    if __debug__:
+        logger.debug("Lid action: %s", action)
+
+    if action == "lock":
+        if __debug__:
+            logger.debug("Locking screen")
+        is_locked.value = True
+    elif action == "sleep":
+        if __debug__:
+            logger.debug("Going to sleep")
+        is_locked.value = True
+        for player in players.value.values():
+            player.pause()
+        get_login_manager().suspend()
+    elif action == "dpms":
+        if __debug__:
+            logger.debug("Turning off displays")
+        is_locked.value = True
+        asyncio.create_task(
+            hyprland.client.raw("dispatch dpms off")
+        )
+
+
 class StateService(Service):
     def start(self) -> None:
         opened_windows.init()
         settings = Settings()
         settings.watch("wallpaper", on_wallpapers_changed, False)
         settings._signals.watch("changed", on_settings_changed)
+        lid_is_closed.watch(on_lid_closed)
         glib.idle_add(generate_wallpaper_texture)

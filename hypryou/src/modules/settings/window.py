@@ -43,7 +43,7 @@ def get_pages() -> dict[str, Page]:
     from src.modules.settings.bluetooth import BluetoothPage
     from src.modules.settings.appearance import AppearancePage
     from src.modules.settings.wallpapers import WallpapersPage
-    from src.modules.settings.sleep import SleepPage
+    from src.modules.settings.power import PowerPage
     from src.modules.settings.apps import AppsPage
     from src.modules.settings.input import InputPage
     from src.modules.settings.monitors import MonitorsPage
@@ -89,11 +89,11 @@ def get_pages() -> dict[str, Page]:
             icon_fill=True,
             widget=MonitorsPage
         ),
-        "sleep": Page(
-            title="Sleep",
+        "power": Page(
+            title="Power",
             icon="power_settings_circle",
             icon_fill=True,
-            widget=SleepPage
+            widget=PowerPage
         ),
         "apps": Page(
             title="Apps",
@@ -138,7 +138,7 @@ sidebar = (
     "separator",
     "input",
     "monitors",
-    "sleep",
+    "power",
     "apps",
     "separator",
     "configs",

@@ -8,6 +8,8 @@ from utils.logger import logger
 from utils.service import Service, Signals
 import typing as t
 
+lid_is_closed = Ref(False, name="lid_is_closed")
+
 
 class BatteryState(int, Enum):
     UNKNOWN = 0
@@ -54,7 +56,7 @@ battery_icons: dict[str, dict[int, str]] = {
 class UPower(Signals):
     def __init__(self) -> None:
         super().__init__()
-        self._proxy = gio.DBusProxy.new_sync(
+        self._display_proxy = gio.DBusProxy.new_sync(
             system_bus,
             gio.DBusProxyFlags.NONE,
             None,
@@ -63,20 +65,40 @@ class UPower(Signals):
             "org.freedesktop.UPower.Device",
             None
         )
-        self._conn = self._proxy.get_connection()
+        self._upower_proxy = gio.DBusProxy.new_sync(
+            system_bus,
+            gio.DBusProxyFlags.NONE,
+            None,
+            "org.freedesktop.UPower",
+            "/org/freedesktop/UPower",
+            "org.freedesktop.UPower",
+            None
+        )
+        self._conn = self._display_proxy.get_connection()
         self.conns = [
-            self._proxy.connect(
+            self._display_proxy.connect(
                 "g-properties-changed", self.properties_changed
             ),
-            self._proxy.connect(
+            self._display_proxy.connect(
                 "g-signal", self.on_dbus_signal
+            ),
+            self._upower_proxy.connect(
+                "g-properties-changed",
+                self.upower_properties_changed
             )
         ]
         self.battery_icon = Ref("battery_unknown", name="battery_icon")
-        self._cache_properties()
+        self.display_cache_properties()
+        self.upower_cache_properties()
 
-    def prop(self, property_name: str) -> t.Any:
-        value = self._proxy.get_cached_property(property_name)
+    def display_prop(self, property_name: str) -> t.Any:
+        value = self._display_proxy.get_cached_property(property_name)
+        if value is None:
+            return None
+        return value.unpack()
+
+    def upower_prop(self, property_name: str) -> t.Any:
+        value = self._upower_proxy.get_cached_property(property_name)
         if value is None:
             return None
         return value.unpack()
@@ -117,23 +139,27 @@ class UPower(Signals):
 
     @property
     def type(self) -> int:
-        return t.cast(int, self.prop("Type"))
+        return t.cast(int, self.display_prop("Type"))
 
     @property
     def state(self) -> BatteryState:
-        return t.cast(BatteryState, self.prop("State"))
+        return t.cast(BatteryState, self.display_prop("State"))
 
     @property
     def percentage(self) -> int:
-        return t.cast(int, self.prop("Percentage"))
+        return t.cast(int, self.display_prop("Percentage"))
 
     @property
     def is_present(self) -> bool:
-        return t.cast(bool, self.prop("IsPresent"))
+        return t.cast(bool, self.display_prop("IsPresent"))
 
     @property
     def battery_level(self) -> BatteryLevel:
-        return t.cast(BatteryLevel, self.prop("BatteryLevel"))
+        return t.cast(BatteryLevel, self.display_prop("BatteryLevel"))
+
+    @property
+    def lid_is_present(self) -> bool:
+        return t.cast(bool, self.upower_prop("LidIsPresent"))
 
     def on_dbus_signal(
         self,
@@ -154,15 +180,26 @@ class UPower(Signals):
             dict[str, str],
             changed_properties_variant.unpack()
         )
-        self._cache_properties(list(changed_properties.keys()))
+        self.display_cache_properties(list(changed_properties.keys()))
 
-    def call_method(
+    def upower_properties_changed(
+        self,
+        proxy: gio.DBusProxy,
+        changed_properties_variant: glib.Variant,
+        invalidated_properties: list[str]
+    ) -> None:
+        changed_properties = changed_properties_variant.unpack()
+        if "LidIsClosed" in changed_properties:
+            lid_is_closed.value = changed_properties["LidIsClosed"]
+        self.upower_cache_properties(dict(changed_properties).keys())
+
+    def display_call_method(
         self,
         method_name: str,
         params: glib.Variant,
         callback: t.Callable[..., None] | None = None
     ) -> None:
-        self._proxy.call(
+        self._display_proxy.call(
             method_name,
             params,
             gio.DBusCallFlags.NONE,
@@ -172,15 +209,26 @@ class UPower(Signals):
             None
         )
 
-    def _cache_properties(self, changed: list[str] | None = None) -> None:
+    def display_cache_properties(
+        self, changed: list[str] | None = None
+    ) -> None:
         cache_proxy_properties(
             self._conn,
-            self._proxy,
+            self._display_proxy,
             changed,
-            self._cache_properties_finish
+            self.display_cache_properties_finish
         )
 
-    def _cache_properties_finish(self, *args: t.Any) -> None:
+    def upower_cache_properties(
+        self, changed: list[str] | None = None
+    ) -> None:
+        cache_proxy_properties(
+            self._conn,
+            self._upower_proxy,
+            changed
+        )
+
+    def display_cache_properties_finish(self, *args: t.Any) -> None:
         self.update_icon()
         self.notify("changed")
 
