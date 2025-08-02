@@ -199,7 +199,3 @@ class LidMonitorService(Service):
             logger.exception(
                 "Failed to handle lid action", exc_info=e
             )
-
-
-# Create service instance
-LidService = LidMonitorService
