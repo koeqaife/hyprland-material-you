@@ -88,6 +88,9 @@ default_settings: dict[str, t.Any] = {
     "idle.battery.dpms": 60,
     "idle.battery.sleep": 60,
 
+    # Lid action
+    "lid_action": "nothing",
+
     # Input
     "input.enabled": True,
     "input.kb_model": "",

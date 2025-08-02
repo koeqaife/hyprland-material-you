@@ -10,6 +10,7 @@ from config import Settings
 from src import widget
 import weakref
 import asyncio
+import os
 import typing as t
 
 
@@ -106,6 +107,28 @@ class PowerMenu(gtk.Box):
         if self.cancel_button:
             self.cancel_button.destroy()
             self.remove(self.cancel_button)
+
+
+def handle_lid_action() -> None:
+    """Handle laptop lid close action based on user settings"""
+    if not os.path.exists("/proc/acpi/button/lid"):
+        return
+        
+    action = Settings().get("lid_action")
+    if not action:
+        action = "nothing"
+    
+    if action == "lock":
+        is_locked.value = True
+    elif action == "sleep":
+        is_locked.value = True
+        for player in players.value.values():
+            player.pause()
+        get_login_manager().suspend()
+    elif action == "dpms":
+        asyncio.create_task(
+            hyprland.client.raw("dispatch dpms off")
+        )
 
 
 class PowerMenuWindow(widget.LayerWindow):

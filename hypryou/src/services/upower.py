@@ -1,5 +1,8 @@
 from __future__ import annotations
 from enum import Enum
+import os
+import threading
+import time
 
 from src.services.dbus import cache_proxy_properties, system_bus
 from repository import gio, glib
@@ -27,6 +30,79 @@ class BatteryLevel(int, Enum):
     NORMAL = 6
     HIGH = 7
     FULL = 8
+
+
+class LidMonitor:
+    """Monitor laptop lid state and trigger appropriate actions"""
+    
+    def __init__(self) -> None:
+        self.lid_path = "/proc/acpi/button/lid/LID/state"
+        self.monitoring = False
+        self.last_state = None
+        self._thread: threading.Thread | None = None
+        
+        if os.path.exists("/proc/acpi/button/lid"):
+            self.start_monitoring()
+    
+    def start_monitoring(self) -> None:
+        """Start monitoring lid state in background thread"""
+        if self.monitoring:
+            return
+            
+        self.monitoring = True
+        self._thread = threading.Thread(target=self._monitor_loop, daemon=True)
+        self._thread.start()
+        logger.debug("Started lid monitoring")
+    
+    def stop_monitoring(self) -> None:
+        """Stop monitoring lid state"""
+        self.monitoring = False
+        if self._thread and self._thread.is_alive():
+            self._thread.join(timeout=1.0)
+        logger.debug("Stopped lid monitoring")
+    
+    def _get_lid_state(self) -> str | None:
+        """Get current lid state from proc filesystem"""
+        try:
+            if os.path.exists(self.lid_path):
+                with open(self.lid_path, 'r') as f:
+                    content = f.read().strip()
+                    # Format: "state:      open" or "state:      closed"
+                    if 'open' in content:
+                        return 'open'
+                    elif 'closed' in content:
+                        return 'closed'
+            return None
+        except (OSError, IOError) as e:
+            logger.warning(f"Failed to read lid state: {e}")
+            return None
+    
+    def _monitor_loop(self) -> None:
+        """Monitor loop running in background thread"""
+        while self.monitoring:
+            try:
+                current_state = self._get_lid_state()
+                
+                if current_state and current_state != self.last_state:
+                    if current_state == 'closed' and self.last_state == 'open':
+                        # Lid was just closed
+                        glib.idle_add(self._trigger_lid_action)
+                    
+                    self.last_state = current_state
+                
+                time.sleep(0.5)  # Check every 500ms
+                
+            except Exception as e:
+                logger.error(f"Error in lid monitoring loop: {e}")
+                time.sleep(1.0)
+    
+    def _trigger_lid_action(self) -> None:
+        """Trigger lid action in main thread"""
+        try:
+            from src.modules.power import handle_lid_action
+            handle_lid_action()
+        except ImportError as e:
+            logger.error(f"Failed to import handle_lid_action: {e}")
 
 
 battery_icons: dict[str, dict[int, str]] = {
@@ -204,3 +280,10 @@ class UPowerService(Service):
         if __debug__:
             logger.debug("Starting upower proxy")
         _instance = UPower()
+        
+        # Initialize lid monitor
+        self.lid_monitor = LidMonitor()
+    
+    def app_destroy(self) -> None:
+        if hasattr(self, 'lid_monitor'):
+            self.lid_monitor.stop_monitoring()
