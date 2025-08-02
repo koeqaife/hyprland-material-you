@@ -44,7 +44,6 @@ from src.services.audio import AudioService
 from src.services.clock import ClockService
 from src.services.network import NetworkService
 from src.services.bluetooth_agent import BluetoothAgentService
-from src.services.lid import LidMonitorService
 
 import src.services.cliphist as cliphist
 
@@ -92,8 +91,7 @@ services: tuple[AsyncService | Service, ...] = (
     BacklightService(),
     AudioService(),
     ClockService(),
-    BluetoothAgentService(),
-    LidMonitorService()
+    BluetoothAgentService()
 )
 
 popups_types = (
