@@ -1,5 +1,4 @@
 import types
-import os
 from utils.ref import Ref
 from utils.styles import toggle_css_class
 from repository import gtk, glib
@@ -291,21 +290,6 @@ class MonitorsPage(gtk.Box):
             max_width_chars=3
         )
 
-        # Lid action option (only show if laptop has lid)
-        self.lid_action = None
-        if os.path.exists("/proc/acpi/button/lid"):
-            self.lid_action = DropdownRow(
-                "Laptop lid action",
-                "What happens when laptop lid is closed",
-                items=[
-                    DropdownItem("nothing", "Do nothing"),
-                    DropdownItem("lock", "Lock screen"),
-                    DropdownItem("sleep", "Sleep"),
-                    DropdownItem("dpms", "Turn off displays")
-                ],
-                on_selected=self.on_lid_action_changed
-            )
-
         self.children = (
             self.monitor_selector,
             gtk.Separator(),
@@ -320,9 +304,6 @@ class MonitorsPage(gtk.Box):
             self.vrr,
             self.bitdepth
         )
-
-        if self.lid_action:
-            self.children = self.children + (gtk.Separator(), self.lid_action)
 
         self.actions_box = gtk.Box(
             css_classes=("actions-box",),
@@ -415,11 +396,6 @@ class MonitorsPage(gtk.Box):
 
     def sync_finished(self) -> None:
         self._finished = True
-        # Initialize lid action setting
-        if self.lid_action:
-            current_lid_action = Settings().get("lid_action")
-            if current_lid_action:
-                self.lid_action.set_current(current_lid_action)
 
     def update_setting(self, key: str, value: str) -> None:
         if not self._finished:
@@ -498,12 +474,6 @@ class MonitorsPage(gtk.Box):
         toggle_css_class(row.entry_box, "incorrect", False)
 
         self.update_setting("bitdepth", value)
-
-    def on_lid_action_changed(self, row: DropdownRow, item: DropdownItem) -> None:
-        if item is None:
-            return
-        # Save lid action setting globally
-        Settings().set("lid_action", item.value)
 
     # Handler generators
 
