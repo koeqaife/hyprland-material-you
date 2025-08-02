@@ -144,6 +144,7 @@ default_settings: dict[str, t.Any] = {
     "hyprland.snap.border_overlap": False,
     "hyprland.snap.respect_gaps": False,
 
+    "lid_action": "dpms",
     "monitors": [],
     "keybinds_overrides": []
 }

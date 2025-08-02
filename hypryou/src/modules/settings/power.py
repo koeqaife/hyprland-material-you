@@ -1,11 +1,12 @@
 from repository import gtk
+from src.modules.settings.base import SettingsDropdownRow, DropdownItem
 from src.modules.settings.base import SettingsTextRow
 from src.modules.settings.base import Category
 from src.modules.settings.base import Hint
 
 
-class SleepPage(gtk.ScrolledWindow):
-    __gtype_name__ = "SettingsSleepPage"
+class PowerPage(gtk.ScrolledWindow):
+    __gtype_name__ = "SettingsPowerPage"
 
     def __init__(self) -> None:
         self.box = gtk.Box(
@@ -13,11 +14,24 @@ class SleepPage(gtk.ScrolledWindow):
             orientation=gtk.Orientation.VERTICAL
         )
         super().__init__(
-            css_classes=("sleep-page", "settings-page",),
+            css_classes=("power-page", "settings-page",),
             child=self.box,
             hscrollbar_policy=gtk.PolicyType.NEVER
         )
         self.box_children = (
+            Category("Laptop lid"),
+            SettingsDropdownRow(
+                "Laptop lid action",
+                "What to do when lid closed",
+                "lid_action",
+                items=[
+                    DropdownItem("", "Nothing"),
+                    DropdownItem("dpms", "Screen off + Lock"),
+                    DropdownItem("sleep", "Sleep"),
+                    DropdownItem("lock", "Lock screen"),
+                ]
+            ),
+
             Category("Charging"),
             SettingsTextRow(
                 "Lock",
