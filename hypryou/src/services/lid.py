@@ -3,7 +3,6 @@ import os
 import typing as t
 import asyncio
 import struct
-import select
 
 from repository import gio, glib
 from utils.logger import logger
@@ -52,18 +51,50 @@ class LidMonitor(Service):
     
     def __init__(self) -> None:
         super().__init__()
-        self.lid_device_path = "/dev/input/event1"  # From grep output above
+        self.lid_device_path: str | None = None
         self.fd: int | None = None
         self.watch_id: int | None = None
+        
+    def _find_lid_device(self) -> str | None:
+        """Find the input device for lid switch"""
+        try:
+            with open('/proc/bus/input/devices', 'r') as f:
+                content = f.read()
+            
+            # Split into device blocks
+            devices = content.split('\n\n')
+            
+            for device in devices:
+                if 'Lid Switch' in device:
+                    for line in device.split('\n'):
+                        if line.startswith('H: Handlers='):
+                            handlers = line.split('=')[1].strip()
+                            for handler in handlers.split():
+                                if handler.startswith('event'):
+                                    event_path = f"/dev/input/{handler}"
+                                    if os.path.exists(event_path):
+                                        logger.debug(f"Found lid device: {event_path}")
+                                        return event_path
+            
+            logger.warning("Lid Switch device not found in /proc/bus/input/devices")
+            return None
+            
+        except Exception as e:
+            logger.error(f"Failed to find lid device: {e}")
+            return None
         
     def app_init(self) -> None:
         """Initialize the lid monitor service"""
         if os.path.exists("/proc/acpi/button/lid"):
-            self.start_monitoring()
+            self.lid_device_path = self._find_lid_device()
+            if self.lid_device_path:
+                self.start_monitoring()
+            else:
+                logger.warning("Lid device not found, lid monitoring disabled")
     
     def start_monitoring(self) -> None:
         """Start monitoring lid state using input events"""
-        if self.fd is not None:
+        if self.fd is not None or not self.lid_device_path:
             return
             
         try:
