@@ -1,0 +1,64 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "calculated" as *;
+@use "sass:color";
+
+window.emoji-picker {
+    @include nLayerBackground($background, 1);
+    min-width: 23.69rem;
+    min-height: 28rem;
+    border-radius: $hyprlandRounding;
+    border: 0.0625rem solid $layerBorderColor;
+
+    .top-bar {
+        background-color: $surfaceContainer;
+        padding: 0.125rem;
+    }
+
+    scrollbar.horizontal {
+        margin: 0;
+        min-height: 0;
+    }
+
+    .category-button {
+        padding: 0;
+        min-height: 2rem;
+        min-width: 2rem;
+        border-radius: 2rem;
+        margin-left: 0.125rem;
+
+        &.selected {
+            background-color: $secondaryContainer;
+            label {
+                font-size: 1.125rem;
+                font-weight: 400;
+                color: $onSecondaryContainer;
+            }
+            &:hover {
+                background-color: color.mix($secondaryContainer, $onSurfaceVariant, 88%);
+            }
+            &:active {
+                background-color: color.mix($secondaryContainer, $onSurfaceVariant, 80%);
+            }
+        }
+        &:not(.selected) {
+            label {
+                font-size: 1.125rem;
+                font-weight: 400;
+                color: $primary;
+            }
+            &:hover {
+                background-color: color.mix(transparent, $primary, 92%);
+            }
+            &:active {
+                background-color: color.mix(transparent, $primary, 90%);
+            }
+        }
+    }
+
+    .search {
+        margin: 0;
+        min-height: 0;
+        min-width: 7rem;
+    }
+}
