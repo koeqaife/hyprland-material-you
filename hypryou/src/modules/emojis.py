@@ -82,8 +82,16 @@ class EmojisBox(gtk.Box):
         self.top_bar_scroll = gtk.ScrolledWindow(
             child=self.top_bar,
             vscrollbar_policy=gtk.PolicyType.NEVER,
+            hscrollbar_policy=gtk.PolicyType.EXTERNAL,
             hexpand=True
         )
+        print(self.top_bar_scroll.observe_controllers())
+        self.scroll_controller = gtk.EventControllerScroll.new(
+            gtk.EventControllerScrollFlags.VERTICAL |
+            gtk.EventControllerScrollFlags.KINETIC
+        )
+        self.top_bar_scroll.add_controller(self.scroll_controller)
+        self.scroll_controller.connect("scroll", self.on_scroll)
 
         self.search_box = gtk.Box(
             css_classes=("misc--search", "search")
@@ -146,6 +154,22 @@ class EmojisBox(gtk.Box):
         self.append(self.scrollable)
 
         self.set_page("Recent")
+
+    def on_scroll(
+        self,
+        controller: gtk.EventControllerScroll,
+        dx: float,
+        dy: float
+    ) -> None:
+        # TODO: That'd be better to make real kinetic scroll like in scrollbar
+        adjustment = self.top_bar_scroll.get_hadjustment()
+        increment = min(
+            abs(dy) * adjustment.get_step_increment(),
+            adjustment.get_minimum_increment()
+        )
+        increment = increment * -1 if dy < 0 else increment
+        adjustment.set_value(adjustment.get_value() + increment)
+        return True
 
     @sync_debounce(500)
     def on_search(self, *args: t.Any) -> None:
