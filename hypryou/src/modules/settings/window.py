@@ -1,4 +1,4 @@
-from repository import gtk
+from repository import gtk, gdk
 import src.widget as widget
 from utils.styles import toggle_css_class
 from utils.logger import logger
@@ -371,6 +371,12 @@ class SettingsWindow(gtk.ApplicationWindow):
         self._child.change_page(page)
         self.set_child(self._child)
 
+        self.key_controller = gtk.EventControllerKey()
+        self.key_handler = self.key_controller.connect(
+            "key-pressed", self.on_key_press
+        )
+        self.add_controller(self.key_controller)
+
         self.close_handler = self.connect(
             "close-request", self.on_close_request
         )
@@ -383,11 +389,22 @@ class SettingsWindow(gtk.ApplicationWindow):
         self.destroy()
         return False
 
+    def on_key_press(
+        self,
+        controller: gtk.EventControllerKey,
+        keyval: int,
+        *args: t.Any
+    ) -> None:
+        if keyval == gdk.KEY_Escape:
+            self.destroy()
+
     def destroy(self) -> None:
         self._destroyed = True
         settings_page.value = None
         self.disconnect(self.close_handler)
         self._child.destroy()
+        self.key_controller.disconnect(self.key_handler)
+        self.remove_controller(self.key_controller)
         super().destroy()
 
 
