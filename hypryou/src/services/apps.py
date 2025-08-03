@@ -9,7 +9,8 @@ from config import APP_CACHE_DIR, CACHE_DIR
 from os.path import join as pjoin
 import os.path as path
 import json
-import os
+import src.services.hyprland as hyprland
+import asyncio
 
 apps = Ref[list["Application"]]([], name="applications", delayed_init=True)
 frequents = Ref[dict[str, int]]({}, name="app_frequents", delayed_init=True)
@@ -20,9 +21,6 @@ LEGACY_APP_FREQUENCY = pjoin(CACHE_DIR, "ags", "apps", "apps_frequency.json")
 
 
 def launch_detached(exec: str) -> None:
-    import shlex
-    import subprocess
-
     if __debug__:
         logger.debug("Running %s", exec)
 
@@ -37,17 +35,8 @@ def launch_detached(exec: str) -> None:
     if __debug__:
         logger.debug("Running %s", exec)
 
-    cmd = shlex.split(exec)
-    cwd = os.path.expanduser("~")
-
-    subprocess.Popen(
-        cmd,
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-        preexec_fn=os.setsid,
-        cwd=cwd,
-        env=os.environ.copy()
+    asyncio.create_task(
+        hyprland.client.raw(f"dispatch exec {exec}")
     )
 
 
