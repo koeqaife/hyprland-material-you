@@ -189,7 +189,7 @@ class EmojisBox(gtk.Box):
         if page == "Recent":
             self._virtual_pool = self.recent_emojis
         elif page == "EMPTY":
-            self._virtual_pool.clear()
+            self._virtual_pool = []
         else:
             self._virtual_pool = self.all_emojis[page]
         self.update_pool()
