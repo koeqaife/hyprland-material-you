@@ -229,12 +229,10 @@ class TemplateFormatter:
                     r'mix\(([^,]+),\s*(0\.\d+|1(?:\.0*)?)\)',
                     transform
                 )
-                print(transform)
                 if not matched:
                     continue
                 color_ref = matched.group(1).strip()
                 ratio = float(matched.group(2))
-                print(color_ref, ratio)
                 if color_ref in self.color_map:
                     other_color = self.color_map[color_ref]
                 elif re.match(
