@@ -8,6 +8,7 @@ from src.services.backlight import (
 from src.services.audio import volume, volume_icon
 import typing as t
 from src.services.state import opened_windows
+from config import Settings
 from math import ceil
 
 window_counter = Ref[dict[int, int]]({}, name="popup_counter")
@@ -213,6 +214,11 @@ class PopupsWindow(widget.LayerWindow):
             self._update_visible
         )
         self._update_visible(window_counter.value)
+
+        self.gaps_out_handler = Settings().watch(
+            "hyprland.gaps_out", self.on_gaps_out,
+            True
+        )
 
     def show(self) -> None:
         self.timeout = None
