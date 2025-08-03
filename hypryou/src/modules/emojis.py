@@ -88,7 +88,7 @@ class EmojisBox(gtk.Box):
         print(self.top_bar_scroll.observe_controllers())
         self.scroll_controller = gtk.EventControllerScroll.new(
             gtk.EventControllerScrollFlags.VERTICAL |
-            gtk.EventControllerScrollFlags.KINETIC
+            gtk.EventControllerScrollFlags.DISCRETE
         )
         self.top_bar_scroll.add_controller(self.scroll_controller)
         self.scroll_controller.connect("scroll", self.on_scroll)
@@ -163,10 +163,7 @@ class EmojisBox(gtk.Box):
     ) -> None:
         # TODO: That'd be better to make real kinetic scroll like in scrollbar
         adjustment = self.top_bar_scroll.get_hadjustment()
-        increment = min(
-            abs(dy) * adjustment.get_step_increment(),
-            adjustment.get_minimum_increment()
-        )
+        increment = abs(dy) * adjustment.get_step_increment()
         increment = increment * -1 if dy < 0 else increment
         adjustment.set_value(adjustment.get_value() + increment)
         return True
