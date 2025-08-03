@@ -12,6 +12,7 @@ from src.services import state
 from config import Settings
 import traceback
 import typing as t
+import src.services.hyprland as hyprland
 
 
 screenshot_mode_args = {
@@ -42,20 +43,8 @@ HELP = {
 
 
 def launch_detached(exec: str) -> None:
-    import shlex
-    import subprocess
-
-    cmd = shlex.split(exec)
-    cwd = os.path.expanduser("~")
-
-    subprocess.Popen(
-        cmd,
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-        preexec_fn=os.setsid,
-        cwd=cwd,
-        env=os.environ.copy()
+    asyncio.create_task(
+        hyprland.client.raw(f"dispatch exec {exec}")
     )
 
 
