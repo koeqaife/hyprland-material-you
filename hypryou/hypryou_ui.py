@@ -67,6 +67,7 @@ from src.modules.clients import ClientsWindow
 from src.modules.settings.window import SettingsWatcher
 from src.modules.wifi_secrets import SecretsDialog
 from src.modules.bluetooth_pin import PinDialog
+from src.modules.emojis import EmojisWindow
 
 from src.modules.settings.wallpapers import executor as wallpaper_executor
 
@@ -105,7 +106,8 @@ popups_types = (
     AudioWindow,
     MicsWindow,
     InfoWindow,
-    ClientsWindow
+    ClientsWindow,
+    EmojisWindow
 )
 
 windows_types = (

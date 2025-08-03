@@ -239,10 +239,16 @@ scrollbar {
     background: transparent;
     color: rgb($primary, 0.5);
     border-radius: 0.25rem;
-    min-width: 0.25rem;
-    min-height: 0.25rem;
-    margin-right: -0.25rem;
-    margin-left: 0.25rem;
+
+    .vertical {
+        margin-right: -0.25rem;
+        margin-left: 0.25rem;
+    }
+
+    .horizontal {
+        margin-bottom: -0.25rem;
+        margin-top: 0.25rem;
+    }
 
     &:hover {
         color: rgb($primary, 0.5);
