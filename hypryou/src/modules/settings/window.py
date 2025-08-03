@@ -4,6 +4,8 @@ from utils.styles import toggle_css_class
 from utils.logger import logger
 import weakref
 from src.services.state import settings_page
+import src.services.hyprland as hyprland
+import asyncio
 import typing as t
 
 
@@ -358,7 +360,7 @@ class SettingsWindow(gtk.ApplicationWindow):
     ) -> None:
         super().__init__(
             application=app,
-            title="Settings",
+            title="HyprYou Settings",
             css_classes=("settings",),
             default_height=1,
             default_width=1,
@@ -400,7 +402,16 @@ class SettingsWatcher:
     ) -> None:
         self.app = app
         self.window: SettingsWindow | None = None
-        self.handler = settings_page.watch(self.on_changed)
+        self.page_handler = settings_page.watch(self.on_changed)
+        self.open_handler = settings_page.watch_signal("open", self.on_open)
+
+    def on_open(self) -> None:
+        ws = hyprland.active_workspace.value
+        asyncio.create_task(
+            hyprland.client.raw(
+                f"dispatch movetoworkspace {ws},title:HyprYou Settings"
+            )
+        )
 
     def on_changed(self, value: str | None) -> None:
         if value is None and self.window is not None:
@@ -417,4 +428,5 @@ class SettingsWatcher:
     def destroy(self) -> None:
         if self.window is not None:
             self.window.destroy()
-        settings_page.unwatch(self.handler)
+        settings_page.unwatch(self.page_handler)
+        settings_page.unwatch_signal(self.open_handler)

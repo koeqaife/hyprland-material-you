@@ -82,6 +82,7 @@ opened_windows = OpenedWindowsWatcher()
 
 def open_settings(page: str = "default") -> None:
     settings_page.value = page
+    settings_page.notify_signal("open")
 
 
 def open_window(window_name: str) -> None:
