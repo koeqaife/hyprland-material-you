@@ -571,3 +571,7 @@ class MonitorsPage(gtk.Box):
 
         for button, handler_id in self.button_handlers.items():
             button.disconnect(handler_id)
+
+        if self._dialog:
+            self._dialog.destroy()
+            self._dialog = None
