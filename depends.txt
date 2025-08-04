@@ -30,6 +30,7 @@ xdg-desktop-portal-hyprland
 xdg-utils
 polkit-gnome
 adw-gtk-theme
+greetd
 
 
 Versions:

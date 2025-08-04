@@ -1,0 +1,292 @@
+:root {
+    --background: #131318;
+    --onBackground: #e4e1e9;
+    --foreground: #e4e1e9;
+    --surface: #131318;
+    --surfaceDim: #131318;
+    --surfaceBright: #39393f;
+    --surfaceContainerLowest: #0e0e13;
+    --surfaceContainerLow: #1b1b21;
+    --surfaceContainer: #1f1f25;
+    --surfaceContainerHigh: #2a292f;
+    --surfaceContainerHighest: #34343a;
+    --onSurface: #e4e1e9;
+    --surfaceVariant: #46464f;
+    --onSurfaceVariant: #c7c5d0;
+    --inverseSurface: #e4e1e9;
+    --inverseOnSurface: #303036;
+    --outline: #91909a;
+    --outlineVariant: #46464f;
+    --shadow: #000000;
+    --scrim: #000000;
+    --surfaceTint: #bec2ff;
+    --primary: #bec2ff;
+    --onPrimary: #272b60;
+    --primaryContainer: #3e4278;
+    --onPrimaryContainer: #e0e0ff;
+    --inversePrimary: #555992;
+    --secondary: #c5c4dd;
+    --onSecondary: #2e2f42;
+    --secondaryContainer: #444559;
+    --onSecondaryContainer: #e1e0f9;
+    --tertiary: #e8b9d5;
+    --onTertiary: #46263b;
+    --tertiaryContainer: #ae849e;
+    --onTertiaryContainer: #000000;
+    --error: #ffb4ab;
+    --onError: #690005;
+    --errorContainer: #93000a;
+    --onErrorContainer: #ffdad6;
+    --primaryFixed: #e0e0ff;
+    --primaryFixedDim: #bec2ff;
+    --onPrimaryFixed: #11144b;
+    --onPrimaryFixedVariant: #3e4278;
+    --secondaryFixed: #e1e0f9;
+    --secondaryFixedDim: #c5c4dd;
+    --onSecondaryFixed: #191a2c;
+    --onSecondaryFixedVariant: #444559;
+    --tertiaryFixed: #ffd8ee;
+    --tertiaryFixedDim: #e8b9d5;
+    --onTertiaryFixed: #2e1126;
+    --onTertiaryFixedVariant: #5e3c52;
+}
+
+window {
+    font-family: "Google Sans Display";
+    font-size: 16px;
+    font-weight: 400;
+}
+
+window.hypryou-greeter {
+    background-color: var(--background);
+    background-image: radial-gradient(circle at top left, mix(var(--primary), transparent, 0.75) 150px, transparent 151px), radial-gradient(circle at bottom right, mix(var(--tertiary), transparent, 0.75) 200px, transparent 201px), radial-gradient(circle at 30% 40%, mix(var(--primaryContainer), transparent, 0.75) 120px, transparent 121px), radial-gradient(circle at 70% 60%, mix(var(--secondaryContainer), transparent, 0.75) 100px, transparent 101px),
+        radial-gradient(circle at 50% 20%, mix(var(--tertiaryContainer), transparent, 0.75) 80px, transparent 81px);
+    background-repeat: no-repeat;
+}
+
+.material-icon,
+.material-icon * {
+    font-family: "Material Symbols Rounded", "MaterialSymbolsRounded";
+}
+
+/* Entry */
+entry {
+    margin: 0;
+    border-radius: 0.5rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    min-width: 0;
+    border: 0.0625rem solid var(--outline);
+    outline: 0;
+
+    color: var(--onSurface);
+    min-height: 2rem;
+    outline: none;
+    background: transparent;
+}
+
+entry placeholder {
+    opacity: 1;
+    color: var(--onSurfaceVariant);
+}
+
+entry:focus-within {
+    border-color: var(--primary);
+}
+
+entry.incorrect {
+    border-color: var(--error);
+}
+
+/* In-dialog button */
+button.in-dialog {
+    border-radius: 2rem;
+    min-height: 2rem;
+    padding: 0;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    background: transparent;
+    border: none;
+    outline: none;
+}
+
+button.in-dialog label {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--primary);
+}
+
+button.in-dialog .icon {
+    font-weight: 500;
+    margin-right: 0.5rem;
+    font-variation-settings: "opsz" 20;
+}
+button.in-dialog:hover {
+    background-color: mix(transparent, var(--primary), 0.08);
+}
+button.in-dialog:active {
+    background-color: mix(transparent, var(--primary), 0.1);
+}
+button.in-dialog:disabled {
+    background-color: mix(var(--onSurface), transparent, 0.82);
+}
+button.in-dialog:disabled label {
+    color: mix(var(--onSurface), transparent, 0.62);
+}
+
+/* Popover */
+listview {
+    background: transparent;
+    margin: 0;
+}
+
+popover {
+    all: unset;
+    margin: 0;
+    padding: 0;
+    background: var(--surfaceContainer);
+}
+
+popover contents {
+    background: var(--surfaceContainer);
+    border: 0.0625rem solid var(--layerBorderColor);
+    border-radius: 0.25rem;
+    min-height: 0;
+    min-width: 4rem;
+    padding: 0;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border: none;
+    outline: none;
+}
+
+popover contents row {
+    border-radius: 0;
+    min-height: 2.5rem;
+    padding: 0;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    margin: 0;
+    background-color: transparent;
+}
+
+popover contents row:hover {
+    background: mix(var(--surfaceContainer), var(--onSurface), 0.1);
+}
+
+popover contents row:active {
+    background: mix(var(--surfaceContainer), var(--onSurface), 0.18);
+}
+
+popover contents label {
+    color: var(--onSurface);
+}
+
+/* Dropdown button */
+dropdown button {
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    min-width: 0;
+    border: 0.0625rem solid var(--outline);
+    background: transparent;
+    outline: none;
+}
+
+dropdown button arrow {
+    color: var(--onSurface);
+}
+
+dropdown button label {
+    color: var(--onSurface);
+    font-size: 1rem;
+    font-weight: 400;
+    font-family: "Google Sans Display";
+}
+
+dropdown.sessions {
+    margin: 1rem;
+}
+
+/* Username box | Auth box */
+.username-box,
+.auth-box {
+    padding: 1.25rem;
+    background-color: var(--surfaceContainer);
+    min-width: 30rem;
+    border-radius: 1rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.username-label,
+.auth-message {
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--onSurface);
+    margin-bottom: 0.25rem;
+}
+
+.username-box entry,
+.auth-box entry {
+    margin-bottom: 0.25rem;
+}
+
+.error,
+.auth-error {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--error);
+    margin-bottom: 0.25rem;
+    margin-left: 0.25rem;
+}
+
+/* Date box */
+.date-box {
+    margin-top: 2rem;
+}
+
+.date-box .time,
+.date-box .date {
+    font-size: 5.5rem;
+    font-weight: 400;
+    font-feature-settings: "tnum";
+    font-family: "Google Sans Display";
+    line-height: 0.7;
+    color: var(--primary);
+    letter-spacing: -0.06em;
+}
+
+.date-box .date {
+    font-size: 2rem;
+    color: var(--onBackground);
+}
+
+/* Info label */
+.info-label {
+    font-size: 1rem;
+    font-weight: 400;
+    font-family: "Google Sans Text";
+    color: var(--onSurfaceVariant);
+    margin: 1rem;
+}
+
+/* Battery */
+.battery-box {
+    margin-left: 2.5rem;
+    margin-top: 2.5rem;
+}
+
+.battery-icon.icon {
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin-right: 0.25rem;
+    color: var(--onSurface);
+    font-variation-settings: "opsz" 20;
+}
+
+.battery-icon:not(.icon) {
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--onSurface);
+}

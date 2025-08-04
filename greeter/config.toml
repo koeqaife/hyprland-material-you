@@ -1,0 +1,5 @@
+[terminal]
+vt = 1
+
+[default_session]
+command = "hyprland --config /opt/hypryou/assets/greeter/hyprland.conf"
