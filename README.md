@@ -31,21 +31,24 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 - Clone repository: `git clone --depth=1 https://github.com/koeqaife/hyprland-material-you.git`
 - Install all dependencies from depends.txt
 - Build Cython code by using `build.sh` in `hypryou/`
-    > If you want you can delete `hypryou/utils_cy/build` to remove temp files
-- Then copy `hypryou` to `/opt/hypryou`
+- Then copy `hypryou` to `/usr/lib/hypryou`
 - Then use `build.sh` in `build`
 - Move `hypryouctl`, `hypryou-start`, `hypryou-crash-dialog` to `/usr/bin`
 - In `~/.config/hypr/hyprland.conf` write `source = /opt/hypryou/assets/configs/hyprland/main.conf`
+- Optional:
+  - You can build `hypryou-utils` or `hypryou-greeter` if you want  
+    > By using `makepkg -si` in `greeter` for `hypryou-greeter` or in `hypryou-utils`
 
 </details>
 <details>
     <summary>Automatic installation (Arch)</summary>
 
-> Not available for now. Wait until v2 releases.  
-> Will be as PKGBUILD for Arch Linux.  
-> Maybe it will be in AUR.
+Use `makepkg -si`
 </details>
 
 ## Things left to do
 
-- PKGBUILD
+> Almost everything is done, you can already use everything
+
+- DBus menu for tray
+- Code improvements
