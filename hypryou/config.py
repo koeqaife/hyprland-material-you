@@ -170,7 +170,8 @@ class Settings:
     __slots__ = (
         "_signals", "_initialized",
         "_values", "_allow_saving",
-        "_file_dict", "_views"
+        "_file_dict", "_views",
+        "mutable"
     )
     _instance: t.Optional['Settings'] = None
 
@@ -187,6 +188,7 @@ class Settings:
             self._allow_saving = False
             self._file_dict: dict[str, t.Any] = {}
             self._views: dict[str, SettingsView] = {}
+            self.mutable = True
             self.sync()
             self._allow_saving = True
 
@@ -225,6 +227,9 @@ class Settings:
                 self._values[key].value = default_settings[key]
 
     def save(self) -> None:
+        if not self.mutable:
+            return
+
         if not self._allow_saving:
             return
         new_dict = self.unpack()
