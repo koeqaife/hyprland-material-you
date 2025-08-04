@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=HyprYou
+Comment=Run HyprYou DE on Hyprland WM
+Exec=hyprland --config /usr/lib/hypryou/assets/configs/hyprland/main.conf
+Type=Application
+DesktopNames=HyprYou
