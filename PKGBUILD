@@ -77,5 +77,5 @@ package() {
   install -Dm755 "$srcdir/$_pkgname/build/hypryou-crash-dialog" "$pkgdir/usr/bin/hypryou-crash-dialog"
 
   install -Dm644 "$srcdir/$_pkgname/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
-  install -Dm644 "${srcdir}/assets/hypryou.desktop" "$pkgdir/usr/share/wayland-sessions/hypryou.desktop"
+  install -Dm644 "$srcdir/$_pkgname/assets/hypryou.desktop" "$pkgdir/usr/share/wayland-sessions/hypryou.desktop"
 }
