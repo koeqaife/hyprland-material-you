@@ -7,3 +7,7 @@ venv/
 
 */build/
 -build/
+
+*.pkg.tar.zst
+src/
+pkg/

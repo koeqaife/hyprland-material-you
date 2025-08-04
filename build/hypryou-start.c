@@ -13,7 +13,7 @@
 
 #define MAX_RETRIES 5
 #define RETRY_TIMEOUT 300
-#define WORKING_DIR "/opt/hypryou"
+#define WORKING_DIR "/usr/lib/hypryou"
 
 #define SIGERROR (SIGRTMIN + 1 + 128)
 #define SIGHUNG (SIGRTMIN + 2 + 128)

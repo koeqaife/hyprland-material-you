@@ -2,4 +2,4 @@
 vt = 1
 
 [default_session]
-command = "hyprland --config /opt/hypryou/assets/greeter/hyprland.conf"
+command = "hyprland --config /usr/lib/hypryou/assets/greeter/hyprland.conf"
