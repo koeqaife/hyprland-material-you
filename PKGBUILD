@@ -29,6 +29,7 @@ depends=(
   'xdg-desktop-portal-hyprland'
   'xdg-utils'
   'polkit-gnome'
+  'adw-gtk-theme'
 
   'gtk4-layer-shell'
   'python-materialyoucolor-git'
