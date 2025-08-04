@@ -632,9 +632,6 @@ class HyprYouGreeter(gtk.Application):
             greeter = GreeterUI(self, monitor)
             greeter.present()
 
-        self.greeter = GreeterUI(self)
-        self.greeter.present()
-
         lid_is_closed.watch(on_lid_closed)
 
         logger.info(
