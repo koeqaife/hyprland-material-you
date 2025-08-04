@@ -22,8 +22,10 @@ from src.services.upower import UPowerService, get_upower
 from src.services.idle import ScreenSaverService
 from src.services.clock import ClockService
 from src.services.login1 import Login1ManagerService
+from src.services.state import lid_is_closed
 
 from src.services.clock import time as time_str, full_date
+import src.services.hyprland as hyprland
 
 # It's like hypryou_ui.py but minimum version of it
 # I like it
@@ -77,6 +79,12 @@ def get_sessions() -> list[SessionDict]:
             exec_cmd = keyfile.get_string("Desktop Entry", "Exec")
             sessions.append({"name": name, "exec": exec_cmd})
     return sessions
+
+
+def on_lid_closed(is_closed: bool) -> None:
+    asyncio.create_task(
+        hyprland.client.raw(f"dispatch dpms {"off" if is_closed else "on"}")
+    )
 
 
 class Greetd:
@@ -626,6 +634,8 @@ class HyprYouGreeter(gtk.Application):
 
         self.greeter = GreeterUI(self)
         self.greeter.present()
+
+        lid_is_closed.watch(on_lid_closed)
 
         logger.info(
             "Started in " +
