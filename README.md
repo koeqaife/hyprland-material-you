@@ -13,7 +13,7 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 - **Design**: The design wherever possible is made by [Material 3 design](https://m3.material.io/)
 
 > [!WARNING]
-> This is **beta** version. Now you can install it only manually.
+> This is **beta** version.
 
 > [!NOTE]
 > I'm doing everything by myself and **for free**.  
