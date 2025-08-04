@@ -149,12 +149,14 @@ default_settings: dict[str, t.Any] = {
     "keybinds_overrides": []
 }
 
-os.makedirs(config_dir, exist_ok=True)
-os.makedirs(color_templates, exist_ok=True)
-os.makedirs(APP_CACHE_DIR, exist_ok=True)
-os.makedirs(TEMP_DIR, exist_ok=True)
-os.makedirs(state_dir, exist_ok=True)
-os.makedirs(wallpaper_dirs[0], exist_ok=True)
+
+def makedirs() -> None:
+    os.makedirs(config_dir, exist_ok=True)
+    os.makedirs(color_templates, exist_ok=True)
+    os.makedirs(APP_CACHE_DIR, exist_ok=True)
+    os.makedirs(TEMP_DIR, exist_ok=True)
+    os.makedirs(state_dir, exist_ok=True)
+    os.makedirs(wallpaper_dirs[0], exist_ok=True)
 
 
 def get_version() -> str:
