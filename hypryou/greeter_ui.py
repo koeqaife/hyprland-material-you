@@ -159,7 +159,11 @@ class SessionItem(gobject.Object):
 
 
 class GreeterUI(gtk.ApplicationWindow):
-    def __init__(self, app: "HyprYouGreeter") -> None:
+    def __init__(
+        self,
+        app: "HyprYouGreeter",
+        monitor: gdk.Monitor
+    ) -> None:
         self.greetd = Greetd()
         self.app = app
         self.overlay = gtk.Overlay(
@@ -360,6 +364,7 @@ class GreeterUI(gtk.ApplicationWindow):
         layer_shell.set_anchor(self, layer_shell.Edge.LEFT, True)
         layer_shell.set_anchor(self, layer_shell.Edge.RIGHT, True)
         layer_shell.set_keyboard_mode(self, layer_shell.KeyboardMode.ON_DEMAND)
+        layer_shell.set_monitor(self, monitor)
 
         try:
             with open(LAST_SESSION_PATH, "r") as f:
@@ -603,11 +608,21 @@ class HyprYouGreeter(gtk.Application):
                     service
                 )
 
+    def get_monitors(self) -> gio.ListModel:
+        display = gdk.Display.get_default()
+        monitors = display.get_monitors()
+        return monitors
+
     async def start_app(self) -> None:
         await self.init_services()
 
         self.tasks: list[asyncio.Task[t.Any]] = []
         await self.start_services()
+
+        monitors = self.get_monitors()
+        for i, monitor in enumerate(list(monitors)):  # type: ignore[assignment]  # noqa
+            greeter = GreeterUI(self, monitor)
+            greeter.present()
 
         self.greeter = GreeterUI(self)
         self.greeter.present()
