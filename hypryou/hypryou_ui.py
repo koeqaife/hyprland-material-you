@@ -20,7 +20,8 @@ from config import Settings, ORIGINAL_DIR
 
 from gi.events import GLibEventLoopPolicy  # type: ignore[import-untyped]
 import asyncio
-from utils.handler import exit_hung, set_fatal_handler, ExitSignals
+from utils.handler import set_fatal_handler, ExitSignals
+from utils.handler import exit_error, exit_hung
 
 # Services
 from utils.service import AsyncService, Service
@@ -160,7 +161,7 @@ class HyprYou(gtk.Application):
                     "Couldn't initialize service %s.",
                     type(service).__name__, exc_info=e
                 )
-                signal.raise_signal(signal.SIGUSR1)
+                exit_error()
 
     async def async_service_wrapper(self, service: AsyncService) -> None:
         try:
@@ -171,7 +172,7 @@ class HyprYou(gtk.Application):
                 type(service).__name__,
                 exc_info=e
             )
-            signal.raise_signal(signal.SIGUSR1)
+            exit_error()
 
     def sync_service_wrapper(self, service: Service) -> None:
         try:
@@ -182,7 +183,7 @@ class HyprYou(gtk.Application):
                 type(service).__name__,
                 exc_info=e
             )
-            signal.raise_signal(signal.SIGUSR1)
+            exit_error()
 
     async def start_services(self) -> None:
         for service in services:
