@@ -1,0 +1,17 @@
+post_install() {
+    echo ":: Setting up greeter home..."
+
+    mkdir -p /home/greeter
+    chown greeter:greeter /home/greeter
+    chmod 700 /home/greeter
+    usermod -d /home/greeter greeter 2>/dev/null || true
+
+    echo ":: Installing config.toml to /etc/greetd/config.toml"
+    install -m644 /usr/share/hypryou-greeter/config.toml /etc/greetd/config.toml
+
+    echo ":: Done."
+}
+
+post_upgrade() {
+    post_install
+}

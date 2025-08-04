@@ -247,8 +247,9 @@ class Settings:
                 self._file_dict = dict(json.load(f))
                 self._update_values(self._file_dict)
         except FileNotFoundError:
-            with open(settings_path, 'w') as f:
-                f.write("{}")
+            if os.path.exists(os.path.dirname(settings_path)):
+                with open(settings_path, 'w') as f:
+                    f.write("{}")
 
     def notify_changed(self, key: str, value: t.Any) -> None:
         self._signals.notify(f"changed::{key}", value)
