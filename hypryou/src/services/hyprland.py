@@ -320,7 +320,7 @@ class HyprlandClient(Signals):
             line = await self.reader.readline()
             if not line:
                 break
-            decoded = line.decode().rstrip("\n")
+            decoded = line.decode("utf-8", errors="replace").rstrip("\n")
             if ">>" not in decoded:
                 continue
             event, data = decoded.split(">>", 1)
