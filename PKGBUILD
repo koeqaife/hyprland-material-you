@@ -1,6 +1,6 @@
 pkgname=hypryou
 _pkgname=hyprland-material-you
-pkgver=2.0.0_beta
+pkgver=2.0.0.beta
 pkgrel=1
 pkgdesc="Dynamic and elegant desktop setup inspired by Material You, featuring auto-generated colors, fluid animations, and customizable user experience."
 arch=('x86_64')
@@ -38,6 +38,11 @@ depends=(
   'ttf-material-symbols-variable-git'
 )
 
+optdepends=(
+  'hypryou-utils: A replacement of hyprland-qtutils with MaterialYou style'
+  'hypryou-greeter: Config for Greetd'
+)
+
 makedepends=(
   'dart-sass'
   'cython'
@@ -60,15 +65,17 @@ build() {
 }
 
 package() {
-  mkdir -pv "$pkgdir/opt/$pkgname"
   mkdir -pv "$pkgdir/usr/bin"
+  mkdir -pv "$pkgdir/usr/lib/$pkgname"
   mkdir -pv "$pkgdir/usr/share/licenses/$pkgname"
+  mkdir -pv "$pkgdir/usr/share/wayland-sessions"
 
-  cp -frv $srcdir/$_pkgname/$pkgname "$pkgdir/opt"
+  cp -a "$srcdir/$_pkgname/$pkgname/." "$pkgdir/usr/lib/$pkgname/"
 
   install -Dm755 "$srcdir/$_pkgname/build/hypryouctl" "$pkgdir/usr/bin/hypryouctl"
   install -Dm755 "$srcdir/$_pkgname/build/hypryou-start" "$pkgdir/usr/bin/hypryou-start"
   install -Dm755 "$srcdir/$_pkgname/build/hypryou-crash-dialog" "$pkgdir/usr/bin/hypryou-crash-dialog"
 
   install -Dm644 "$srcdir/$_pkgname/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 "${srcdir}/assets/hypryou.desktop" "$pkgdir/usr/share/wayland-sessions/hypryou.desktop"
 }
