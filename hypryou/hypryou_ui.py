@@ -16,7 +16,7 @@ import utils.colors
 from utils.styles import apply_css
 from utils.logger import logger, setup_logger
 from src.variables import Globals
-from config import Settings, ORIGINAL_DIR
+from config import Settings, ORIGINAL_DIR, makedirs
 
 from gi.events import GLibEventLoopPolicy  # type: ignore[import-untyped]
 import asyncio
@@ -305,6 +305,7 @@ def init() -> None:
 
     set_fatal_handler(handle_fatal_signal)
 
+    makedirs()
     settings = Settings()
     asyncio.set_event_loop_policy(GLibEventLoopPolicy())
     display = gdk.Display.get_default()
