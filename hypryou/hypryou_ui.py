@@ -69,6 +69,7 @@ from src.modules.settings.window import SettingsWatcher
 from src.modules.wifi_secrets import SecretsDialog
 from src.modules.bluetooth_pin import PinDialog
 from src.modules.emojis import EmojisWindow
+from src.modules.keybinds import KeybindsWindow
 
 from src.modules.settings.wallpapers import executor as wallpaper_executor
 
@@ -108,7 +109,8 @@ popups_types = (
     MicsWindow,
     InfoWindow,
     ClientsWindow,
-    EmojisWindow
+    EmojisWindow,
+    KeybindsWindow
 )
 
 windows_types = (

@@ -1,0 +1,72 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "calculated" as *;
+@use "sass:color";
+
+window.keybinds {
+    @include nLayerBackground($background, 1);
+    min-width: 60rem;
+    border-radius: $hyprlandRounding;
+    border: 0.0625rem solid $layerBorderColor;
+    padding: 0.5rem;
+
+    .category-box {
+        @include nLayerBackground($surfaceContainer, 1);
+        @include elevation(1);
+        border-radius: max(calc($hyprlandRounding - 0.5rem), 0.25rem);
+        padding-bottom: 0.25rem;
+        padding-top: 0.25rem;
+    }
+
+    .label-box {
+        .category {
+            font-size: 1rem;
+            font-weight: 400;
+            color: $primary;
+            margin-left: 0.25rem;
+        }
+        .icon {
+            font-size: 1.125rem;
+            font-variation-settings: "opsz" 20;
+            font-weight: 500;
+            color: $primary;
+            margin-left: 0.5rem;
+        }
+    }
+
+    .keybind {
+        margin-left: 0.25rem;
+        margin-right: 0.25rem;
+    }
+
+    .bind-key {
+        background-color: $surfaceContainerLowest;
+        color: $onSurface;
+        border-radius: 0.25rem;
+        font-size: 1rem;
+        font-weight: 400;
+        border: 0.0625rem solid $outlineVariant;
+        padding-left: 0.25rem;
+        padding-right: 0.25rem;
+        min-width: 0.5rem;
+    }
+
+    .plus {
+        color: $onSurfaceVariant;
+        font-size: 1rem;
+        font-weight: 400;
+        margin-left: 0.25rem;
+        margin-right: 0.25rem;
+    }
+
+    .description {
+        color: $onSurface;
+        font-size: 1rem;
+        font-weight: 400;
+    }
+
+    separator {
+        margin-top: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+}
