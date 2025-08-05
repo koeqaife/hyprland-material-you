@@ -12,8 +12,7 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 - **Fluid Animations**: Expect natural and fluid animations throughout the desktop experience.
 - **Design**: The design wherever possible is made by [Material 3 design](https://m3.material.io/)
 
-> [!WARNING]
-> This is **beta** version.
+[![Screenshot](assets/screenshot.png "Screenshot")](assets/screenshot.png)
 
 > [!NOTE]
 > I'm doing everything by myself and **for free**.  
@@ -44,12 +43,24 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 <details>
     <summary>Automatic installation (Arch)</summary>
 
-Use `makepkg -si`
+- `hypryou` - Use `makepkg -si`
+- `hypryou-greeter` - Use `makepkg -si` in `greeter/`
+- `hypryou-utils` - Use `makepkg -si` in `hypryou-utils/`
+
 </details>
 
-## Things left to do
+## Thanks to
 
-> Almost everything is done, you can already use everything
+- All people from my discord server
+- All Sponsors (I love y'all!)
+- [Astal](https://github.com/Aylur/astal): For Bluetooth and WirePlumber services
+- [Gtk4LayerShell](https://github.com/wmww/gtk4-layer-shell): For LayerShell
+- [Hyprland](https://github.com/hyprwm/Hyprland): For the best TWM I've ever seen
+- Maybe that's it
 
-- DBus menu for tray
-- Code improvements
+## Note
+
+> Just wanted to say. This project is crazy ngl. Why did I even choose to wrote it on gtk4 😭  
+> I tried to make menu in tray... I couldn't... Sorry.....  
+> I really hope everyone will like it, I spent 2 months for it, holy moly!
+> And now, it's time to release it, I'm so tired........
