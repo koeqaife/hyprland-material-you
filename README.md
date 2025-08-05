@@ -62,5 +62,5 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 
 > Just wanted to say. This project is crazy ngl. Why did I even choose to wrote it on gtk4 😭  
 > I tried to make menu in tray... I couldn't... Sorry.....  
-> I really hope everyone will like it, I spent 2 months for it, holy moly!
+> I really hope everyone will like it, I spent 2 months for it, holy moly!  
 > And now, it's time to release it, I'm so tired........
