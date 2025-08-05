@@ -187,7 +187,7 @@ class InternetButton(ManagementButton):
                 self.set_activated(True)
                 active_ap = wifi.active_access_point
                 if active_ap:
-                    self.state.set_label(active_ap.ssid)
+                    self.state.set_label(active_ap.ssid or "Unknown")
                 else:
                     self.state.set_label("Disconnected")
             else:

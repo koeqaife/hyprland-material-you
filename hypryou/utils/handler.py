@@ -22,7 +22,7 @@ def exit_error() -> None:
 
 
 def set_fatal_handler(
-    callback: t.Callable[[int, types.FrameType], None]
+    callback: t.Callable[[int, types.FrameType | None], None]
 ) -> None:
     for sig in (
         signal.SIGTERM,

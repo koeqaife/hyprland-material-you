@@ -262,8 +262,8 @@ class RoundedCorner(gtk.DrawingArea):
         self.radius = radius or 1
         self.place = place
         self.set_draw_func(self.on_draw)
-        self.set_content_height(radius)
-        self.set_content_width(radius)
+        self.set_content_height(self.radius)
+        self.set_content_width(self.radius)
         self.add_css_class("corner")
 
     def on_draw(

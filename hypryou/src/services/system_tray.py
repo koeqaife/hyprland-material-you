@@ -239,7 +239,7 @@ class StatusNotifierItem(Signals):
             return pixbuf
 
         if not self._proxy:
-            return
+            return None
         variant = self._proxy.get_cached_property("IconPixmap")
         if variant is None or variant.n_children() == 0:
             return None
@@ -264,7 +264,7 @@ class StatusNotifierItem(Signals):
         data_variant = nearest.get_child_value(2)
         try:
             glib_bytes = data_variant.get_data_as_bytes()
-            data_bytes = bytearray(glib_bytes.get_data())
+            data_bytes = bytearray(glib_bytes.get_data() or b"")
         except MemoryError:
             return None
 

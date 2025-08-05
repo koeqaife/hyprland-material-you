@@ -15,13 +15,13 @@ def test_float(value: str) -> bool:
         return False
 
 
-int_kwargs = {
+int_kwargs: t.Any = {
     "transform_fn": lambda v: str(v),
     "transform2_fn": lambda v: int(v),
     "test_text": lambda v: str(v).isdecimal()
 }
 
-float_kwargs = {
+float_kwargs: t.Any = {
     "transform_fn": lambda v: str(v),
     "transform2_fn": lambda v: float(v),
     "test_text": test_float
@@ -37,7 +37,7 @@ class RowTemplate(gtk.Box):
         description: str | None,
         css_classes: tuple[str, ...] = (),
         clickable: bool = True,
-        **props: "RowTemplate.Props"
+        **props: t.Any
     ) -> None:
         super().__init__(
             css_classes=css_classes,
@@ -180,7 +180,7 @@ class TextRowTemplate(RowTemplate):
             self.entry.set_max_length(max_length)
 
         if max_length or max_width_chars:
-            self.entry.set_max_width_chars(max_length or max_width_chars)
+            self.entry.set_max_width_chars(max_length or max_width_chars or 0)
 
         self.entry_box.append(self.entry)
         if left_icon:
@@ -293,6 +293,8 @@ class DropdownRowTemplate(RowTemplate):
 
     def set_current(self, value: str) -> None:
         model = self.dropdown.get_model()
+        if model is None:
+            return
         for i in range(model.get_n_items()):
             item = t.cast(DropdownItem, model.get_item(i))
             if item.value == value:
@@ -343,7 +345,7 @@ class Row(RowTemplate):
             return
         method = self._on_click()
         if callable(method):
-            method(self)
+            method(self)  # type: ignore
 
     def on_secondary_click(self) -> None:
         super().on_secondary_click()
@@ -351,7 +353,7 @@ class Row(RowTemplate):
             return
         method = self._on_secondary_click()
         if callable(method):
-            method(self)
+            method(self)  # type: ignore
 
 
 class SwitchRow(SwitchRowTemplate):
@@ -372,7 +374,7 @@ class SwitchRow(SwitchRowTemplate):
         super().on_switch_changed(*args)
         method = self._on_changed()
         if callable(method):
-            method(self, self.switch.get_active())
+            method(self, self.switch.get_active())  # type: ignore
 
 
 class TextRow(TextRowTemplate):
@@ -397,10 +399,10 @@ class TextRow(TextRowTemplate):
             **props
         )
 
-    def on_text_changed(self, *args: t.Any):
+    def on_text_changed(self, *args: t.Any) -> None:
         method = self._on_text_changed()
         if callable(method):
-            method(self, self.entry.get_text())
+            method(self, self.entry.get_text())  # type: ignore
 
 
 class DropdownRow(DropdownRowTemplate):
@@ -422,7 +424,7 @@ class DropdownRow(DropdownRowTemplate):
         super().on_item_selected(*args)
         method = self._on_selected()
         if callable(method):
-            method(self, self.get_current())
+            method(self, self.get_current())  # type: ignore
 
 
 class SettingsBoolRow(SwitchRowTemplate):

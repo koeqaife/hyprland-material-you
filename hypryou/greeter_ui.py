@@ -18,11 +18,10 @@ import src.widget as widget
 # Minimum services
 from src.services.dbus import DBusService
 from src.services.hyprland import HyprlandService
-from src.services.upower import UPowerService, get_upower
+from src.services.upower import UPowerService, get_upower, lid_is_closed
 from src.services.idle import ScreenSaverService
 from src.services.clock import ClockService
 from src.services.login1 import Login1ManagerService
-from src.services.state import lid_is_closed
 
 from src.services.clock import time as time_str, full_date
 import src.services.hyprland as hyprland
@@ -78,7 +77,7 @@ def get_sessions() -> list[SessionDict]:
             name = keyfile.get_string("Desktop Entry", "Name")
             exec_cmd = keyfile.get_string("Desktop Entry", "Exec")
             sessions.append({"name": name, "exec": exec_cmd})
-    return sessions
+    return t.cast(list[SessionDict], sessions)
 
 
 def on_lid_closed(is_closed: bool) -> None:
@@ -95,19 +94,19 @@ class Greetd:
         self.socket_path = socket_path
 
     @staticmethod
-    def build_message(payload: dict) -> bytes:
+    def build_message(payload: dict[str, t.Any]) -> bytes:
         json_bytes = json.dumps(payload).encode('utf-8')
         length_prefix = struct.pack('@I', len(json_bytes))
         return length_prefix + json_bytes
 
     @staticmethod
-    async def read_message(reader: asyncio.StreamReader) -> dict:
+    async def read_message(reader: asyncio.StreamReader) -> dict[str, t.Any]:
         length_bytes = await reader.readexactly(4)
         length, = struct.unpack('@I', length_bytes)
         payload = await reader.readexactly(length)
-        return json.loads(payload.decode('utf-8'))
+        return dict(json.loads(payload.decode('utf-8')))
 
-    async def raw(self, payload: dict) -> dict[str, t.Any]:
+    async def raw(self, payload: dict[str, t.Any]) -> dict[str, t.Any]:
         try:
             reader, writer = await asyncio.open_unix_connection(
                 self.socket_path
@@ -379,6 +378,8 @@ class GreeterUI(gtk.ApplicationWindow):
                 data: dict[str, str] = json.load(f)
             if "session" in data.keys():
                 model = self.dropdown.get_model()
+                if model is None:
+                    return
                 for i in range(model.get_n_items()):
                     item = t.cast(SessionItem, model.get_item(i))
                     if item.label == data["session"]:
@@ -398,7 +399,7 @@ class GreeterUI(gtk.ApplicationWindow):
         toggle_css_class(self.auth_entry, "incorrect", is_error)
         self.error.set_visible(is_error)
         self.auth_error.set_visible(is_error)
-        if is_error:
+        if error is not None:
             self.error.set_label(error)
             self.auth_error.set_label(error)
 
@@ -628,8 +629,8 @@ class HyprYouGreeter(gtk.Application):
         await self.start_services()
 
         monitors = self.get_monitors()
-        for i, monitor in enumerate(list(monitors)):  # type: ignore[assignment]  # noqa
-            greeter = GreeterUI(self, monitor)
+        for i, monitor in enumerate(list(monitors)):
+            greeter = GreeterUI(self, t.cast(gdk.Monitor, monitor))
             greeter.present()
 
         lid_is_closed.watch(on_lid_closed)

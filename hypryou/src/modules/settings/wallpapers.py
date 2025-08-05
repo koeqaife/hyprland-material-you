@@ -51,12 +51,14 @@ def spawn_thumbnail_process(
 ) -> None:
     global executor
 
-    _on_done = None
+    _on_done: weakref.WeakMethod[t.Any] | weakref.ReferenceType[t.Any] | None
     if on_done:
         if hasattr(on_done, "__self__"):
             _on_done = weakref.WeakMethod(on_done)
         else:
             _on_done = weakref.ref(on_done)
+    else:
+        _on_done = None
     on_done = None
 
     def _callback(future: concurrent.futures.Future[None]) -> None:
@@ -66,7 +68,8 @@ def spawn_thumbnail_process(
             logger.error("Couldn't generate thumbnails: %s", e, exc_info=e)
         if _on_done and (method := _on_done()) is not None:
             method()
-        executor.shutdown(False)
+        if executor is not None:
+            executor.shutdown(False)
 
     if (
         task_lock.acquire(blocking=False)

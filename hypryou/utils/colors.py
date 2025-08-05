@@ -191,7 +191,7 @@ class TemplateFormatter:
         dark_scheme: DynamicScheme,
         light_scheme: DynamicScheme,
         vars: dict[str, str],
-        allowed_actions: tuple[str] | tuple[()] = ()
+        allowed_actions: tuple[str, ...] | tuple[()] = ()
     ) -> None:
         self.color_map = generate_color_map(scheme, dark_scheme, light_scheme)
         self.vars = vars
@@ -387,7 +387,7 @@ def generate_templates(
     light_scheme: DynamicScheme,
     is_dark: bool,
     wallpaper: str | None = None,
-    allowed_actions: tuple[str] | tuple[()] = ()
+    allowed_actions: tuple[str, ...] | tuple[()] = ()
 ) -> dict[str, list[str]]:
     actions: dict[str, list[str]] = {}
     color_scheme = "dark" if is_dark else "light"
@@ -595,7 +595,7 @@ def generate_colors_sync(
         ))
 
     marked: dict[str, str] = {}
-    processes: list["subprocess.Popen"] = []
+    processes: list["subprocess.Popen[bytes]"] = []
     for file_path, actions in post.items():
         for action in actions:
             if action.startswith("compile_scss"):
@@ -643,7 +643,7 @@ def post_actions(marked: dict[str, str], colors: ColorsCache) -> None:
         generate_telegram_theme(path, colors.colors["background"])
 
 
-def compile_scss(path: str, output: str) -> "subprocess.Popen":
+def compile_scss(path: str, output: str) -> "subprocess.Popen[bytes]":
     import subprocess
     if __debug__:
         logger.debug("Compiling scss: %s", repr(path))
@@ -707,7 +707,8 @@ def generate_colors(
         glib.idle_add(default_on_complete)
         if on_complete:
             on_complete()
-        executor.shutdown(False)
+        if executor is not None:
+            executor.shutdown(False)
         task_lock.release()
 
     if task_lock.acquire(blocking=False):

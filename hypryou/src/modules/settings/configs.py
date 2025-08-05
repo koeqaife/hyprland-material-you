@@ -102,8 +102,8 @@ class ConfigsPage(gtk.ScrolledWindow):
         for child, url in self.children_with_wiki:
             child.insert_child_after(WikiButton(url), child.info_box)
 
-        for child in self.box_children:
-            self.box.append(child)
+        for _child in self.box_children:
+            self.box.append(_child)
 
     def destroy(self) -> None:
         for child in self.box_children:

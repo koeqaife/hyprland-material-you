@@ -51,7 +51,7 @@ class KeybindRow(RowTemplate):
         self._on_action_text = weakref.WeakMethod(on_action_text)
 
         super().__init__(
-            self.keybind.description,
+            self.keybind.description or "Uknown",
             description=None,
             css_classes=("keybind-row",),
             clickable=False
@@ -125,9 +125,9 @@ class KeybindRow(RowTemplate):
         _on_bind_text = self._on_bind_text()
         _on_action_text = self._on_action_text()
         if callable(_on_bind_text):
-            _on_bind_text(self, None)
+            _on_bind_text(self, None)  # type: ignore
         if callable(_on_action_text):
-            _on_action_text(self, None)
+            _on_action_text(self, None)  # type: ignore
         self.reset.set_sensitive(False)
 
     def update(self) -> None:
@@ -177,7 +177,7 @@ class KeybindRow(RowTemplate):
         else:
             toggle_css_class(self.bind_entry, "incorrect", False)
             self.bind_entry.set_tooltip_text(None)
-            callback(self, binds)
+            callback(self, binds)  # type: ignore
             self.reset.set_sensitive(True)
 
     def on_action_text(self, *args: t.Any) -> None:
@@ -198,7 +198,7 @@ class KeybindRow(RowTemplate):
         else:
             toggle_css_class(self.action_entry, "incorrect", False)
             self.action_entry.set_tooltip_text(None)
-            callback(self, binds)
+            callback(self, binds)  # type: ignore
             self.reset.set_sensitive(True)
 
     def destroy(self) -> None:
@@ -226,7 +226,7 @@ class KeybindsPage(gtk.Box):
             vexpand=True
         )
         self.box_children: list[RowTemplate | Category] = []
-        self.overrides: dict[str, dict[str, str] | None] = {}
+        self.overrides: dict[str, dict[str, list[str] | None]] = {}
 
         added_categories: list[str] = []
         for keybind in key_binds:
@@ -234,9 +234,10 @@ class KeybindsPage(gtk.Box):
                 continue
             if not keybind.description:
                 continue
-            if keybind.category not in added_categories:
-                self.box_children.append(Category(keybind.category))
-                added_categories.append(keybind.category)
+            category = keybind.category or "Uknown"
+            if category not in added_categories:
+                self.box_children.append(Category(category))
+                added_categories.append(category)
             row = KeybindRow(keybind, self.on_bind_text, self.on_action_text)
             self.box_children.append(row)
 
@@ -288,7 +289,7 @@ class KeybindsPage(gtk.Box):
         }
         for id, to_change in self.overrides.items():
             if id not in _map:
-                _map[id] = overrides._wrap_if_mutable({
+                _map[id] = overrides._wrap_if_mutable({    # type: ignore
                     "id": id
                 })
                 overrides.value.append(_map[id])

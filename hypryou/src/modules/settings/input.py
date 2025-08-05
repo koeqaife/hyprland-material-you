@@ -160,7 +160,7 @@ class InputPage(gtk.ScrolledWindow):
                 "Focus mode",
                 "Controls window focus behavior on mouse move or click",
                 "input.follow_mouse",
-                items=(
+                items=[
                     DropdownItem(
                         0, "Standard",
                         "Focus changes only when clicked on window"
@@ -177,7 +177,7 @@ class InputPage(gtk.ScrolledWindow):
                         3, "Separate",
                         "Click doesn't change keyboard focus"
                     )
-                )
+                ]
             ),
             SettingsTextRow(
                 "Focus follow threshold",

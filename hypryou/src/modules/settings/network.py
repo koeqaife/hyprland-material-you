@@ -204,6 +204,8 @@ class WifiList(gtk.Box):
         self.wifi = self.network.wifi
         self.items: dict[str, AccessPointRow] = {}
         for ap in self.wifi.access_points.values():
+            if ap.ssid is None:
+                continue
             self.bssid_ssid_map[ap.bssid] = ap.ssid
             if ap.ssid in self.items.keys():
                 self.items[ap.ssid].add_ap(ap)

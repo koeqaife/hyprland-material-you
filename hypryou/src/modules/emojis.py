@@ -33,7 +33,7 @@ type EmojiTuple = tuple[str, str]  # (char, name)
 
 def get_emojis() -> dict[str, list[EmojiTuple]]:
     cached = t.cast(
-        dict[str, dict[str, str]] | None,
+        dict[str, list[EmojiTuple]] | None,
         getattr(get_emojis, "_cached", None)
     )
     if cached is not None:
@@ -52,7 +52,7 @@ def get_emojis() -> dict[str, list[EmojiTuple]]:
         }
 
         setattr(get_emojis, "_cached", emojis)
-        return t.cast(dict, emojis)
+        return t.cast(dict[str, list[EmojiTuple]], emojis)
 
 
 class EmojisBox(gtk.Box):
@@ -160,7 +160,7 @@ class EmojisBox(gtk.Box):
         controller: gtk.EventControllerScroll,
         dx: float,
         dy: float
-    ) -> None:
+    ) -> bool:
         # TODO: That'd be better to make real kinetic scroll like in scrollbar
         adjustment = self.top_bar_scroll.get_hadjustment()
         increment = abs(dy) * adjustment.get_step_increment()
@@ -178,7 +178,7 @@ class EmojisBox(gtk.Box):
             matches: list[tuple[float, tuple[str, str]]] = []
             for _, category in self.all_emojis.items():
                 for emoji in category:
-                    scores = {}
+                    scores: dict[str, float] = {}
                     for word in emoji[1].split():
                         for word2 in value.split():
                             _score = compute_score(word, word2)
@@ -228,7 +228,7 @@ class EmojisBox(gtk.Box):
         )
 
     def on_emoji_clicked(self, btn: gtk.Button, *args: t.Any) -> None:
-        emoji = btn.get_label()
+        emoji = str(btn.get_label())
         clipboard = gdk.Display.get_default().get_clipboard()
         clipboard.set_content(
             gdk.ContentProvider.new_for_bytes(
@@ -236,7 +236,7 @@ class EmojisBox(gtk.Box):
                 glib.Bytes.new(emoji.encode())
             )
         )
-        emoji_tuple = (emoji, btn.get_tooltip_text())
+        emoji_tuple = (emoji, str(btn.get_tooltip_text()))
         for _emoji in self.recent_emojis:
             if _emoji[0] == emoji:
                 self.recent_emojis.remove(_emoji)
@@ -246,7 +246,9 @@ class EmojisBox(gtk.Box):
             json.dump(self.recent_emojis, f)
         close_window("emojis")
 
-    def _add_next_emoji(self):
+    def _add_next_emoji(self) -> bool:
+        if self._emojis_iter is None:
+            raise RuntimeError("EmojisBox._emoji_iter must not be None")
         try:
             for i in range(100):
                 emoji = next(self._emojis_iter)

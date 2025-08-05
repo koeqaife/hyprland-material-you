@@ -209,7 +209,10 @@ def get_saved_connection_for_ssid(
         if not ssid_bytes:
             continue
 
-        conn_ssid = ssid_bytes.get_data().decode()
+        _ssid_bytes = ssid_bytes.get_data()
+        if _ssid_bytes is None:
+            continue
+        conn_ssid = _ssid_bytes.decode()
         if conn_ssid != ssid:
             continue
 
@@ -246,10 +249,11 @@ class AccessPoint(Signals):
         self.wpa_flags = ApSecurityFlags80211(ap.get_wpa_flags())
 
         _ssid = ap.get_ssid()
+        self.ssid = None
         if _ssid is not None:
-            self.ssid = nm.utils_ssid_to_utf8(_ssid.get_data())
-        else:
-            self.ssid = None
+            ssid_bytes = _ssid.get_data()
+            if ssid_bytes is not None:
+                self.ssid = nm.utils_ssid_to_utf8(ssid_bytes)
 
         self.strength_handler = ap.connect(
             "notify::strength",
@@ -269,10 +273,14 @@ class AccessPoint(Signals):
 
     @property
     def is_saved(self) -> bool:
+        if self.ssid is None:
+            return False
         conn = get_saved_connection_for_ssid(self.client, self.ssid)
         return conn is not None
 
     def try_to_connect(self) -> None:
+        if self.ssid is None:
+            return
         conn = get_saved_connection_for_ssid(self.client, self.ssid)
 
         if conn is not None:
@@ -286,6 +294,8 @@ class AccessPoint(Signals):
             )
 
     def connect_new(self) -> None:
+        if self.ssid is None:
+            return
         if __debug__:
             logger.debug("Trying to connect to %s", self.ssid)
 
@@ -329,10 +339,11 @@ class AccessPoint(Signals):
 
     def ssid_changed(self, *_: t.Any) -> None:
         _ssid = self.ap.get_ssid()
+        self.ssid = None
         if _ssid is not None:
-            self.ssid = nm.utils_ssid_to_utf8(_ssid.get_data())
-        else:
-            self.ssid = None
+            ssid_bytes = _ssid.get_data()
+            if ssid_bytes is not None:
+                self.ssid = nm.utils_ssid_to_utf8()
         self.notify("changed")
 
     def get_icon(self) -> str:
@@ -408,7 +419,7 @@ class Wifi(Signals):
             "state-changed",
             DeviceState(new_state),
             DeviceState(old_state),
-            DeviceStateReason(reason)
+            DeviceStateReason(int(reason))
         )
         self.state = DeviceState(new_state)
 

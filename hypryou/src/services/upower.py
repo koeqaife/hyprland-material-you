@@ -191,7 +191,7 @@ class UPower(Signals):
         changed_properties = changed_properties_variant.unpack()
         if "LidIsClosed" in changed_properties:
             lid_is_closed.value = changed_properties["LidIsClosed"]
-        self.upower_cache_properties(dict(changed_properties).keys())
+        self.upower_cache_properties(list(dict(changed_properties).keys()))
 
     def display_call_method(
         self,

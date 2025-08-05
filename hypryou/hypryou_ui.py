@@ -368,7 +368,7 @@ def start_watchdog(timeout: float = 5.0) -> threading.Thread:
     return thread
 
 
-def handle_fatal_signal(signum: int, frame: types.FrameType) -> None:
+def handle_fatal_signal(signum: int, frame: types.FrameType | None) -> None:
     logger.setLevel(logging.DEBUG)
 
     sigmap = {
@@ -386,7 +386,7 @@ def handle_fatal_signal(signum: int, frame: types.FrameType) -> None:
 
     if signum == ExitSignals.SIGERROR or signum == ExitSignals.SIGHUNG:
         save_state()
-    if signum != ExitSignals.SIGRELOAD:
+    if signum != ExitSignals.SIGRELOAD and frame is not None:
         stack_str = ''.join(traceback.format_stack(frame))
         logger.debug("Stack at signal:\n%s", stack_str)
 

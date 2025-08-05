@@ -33,7 +33,7 @@ class WallpapersWidget(gtk.Stack):
         glib.timeout_add(451, self.delete_old_picture)
 
     def delete_old_picture(self) -> None:
-        for picture in list(self):
+        for picture in list(self):  # type: ignore
             if picture is not self.picture:
                 self.remove(picture)
 

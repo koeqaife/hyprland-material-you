@@ -410,7 +410,7 @@ class Ref(t.Generic[T]):
     def watch_signal(
         self,
         signal_name: str,
-        callback: t.Callable[[T], None],
+        callback: t.Callable[..., None],
         **kwargs: t.Any
     ) -> int:
         return self._signals.watch(signal_name, callback, **kwargs)

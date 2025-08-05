@@ -241,8 +241,8 @@ def generate_overrides(raw: KeybindOverridesRaw) -> dict[str, KeyBindOverride]:
             continue
         bind = unpack_reactive(override.get("bind"))
         action = unpack_reactive(override.get("action"))
-        overrides[override["id"]] = KeyBindOverride(
-            id=override["id"],
+        overrides[str(override["id"])] = KeyBindOverride(
+            id=str(override["id"]),
             bind=(
                 tuple(bind)
                 if bind is not None

@@ -370,10 +370,10 @@ class MonitorsPage(gtk.Box):
         }
         self.save_button.set_sensitive(False)
 
-        monitor = self.monitors.get(self.current_monitor)
-        if monitor is None:
+        cur_monitor = self.monitors.get(self.current_monitor)
+        if cur_monitor is None:
             return
-        self.update_all(monitor)
+        self.update_all(cur_monitor)
 
     def cancel(self, *args: t.Any) -> None:
         self.settings = {
@@ -397,7 +397,7 @@ class MonitorsPage(gtk.Box):
     def sync_finished(self) -> None:
         self._finished = True
 
-    def update_setting(self, key: str, value: str) -> None:
+    def update_setting(self, key: str, value: t.Any) -> None:
         if not self._finished:
             return
         current = self.settings[self.current_monitor]
@@ -419,6 +419,8 @@ class MonitorsPage(gtk.Box):
     # on_... events
 
     def on_dialog(self, save: bool) -> None:
+        if self._dialog is None:
+            return
         self._dialog.destroy()
         self._dialog = None
         self.set_sensitive(True)
@@ -467,7 +469,7 @@ class MonitorsPage(gtk.Box):
 
         self.update_setting("scale", float(value) / 100)
 
-    def on_bitdepth(self, row: TextRow, value: str):
+    def on_bitdepth(self, row: TextRow, value: str) -> None:
         if not value.isdigit():
             toggle_css_class(row.entry_box, "incorrect", True)
             return
@@ -486,7 +488,7 @@ class MonitorsPage(gtk.Box):
 
     def make_dropdown_handler(
         self, key: str
-    ) -> t.Callable[[DropdownRow, str], None]:
+    ) -> t.Callable[[DropdownRow, DropdownItem], None]:
         def handler(
             this: MonitorsPage, row: DropdownRow, item: DropdownItem
         ) -> None:
@@ -550,9 +552,9 @@ class MonitorsPage(gtk.Box):
             return
 
         self.modes_items.clear()
-        for mode in monitor["availableModes"]:
+        for _mode in monitor["availableModes"]:
             self.modes_items.append(DropdownItem(
-                mode, mode
+                _mode, _mode
             ))
         self.modes_items.append(self._cached_custom)
         self.mode_selector.set_items(self.modes_items)

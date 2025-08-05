@@ -135,7 +135,7 @@ class InfoPage(gtk.ScrolledWindow):
             Row("Swap", f"{total_swap} MB"),
             Row("Kernel", str(STATIC["kernel"])),
             Row("Distro", str(STATIC["distro"])),
-            Row("User", USER),
+            Row("User", str(USER)),
             Row("Hostname", HOSTNAME),
             Row("Shell", SHELL),
             Row("Python", platform.python_version()),
