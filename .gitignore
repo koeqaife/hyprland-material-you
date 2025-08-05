@@ -9,5 +9,6 @@ venv/
 -build/
 
 *.pkg.tar.zst
-src/
-pkg/
+/src/
+!*/src/
+/pkg/
