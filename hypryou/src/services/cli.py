@@ -13,6 +13,7 @@ from config import Settings
 import traceback
 import typing as t
 import src.services.hyprland as hyprland
+from repository import gtk, gdk
 
 
 screenshot_mode_args = {
@@ -38,8 +39,10 @@ HELP = {
     "help": "Show this help",
     "settings": "Open settings",
     "wallpaper": ("Change wallpapers. " +
-                  "Use 'random' instead of path to pick random")
+                  "Use 'random' instead of path to pick random"),
+    "toggle_animations": "Toggle animations in gtk and hyprland"
 }
+animations = True
 
 
 def launch_detached(exec: str) -> None:
@@ -80,6 +83,24 @@ class CliRequest:
 
     def do_toggle_window(self, window_name: str) -> str:
         state.toggle_window(window_name)
+        return "ok"
+
+    def do_toggle_animations(self, *args: str) -> str:
+        global animations
+        display = gdk.Display.get_default()
+        settings = gtk.Settings.get_for_display(display)
+        if animations:
+            animations = False
+            asyncio.create_task(
+                hyprland.client.raw("keyword animations:enabled false")
+            )
+            settings.set_property("gtk-enable-animations", False)
+        else:
+            animations = True
+            asyncio.create_task(
+                hyprland.client.raw("keyword animations:enabled true")
+            )
+            settings.set_property("gtk-enable-animations", True)
         return "ok"
 
     def do_close_window(self, window_name: str) -> str:
