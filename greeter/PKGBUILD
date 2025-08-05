@@ -1,14 +1,18 @@
+# Maintainer: Koeqaife
+
 pkgname=hypryou-greeter
-pkgver=1.0
-pkgrel=1
+pkgver=1.0.0
+pkgrel=2
 pkgdesc="Greetd config for hypryou greeter"
 arch=('any')
 license=('custom')
 depends=('greetd')
 install="${pkgname}.install"
-source=('config.toml')
+url="https://github.com/koeqaife/hyprland-material-you"
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/koeqaife/hyprland-material-you/archive/refs/heads/v2.tar.gz")
 sha256sums=('SKIP')
 
 package() {
-    install -Dm644 "${srcdir}/config.toml" "${pkgdir}/usr/share/${pkgname}/config.toml"
+    install -Dm644 "${srcdir}/hyprland-material-you-2/greeter/config.toml" \
+        "${pkgdir}/usr/share/${pkgname}/config.toml"
 }

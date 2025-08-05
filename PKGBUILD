@@ -1,3 +1,4 @@
+# Maintainer: Koeqaife
 pkgname=hypryou
 _pkgname=hyprland-material-you
 pkgver=2.0.0
