@@ -14,10 +14,13 @@ import weakref
 from src.services.state import set_random_wallpaper, get_all_wallpapers
 from src.services.state import task_lock as task_lock1
 from utils.colors import task_lock as task_lock2
+from utils.debounce import sync_debounce
+from utils_cy.levenshtein import compute_score
+import src.widget as widget
 
 # That is so difficult to optimize that
 
-
+THRESHOLD = 0.2
 executor: concurrent.futures.ProcessPoolExecutor | None = None
 task_lock = threading.Lock()
 
@@ -101,18 +104,21 @@ class WallpaperCard(gtk.Button):
         self.path = file
         self.settings = Settings()
         self.box = gtk.Box(
-            orientation=gtk.Orientation.VERTICAL
+            orientation=gtk.Orientation.VERTICAL,
+            vexpand=True,
         )
         super().__init__(
             css_classes=("wallpaper",),
             child=self.box,
             tooltip_text=path.basename(file),
-            valign=gtk.Align.START,
-            hexpand=True
+            hexpand=True,
+            vexpand=True
         )
         self.image = gtk.Picture(
             css_classes=("image",),
-            content_fit=gtk.ContentFit.COVER
+            content_fit=gtk.ContentFit.COVER,
+            vexpand=True,
+            hexpand=True
         )
         self.name = gtk.Label(
             css_classes=("name",),
@@ -143,14 +149,23 @@ class WallpaperCard(gtk.Button):
         self.disconnect(self.handler)
 
 
-class WallpapersList(gtk.FlowBox):
+class WallpapersList(gtk.Box):
     __gtype_name__ = "SettingsWallpapersList"
 
     def __init__(self) -> None:
         self.settings = Settings()
-        super().__init__(
+        self.flow_box = gtk.FlowBox(
             selection_mode=gtk.SelectionMode.NONE,
-            css_classes=("wallpapers-box",)
+            homogeneous=True,
+            valign=gtk.Align.START
+        )
+        self.box = gtk.Box(
+            vexpand=True,
+            hexpand=True
+        )
+        super().__init__(
+            css_classes=("wallpapers-box",),
+            orientation=gtk.Orientation.VERTICAL
         )
         self.items: dict[str, WallpaperCard] = {}
         self._last_active: tuple[str, WallpaperCard] | None = None
@@ -158,6 +173,38 @@ class WallpapersList(gtk.FlowBox):
         self.settings_handler = self.settings.watch(
             "wallpaper", self.on_wallpaper_update, False
         )
+
+        self.search_box = gtk.Box(
+            css_classes=("misc--search", "search")
+        )
+        self.entry_icon = widget.Icon("search")
+        self.entry = gtk.Entry(
+            css_classes=("entry",),
+            placeholder_text="Search",
+            hexpand=True
+        )
+        self.search_box.append(self.entry_icon)
+        self.search_box.append(self.entry)
+        self.entry_handler = (
+            self.entry.connect("notify::text", self.on_search)
+        )
+
+        self.append(self.search_box)
+        self.append(self.flow_box)
+
+    @sync_debounce(150)
+    def on_search(self, *args: t.Any) -> None:
+        text = self.entry.get_text()
+        self.flow_box.remove_all()
+        if len(text.strip()) == 0:
+            for item in self.items.values():
+                self.flow_box.append(item)
+            return
+
+        for item in self.items.values():
+            score = compute_score(item.name.get_text(), text)
+            if score >= THRESHOLD:
+                self.flow_box.append(item)
 
     def on_wallpaper_update(self, new: str) -> None:
         if self._last_active:
@@ -184,7 +231,7 @@ class WallpapersList(gtk.FlowBox):
         for image in images:
             _widget = WallpaperCard(image)
             self.items[image] = _widget
-            self.append(_widget)
+            self.flow_box.append(_widget)
 
         spawn_thumbnail_process(images, self.update_all)
 
@@ -192,6 +239,7 @@ class WallpapersList(gtk.FlowBox):
         for item in self.items.values():
             item.destroy()
         self.settings.unwatch(self.settings_handler)
+        self.entry.disconnect(self.entry_handler)
 
 
 class Actions(gtk.Box):
