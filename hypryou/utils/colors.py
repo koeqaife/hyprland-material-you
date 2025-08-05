@@ -9,7 +9,7 @@ from materialyoucolor.scheme.scheme_tonal_spot import SchemeTonalSpot  # type: i
 import hashlib
 import re
 import typing as t
-from config import color_templates, ORIGINAL_DIR, CONFIG_DIR
+from config import color_templates, ASSETS_DIR, CONFIG_DIR
 from config import config_dir, TEMP_DIR
 from utils.logger import logger
 from utils.ref import Ref
@@ -28,7 +28,7 @@ if t.TYPE_CHECKING:
 executor: concurrent.futures.ProcessPoolExecutor | None = None
 
 
-TEMPLATES_DIR = join(ORIGINAL_DIR, "assets", "templates")
+TEMPLATES_DIR = join(ASSETS_DIR, "templates")
 USER_TEMPLATES_DIR = join(config_dir, "templates")
 CACHE_PATH = color_templates
 

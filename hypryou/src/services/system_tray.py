@@ -3,7 +3,7 @@ from __future__ import annotations
 import signal
 import os
 from repository import gio, glib, gtk, gdk_pixbuf
-from config import ORIGINAL_DIR
+from config import ASSETS_DIR
 from utils.logger import logger
 from src.services.dbus import dbus_proxy, cache_proxy_properties
 from src.services.dbus import name_owner_changed
@@ -19,13 +19,13 @@ from utils_cy.helpers import argb_to_rgba
 
 
 WATCHER_XML_PATH = os.path.join(
-    ORIGINAL_DIR, "assets", "dbus", "org.kde.StatusNotifierWatcher.xml"
+    ASSETS_DIR, "dbus", "org.kde.StatusNotifierWatcher.xml"
 )
 BUS_WATCHER = "org.kde.StatusNotifierWatcher"
 PATH_WATCHER = "/StatusNotifierWatcher"
 
 ITEM_XML_PATH = os.path.join(
-    ORIGINAL_DIR, "assets", "dbus", "org.kde.StatusNotifierItem.xml"
+    ASSETS_DIR, "dbus", "org.kde.StatusNotifierItem.xml"
 )
 BUS_ITEM = "org.kde.StatusNotifierItem"
 PATH_ITEM = "/StatusNotifierItem"

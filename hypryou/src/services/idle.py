@@ -1,7 +1,7 @@
 from __future__ import annotations
 import asyncio
 import os
-from config import ORIGINAL_DIR
+from config import ASSETS_DIR
 from utils.service import Service
 from repository import gio, glib
 from utils.logger import logger
@@ -26,7 +26,7 @@ if t.TYPE_CHECKING:
 
 
 WATCHER_XML_PATH = os.path.join(
-    ORIGINAL_DIR, "assets", "dbus", "org.freedesktop.ScreenSaver.xml"
+    ASSETS_DIR, "dbus", "org.freedesktop.ScreenSaver.xml"
 )
 BUS_WATCHER = "org.freedesktop.ScreenSaver"
 PATH_WATCHER = "/org/freedesktop/ScreenSaver"

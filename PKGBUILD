@@ -67,11 +67,13 @@ build() {
 
 package() {
   mkdir -pv "$pkgdir/usr/bin"
+  mkdir -pv "$pkgdir/usr/share/$pkgname"
   mkdir -pv "$pkgdir/usr/lib/$pkgname"
   mkdir -pv "$pkgdir/usr/share/licenses/$pkgname"
   mkdir -pv "$pkgdir/usr/share/wayland-sessions"
 
   cp -a "$srcdir/$_pkgname/$pkgname/." "$pkgdir/usr/lib/$pkgname/"
+  cp -a "$srcdir/$_pkgname/$pkgname-assets" "$pkgdir/usr/share/$pkgname/"
 
   install -Dm755 "$srcdir/$_pkgname/build/hypryouctl" "$pkgdir/usr/bin/hypryouctl"
   install -Dm755 "$srcdir/$_pkgname/build/hypryou-start" "$pkgdir/usr/bin/hypryou-start"

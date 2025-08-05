@@ -7,11 +7,11 @@ from src.services.state import close_window
 import typing as t
 from os.path import join
 import json
-from config import ORIGINAL_DIR, APP_CACHE_DIR
+from config import ASSETS_DIR, APP_CACHE_DIR
 import src.widget as widget
 import weakref
 
-emojis_file = join(ORIGINAL_DIR, "assets", "emojis.json")
+emojis_file = join(ASSETS_DIR, "emojis.json")
 recent_emojis = join(APP_CACHE_DIR, "recent-emojis.json")
 
 FOUND_THRESHOLD = 0.8

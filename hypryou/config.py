@@ -2,7 +2,6 @@ import os
 from os.path import join as pjoin
 import json
 import typing as t
-import sys
 from utils.service import Signals
 from utils.ref import Ref
 
@@ -14,13 +13,14 @@ CACHE_DIR = os.getenv("XDG_CACHE_HOME", f"{HOME}/.cache")
 CONFIG_DIR = os.getenv("XDG_CONFIG_HOME", f"{HOME}/.config")
 PICTURES_DIR = os.getenv("XDG_PICTURES_DIR", f"{HOME}/Pictures")
 APP_CACHE_DIR = pjoin(CACHE_DIR, "hypryou")
-ORIGINAL_DIR = os.path.dirname(os.path.abspath(sys.argv[0]))
+ORIGINAL_DIR = "/usr/lib/hypryou"
 TEMP_DIR = "/tmp/hypryou/"
+ASSETS_DIR = "/usr/share/hypryou"
 
 color_templates = pjoin(APP_CACHE_DIR, "colors")
 styles_output = pjoin(APP_CACHE_DIR, "style.css")
 scss_variables = pjoin(TEMP_DIR, "_variables.scss")
-main_scss = pjoin(ORIGINAL_DIR, "src", "scss", "main.scss")
+main_scss = pjoin(ASSETS_DIR, "scss", "main.scss")
 config_dir = pjoin(CONFIG_DIR, "hypryou")
 settings_path = pjoin(config_dir, "settings.json")
 socket_path = pjoin(

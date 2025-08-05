@@ -8,7 +8,7 @@ from utils.styles import toggle_css_class
 from config import Settings
 import datetime
 import json
-from config import ORIGINAL_DIR
+from config import ASSETS_DIR
 from os.path import join as pjoin
 
 safe_categories: tuple[Category, ...] = (
@@ -18,7 +18,7 @@ safe_categories: tuple[Category, ...] = (
     "call"
 )
 
-messengers_file = pjoin(ORIGINAL_DIR, "assets", "messengers.json")
+messengers_file = pjoin(ASSETS_DIR, "messengers.json")
 message_prefixes = ("im", "call", "email")
 
 

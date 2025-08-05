@@ -2,11 +2,11 @@ import typing as t
 from repository import gtk, glib, gio
 from utils.logger import logger
 import os
-from config import ORIGINAL_DIR
+from config import ASSETS_DIR
 from utils.service import Service
 
 AGENT_XML_PATH = os.path.join(
-    ORIGINAL_DIR, "assets", "dbus",
+    ASSETS_DIR, "dbus",
     "org.bluez.Agent1.xml"
 )
 

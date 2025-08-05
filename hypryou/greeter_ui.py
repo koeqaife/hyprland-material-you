@@ -10,7 +10,7 @@ from gi.events import GLibEventLoopPolicy  # type: ignore[import-untyped]
 import logging
 import typing as t
 from utils.service import Service, AsyncService
-from config import ORIGINAL_DIR, Settings, get_version, HOME
+from config import ASSETS_DIR, Settings, get_version, HOME
 import time
 from enum import IntEnum
 import src.widget as widget
@@ -33,7 +33,7 @@ import src.services.hyprland as hyprland
 # It's only one window so I don't think it needs any structure
 
 APP_START = time.perf_counter()
-STYLES = os.path.join(ORIGINAL_DIR, "assets", "greeter", "main.css")
+STYLES = os.path.join(ASSETS_DIR, "greeter", "main.css")
 SESSION_DIRS = [
     "/usr/share/xsessions",
     "/usr/share/wayland-sessions"

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import Enum
 import time
-from config import ORIGINAL_DIR
+from config import ASSETS_DIR
 import os
 from repository import glib, gio, gdk_pixbuf, gtk, gdk
 from utils.ref import Ref
@@ -13,7 +13,7 @@ from utils.service import Signals, Service
 
 
 WATCHER_XML_PATH = os.path.join(
-    ORIGINAL_DIR, "assets", "dbus", "org.freedesktop.Notifications.xml"
+    ASSETS_DIR, "dbus", "org.freedesktop.Notifications.xml"
 )
 BUS_WATCHER = "org.freedesktop.Notifications"
 PATH_WATCHER = "/org/freedesktop/Notifications"
