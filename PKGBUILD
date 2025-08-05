@@ -1,6 +1,6 @@
 pkgname=hypryou
 _pkgname=hyprland-material-you
-pkgver=2.0.0.beta
+pkgver=2.0.0
 pkgrel=1
 pkgdesc="Dynamic and elegant desktop setup inspired by Material You, featuring auto-generated colors, fluid animations, and customizable user experience."
 arch=('x86_64')
