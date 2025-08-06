@@ -2,11 +2,14 @@
 pkgname=hypryou
 _pkgname=hyprland-material-you
 pkgver=2.0.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Dynamic and elegant desktop setup inspired by Material You, featuring auto-generated colors, fluid animations, and customizable user experience."
 arch=('x86_64')
 url="https://github.com/koeqaife/hyprland-material-you"
+install=hypryou.install
 license=('GPL3')
+source=("$_pkgname::git+https://github.com/koeqaife/hyprland-material-you.git")
+sha256sums=('SKIP')
 
 depends=(
   'python'
@@ -49,11 +52,6 @@ makedepends=(
   'cython'
 )
 
-prepare() {
-  rm -rf "$srcdir/$_pkgname"
-  git clone --depth=1 https://github.com/koeqaife/hyprland-material-you.git "$srcdir/$_pkgname" # We don't need the full history for this repository that's why I don't use source=()
-}
-
 
 build() {
   cd "$srcdir/$_pkgname/$pkgname"
@@ -68,12 +66,16 @@ build() {
 package() {
   mkdir -pv "$pkgdir/usr/bin"
   mkdir -pv "$pkgdir/usr/share/$pkgname"
+  mkdir -pv "$pkgdir/usr/share/fonts/$pkgname"
   mkdir -pv "$pkgdir/usr/lib/$pkgname"
   mkdir -pv "$pkgdir/usr/share/licenses/$pkgname"
   mkdir -pv "$pkgdir/usr/share/wayland-sessions"
 
   cp -a "$srcdir/$_pkgname/$pkgname/." "$pkgdir/usr/lib/$pkgname/"
   cp -a "$srcdir/$_pkgname/$pkgname-assets/." "$pkgdir/usr/share/$pkgname/"
+  cp -a "$srcdir/$_pkgname/assets/Google Sans/." "$pkgdir/usr/share/fonts/$pkgname/Google Sans/"
+  cp -a "$srcdir/$_pkgname/assets/Google Sans Display/." "$pkgdir/usr/share/fonts/$pkgname/Google Sans Display/"
+  cp -a "$srcdir/$_pkgname/assets/Google Sans Text/." "$pkgdir/usr/share/fonts/$pkgname/Google Sans Text/"
 
   install -Dm755 "$srcdir/$_pkgname/build/hypryouctl" "$pkgdir/usr/bin/hypryouctl"
   install -Dm755 "$srcdir/$_pkgname/build/hypryou-start" "$pkgdir/usr/bin/hypryou-start"
