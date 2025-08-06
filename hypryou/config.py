@@ -50,7 +50,7 @@ default_settings: dict[str, t.Any] = {
     "always_show_battery": False,
     "corners": True,
     "opacity": 1.0,
-    "wallpaper": f"{ORIGINAL_DIR}/assets/default_wallpaper.jpg",
+    "wallpaper": f"{ASSETS_DIR}/default_wallpaper.jpg",
     "separated_workspaces": False,
     "one_popup_at_time": True,
     "power_menu_cancel_button": True,
