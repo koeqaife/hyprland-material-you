@@ -11,8 +11,16 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 - **Material You Colors**: The project generates colors for your apps based on you wallpapers or settings.
 - **Fluid Animations**: Expect natural and fluid animations throughout the desktop experience.
 - **Design**: The design wherever possible is made by [Material 3 design](https://m3.material.io/)
+- **Settings**: Almost all settings are possible to configure in settings! You don't need to change hyprland.conf unless you need something specific.
+- **Clean home folder**: I made everything so won't have any unnecessary files in home. And from settings you can enable configs for terminals or anything else.
 
 [![Screenshot](assets/screenshot.png "Screenshot")](assets/screenshot.png)
+
+> [!TIP]
+> When you run HyprYou as DE session (from SDDM, Greetd, etc.) it doesn't use ~/.config/hypr/hyprland.conf  
+> For any custom variables/configs look for ~/.config/hypryou/hyprland.conf
+> I made that so you can have different dotfiles on one system
+> If you don't have Display Manager you can use `hyprland --config /usr/share/hypryou/configs/hyprland/main.conf`
 
 > [!NOTE]
 > I'm doing everything by myself and **for free**.  
@@ -43,13 +51,9 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 <details>
     <summary>Automatic installation (Arch)</summary>
 
-You can install packages from **releases** or build it by yourself:
-
 - `hypryou` - Use `makepkg -si`
 - `hypryou-greeter` - Use `makepkg -si` in `greeter/`
 - `hypryou-utils` - Use `makepkg -si` in `hypryou-utils/`
-
-> Coming soon to `AUR`!
 
 </details>
 
