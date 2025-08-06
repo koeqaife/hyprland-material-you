@@ -13,6 +13,7 @@ sha256sums=('SKIP')
 
 depends=(
   'python'
+  'dart-sass'
   'python-gobject'
   'python-pam'
   'gtk4'
@@ -48,8 +49,9 @@ optdepends=(
 )
 
 makedepends=(
-  'dart-sass'
   'cython'
+  'git'
+  'gcc'
 )
 
 build() {

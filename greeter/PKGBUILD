@@ -7,6 +7,7 @@ pkgdesc="Greetd config for hypryou greeter"
 arch=('any')
 license=('custom')
 depends=('greetd')
+makedepends=('git')
 install="${pkgname}.install"
 url="https://github.com/koeqaife/hyprland-material-you"
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/koeqaife/hyprland-material-you/archive/refs/heads/v2.tar.gz")

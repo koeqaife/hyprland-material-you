@@ -12,6 +12,10 @@ conflicts=('hyprland-qtutils')
 replaces=('hyprland-qtutils')
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/koeqaife/hyprland-material-you/archive/refs/heads/v2.tar.gz")
 sha256sums=('SKIP')
+makedepends=(
+  'git'
+  'gcc'
+)
 
 build() {
     gcc "${srcdir}/hyprland-material-you-2/hypryou-utils/hyprland-dialog.c" -o hyprland-dialog $(pkg-config --cflags --libs gtk4) \
