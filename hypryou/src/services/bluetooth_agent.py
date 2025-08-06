@@ -254,5 +254,8 @@ class BluetoothAgent:
 
 class BluetoothAgentService(Service):
     def start(self) -> None:
-        self.agent = BluetoothAgent()
-        self.agent.register()
+        try:
+            self.agent = BluetoothAgent()
+            self.agent.register()
+        except Exception as e:
+            logger.exception("Error on running bluetooth agent", exc_info=e)
