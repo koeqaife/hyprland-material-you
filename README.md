@@ -49,7 +49,7 @@ You can install packages from **releases** or build it by yourself:
 - `hypryou-greeter` - Use `makepkg -si` in `greeter/`
 - `hypryou-utils` - Use `makepkg -si` in `hypryou-utils/`
 
-> Coming soo to `AUR`!
+> Coming soon to `AUR`!
 
 </details>
 
