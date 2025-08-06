@@ -17,8 +17,8 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 [![Screenshot](assets/screenshot.png "Screenshot")](assets/screenshot.png)
 
 > [!TIP]
-> When you run HyprYou as DE session (from SDDM, Greetd, etc.) it doesn't use ~/.config/hypr/hyprland.conf  
-> For any custom variables/configs look for ~/.config/hypryou/hyprland.conf  
+> When you run HyprYou as DE session (from SDDM, Greetd, etc.) it doesn't use `~/.config/hypr/hyprland.conf`  
+> For any custom variables/configs look for `~/.config/hypryou/hyprland.conf`  
 > I made that so you can have different dotfiles on one system  
 > If you don't have Display Manager you can use `hyprland --config /usr/share/hypryou/configs/hyprland/main.conf`
 
