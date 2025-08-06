@@ -30,7 +30,7 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 > If you want to talk or to check devlogs go to our Discord server  
 > <https://discord.gg/nCK3sh8mNU>
 
-## How to install
+## How to install (Arch)
 
 <details>
     <summary>Manual installation</summary>
@@ -49,11 +49,15 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 
 </details>
 <details>
-    <summary>Automatic installation (Arch)</summary>
+    <summary>Automatic installation</summary>
+
+You can install packages from **releases** or build it by yourself:  
 
 - `hypryou` - Use `makepkg -si`
 - `hypryou-greeter` - Use `makepkg -si` in `greeter/`
 - `hypryou-utils` - Use `makepkg -si` in `hypryou-utils/`
+
+> Coming soon to `AUR`!
 
 </details>
 
