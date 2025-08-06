@@ -52,15 +52,16 @@ makedepends=(
   'cython'
 )
 
-
 build() {
   cd "$srcdir/$_pkgname/$pkgname"
-  python utils_cy/setup.py build_ext --build-lib utils_cy --build-temp $(mktemp -d)
+  python utils_cy/setup.py build_ext --build-lib utils_cy --build-temp "$(mktemp -d)"
   cd "$srcdir/$_pkgname/build"
 
-  gcc -Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wcast-align -Wconversion -Wstrict-overflow=5 -O3 -march=native -flto -fno-plt client.c -o hypryouctl
-  gcc -O3 -march=native -flto -fno-plt $(pkg-config --cflags --libs gtk4) -Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wcast-align -Wconversion -Wstrict-overflow=5 -o hypryou-start hypryou-start.c
-  gcc -O3 -march=native -flto -fno-plt $(pkg-config --cflags --libs gtk4) -Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wcast-align -Wconversion -Wstrict-overflow=5 -o hypryou-crash-dialog crash-dialog.c
+  COMMON_FLAGS="-Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wcast-align -Wconversion -Wstrict-overflow=5 -O3 -flto -fno-plt -march=x86-64 -mtune=generic"
+
+  gcc $COMMON_FLAGS client.c -o hypryouctl
+  gcc $COMMON_FLAGS $(pkg-config --cflags --libs gtk4) -o hypryou-start hypryou-start.c
+  gcc $COMMON_FLAGS $(pkg-config --cflags --libs gtk4) -o hypryou-crash-dialog crash-dialog.c
 }
 
 package() {
