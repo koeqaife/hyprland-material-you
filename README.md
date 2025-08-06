@@ -30,7 +30,7 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 - Clone repository: `git clone --depth=1 https://github.com/koeqaife/hyprland-material-you.git`
 - Install all dependencies from depends.txt
 - Build Cython code by using `build.sh` in `hypryou/`
-- Then copy `hypryou` to `/usr/lib/hypryou`
+- Then copy `hypryou` to `/usr/lib/hypryou` and copy `hypryou-assets` to `/usr/share/hypryou`
 - Then use `build.sh` in `build`
 - Move `hypryouctl`, `hypryou-start`, `hypryou-crash-dialog` to `/usr/bin`
 - Copy `assets/hypryou.desktop` to `/usr/share/wayland-sessions/`
