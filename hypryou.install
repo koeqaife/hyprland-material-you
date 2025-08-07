@@ -1,6 +1,9 @@
 post_install() {
     echo ":: Updating font cache..."
     fc-cache -f > /dev/null
+    echo ":: Enabling NetworkManager service"
+    sudo systemctl enable NetworkManager
+    echo ":: Reboot your pc!"
 }
 
 post_upgrade() {
