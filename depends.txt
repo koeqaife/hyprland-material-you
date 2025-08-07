@@ -32,7 +32,7 @@ polkit-gnome
 adw-gtk-theme
 greetd
 python-cairo
-
+networkmanager
 
 Versions:
 "Used" means I used this version when I was developing, so these versions are 100% compatible
