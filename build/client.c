@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
         }
 
         static char default_dir[256];
-        snprintf(default_dir, sizeof(default_dir), "/tmp/hypryou-%s", user);
+        snprintf(default_dir, sizeof(default_dir), "/tmp/hypryou-%s/sockets", user);
 
         base_dir = default_dir;
     }
