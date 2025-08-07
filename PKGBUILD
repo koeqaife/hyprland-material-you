@@ -49,6 +49,8 @@ depends=(
 optdepends=(
   'hypryou-utils: A replacement of hyprland-qtutils with MaterialYou style'
   'hypryou-greeter: Config for Greetd'
+  'ttf-meslo-nerd-font-powerlevel10k: Font for alacritty'
+  'alacritty: I recommend to use this terminal'
 )
 
 makedepends=(
