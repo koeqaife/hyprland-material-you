@@ -115,7 +115,16 @@ class HyprlandPage(gtk.ScrolledWindow):
                 max_width_chars=3,
                 **int_kwargs
             ),
-            Hint("Changing cursor settings requires session restart")
+            Hint("Changing cursor settings requires session restart"),
+
+            Category("Hyprsunset"),
+            SettingsTextRow(
+                "Night light temperature",
+                "Screen temperature for night light (in K)",
+                "hyprsunset.temperature",
+                max_width_chars=5,
+                **int_kwargs
+            )
         )
         for child in self.box_children:
             self.box.append(child)

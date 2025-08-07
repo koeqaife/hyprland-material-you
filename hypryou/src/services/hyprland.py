@@ -8,6 +8,7 @@ import typing as t
 import json
 from utils.service import Signals, AsyncService
 from repository import gio, gtk, gdk
+from config import Settings
 
 active_workspace = Ref(0, name="workspace", delayed_init=True)
 active_layout = Ref("en", name="active_layout", delayed_init=True)
@@ -552,8 +553,12 @@ async def get_active_workspaces(client: HyprlandClient) -> list[int]:
 
 def change_night_light(value: bool) -> None:
     if value:
+        temperature = Settings().get("hyprsunset.temperature")
         asyncio.create_task(
-            client.raw("temperature 3500", SocketType.HYPRSUNSET, 2.0)
+            client.raw(
+                f"temperature {temperature}",
+                SocketType.HYPRSUNSET, 2.0
+            )
         )
     else:
         asyncio.create_task(
