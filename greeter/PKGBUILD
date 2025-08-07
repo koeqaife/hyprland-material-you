@@ -2,7 +2,7 @@
 
 pkgname=hypryou-greeter
 pkgver=1.0.0
-pkgrel=2
+pkgrel=3
 pkgdesc="Greetd config for hypryou greeter"
 arch=('any')
 license=('custom')
