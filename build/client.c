@@ -21,9 +21,16 @@ int main(int argc, char *argv[])
     }
 
     const char *base_dir = getenv("HYPRYOU_SOCKET_DIR");
-    if (!base_dir)
-    {
-        base_dir = "/tmp/hypryou/sockets";
+    if (!base_dir) {
+        const char *user = getenv("USER");
+        if (!user) {
+            user = "unknown";
+        }
+
+        static char default_dir[256];
+        snprintf(default_dir, sizeof(default_dir), "/tmp/hypryou-%s", user);
+
+        base_dir = default_dir;
     }
 
     char socket_path[BUFFER_SIZE];
