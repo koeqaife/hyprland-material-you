@@ -905,4 +905,7 @@ class NetworkService(Service):
         _instance = Network(self.client)
 
     def start(self) -> None:
-        get_network().agent.register()
+        try:
+            get_network().agent.register()
+        except Exception as e:
+            logger.exception("Couldn't run NM agent", exc_info=e)
