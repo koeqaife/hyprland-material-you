@@ -9,7 +9,7 @@ key_binds = (
         Category.WORKSPACES
     ),
     KeyBindHint(
-        (main_mod, "0-9"),
+        (main_mod, "Shift", "0-9"),
         "Move window to workspace",
         Category.WORKSPACES
     ),
