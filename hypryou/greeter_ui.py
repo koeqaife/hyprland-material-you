@@ -416,8 +416,7 @@ class GreeterUI(gtk.ApplicationWindow):
 
         async def task() -> None:
             cmd = shlex.split(self.current_exec)
-            env = [f"{k}={v}" for k, v in os.environ.items()]
-            response = await self.greetd.start_session(cmd, env)
+            response = await self.greetd.start_session(cmd, [])
             if response["type"] == "success":
                 try:
                     with open(LAST_SESSION_PATH, "w") as f:
