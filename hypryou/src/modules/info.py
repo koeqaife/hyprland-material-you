@@ -43,7 +43,7 @@ class InfoPage(gtk.Box):
         )
         self.version = gtk.Label(
             css_classes=("version",),
-            label=get_version()
+            label=f"v{get_version()}"
         )
         self.logo_box.append(self.logo)
         self.logo_box.append(self.name)
