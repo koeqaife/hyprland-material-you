@@ -400,7 +400,13 @@ class MonitorsPage(gtk.Box):
     def update_setting(self, key: str, value: t.Any) -> None:
         if not self._finished:
             return
-        current = self.settings[self.current_monitor]
+        if self.current_monitor in self.settings:
+            current = self.settings[self.current_monitor]
+        else:
+            current = {
+                "output": self.current_monitor
+            }
+            self.settings[self.current_monitor] = current
         current[key] = value
         self.save_button.set_sensitive(True)
 
