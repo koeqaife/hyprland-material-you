@@ -158,7 +158,17 @@ class BluetoothDevice(RowTemplate):
             "Copy address",
             "copy_address"
         )
+        self.menu.append(
+            "Remove Device",
+            "delete"
+        )
         self.popover.set_menu_model(self.menu)
+
+    def delete(self, *args: t.Any) -> None:
+        _bluetooth = bluetooth.get_default()
+        adapter = _bluetooth.get_adapter()
+        adapter.remove_device(self.device)
+        _bluetooth.notify("devices")
 
     def copy(self, *args: t.Any) -> None:
         display = gdk.Display.get_default()
@@ -245,6 +255,9 @@ BluetoothDevice.install_action(
 BluetoothDevice.install_action(
     "copy_address", None, BluetoothDevice.copy  # type: ignore
 )
+BluetoothDevice.install_action(
+    "delete", None, BluetoothDevice.delete  # type: ignore
+)
 
 
 class BluetoothList(gtk.Box):
@@ -274,7 +287,7 @@ class BluetoothList(gtk.Box):
             self.append(row)
 
         self.devices_handler = self.bluetooth.connect(
-            "notify",
+            "notify::devices",
             self.on_devices
         )
 
