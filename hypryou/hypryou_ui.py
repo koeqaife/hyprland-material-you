@@ -211,7 +211,10 @@ class HyprYou(gtk.Application):
         self.tasks: list[asyncio.Task[t.Any]] = []
         await self.start_services()
 
-        self.display: gdk.Display = gdk.Display.get_default()
+        self.display = gdk.Display.get_default()
+        icon_theme = gtk.IconTheme.get_for_display(self.display)
+        icon_theme.add_search_path(f"{ASSETS_DIR}/icons")
+
         self.monitors = self.display.get_monitors()
         self.monitors.connect("items-changed", self.update_monitors)
 
@@ -310,9 +313,6 @@ def init() -> None:
     makedirs()
     settings = Settings()
     asyncio.set_event_loop_policy(GLibEventLoopPolicy())
-    display = gdk.Display.get_default()
-    icon_theme = gtk.IconTheme.get_for_display(display)
-    icon_theme.add_search_path(f"{ASSETS_DIR}/icons")
 
     if settings.get("secure_cliphist"):
         cliphist.secure_clear()
