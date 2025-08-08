@@ -161,8 +161,14 @@ class CliRequest:
         if "freeze" in _mode:
             args.append("--freeze")
         if shutil.which("swappy"):
-            args.append("--raw")
-            command = f"bash -c \"hyprshot {" ".join(args)} | swappy -f -\""
+            script = (
+                "tmpdir=$(mktemp -d)",
+                f'hyprshot {" ".join(args)} -s -o "$tmpdir" -f "output.png"',
+                "swappy -f \"$tmpdir/output.png\"",
+                "rm -rf $tmpdir"
+            )
+            command = f"bash -c '{"; ".join(script)}'"
+            print(command)
             launch_detached(command)
         else:
             command = f"bash -c \"hyprshot {" ".join(args)}\""
