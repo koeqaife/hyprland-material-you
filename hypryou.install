@@ -7,6 +7,13 @@ post_install() {
 }
 
 post_upgrade() {
+    echo ":: Removing styles cache for all users"
+    for user_home in /home/*; do
+        if [ -d "$user_home/.cache/hypryou" ]; then
+            rm -f "$user_home/.cache/hypryou/style.css"
+        fi
+    done
+
     post_install
 }
 
