@@ -5,6 +5,7 @@ from src.services.system_tray import StatusNotifierItem, items
 import weakref
 import typing as t
 from src import widget
+from src import dbus_menu
 
 # It's so cool that when tray isn't opened there isn't any load to CPU
 # Cause it's not listening to any updates of items
@@ -30,6 +31,16 @@ class TrayItem(gtk.Box):
             halign=gtk.Align.END,
             css_classes=("attention-outlined",)
         )
+        self.menu_btn = gtk.MenuButton(
+            child=widget.Icon("menu"),
+            css_classes=("menu-button", "icon-outlined")
+        )
+        self.popover = dbus_menu.DBusMenuPopover(
+            self._item.get_bus_name(),
+            self._item.menu
+        )
+        self.menu_btn.set_popover(self.popover)
+        btn_box.append(self.menu_btn)
         btn_box.append(self.quit_btn)
 
         self.children = (
@@ -131,6 +142,9 @@ class TrayItem(gtk.Box):
         self.remove_controller(self.click_gesture)
         self.quit_btn.disconnect(self.quit_conn)
         self._item.unwatch(self.handler_id)
+        self.popover.destroy()
+        self.popover = None
+        self.menu_btn.set_popover(None)
 
 
 class TrayBox(gtk.ScrolledWindow):
@@ -228,9 +242,9 @@ class TrayWindow(widget.LayerWindow):
         self.set_child(self._child)
 
     def on_hide(self) -> None:
+        self.set_child(None)
         if self._child:
             self._child.destroy()
-        self.set_child(None)
         self._child = None
 
     def destroy(self) -> None:

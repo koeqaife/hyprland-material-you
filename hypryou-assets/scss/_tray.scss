@@ -50,4 +50,32 @@ window.tray {
             margin-top: 0.5rem;
         }
     }
+
+    .menu-button {
+        border-radius: 100px;
+        min-height: 2rem;
+        min-width: 2rem;
+        border: 1px solid $outline;
+        border-radius: 2rem;
+        margin-right: 0.5rem;
+
+        .icon {
+            font-size: 1.125rem;
+            font-weight: 400;
+            color: $onSurface;
+        }
+        &:hover {
+            background-color: color.mix(transparent, $onSurfaceVariant, 92%);
+        }
+        &:active {
+            background-color: color.mix(transparent, $onSurfaceVariant, 90%);
+        }
+        &:disabled {
+            box-shadow: none;
+            border-color: color.mix($onSurface, transparent, 12%);
+            label {
+                color: color.mix($onSurface, transparent, 38%);
+            }
+        }
+    }
 }

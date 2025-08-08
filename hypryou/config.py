@@ -15,7 +15,7 @@ PICTURES_DIR = os.getenv("XDG_PICTURES_DIR", f"{HOME}/Pictures")
 APP_CACHE_DIR = pjoin(CACHE_DIR, "hypryou")
 ORIGINAL_DIR = "/usr/lib/hypryou"
 TEMP_DIR = f"/tmp/hypryou-{os.getenv("USER", "unknown")}"
-ASSETS_DIR = "/usr/share/hypryou"
+ASSETS_DIR = "/home/mrdan/Files/hyprland-material-you/hypryou-assets"
 
 color_templates = pjoin(APP_CACHE_DIR, "colors")
 styles_output = pjoin(APP_CACHE_DIR, "style.css")

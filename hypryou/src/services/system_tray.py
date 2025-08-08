@@ -166,6 +166,10 @@ class StatusNotifierItem(Signals):
         return value.unpack()
 
     @property
+    def menu(self) -> str:
+        return t.cast(str, self.prop("Menu"))
+
+    @property
     def id(self) -> int:
         return t.cast(int, self.prop("Id"))
 
