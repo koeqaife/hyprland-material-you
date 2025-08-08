@@ -12,11 +12,6 @@ from utils.ref import Ref
 from utils.service import Signals, Service
 from utils_cy.helpers import argb_to_rgba
 
-# it won't reproduce the all possibilities of tray
-# I'll just use it as for running background services
-# but without any menus
-# only actions like activate, secondary activate and quit
-
 
 WATCHER_XML_PATH = os.path.join(
     ASSETS_DIR, "dbus", "org.kde.StatusNotifierWatcher.xml"
