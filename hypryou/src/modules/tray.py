@@ -31,16 +31,17 @@ class TrayItem(gtk.Box):
             halign=gtk.Align.END,
             css_classes=("attention-outlined",)
         )
-        self.menu_btn = gtk.MenuButton(
-            child=widget.Icon("menu"),
-            css_classes=("menu-button", "icon-outlined")
-        )
-        self.popover = dbus_menu.DBusMenuPopover(
-            self._item.get_bus_name(),
-            self._item.menu
-        )
-        self.menu_btn.set_popover(self.popover)
-        btn_box.append(self.menu_btn)
+        if self._item.menu:
+            self.menu_btn = gtk.MenuButton(
+                child=widget.Icon("menu"),
+                css_classes=("menu-button", "icon-outlined")
+            )
+            self.popover = dbus_menu.DBusMenuPopover(
+                self._item.get_bus_name(),
+                self._item.menu
+            )
+            self.menu_btn.set_popover(self.popover)
+            btn_box.append(self.menu_btn)
         btn_box.append(self.quit_btn)
 
         self.children = (
