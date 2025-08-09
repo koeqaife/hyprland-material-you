@@ -168,7 +168,6 @@ class CliRequest:
                 f"rm {TEMP_DIR}/screenshot.png"
             )
             command = f'bash -c "{"; ".join(script)}"'
-            print(command)
             launch_detached(command)
         else:
             command = f"bash -c \"hyprshot {" ".join(args)}\""
