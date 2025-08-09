@@ -6,6 +6,7 @@ import typing as t
 
 
 class DBusMenuPopover(gtk.PopoverMenu):
+    __gtype_name__ = "DBusMenuPopover"
     IFACE = "com.canonical.dbusmenu"
 
     def __init__(self, bus_name: str, obj_path: str) -> None:
@@ -110,9 +111,6 @@ class DBusMenuPopover(gtk.PopoverMenu):
                 return
             revision = unpacked[0]
             layout = unpacked[1]
-            if __debug__:
-                logger.debug("GetLayout -> revision: %s", revision)
-                logger.debug("Layout repr: %s", repr(layout)[:1200])
             self._menu_revision = int(revision)
             gio_menu = gio.Menu()
             self._id_to_action.clear()
@@ -127,15 +125,13 @@ class DBusMenuPopover(gtk.PopoverMenu):
 
     def _extract_children_from_layout(
         self, layout: tuple[int, int, list[tuple[int, dict[str, str]]]]
-    ) -> list[list[tuple[int, dict[str, str]]]]:
-        maybe_children = layout[2]
-        if isinstance(maybe_children, (list, tuple)):
-            return list(maybe_children)
+    ) -> list[tuple[int, dict[str, str]]]:
+        return list(layout[2])
 
     def _build_gio_menu(
         self,
         gio_menu: gio.Menu,
-        children: list[tuple[int, dict[str, str]]]
+        children: list[tuple[int, dict[str, str], dict[str, str]]]
     ) -> None:
         for node in children:
             try:
@@ -163,9 +159,9 @@ class DBusMenuPopover(gtk.PopoverMenu):
             gio_menu.append(label or "", f"dbusmenu.{action_name}")
 
     def _register_action(self, node_id: int, props: dict[str, t.Any]) -> str:
+        if node_id in self._id_to_action:
+            return self._id_to_action[node_id]
         name = f"action{node_id}"
-        if name in self._id_to_action.values():
-            return name
         act = gio.SimpleAction.new(name, None)
         self._handlers[act] = act.connect(
             "activate",
