@@ -1,7 +1,7 @@
 import os
 import asyncio
 import socket
-from config import socket_path
+from config import socket_path, TEMP_DIR
 from utils.logger import logger
 from utils.styles import reload_css
 from utils.handler import exit_reload
@@ -162,12 +162,12 @@ class CliRequest:
             args.append("--freeze")
         if shutil.which("swappy"):
             script = (
-                "tmpdir=$(mktemp -d)",
-                f'hyprshot {" ".join(args)} -s -o "$tmpdir" -f "output.png"',
-                "swappy -f \"$tmpdir/output.png\"",
-                "rm -rf $tmpdir"
+                f"hyprshot {" ".join(args)} -s -o '{TEMP_DIR}' "
+                "-f 'screenshot.png'",
+                f"swappy -f '{TEMP_DIR}/screenshot.png'",
+                f"rm {TEMP_DIR}/screenshot.png"
             )
-            command = f"bash -c '{"; ".join(script)}'"
+            command = f'bash -c "{"; ".join(script)}"'
             print(command)
             launch_detached(command)
         else:
