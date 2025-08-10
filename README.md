@@ -14,7 +14,9 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 - **Settings**: Almost all settings are possible to configure in settings! You don't need to change hyprland.conf unless you need something specific.
 - **Clean home folder**: I made everything so won't have any unnecessary files in home. And from settings you can enable configs for terminals or anything else.
 
-[![Screenshot](assets/screenshot.png "Screenshot")](assets/screenshot.png)
+## Preview
+- **Demo video:** [Reddit post](https://www.reddit.com/r/unixporn/comments/1mj2p6x/hyprland_hyprland_material_you_v2_hypryou/)  
+- **Screenshot:** [![Screenshot](assets/screenshot.png "Screenshot")](assets/screenshot.png)
 
 > [!TIP]
 > When you run HyprYou as DE session (from SDDM, Greetd, etc.) it doesn't use `~/.config/hypr/hyprland.conf`  
