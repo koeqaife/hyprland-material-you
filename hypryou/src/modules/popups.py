@@ -1,6 +1,6 @@
 from utils.ref import Ref
 import src.widget as widget
-from repository import gtk, gdk, glib
+from repository import gtk, gdk, glib, layer_shell
 from src.services.backlight import (
     get_backlight_manager, BacklightDevice,
     BacklightDeviceView
@@ -197,7 +197,8 @@ class PopupsWindow(widget.LayerWindow):
             },
             monitor=monitor,
             name="popups",
-            css_classes=("popups",)
+            css_classes=("popups",),
+            layer=layer_shell.Layer.OVERLAY
         )
         self.child = gtk.Box(
             orientation=gtk.Orientation.VERTICAL
