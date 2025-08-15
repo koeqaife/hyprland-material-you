@@ -9,6 +9,9 @@ post_install() {
     echo ":: Installing config.toml to /etc/greetd/config.toml"
     install -m644 /usr/share/hypryou-greeter/config.toml /etc/greetd/config.toml
 
+    echo ":: Trying to enable greetd"
+    systemctl enable greetd.service
+
     echo ":: Done."
 }
 
