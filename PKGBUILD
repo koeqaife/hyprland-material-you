@@ -51,6 +51,7 @@ optdepends=(
   'hypryou-greeter: Config for Greetd'
   'ttf-meslo-nerd-font-powerlevel10k: Font for alacritty'
   'alacritty: I recommend to use this terminal'
+  'tela-circle-icon-theme-nord: Default cons'
 )
 
 makedepends=(
