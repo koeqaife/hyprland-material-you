@@ -34,6 +34,9 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 
 ## How to install (Arch)
 
+> [!TIP]
+> If you have an error like "cannot resolve dependency" you should install packages that are named there with `yay` or any other AUR helpers.
+
 <details>
     <summary>Manual installation</summary>
 
