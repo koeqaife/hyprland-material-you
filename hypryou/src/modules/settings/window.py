@@ -304,9 +304,7 @@ class SettingsBox(gtk.Box):
         last_widget = None
 
     def on_close(self, *args: t.Any) -> None:
-        window = self.window()
-        if window is not None:
-            window.emit("close-request")
+        settings_page.value = None
 
     def on_sidebar_button(self, name: str) -> None:
         settings_page.value = name
