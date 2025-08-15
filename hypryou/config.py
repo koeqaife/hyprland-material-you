@@ -66,8 +66,8 @@ default_settings: dict[str, t.Any] = {
     "themes.alacritty": False,
     "themes.telegram": False,
 
-    "icons.dark": "Tela-nord-dark",
-    "icons.light": "Tela-nord-light",
+    "icons.dark": "Tela-circle-nord-dark",
+    "icons.light": "Tela-circle-nord-light",
 
     "blur.enabled": True,
     "blur.xray": True,
