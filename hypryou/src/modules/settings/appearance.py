@@ -134,6 +134,18 @@ class AppearancePage(gtk.ScrolledWindow):
                 "Don't show workspaces without windows",
                 "hide_empty_workspaces"
             ),
+
+            Category("Icons"),
+            SettingsTextRow(
+                "Light Icons",
+                "Gtk icons that will be used on light theme",
+                "icons.light"
+            ),
+            SettingsTextRow(
+                "Dark Icons",
+                "Gtk icons that will be used on dark theme",
+                "icons.dark"
+            )
         )
         for child in self.children:
             self.box.append(child)
