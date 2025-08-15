@@ -1,12 +1,12 @@
 AUR:
-gtk4-layer-shell
-dart-sass
 python-materialyoucolor-git
 libastal-bluetooth-git
 libastal-wireplumber-git
 ttf-material-symbols-variable-git
 
 Sync:
+gtk4-layer-shell
+dart-sass
 python
 python-gobject
 python-pam
