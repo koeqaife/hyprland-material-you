@@ -58,6 +58,7 @@ makedepends=(
   'cython'
   'git'
   'gcc'
+  'python-setuptools'
 )
 
 build() {
