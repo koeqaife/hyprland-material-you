@@ -6,7 +6,10 @@ pkgrel=4
 pkgdesc="Greetd config for hypryou greeter"
 arch=('any')
 license=('custom')
-depends=('greetd')
+depends=(
+    'greetd'
+    'hypryou'
+)
 makedepends=('git')
 install="${pkgname}.install"
 url="https://github.com/koeqaife/hyprland-material-you"
