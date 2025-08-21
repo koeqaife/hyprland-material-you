@@ -38,6 +38,7 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 > If you have an error like "cannot resolve dependency" you should install packages that are named there with `yay` or any other AUR helpers.  
 > For very new people to ArchLinux, check this: <https://itsfoss.com/install-yay-arch-linux/>  
 > Also if AUR is down (it happens sometimes) you can check for Chaotic AUR: <https://aur.chaotic.cx/>
+> And if you have errors like `Config error in file /....` just try using `hyprctl reload`
 
 <details>
     <summary>Manual installation</summary>
