@@ -37,7 +37,7 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 > [!TIP]
 > If you have an error like "cannot resolve dependency" you should install packages that are named there with `yay` or any other AUR helpers.  
 > For very new people to ArchLinux, check this: <https://itsfoss.com/install-yay-arch-linux/>  
-> Also if AUR is down (it happens sometimes) you can check for Chaotic AUR: <https://aur.chaotic.cx/>
+> Also if AUR is down (it happens sometimes) you can check for Chaotic AUR: <https://aur.chaotic.cx/>  
 > And if you have errors like `Config error in file /....` just try using `hyprctl reload`
 
 <details>
@@ -59,7 +59,7 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 <details>
     <summary>Automatic installation</summary>
 
-- **Pre-built:  **
+- **Pre-built:**
   - Install needed packages from [releases](https://github.com/koeqaife/hyprland-material-you/releases)
   - Use `sudo pacman -U <file name>` change <file name> to name of the package you downloaded and make sure you're in Downloads folder
     > Yea some people were trying to use `pacman -U` in home folder so I had to say that
