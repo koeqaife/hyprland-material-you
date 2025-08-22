@@ -1,5 +1,4 @@
 import asyncio
-from repository import glib
 from utils.debounce import sync_debounce
 from utils.service import Service
 from utils.logger import logger
@@ -416,12 +415,11 @@ class HyprlandConfigService(Service):
         keybind_overrides.ready()
         generate_config()
 
-    def check_errors(self) -> None:
-        async def _async() -> None:
-            config_errors = (await hyprland.client.raw("configerrors")).strip()
-            if config_errors:
-                await hyprland.client.raw("reload")
-        asyncio.create_task(_async())
+    async def check_errors(self) -> None:
+        asyncio.sleep(2.5)
+        config_errors = (await hyprland.client.raw("configerrors")).strip()
+        if config_errors:
+            await hyprland.client.raw("reload")
 
     def start(self) -> None:
-        glib.timeout_add(2500, self.check_errors)
+        asyncio.create_task(self.check_errors())
