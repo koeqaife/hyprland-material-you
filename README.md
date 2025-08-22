@@ -37,7 +37,7 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 
 - `hypryou` - The main package, should be installed before anything else
 - `hypryou-utils` - Replacement of `hypryou-qtutils`, uses gtk4 for hyprland dialogs instead of qt
-- `hypryou-greeter` - Configs for greetd, so it's replacement of SDDM or anything like that. With Material You theme.
+- `hypryou-greeter` - Configs for greetd, so it's replacement of SDDM or anything like that. With Material 3 theme.
 
 ## How to install (Arch)
 
