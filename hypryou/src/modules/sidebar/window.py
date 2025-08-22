@@ -4,6 +4,28 @@ from utils.styles import toggle_css_class
 from repository import gtk, layer_shell
 import weakref
 from src import widget
+from src.modules.notifications.list import Notifications
+
+
+class SidebarNotifications(gtk.Overlay):
+    __gtype_name__ = "SidebarNotifications"
+
+    def __init__(self):
+        super().__init__()
+        self.notifications = Notifications()
+        self.clear_button = self.notifications.clear_button
+        self.clear_button.remove_css_class("elevated")
+        self.clear_button.add_css_class("filled")
+
+        self.notifications.box.remove(self.clear_button)
+        self.set_child(self.notifications)
+        self.add_overlay(self.clear_button)
+
+    def freeze(self) -> None:
+        self.notifications.freeze()
+
+    def unfreeze(self) -> None:
+        self.notifications.unfreeze()
 
 
 class SidebarBox(gtk.Box):
@@ -12,13 +34,12 @@ class SidebarBox(gtk.Box):
     def __init__(self) -> None:
         from src.modules.sidebar.management import ManagementBox
         from src.modules.sidebar.actions import Actions
-        from src.modules.notifications.list import Notifications
         super().__init__(
             orientation=gtk.Orientation.VERTICAL
         )
         self.management = ManagementBox()
         self.actions = Actions()
-        self.notifications = Notifications()
+        self.notifications = SidebarNotifications()
         self.children = (
             self.management,
             self.actions,

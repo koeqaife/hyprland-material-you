@@ -199,7 +199,7 @@ class Notifications(gtk.ScrolledWindow):
             self.on_change()
 
     def update_clear_button(self, *args: t.Any) -> None:
-        if len(notifications.value) > 0 and not is_closing.value:
+        if len(notifications.value) > 2 and not is_closing.value:
             self.clear_button.set_visible(True)
         else:
             self.clear_button.set_visible(False)

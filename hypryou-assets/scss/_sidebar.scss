@@ -116,6 +116,10 @@ window.sidebar {
         padding-top: 0.75rem;
     }
 
+    .notifications-categories {
+        padding-bottom: 3.25rem;
+    }
+
     box.notification {
         @include elevation(1);
         border-radius: 1.25rem;
@@ -124,7 +128,7 @@ window.sidebar {
     }
 
     .clear-all {
-        margin-right: 0.75rem;
-        margin-bottom: 0.75rem;
+        margin-right: 1rem;
+        margin-bottom: 1.25rem;
     }
 }
