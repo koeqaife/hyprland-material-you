@@ -50,7 +50,7 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 - Then use `build.sh` in `build`
 - Move `hypryouctl`, `hypryou-start`, `hypryou-crash-dialog` to `/usr/bin`
 - Copy `assets/hypryou.desktop` to `/usr/share/wayland-sessions/`
-- And run it as `HyprYou` from your window manager (Not `Hyprland`!!)
+- And run it as `HyprYou` from your display manager (Not `Hyprland`!!)
 - Optional:
   - You can build `hypryou-utils` or `hypryou-greeter` if you want  
     > By using `makepkg -si` in `greeter` for `hypryou-greeter` or in `hypryou-utils`
