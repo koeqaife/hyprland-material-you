@@ -15,6 +15,7 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 - **Clean home folder**: I made everything so won't have any unnecessary files in home. And from settings you can enable configs for terminals or anything else.
 
 ## Preview
+
 - **Demo video:** [Reddit post](https://www.reddit.com/r/unixporn/comments/1mj2p6x/hyprland_hyprland_material_you_v2_hypryou/)  
 - **Screenshot:** [![Screenshot](assets/screenshot.png "Screenshot")](assets/screenshot.png)
 
@@ -31,6 +32,12 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 > [!NOTE]
 > If you want to talk or to check devlogs go to our Discord server  
 > <https://discord.gg/nCK3sh8mNU>
+
+## Packages info
+
+- `hypryou` - The main package, should be installed before anything else
+- `hypryou-utils` - Replacement of `hypryou-qtutils`, uses gtk4 for hyprland dialogs instead of qt
+- `hypryou-greeter` - Configs for greetd, so it's replacement of SDDM or anything like that. With Material You theme.
 
 ## How to install (Arch)
 
@@ -61,7 +68,7 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 
 - **Pre-built:**
   - Install needed packages from [releases](https://github.com/koeqaife/hyprland-material-you/releases)
-  - Use `sudo pacman -U <file name>` change <file name> to name of the package you downloaded and make sure you're in Downloads folder
+  - Use `sudo pacman -U <file name>` change `<file name>` to name of the package you downloaded and make sure you're in Downloads folder
     > Yea some people were trying to use `pacman -U` in home folder so I had to say that
 
 - **Build manually:**
