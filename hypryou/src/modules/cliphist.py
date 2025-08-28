@@ -99,7 +99,7 @@ class ClipItem(gtk.Revealer):
                 gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
             )
             css_provider.load_from_data(f"box {{ {css} }}")
-        elif not isinstance(self._child, gtk.Label):
+        elif not self.show_image and not isinstance(self._child, gtk.Label):
             if self.is_image:
                 format = self.format.capitalize()
                 label_widget = gtk.Label(
