@@ -416,7 +416,7 @@ class HyprlandConfigService(Service):
         generate_config()
 
     async def check_errors(self) -> None:
-        asyncio.sleep(2.5)
+        await asyncio.sleep(2.5)
         config_errors = (await hyprland.client.raw("configerrors")).strip()
         if config_errors:
             await hyprland.client.raw("reload")
