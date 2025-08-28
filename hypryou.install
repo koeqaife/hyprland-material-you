@@ -29,8 +29,8 @@ post_upgrade() {
             done
         fi
     done
-
-    post_install
+    echo ":: Updating font cache..."
+    fc-cache -f > /dev/null
 }
 
 post_remove() {
