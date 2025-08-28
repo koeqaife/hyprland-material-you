@@ -275,7 +275,7 @@ class NotificationItem(gtk.Box):
         if actions:
             for action in actions:
                 button = gtk.Button(
-                    label=action[1],
+                    label=action[1] or action[0],
                     css_classes=("action", "outlined"),
                     halign=gtk.Align.END
                 )
