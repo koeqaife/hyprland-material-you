@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 from __start__ import START
 import atexit
 import threading
@@ -16,7 +17,7 @@ import utils.colors
 from utils.styles import apply_css
 from utils.logger import logger, setup_logger
 from src.variables import Globals
-from config import Settings, ASSETS_DIR, makedirs
+from config import Settings, ASSETS_DIR, makedirs, APP_CACHE_DIR
 
 from gi.events import GLibEventLoopPolicy  # type: ignore[import-untyped]
 import asyncio
@@ -300,6 +301,31 @@ class HyprYou(gtk.Application):
                 self.corners[monitor] = Corners(self, monitor)
 
 
+def get_dir_size(path: str) -> int:
+    total = 0
+    with os.scandir(path) as it:
+        for entry in it:
+            if entry.is_file():
+                total += entry.stat().st_size
+            elif entry.is_dir():
+                total += get_dir_size(entry.path)
+    return total
+
+
+def clear_cache() -> None:
+    dirs = (
+        os.path.join(APP_CACHE_DIR, "arts"),
+        os.path.join(APP_CACHE_DIR, "thumbnails")
+    )
+    for dir in dirs:
+        if not os.path.isdir(dir):
+            continue
+        cache_size = get_dir_size(dir) / 1024 / 1024
+        if cache_size > 100:
+            import shutil
+            shutil.rmtree(dir, True)
+
+
 def init() -> None:
     setup_logger(logging.DEBUG if __debug__ else logging.INFO)
     if is_socket_exists():
@@ -310,6 +336,7 @@ def init() -> None:
 
     set_fatal_handler(handle_fatal_signal)
 
+    clear_cache()
     makedirs()
     settings = Settings()
     asyncio.set_event_loop_policy(GLibEventLoopPolicy())
