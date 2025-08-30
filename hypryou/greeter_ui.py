@@ -402,7 +402,6 @@ class GreeterUI(gtk.ApplicationWindow):
         if error is not None:
             self.error.set_label(error)
             self.auth_error.set_label(error)
-            self.stack.set_visible_child_name("username")
 
     async def _handler(self, response: dict[str, t.Any]) -> None:
         if response["type"] == "success":
