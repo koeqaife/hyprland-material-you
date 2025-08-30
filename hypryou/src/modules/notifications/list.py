@@ -157,7 +157,8 @@ class Notifications(gtk.ScrolledWindow):
         is_closing.value = True
         self._iterator = iter(self.items.items())
         self.closing_source = glib.timeout_add(
-            75 if len(self.items) < 30 else 45,
+            75 if len(self.items) < 30 else 45
+            if len(self.items) < 60 else 10,
             self.close_next
         )
         self.update_clear_button()
