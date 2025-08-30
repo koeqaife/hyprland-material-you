@@ -235,6 +235,8 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         else:
             self.change_button_icon()
 
+        self.unlock_btn.grab_focus()
+
     def update_battery(self, *args: t.Any) -> None:
         upower = get_upower()
 
