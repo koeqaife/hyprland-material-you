@@ -428,7 +428,8 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         if self.expanded:
             self.time.set_label(time.value)
         else:
-            self.time.set_label("\n".join(time.value.split()[0].split(":")))
+            hours, minutes = time.value.split()[0].split(":")
+            self.time.set_label(f"{int(hours):02d}\n{int(minutes):02d}")
 
     def destroy(self) -> None:
         self.unlock_btn.disconnect(self.unblock_btn_handler)
