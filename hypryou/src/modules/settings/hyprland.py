@@ -118,17 +118,17 @@ class HyprlandPage(gtk.ScrolledWindow):
             Hint("Changing cursor settings requires session restart"),
 
             Category("Hyprsunset"),
+            SettingsBoolRow(
+                "Keep Night Light On",
+                "Restore night light between sessions",
+                "hyprsunset.remember"
+            ),
             SettingsTextRow(
                 "Night light temperature",
                 "Screen temperature for night light (in K)",
                 "hyprsunset.temperature",
                 max_width_chars=5,
                 **int_kwargs
-            ),
-            SettingsBoolRow(
-                "Remember Night Light",
-                "Restore night light between sessions",
-                "hyprsunset.remember"
             )
         )
         for child in self.box_children:
