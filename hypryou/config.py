@@ -146,12 +146,12 @@ default_settings: dict[str, t.Any] = {
 
     # Hyprsunset
     "hyprsunset.temperature": 3500,
+    "hyprsunset.value": False,
+    "hyprsunset.remember": True,
 
     "lid_action": "dpms",
     "monitors": [],
-    "keybinds_overrides": [],
-
-    "night_light": False
+    "keybinds_overrides": []
 }
 
 

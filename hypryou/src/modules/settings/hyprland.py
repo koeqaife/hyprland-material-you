@@ -124,6 +124,11 @@ class HyprlandPage(gtk.ScrolledWindow):
                 "hyprsunset.temperature",
                 max_width_chars=5,
                 **int_kwargs
+            ),
+            SettingsBoolRow(
+                "Remember Night Light",
+                "Restore night light between sessions",
+                "hyprsunset.remember"
             )
         )
         for child in self.box_children:

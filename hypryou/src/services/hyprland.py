@@ -552,7 +552,7 @@ async def get_active_workspaces(client: HyprlandClient) -> list[int]:
 
 
 def change_night_light(value: bool) -> None:
-    Settings().set("night_light", value)
+    Settings().set("hyprsunset.value", value)
     if value:
         temperature = Settings().get("hyprsunset.temperature")
         asyncio.create_task(
@@ -657,10 +657,16 @@ async def init() -> None:
         if not _temperature.isdigit():
             logger.error("Invalid answer from hyprsunset: %s", _temperature)
         else:
-            last_state = bool(Settings().get("night_light"))
-            night_light.value = last_state
+            hyprsunset_settings = Settings().get_view_for("hyprsunset")
+            if hyprsunset_settings.get("remember"):
+                last_state = bool(hyprsunset_settings.get("value"))
+                night_light.value = last_state
+            else:
+                night_light.value = int(_temperature) < 6000
+
             night_light.ready()
-            change_night_light(last_state)
+
+            change_night_light(night_light.value)
             night_light.watch(change_night_light)
     except (ConnectionRefusedError, FileNotFoundError) as e:
         logger.error("Couldn't connect to hyprsunset", exc_info=e)
