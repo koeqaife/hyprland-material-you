@@ -127,7 +127,9 @@ class AudioService(Service):
         self.default_speaker.connect("notify::volume", self.on_volume_changed)
         self.default_speaker.connect("notify::mute", self.on_muted_changed)
 
+        mic_volume.watch(self.on_mic_volume_ref_changed)
         mic_muted.watch(self.on_mic_muted_ref_changed)
+        self.default_mic.connect("notify::volume", self.on_mic_volume_changed)
         self.default_mic.connect("notify::mute", self.on_mic_muted_changed)
 
         targets: dict[str, Ref[set[wp.Stream]] | Ref[set[wp.Endpoint]]] = {
