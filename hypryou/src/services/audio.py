@@ -70,6 +70,9 @@ mic_icon = Computed(
     name="mic_icon"
 )
 
+speaker_name = Ref("Unknown speaker", name="speaker_name")
+mic_name = Ref("Unknown mic", name="mic_name")
+
 
 class AudioService(Service):
     def __init__(self) -> None:
@@ -118,6 +121,19 @@ class AudioService(Service):
     def on_mic_muted_ref_changed(self, new_value: bool) -> None:
         self.default_mic.set_mute(new_value)
 
+    # Speaker's and mic's name
+    def update_mic_name(self, *args: t.Any) -> None:
+        mic_name.value = (
+            self.default_mic.get_description()
+            or self.default_mic.get_name()
+        )
+
+    def update_speaker_name(self, *args: t.Any) -> None:
+        speaker_name.value = (
+            self.default_speaker.get_description()
+            or self.default_speaker.get_name()
+        )
+
     def app_init(self) -> None:
         if not self.success:
             return
@@ -126,11 +142,17 @@ class AudioService(Service):
         volume_muted.watch(self.on_muted_ref_changed)
         self.default_speaker.connect("notify::volume", self.on_volume_changed)
         self.default_speaker.connect("notify::mute", self.on_muted_changed)
+        self.default_speaker.connect(
+            "notify::description", self.update_speaker_name
+        )
+        self.default_speaker.connect("notify::name", self.update_speaker_name)
 
         mic_volume.watch(self.on_mic_volume_ref_changed)
         mic_muted.watch(self.on_mic_muted_ref_changed)
         self.default_mic.connect("notify::volume", self.on_mic_volume_changed)
         self.default_mic.connect("notify::mute", self.on_mic_muted_changed)
+        self.default_mic.connect("notify::description", self.update_mic_name)
+        self.default_mic.connect("notify::name", self.update_mic_name)
 
         targets: dict[str, Ref[set[wp.Stream]] | Ref[set[wp.Endpoint]]] = {
             "microphone": microphones,
