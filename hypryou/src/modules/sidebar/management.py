@@ -1,6 +1,6 @@
 from repository import gtk, pango, gdk, bluetooth
 from utils import colors
-from utils.ref import Ref
+from utils.ref import Ref, Computed
 from utils.styles import toggle_css_class
 import typing as t
 from src.services.clock import full_date
@@ -12,10 +12,10 @@ from src.services.hyprland import night_light
 from src.services.state import open_settings, close_window
 from src import widget
 
-dnd_icon = Ref("do_not_disturb_off", name="dnd_icon")
-dnd_icon.bind(
-    dnd,
-    lambda bool: "do_not_disturb_on" if bool else "do_not_disturb_off"
+dnd_icon = Computed(
+    "do_not_disturb_off",
+    lambda: "do_not_disturb_on" if dnd.value else "do_not_disturb_off",
+    name="dnd_icon"
 )
 
 
