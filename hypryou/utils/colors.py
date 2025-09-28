@@ -507,12 +507,16 @@ def update_settings() -> None:
     settings = Settings()
     gsettings = gio.Settings.new("org.gnome.desktop.interface")
 
+    if settings.get("themes.gtk3") or settings.get("themes.gtk4"):
+        if not dark_mode.value:
+            gsettings.set_string("gtk-theme", "adw-gtk3")
+        else:
+            gsettings.set_string("gtk-theme", "adw-gtk3-dark")
+
     if not dark_mode.value:
-        gsettings.set_string("gtk-theme", "adw-gtk3")
         gsettings.set_string("color-scheme", "prefer-light")
         gsettings.set_string("icon-theme", settings.get("icons.light"))
     else:
-        gsettings.set_string("gtk-theme", "adw-gtk3-dark")
         gsettings.set_string("color-scheme", "prefer-dark")
         gsettings.set_string("icon-theme", settings.get("icons.dark"))
 
