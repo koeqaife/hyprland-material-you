@@ -1,12 +1,12 @@
 from utils.ref import Ref
 import src.widget as widget
-from repository import gtk, gdk, glib, layer_shell
+from repository import gtk, gdk, glib, layer_shell, pango
 from src.services.backlight import (
     get_backlight_manager, BacklightDevice,
     BacklightDeviceView
 )
-from src.services.audio import volume, volume_icon
-from src.services.audio import mic_volume, mic_icon
+from src.services.audio import volume, volume_icon, speaker_name
+from src.services.audio import mic_volume, mic_icon, mic_name
 import typing as t
 from src.services.state import opened_windows
 from config import Settings
@@ -22,24 +22,35 @@ class Popup(gtk.Revealer):
         self,
         icon: str | Ref[str],
         num: int,
-        max_value: int = 100,
+        name: str,
+        max_value: int = 100
     ) -> None:
         self.num = num
         self.event_counter = 0
         self.max = max_value
         self.revealed = False
-        self.box = gtk.Box(
+        self.vbox = gtk.Box(
             css_classes=("popup",),
-            hexpand=True
+            hexpand=True,
+            orientation=gtk.Orientation.VERTICAL
         )
         super().__init__(
             css_classes=("popup-revealer",),
-            child=self.box,
+            child=self.vbox,
             reveal_child=False,
             transition_duration=250,
             transition_type=gtk.RevealerTransitionType.SLIDE_DOWN
         )
-        self.icon = widget.Icon(icon)
+        self.name = gtk.Label(
+            label=name,
+            halign=gtk.Align.START,
+            css_classes=("name",),
+            ellipsize=pango.EllipsizeMode.END
+        )
+        self.icon = widget.Icon(
+            icon,
+            valign=gtk.Align.END
+        )
         self.scale = gtk.Scale.new_with_range(
             gtk.Orientation.HORIZONTAL,
             0,
@@ -47,15 +58,25 @@ class Popup(gtk.Revealer):
             1
         )
         self.scale.set_hexpand(True)
-        self.label = gtk.Label(
+        self.percent = gtk.Label(
             label="0%",
             halign=gtk.Align.END,
             css_classes=("percent",)
         )
 
-        self.box.append(self.icon)
-        self.box.append(self.scale)
-        self.box.append(self.label)
+        self.name_box = gtk.Box(
+            valign=gtk.Align.END
+        )
+        self.scale_box = gtk.Box()
+
+        self.scale_box.append(self.scale)
+        self.scale_box.append(self.percent)
+
+        self.name_box.append(self.icon)
+        self.name_box.append(self.name)
+
+        self.vbox.append(self.name_box)
+        self.vbox.append(self.scale_box)
 
         self.scale_handler = self.scale.connect(
             "value-changed", self.scale_changed
@@ -66,7 +87,7 @@ class Popup(gtk.Revealer):
     def update_percent(self) -> None:
         new_value = int(self.scale.get_value() / self.max * 100)
         new_label = f"{new_value}%"
-        self.label.set_label(new_label)
+        self.percent.set_label(new_label)
 
     def scale_changed(self, *args: t.Any) -> None:
         self.update_percent()
@@ -97,7 +118,7 @@ class BrightnessPopup(Popup):
 
     def __init__(self, device: BacklightDevice, num: int) -> None:
         self.device = BacklightDeviceView(device)
-        super().__init__(device.icon, num, 512)
+        super().__init__(device.icon, num, "Brightness", 512)
 
         self.handler = self.device.watch(
             "changed-external",
@@ -144,19 +165,33 @@ class VolumePopup(Popup):
         self,
         num: int,
         icon: str | Ref[str],
-        volume: Ref[float]
+        volume: Ref[float],
+        name: Ref[str],
+        show_if: t.Callable[[], bool]
     ) -> None:
-        super().__init__(icon, num)
+        super().__init__(icon, num, "unknown")
 
+        self.is_ready = [False, False]
+        self.show_if = show_if
         self.volume = volume
+        self.name_ref = name
+        self.update_scale_value(self.volume.value, False)
         self.handler = self.volume.watch(
             self.update_scale_value
         )
-        self.update_scale_value(self.volume.value, False)
+        self.name_handler = self.name_ref.watch(
+            self.on_name_change
+        )
 
     def destroy(self) -> None:
         self.volume.unwatch(self.handler)
         super().destroy()
+
+    def on_name_change(self, new_value: str) -> None:
+        self.is_ready[0] = True
+        self.name.set_label(new_value)
+        if self.show_if() and all(self.is_ready):
+            self.reveal()
 
     def update_scale_value(
         self,
@@ -166,12 +201,14 @@ class VolumePopup(Popup):
         self.event_counter += 1
         if self.event_counter < 3:
             return
-        if reveal and not opened_windows.is_visible("audio"):
-            value = new_value
-            self.scale.handler_block(self.scale_handler)
-            self.scale.set_value(value)
-            self.scale.handler_unblock(self.scale_handler)
-            self.update_percent()
+
+        self.scale.handler_block(self.scale_handler)
+        self.scale.set_value(new_value)
+        self.scale.handler_unblock(self.scale_handler)
+        self.update_percent()
+
+        self.is_ready[1] = True
+        if reveal and self.show_if() and all(self.is_ready):
             self.reveal()
         elif self.revealed:
             self.un_reveal()
@@ -180,7 +217,8 @@ class VolumePopup(Popup):
         if not self.revealed:
             return
         self.volume.value = self.scale.get_value()
-        if not opened_windows.is_visible("audio"):
+        self.name_ref.unwatch(self.name_handler)
+        if self.show_if():
             self.reveal()
         super().scale_changed(*args)
 
@@ -205,7 +243,8 @@ class PopupsWindow(widget.LayerWindow):
             monitor=monitor,
             name="popups",
             css_classes=("popups",),
-            layer=layer_shell.Layer.OVERLAY
+            layer=layer_shell.Layer.OVERLAY,
+            visible=False
         )
         self.child = gtk.Box(
             orientation=gtk.Orientation.VERTICAL
@@ -216,10 +255,16 @@ class PopupsWindow(widget.LayerWindow):
             self.brightness = BrightnessPopup(self.manager.devices[0], num)
             self.child.append(self.brightness)
 
-        self.volume = VolumePopup(num, volume_icon, volume)
+        self.volume = VolumePopup(
+            num, volume_icon, volume, speaker_name,
+            show_if=lambda: (not opened_windows.is_visible("audio"))
+        )
         self.child.append(self.volume)
 
-        self.mic_volume = VolumePopup(num, mic_icon, mic_volume)
+        self.mic_volume = VolumePopup(
+            num, mic_icon, mic_volume, mic_name,
+            show_if=lambda: (not opened_windows.is_visible("mics"))
+        )
         self.child.append(self.mic_volume)
 
         self.set_child(self.child)
@@ -240,6 +285,9 @@ class PopupsWindow(widget.LayerWindow):
 
     def hide(self) -> None:
         self.timeout = None
+        counter = window_counter.value[self.num]
+        if counter > 0:
+            return
         super().hide()
 
     def _update_visible(self, new: dict[int, int]) -> None:

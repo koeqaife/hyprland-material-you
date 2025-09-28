@@ -9,9 +9,10 @@ window.popups {
         @include nLayerBackground($background, 1);
         border-radius: $hyprlandRounding;
         border: 0.0625rem solid $layerBorderColor;
-        min-width: 15rem;
+        min-width: 17rem;
         min-height: 1rem;
         padding: 0.25rem;
+        padding-top: 0.35rem;
         padding-left: 0.75rem;
         padding-right: 0.75rem;
         margin-bottom: 0.5rem;
@@ -19,8 +20,9 @@ window.popups {
 
         .icon {
             margin-right: 0.188rem;
+            margin-left: 0.188rem;
             color: $onSurface;
-            font-size: 1.063rem;
+            font-size: 1.125rem;
             font-variation-settings: "opsz" 20;
             font-weight: 500;
         }
@@ -32,6 +34,13 @@ window.popups {
             font-weight: 400;
             color: $onSurfaceVariant;
         }
+
+        .name {
+            font-size: 1rem;
+            font-weight: 400;
+            margin-top: 0.188rem;
+        }
+
         scale slider {
             box-shadow: none;
             @if $layerOpacity == 1 {
