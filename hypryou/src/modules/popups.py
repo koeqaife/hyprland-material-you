@@ -75,7 +75,6 @@ class Popup(gtk.Revealer):
         if self.timer_handler != -1:
             glib.source_remove(self.timer_handler)
         self.timer_handler = glib.timeout_add(3000, self.un_reveal)
-        print("REVEAL")
 
         if not self.revealed:
             self.revealed = True
