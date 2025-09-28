@@ -372,6 +372,9 @@ class Ref(t.Generic[T]):
 
     @value.setter
     def value(self, _new_value: T) -> None:
+        self._set_value(_new_value)
+
+    def _set_value(self, _new_value: T) -> None:
         old_value = self._value
         new_value = self._wrap_if_mutable(_new_value)
         if old_value != new_value:
@@ -503,5 +506,13 @@ class Computed(Ref[T], t.Generic[T]):
             ref.watch(self.on_computed)
         self.on_computed()
 
+    @property
+    def value(self) -> T:
+        return super().value
+
+    @value.setter
+    def value(self, _new_value: T) -> None:
+        raise RuntimeError("Computed is immutable")
+
     def on_computed(self, *args: t.Any) -> None:
-        self.value = self.func()
+        self._set_value(self.func())
