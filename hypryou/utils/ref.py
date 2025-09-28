@@ -498,10 +498,10 @@ class Computed(Ref[T], t.Generic[T]):
             self.refs = refs
         else:
             self.refs = find_refs_in_func(func)
-        print(self.refs)
 
         for ref in self.refs:
             ref.watch(self.on_computed)
+        self.on_computed()
 
     def on_computed(self, *args: t.Any) -> None:
         self.value = self.func()
