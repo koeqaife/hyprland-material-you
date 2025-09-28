@@ -6,6 +6,7 @@ from src.services.backlight import (
     BacklightDeviceView
 )
 from src.services.audio import volume, volume_icon
+from src.services.audio import mic_volume, mic_icon
 import typing as t
 from src.services.state import opened_windows
 from config import Settings
@@ -74,6 +75,7 @@ class Popup(gtk.Revealer):
         if self.timer_handler != -1:
             glib.source_remove(self.timer_handler)
         self.timer_handler = glib.timeout_add(3000, self.un_reveal)
+        print("REVEAL")
 
         if not self.revealed:
             self.revealed = True
@@ -139,16 +141,22 @@ class BrightnessPopup(Popup):
 class VolumePopup(Popup):
     __gtype_name__ = "VolumePopup"
 
-    def __init__(self, num: int) -> None:
-        super().__init__(volume_icon, num)
+    def __init__(
+        self,
+        num: int,
+        icon: str | Ref[str],
+        volume: Ref[float]
+    ) -> None:
+        super().__init__(icon, num)
 
-        self.handler = volume.watch(
+        self.volume = volume
+        self.handler = self.volume.watch(
             self.update_scale_value
         )
-        self.update_scale_value(volume.value, False)
+        self.update_scale_value(self.volume.value, False)
 
     def destroy(self) -> None:
-        volume.unwatch(self.handler)
+        self.volume.unwatch(self.handler)
         super().destroy()
 
     def update_scale_value(
@@ -172,7 +180,7 @@ class VolumePopup(Popup):
     def scale_changed(self, *args: t.Any) -> None:
         if not self.revealed:
             return
-        volume.value = self.scale.get_value()
+        self.volume.value = self.scale.get_value()
         if not opened_windows.is_visible("audio"):
             self.reveal()
         super().scale_changed(*args)
@@ -203,12 +211,18 @@ class PopupsWindow(widget.LayerWindow):
         self.child = gtk.Box(
             orientation=gtk.Orientation.VERTICAL
         )
+
         self.manager = get_backlight_manager()
         if self.manager.devices:
             self.brightness = BrightnessPopup(self.manager.devices[0], num)
             self.child.append(self.brightness)
-        self.volume = VolumePopup(num)
+
+        self.volume = VolumePopup(num, volume_icon, volume)
         self.child.append(self.volume)
+
+        self.mic_volume = VolumePopup(num, mic_icon, mic_volume)
+        self.child.append(self.mic_volume)
+
         self.set_child(self.child)
 
         self.handler = window_counter.watch(
