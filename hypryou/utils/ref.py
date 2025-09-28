@@ -3,6 +3,7 @@ import typing as t
 from collections.abc import MutableSequence, MutableSet
 from utils.logger import logger
 from utils.service import Signals
+import inspect
 
 __all__ = [
     "Ref"
@@ -234,6 +235,33 @@ def unpack_reactive(value: T) -> T:
     return t.cast(T, _unpack(value))
 
 
+def find_refs_in_func(
+    func: t.Callable[[], T]
+) -> set["Ref[t.Any]"]:
+    refs: set[Ref[t.Any]] = set()
+    current_frame = inspect.currentframe()
+    try:
+        frame = current_frame
+        while frame:
+            caller_module = frame.f_globals.get("__name__")
+            if caller_module and caller_module != __name__:
+                break
+            frame = frame.f_back
+
+        if not frame:
+            frame = current_frame.f_back
+
+        code = func.__code__
+        for name in code.co_names:
+            obj = frame.f_locals.get(name) or frame.f_globals.get(name)
+            if isinstance(obj, Ref):
+                refs.add(obj)
+
+        return refs
+    finally:
+        del frame
+
+
 class Ref(t.Generic[T]):
     __slots__ = (
         "_signals", "deep", "is_ready",
@@ -443,3 +471,37 @@ class Ref(t.Generic[T]):
 
         handler_id = ref.watch(on_changed)
         return handler_id
+
+
+class Computed(Ref[T], t.Generic[T]):
+    def __init__(
+        self,
+        default_value: T,
+        func: t.Callable[[], T],
+        *,
+        name: str | None = None,
+        delayed_init: bool = False,
+        deep: bool = False,
+        types: tuple[type, ...] | None = None,
+        refs: set[Ref[t.Any]] | None = None
+    ) -> None:
+        super().__init__(
+            default_value,
+            name=name,
+            delayed_init=delayed_init,
+            deep=deep,
+            types=types
+        )
+        self.func = func
+
+        if refs:
+            self.refs = refs
+        else:
+            self.refs = find_refs_in_func(func)
+        print(self.refs)
+
+        for ref in self.refs:
+            ref.watch(self.on_computed)
+
+    def on_computed(self, *args: t.Any) -> None:
+        self.value = self.func()
