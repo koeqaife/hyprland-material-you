@@ -126,12 +126,14 @@ class AudioService(Service):
         mic_name.value = (
             self.default_mic.get_description()
             or self.default_mic.get_name()
+            or mic_name.value
         )
 
     def update_speaker_name(self, *args: t.Any) -> None:
         speaker_name.value = (
             self.default_speaker.get_description()
             or self.default_speaker.get_name()
+            or speaker_name.value
         )
 
     def app_init(self) -> None:
@@ -153,6 +155,9 @@ class AudioService(Service):
         self.default_mic.connect("notify::mute", self.on_mic_muted_changed)
         self.default_mic.connect("notify::description", self.update_mic_name)
         self.default_mic.connect("notify::name", self.update_mic_name)
+
+        self.update_mic_name()
+        self.update_speaker_name()
 
         targets: dict[str, Ref[set[wp.Stream]] | Ref[set[wp.Endpoint]]] = {
             "microphone": microphones,
