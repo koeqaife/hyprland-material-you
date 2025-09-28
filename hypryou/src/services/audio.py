@@ -1,5 +1,5 @@
 from repository import wp
-from utils.ref import Ref
+from utils.ref import Ref, Computed
 from utils.logger import logger
 from utils.service import Service
 import typing as t
@@ -25,13 +25,16 @@ def get_volume_icon(*args: t.Any) -> str:
     return ICON_VALUES[0]
 
 
-volume = Ref(0.0, name="audio_volume")
-volume_muted = Ref(False, name="audio_volume_muted")
-volume_icon = Ref("volume_off", name="audio_volume_icon")
-volume_icon.bind(volume, get_volume_icon)
-volume_icon.bind(volume_muted, get_volume_icon)
+def get_mic_icon(*args: t.Any) -> None:
+    muted = mic_muted.value
+    is_recording = len(recorders.value) > 0
+    if muted:
+        return "mic_off"
+    elif is_recording:
+        return "mic_double"
+    else:
+        return "mic"
 
-mic_muted = Ref(False, name="mic_muted")
 
 streams = Ref[set[wp.Stream]](
     set(), name="audio_streams",
@@ -51,6 +54,22 @@ microphones = Ref[set[wp.Endpoint]](
     types=(wp.Endpoint,)
 )
 
+volume = Ref(0.0, name="audio_volume")
+volume_muted = Ref(False, name="audio_volume_muted")
+volume_icon = Computed(
+    "volume_off",
+    get_volume_icon,
+    name="audio_volume_icon"
+)
+
+mic_volume = Ref(0.0, name="mic_volume")
+mic_muted = Ref(False, name="mic_muted")
+mic_icon = Computed(
+    "mic_off",
+    get_mic_icon,
+    name="mic_icon"
+)
+
 
 class AudioService(Service):
     def __init__(self) -> None:
@@ -65,6 +84,7 @@ class AudioService(Service):
             self.success = False
             logger.error("AudioService init error", exc_info=e)
 
+    # Speaker: Volume
     def on_volume_ref_changed(self, new_value: float) -> None:
         volume = self.default_speaker.get_volume() * 100.0
         if volume == new_value:
@@ -74,12 +94,24 @@ class AudioService(Service):
     def on_volume_changed(self, *args: t.Any) -> None:
         volume.value = self.default_speaker.get_volume() * 100.0
 
+    # Speaker: Muted
     def on_muted_changed(self, *args: t.Any) -> None:
         volume_muted.value = self.default_speaker.get_mute()
 
     def on_muted_ref_changed(self, new_value: bool) -> None:
         self.default_speaker.set_mute(new_value)
 
+    # Mic: Volume
+    def on_mic_volume_ref_changed(self, new_value: float) -> None:
+        volume = self.default_mic.get_volume() * 100.0
+        if volume == new_value:
+            return
+        self.default_mic.set_volume(new_value / 100.0)
+
+    def on_mic_volume_changed(self, *args: t.Any) -> None:
+        mic_volume.value = self.default_mic.get_volume() * 100.0
+
+    # Mic: Muted
     def on_mic_muted_changed(self, *args: t.Any) -> None:
         mic_muted.value = self.default_mic.get_mute()
 
