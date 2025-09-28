@@ -384,15 +384,25 @@ class MprisWatcher:
         if name in players.value:
             return
 
-        proxy = gio.DBusProxy.new_sync(
+        gio.DBusProxy.new(
             session_bus,
             gio.DBusProxyFlags.NONE,
             None,
             name,
             "/org/mpris/MediaPlayer2",
             "org.mpris.MediaPlayer2.Player",
-            None
+            None,
+            self.add_player_finish,
+            name
         )
+
+    def add_player_finish(
+        self,
+        proxy: gio.DBusProxy,
+        result: gio.AsyncResult,
+        name: str
+    ) -> None:
+        proxy.new_finish(result)
         player = MprisPlayer(proxy)
         players.value[name] = player
         if __debug__:
