@@ -45,8 +45,17 @@ class TrayItem(gtk.Box):
             btn_box.append(self.menu_btn)
         btn_box.append(self.quit_btn)
 
+        self.image_overlay = gtk.Overlay(
+            child=gtk.Box(css_classes=("app-icon-size",)),
+            css_classes=("app-icon",)
+        )
+        self.image = gtk.Picture(
+            content_fit=gtk.ContentFit.SCALE_DOWN,
+            can_shrink=True
+        )
+        self.image_overlay.add_overlay(self.image)
         self.children = (
-            gtk.Image(),
+            self.image_overlay,
             gtk.Label(
                 css_classes=("app-label",)
             ),
@@ -114,23 +123,21 @@ class TrayItem(gtk.Box):
                 self._item.get_bus_name()
             )
         item = self._item
-        image = self.children[0]
+        image = self.image
         theme = item.icon_theme
         if theme and theme.has_icon(item.icon_name):
             texture = theme.lookup_icon(
                 item.icon_name,
                 None,
-                32,
+                64,
                 1,
                 gtk.TextDirection.RTL,
                 gtk.IconLookupFlags.FORCE_SYMBOLIC
             )
-            image.set_from_paintable(texture)
-        elif (pixbuf := item.get_pixbuf(32, 32)) is not None:
-            image.set_from_pixbuf(pixbuf)
-        else:
-            image.set_from_icon_name(item.icon_name)
-        image.set_size_request(32, 32)
+            image.set_paintable(texture)
+        elif (pixbuf := item.get_pixbuf(64, 64)) is not None:
+            texture = gdk.Texture.new_for_pixbuf(pixbuf)
+            image.set_paintable(texture)
 
     def update_label(self) -> None:
         name = self._item.get_name() or "unknown"

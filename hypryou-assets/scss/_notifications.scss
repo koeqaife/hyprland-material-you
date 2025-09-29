@@ -54,9 +54,11 @@ box.notification {
         }
         .body-image {
             margin-right: 0.5rem;
-            min-height: 4rem;
-            min-width: 4rem;
             color: $onSurface;
+        }
+        .body-image-size {
+            min-height: 4.5rem;
+            min-width: 4.5rem;
         }
     }
     .actions {

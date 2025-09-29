@@ -20,7 +20,15 @@ class ClientItem(gtk.Box):
         )
         self._item = item
 
-        self.image = gtk.Image()
+        self.image_overlay = gtk.Overlay(
+            child=gtk.Box(css_classes=("image-size",)),
+            css_classes=("image",)
+        )
+        self.image = gtk.Picture(
+            content_fit=gtk.ContentFit.SCALE_DOWN,
+            can_shrink=True
+        )
+        self.image_overlay.add_overlay(self.image)
         self.title = gtk.Label(
             css_classes=("app-title",),
             ellipsize=pango.EllipsizeMode.END,
@@ -33,7 +41,7 @@ class ClientItem(gtk.Box):
         )
 
         self.children = (
-            self.image,
+            self.image_overlay,
             self.title,
             self.workspace
         )
@@ -76,13 +84,22 @@ class ClientItem(gtk.Box):
     def update_image(self) -> None:
         if not self.get_visible():
             return
-        image = self.children[0]
+        image = self.image
         icon = self._item.get_icon()
         if icon is None:
-            image.set_from_icon_name("image-missing")
+            display = gdk.Display.get_default()
+            icon_theme = gtk.IconTheme.get_for_display(display)
+            texture = icon_theme.lookup_icon(
+                "image-missing",
+                None,
+                64,
+                1,
+                gtk.TextDirection.RTL,
+                gtk.IconLookupFlags.FORCE_SYMBOLIC
+            )
+            image.set_paintable(texture)
         else:
-            image.set_from_paintable(icon)
-        image.set_size_request(32, 32)
+            image.set_paintable(icon)
 
     def destroy(self) -> None:
         for child in self.children:

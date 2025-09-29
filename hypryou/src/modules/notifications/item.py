@@ -146,10 +146,16 @@ class NotificationItem(gtk.Box):
         self.body_box = gtk.Box(
             css_classes=("body",)
         )
-        self.image = gtk.Image(
-            css_classes=("body-image",),
-            valign=gtk.Align.START,
+        self.image_overlay = gtk.Overlay(
+            child=gtk.Box(css_classes=("body-image-size",)),
+            css_classes=("body-image",)
         )
+        self.image = gtk.Picture(
+            css_classes=("body-image-widget",),
+            content_fit=gtk.ContentFit.SCALE_DOWN,
+            can_shrink=True
+        )
+        self.image_overlay.add_overlay(self.image)
         self.text_box = gtk.Box(
             orientation=gtk.Orientation.VERTICAL
         )
@@ -167,7 +173,7 @@ class NotificationItem(gtk.Box):
         )
         self.text_box.append(self.title)
         self.text_box.append(self.body_text)
-        self.body_box.append(self.image)
+        self.body_box.append(self.image_overlay)
         self.body_box.append(self.text_box)
 
         # Notification actions
@@ -293,13 +299,17 @@ class NotificationItem(gtk.Box):
                 gtk.TextDirection.LTR,
                 gtk.IconLookupFlags.FORCE_SYMBOLIC
             )
-            self.image.set_from_paintable(texture)
-        elif icon:
-            self.image.set_from_pixbuf(icon)
+            self.image.set_paintable(texture)
             self.image.set_visible(True)
+            self.image_overlay.set_visible(True)
+        elif icon:
+            texture = gdk.Texture.new_for_pixbuf(icon)
+            self.image.set_paintable(texture)
+            self.image.set_visible(True)
+            self.image_overlay.set_visible(True)
         else:
             self.image.set_visible(False)
-            self.image.set_size_request(0, 0)
+            self.image_overlay.set_visible(False)
 
         self.title.set_label(self.item.summary)
         try:

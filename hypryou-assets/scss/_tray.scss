@@ -23,11 +23,12 @@ window.tray {
         margin-left: 0.5rem;
         margin-right: 0.5rem;
         margin-bottom: 0.5rem;
-        image {
+        .app-icon {
             margin-right: 0.5rem;
-            min-height: 1.5rem;
-            min-width: 1.5rem;
-            font-size: 2rem;
+        }
+        .app-icon-size {
+            min-height: 1.75rem;
+            min-width: 1.75rem;
         }
         .app-label {
             font-size: 1rem;
