@@ -143,8 +143,9 @@ class TrayItem(gtk.Box):
         self.remove_controller(self.click_gesture)
         self.quit_btn.disconnect(self.quit_conn)
         self._item.unwatch(self.handler_id)
-        self.popover.destroy()
-        self.popover = None  # type: ignore
+        if self.popover:
+            self.popover.destroy()
+            self.popover = None  # type: ignore
         self.menu_btn.set_popover(None)
 
 
