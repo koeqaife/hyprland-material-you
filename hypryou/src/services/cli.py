@@ -40,7 +40,9 @@ HELP = {
     "settings": "Open settings",
     "wallpaper": ("Change wallpapers. " +
                   "Use 'random' instead of path to pick random"),
-    "toggle_animations": "Toggle animations in gtk and hyprland"
+    "toggle_animations": "Toggle animations in gtk and hyprland",
+    "move_window": "Moves window to workspace",
+    "change_workspace": "Changes workspace"
 }
 animations = True
 
@@ -193,6 +195,38 @@ class CliRequest:
             padding = " " * (max_cmd_len - len(cmd))
             output += f"{cmd}{padding} -> {help}\n"
         return output
+
+    def do_change_workspace(self, workspace_id: str) -> str:
+        if not workspace_id.isdigit():
+            return "Wrong workspace ID"
+        if not Settings().get("separated_workspaces"):
+            asyncio.create_task(
+                hyprland.client.raw(f"dispatch workspace {workspace_id}")
+            )
+        else:
+            active_monitor = hyprland.active_monitor_id.value
+            _workspace_id = int(workspace_id) + (10 * active_monitor)
+            asyncio.create_task(
+                hyprland.client.raw(f"dispatch workspace {_workspace_id}")
+            )
+        return "ok"
+
+    def do_move_window(self, workspace_id: str) -> str:
+        if not workspace_id.isdigit():
+            return "Wrong workspace ID"
+        if not Settings().get("separated_workspaces"):
+            asyncio.create_task(
+                hyprland.client.raw(f"dispatch movetoworkspace {workspace_id}")
+            )
+        else:
+            active_monitor = hyprland.active_monitor_id.value
+            _workspace_id = int(workspace_id) + (10 * active_monitor)
+            asyncio.create_task(
+                hyprland.client.raw(
+                    f"dispatch movetoworkspace {_workspace_id}"
+                )
+            )
+        return "ok"
 
 
 async def handle_client(
