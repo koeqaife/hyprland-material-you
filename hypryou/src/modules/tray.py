@@ -31,6 +31,7 @@ class TrayItem(gtk.Box):
             halign=gtk.Align.END,
             css_classes=("attention-outlined",)
         )
+        self.popover: dbus_menu.DBusMenuPopover | None = None
         if self._item.menu:
             self.menu_btn = gtk.MenuButton(
                 child=widget.Icon("menu"),
