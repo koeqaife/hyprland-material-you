@@ -1,0 +1,58 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "calculated" as *;
+@use "sass:color";
+
+window.calendar {
+    @include nLayerBackground($background, 1);
+    border-radius: $hyprlandRounding;
+    border: 0.0625rem solid $layerBorderColor;
+    padding: 0.5rem;
+
+    .entry {
+        min-height: 2rem;
+        min-width: 2rem;
+        font-feature-settings: "tnum";
+        color: $onSurface;
+        border-radius: max(calc($hyprlandRounding - 0.5rem), 0.25rem);
+        &.weekend {
+            @include nLayerBackground($surfaceContainer, 2);
+            color: $onSurfaceVariant;
+        }
+        &.today {
+            background-color: $primary;
+            color: $onPrimary;
+            &.weekend {
+                outline: 1px solid $outline;
+                outline-offset: -1px;
+            }
+        }
+        &.today-weekday {
+            color: $primary;
+        }
+    }
+
+    .header-box {
+        @include nLayerBackground($surfaceContainer, 2);
+        border-radius: max(calc($hyprlandRounding - 0.5rem), 0.25rem);
+        padding: 0.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .date {
+        font-size: 1rem;
+        margin-left: 0.5rem;
+    }
+
+    .weekdays {
+        @include nLayerBackground($surfaceContainer, 2);
+        border-radius: max(calc($hyprlandRounding - 0.5rem), 0.25rem);
+        margin-bottom: 0.25rem;
+        padding: 0.25rem;
+    }
+
+    button.next {
+        margin-right: 0.25rem;
+        margin-left: 0.25rem;
+    }
+}

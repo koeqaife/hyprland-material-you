@@ -179,7 +179,7 @@ class Workspaces(gtk.Box):
                 button.set_visible(True)
 
 
-class Clock(gtk.Label):
+class Clock(gtk.Button):
     __gtype_name__ = "ClockApplet"
 
     def __init__(self) -> None:
@@ -196,6 +196,10 @@ class Clock(gtk.Label):
             # as it's updated after clock.date
             full_date: full_date.watch(self.update_date)
         }
+        self.handler = self.connect("clicked", self.on_click)
+
+    def on_click(self, *args: t.Any) -> None:
+        toggle_window("calendar")
 
     def update_time(self, new: str) -> None:
         self.set_label(new)
@@ -206,6 +210,7 @@ class Clock(gtk.Label):
         )
 
     def destroy(self) -> None:
+        self.disconnect(self.handler)
         for ref, handler_id in self.ref_handlers.items():
             ref.unwatch(handler_id)
 
