@@ -10,7 +10,7 @@ window.popups {
         border-radius: $hyprlandRounding;
         border: 0.0625rem solid $layerBorderColor;
         min-width: 17rem;
-        min-height: 1rem;
+        min-height: 2.5rem;
         padding: 0.25rem;
         padding-top: 0.375rem;
         padding-left: 0.75rem;
@@ -45,6 +45,24 @@ window.popups {
             box-shadow: none;
             @if $layerOpacity == 1 {
                 box-shadow: -0.375rem 0 0 0 $background, 0.375rem 0 0 0 $background;
+            }
+        }
+    }
+
+    .text-popup {
+        padding: 0.25rem;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        .icon {
+            margin-right: 0.5rem;
+        }
+        &.critical {
+            background-color: $error;
+            .icon {
+                color: $onError;
+            }
+            .name {
+                color: $onError;
             }
         }
     }

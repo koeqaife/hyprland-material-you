@@ -7,12 +7,76 @@ from src.services.backlight import (
 )
 from src.services.audio import volume, volume_icon, speaker_name
 from src.services.audio import mic_volume, mic_icon, mic_name
+from src.services.audio import recorders
 import typing as t
 from src.services.state import opened_windows
+from src.services.upower import BatteryLevel, get_upower
 from config import Settings
 from math import ceil
 
 window_counter = Ref[dict[int, int]]({}, name="popup_counter")
+
+
+class TextPopup(gtk.Revealer):
+    __gtype_name__ = "TextPopup"
+
+    def __init__(
+        self,
+        num: int,
+        icon: str | Ref[str],
+        text: str,
+        critical: bool = False
+    ) -> None:
+        self.event_counter = 0
+        self.num = num
+        self.revealed = False
+        self.box = gtk.Box(
+            css_classes=("popup", "text-popup"),
+            hexpand=True
+        )
+        if critical:
+            self.box.add_css_class("critical")
+        super().__init__(
+            css_classes=("popup-revealer",),
+            child=self.box,
+            reveal_child=False,
+            transition_duration=250,
+            transition_type=gtk.RevealerTransitionType.SLIDE_DOWN
+        )
+        self.name = gtk.Label(
+            label=text,
+            halign=gtk.Align.START,
+            css_classes=("name",),
+            ellipsize=pango.EllipsizeMode.END
+        )
+        self.icon = widget.Icon(
+            icon,
+            valign=gtk.Align.CENTER
+        )
+        self.box.append(self.icon)
+        self.box.append(self.name)
+
+        self.timer_handler = -1
+
+    def reveal(self) -> None:
+        if self.timer_handler != -1:
+            glib.source_remove(self.timer_handler)
+        self.timer_handler = glib.timeout_add(5000, self.un_reveal)
+
+        if not self.revealed:
+            self.revealed = True
+            window_counter.value[self.num] += 1
+            glib.idle_add(self.set_reveal_child, True)
+
+    def un_reveal(self) -> None:
+        self.timer_handler = -1
+        if self.revealed:
+            self.set_reveal_child(False)
+            self.revealed = False
+            window_counter.value[self.num] -= 1
+
+    def destroy(self) -> None:
+        self.icon.destroy()
 
 
 class Popup(gtk.Revealer):
@@ -267,6 +331,21 @@ class PopupsWindow(widget.LayerWindow):
         )
         self.child.append(self.mic_volume)
 
+        self.mic_is_using = TextPopup(
+            num,
+            "mic_double",
+            "An application is recording",
+        )
+        self.child.append(self.mic_is_using)
+
+        self.low_battery = TextPopup(
+            num,
+            "battery_alert",
+            "You have low battery!",
+            True
+        )
+        self.child.append(self.low_battery)
+
         self.set_child(self.child)
 
         self.handler = window_counter.watch(
@@ -278,6 +357,26 @@ class PopupsWindow(widget.LayerWindow):
             "hyprland.gaps_out", self.on_gaps_out,
             True
         )
+        self.recorders_handler = recorders.watch(
+            self.on_recorders
+        )
+        self.upower_handler = get_upower().watch("changed", self.on_upower)
+        self.on_upower()
+
+    def on_upower(self, *args: t.Any) -> None:
+        upower = get_upower()
+        is_critical = (
+            upower.battery_level == BatteryLevel.CRITICAL
+            or upower.percentage <= 10
+        )
+        if is_critical:
+            self.low_battery.reveal()
+
+    def on_recorders(self, *args: t.Any) -> None:
+        if len(recorders.value) > 0:
+            self.mic_is_using.reveal()
+        else:
+            self.mic_is_using.un_reveal()
 
     def show(self) -> None:
         self.timeout = None
@@ -304,5 +403,7 @@ class PopupsWindow(widget.LayerWindow):
         if getattr(self, "brightness"):
             self.brightness.destroy()
         self.volume.destroy()
+        recorders.unwatch(self.recorders_handler)
+        get_upower().unwatch(self.upower_handler)
         del window_counter.value[self.num]
         super().destroy()
