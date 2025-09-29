@@ -368,13 +368,21 @@ class MprisWatcher:
                 self.add_player(name)
 
     def scan_existing_players(self) -> None:
-        result = dbus_proxy.call_sync(
+        dbus_proxy.call(
             "ListNames",
             None,
             gio.DBusCallFlags.NONE,
             -1,
-            None
+            None,
+            self.scan_existing_players_finish
         )
+
+    def scan_existing_players_finish(
+        self,
+        proxy: gio.DBusProxy,
+        _result: gio.AsyncResult
+    ) -> None:
+        result = proxy.call_finish(_result)
         names = t.cast(list[str], result.unpack()[0])
         players = [name for name in names if name.startswith(MPRIS_PREFIX)]
         for name in players:

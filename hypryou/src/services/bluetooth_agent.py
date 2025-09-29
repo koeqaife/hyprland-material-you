@@ -152,17 +152,24 @@ class BluetoothAgent:
 
         if __debug__:
             logger.debug("Registering BluetoothAgent")
-        proxy = gio.DBusProxy.new_sync(
+        gio.DBusProxy.new(
             self.conn,
             gio.DBusProxyFlags.NONE,
             None,
             "org.bluez",
             "/org/bluez",
             "org.bluez.AgentManager1",
-            None
+            None,
+            self.register_finish
         )
 
-        proxy.call_sync(
+    def register_finish(
+        self,
+        proxy: gio.DBusProxy,
+        result: gio.AsyncResult
+    ) -> None:
+        proxy.new_finish(result)
+        proxy.call(
             "RegisterAgent",
             glib.Variant("(os)", (
                 "/com/koeqaife/BluetoothAgent",

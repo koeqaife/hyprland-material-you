@@ -818,7 +818,7 @@ class SecretAgent:
         )
         caps = nm.SecretAgentCapabilities.NONE
 
-        proxy.call_sync(
+        proxy.call(
             "RegisterWithCapabilities",
             glib.Variant("(su)", (
                 "com.koeqaife.SecretAgent",

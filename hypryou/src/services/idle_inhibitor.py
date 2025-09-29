@@ -11,16 +11,25 @@ inhibited = Ref(False, name="inhibited")
 
 class IdleInhibitor:
     def __init__(self) -> None:
-        self._proxy = gio.DBusProxy.new_sync(
+        self._proxy: gio.DBusProxy
+        gio.DBusProxy.new(
             session_bus,
             gio.DBusProxyFlags.NONE,
             None,
             "org.freedesktop.ScreenSaver",
             "/org/freedesktop/ScreenSaver",
             "org.freedesktop.ScreenSaver",
-            None
+            None,
+            self._new_finish
         )
         self.cookie: int = -1
+
+    def _new_finish(
+        self,
+        proxy: gio.DBusProxy,
+        result: gio.AsyncResult
+    ) -> None:
+        self._proxy = proxy.new_finish(result)
 
     def on_inhibit(
         self,
