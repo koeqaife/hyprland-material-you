@@ -1,4 +1,4 @@
-from repository import gtk, gdk, pango, bluetooth
+from repository import gtk, gdk, pango, bluetooth, layer_shell, glib
 from dataclasses import dataclass
 from utils.ref import Ref
 from utils.styles import toggle_css_class
@@ -11,7 +11,7 @@ from config import Settings
 import weakref
 import cairo
 from src.services.network import get_network
-from src.services.state import toggle_window, open_settings
+from src.services.state import toggle_window, open_settings, _opened_windows
 from src.services.upower import get_upower, BatteryLevel, BatteryState
 from src.services.backlight import get_backlight_manager, BacklightDeviceView
 from src.services.clock import date, full_date, time
@@ -1053,19 +1053,60 @@ class Bar(widget.LayerWindow):
             exclusive=True,
             monitor=monitor,
             css_classes=("bar",),
-            name="bar"
+            name="bar",
+            layer=layer_shell.Layer.OVERLAY
         )
 
+        self.monitor_id = monitor_id
         self.center_box = gtk.CenterBox(
             start_widget=ModulesLeft(monitor_id),
             center_widget=ModulesCenter(monitor_id),
             end_widget=ModulesRight(monitor_id)
         )
 
+        self.ref_handlers: dict[Ref[t.Any], int] = {
+            hyprland.active_client: hyprland.active_client.watch(
+                self.update_hidden
+            ),
+            _opened_windows: _opened_windows.watch(self.update_hidden)
+        }
+        self.visible_timeout: int = -1
+
         self.set_child(self.center_box)
         self.show()
         if __debug__:
             weakref.finalize(self, lambda: logger.debug("Bar finalized"))
+
+    def update_hidden(self, *args: t.Any) -> None:
+        if self.visible_timeout != -1:
+            glib.source_remove(self.visible_timeout)
+            self.visible_timeout = -1
+
+        active_client = hyprland.active_client.value.get(self.monitor_id)
+        set_visible = True
+        if (
+            len(_opened_windows.value) > 0
+            or active_client is None
+        ):
+            set_visible = True
+        else:
+            set_visible = not active_client.fullscreen
+
+        if set_visible is True:
+            self.set_visible(True)
+        else:
+            weak_self = weakref.ref(self)
+
+            def hide() -> None:
+                self = weak_self()
+                if not self:
+                    return
+                self.set_visible(False)
+                self.visible_timeout = -1
+
+            self.visible_timeout = glib.timeout_add(
+                250, hide
+            )
 
     def destroy(self) -> None:
         box = self.center_box
@@ -1083,6 +1124,8 @@ class Bar(widget.LayerWindow):
         box.set_end_widget(None)
         self.set_child(None)
         self.close()
+        for ref, handler in self.ref_handlers.items():
+            ref.unwatch(handler)
         super().destroy()
 
 
