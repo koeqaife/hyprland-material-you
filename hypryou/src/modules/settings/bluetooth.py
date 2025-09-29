@@ -138,6 +138,9 @@ class BluetoothDevice(RowTemplate):
         self.handlers = (
             self.device.connect("notify::connecting", self.on_connecting),
             self.device.connect("notify::connected", self.on_connected),
+            self.device.connect(
+                "notify::battery-percentage", self.update_description
+            ),
         )
         self.update_description()
 
@@ -224,12 +227,18 @@ class BluetoothDevice(RowTemplate):
         self.popover.set_pointing_to(rect)
         self.popover.popup()
 
-    def update_description(self) -> None:
+    def update_description(self, *args: t.Any) -> None:
         if self.device.get_connecting():
             self.set_description("Connecting...")
             toggle_css_class(self, "active", True)
         elif self.device.get_connected():
-            self.set_description("Connected")
+            percent = self.device.get_battery_percentage()
+            if percent == -1.0:
+                self.set_description("Connected")
+            else:
+                self.set_description(
+                    f"Connected ({int(percent * 100)}%)"
+                )
             toggle_css_class(self, "active", True)
         else:
             self.set_description(self.address)
