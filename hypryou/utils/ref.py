@@ -240,16 +240,18 @@ def find_refs_in_func(
 ) -> set["Ref[t.Any]"]:
     refs: set[Ref[t.Any]] = set()
     current_frame = inspect.currentframe()
+    if current_frame is None:
+        return refs
     try:
         frame = current_frame
         while frame:
             caller_module = frame.f_globals.get("__name__")
             if caller_module and caller_module != __name__:
                 break
-            frame = frame.f_back
+            frame = frame.f_back or frame
 
         if not frame:
-            frame = current_frame.f_back
+            frame = current_frame.f_back or current_frame
 
         code = func.__code__
         for name in code.co_names:

@@ -25,7 +25,7 @@ def get_volume_icon(*args: t.Any) -> str:
     return ICON_VALUES[0]
 
 
-def get_mic_icon(*args: t.Any) -> None:
+def get_mic_icon(*args: t.Any) -> str:
     muted = mic_muted.value
     is_recording = len(recorders.value) > 0
     if muted:

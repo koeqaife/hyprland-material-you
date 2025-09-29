@@ -5,6 +5,9 @@ from utils.logger import logger
 import typing as t
 
 
+type Elements = list[tuple[int, dict[str, str], Elements]]
+
+
 class DBusMenuPopover(gtk.PopoverMenu):
     __gtype_name__ = "DBusMenuPopover"
     IFACE = "com.canonical.dbusmenu"
@@ -124,14 +127,19 @@ class DBusMenuPopover(gtk.PopoverMenu):
             self._set_fallback_menu()
 
     def _extract_children_from_layout(
-        self, layout: tuple[int, int, list[tuple[int, dict[str, str]]]]
-    ) -> list[tuple[int, dict[str, str]]]:
+        self,
+        layout: tuple[
+            int,
+            int,
+            Elements
+        ]
+    ) -> Elements:
         return list(layout[2])
 
     def _build_gio_menu(
         self,
         gio_menu: gio.Menu,
-        children: list[tuple[int, dict[str, str], dict[str, str]]]
+        children: Elements
     ) -> None:
         for node in children:
             try:

@@ -10,7 +10,7 @@ from src.modules.notifications.list import Notifications
 class SidebarNotifications(gtk.Overlay):
     __gtype_name__ = "SidebarNotifications"
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.notifications = Notifications()
         self.clear_button = self.notifications.clear_button
@@ -26,6 +26,9 @@ class SidebarNotifications(gtk.Overlay):
 
     def unfreeze(self) -> None:
         self.notifications.unfreeze()
+
+    def destroy(self) -> None:
+        self.notifications.destroy()
 
 
 class SidebarBox(gtk.Box):

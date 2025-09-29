@@ -155,7 +155,7 @@ class KeybindsWindow(widget.LayerWindow):
     def on_hide(self) -> None:
         if self._child:
             self._child.destroy()
-        self.box.remove(self._child)
+            self.box.remove(self._child)
         self._child = None
 
     def destroy(self) -> None:

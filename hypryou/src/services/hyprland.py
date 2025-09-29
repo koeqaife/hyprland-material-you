@@ -31,7 +31,7 @@ workspace_ids = Computed[set[int]](
     set(),
     lambda: set(workspace_monitors.value.keys()),
     name="workspace_ids",
-    refs=[workspace_monitors]
+    refs={workspace_monitors}
 )
 clients = Ref[dict[str, "Client"]](
     {},
@@ -41,7 +41,7 @@ active_monitor_id = Computed[int](
     -1,
     lambda: monitor_ids.value.get(active_monitor_name.value, -1),
     name="active_monitor_id",
-    refs=[monitor_ids, active_monitor_name]
+    refs={monitor_ids, active_monitor_name}
 )
 active_client = Ref[dict[int, "Client | None"]](
     {},
@@ -556,7 +556,7 @@ class EventCallbacks:
 
     @staticmethod
     def on_monitorremovedv2(
-        monitor_id: str,
+        _monitor_id: str,
         monitor_name: str,
         *monitor_description: str
     ) -> None:
