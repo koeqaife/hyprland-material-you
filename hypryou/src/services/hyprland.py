@@ -2,7 +2,7 @@ import asyncio
 from enum import Enum
 import os
 from asyncio import StreamReader, StreamWriter
-from utils.ref import Ref
+from utils.ref import Ref, Computed
 from utils.logger import logger
 import typing as t
 import json
@@ -12,20 +12,41 @@ from config import Settings
 
 active_workspace = Ref(0, name="workspace", delayed_init=True)
 active_layout = Ref("en", name="active_layout", delayed_init=True)
+active_monitor_name = Ref[str](
+    "", name="active_monitor_name"
+)
+
 show_layout = Ref(False, name="show_layout", delayed_init=True)
 night_light = Ref(False, name="night_light", delayed_init=True)
 
-workspace_ids = Ref[set[int]](
+workspace_monitors = Ref[dict[int, int]](
+    {},
+    name="workspace_monitors"
+)
+monitor_ids = Ref[dict[str, int]](
+    {},
+    name="monitor_ids"
+)
+workspace_ids = Computed[set[int]](
     set(),
+    lambda: set(workspace_monitors.value.keys()),
     name="workspace_ids",
-    delayed_init=True
+    refs=[workspace_monitors]
 )
 clients = Ref[dict[str, "Client"]](
     {},
     name="hyprland_clients"
 )
-clients_use_counter = 0
-initialized = Ref(False)
+active_monitor_id = Computed[int](
+    -1,
+    lambda: monitor_ids.value.get(active_monitor_name.value, -1),
+    name="active_monitor_id",
+    refs=[monitor_ids, active_monitor_name]
+)
+active_client = Ref[dict[int, "Client | None"]](
+    {},
+    name="active_client",
+)
 
 
 type HyprlandQueryType = t.Literal[
@@ -118,6 +139,12 @@ class Client(Signals):
         super().__init__()
         self._data = client
 
+    def notify_changed(self) -> None:
+        # I couldn't find any better way to do that without refs, sadly
+        self.notify("changed")
+        if active_client.value.get(self.monitor) is self:
+            active_client.notify_signal("changed", active_client.value)
+
     def sync(self) -> None:
         async def async_task() -> None:
             data = await get_client_dict_by_address(self.address)
@@ -125,7 +152,7 @@ class Client(Signals):
                 await clients_full_sync()
             else:
                 self._data = data
-                self.notify("changed")
+                self.notify_changed()
 
         asyncio.create_task(async_task())
 
@@ -224,7 +251,7 @@ class Client(Signals):
 
     @property
     def monitor(self) -> int:
-        raise NotImplementedError("Not synced")
+        return workspace_monitors.value.get(self.workspace_id, -1)
 
     @property
     def class_(self) -> str:
@@ -255,8 +282,8 @@ class Client(Signals):
         return self._data["pinned"]
 
     @property
-    def fullscreen(self) -> int:
-        raise NotImplementedError("Not synced")
+    def fullscreen(self) -> bool:
+        return int(self._data["fullscreen"]) != 0
 
     @property
     def fullscreen_client(self) -> int:
@@ -391,6 +418,7 @@ class EventCallbacks:
         new_workspace_id: str
     ) -> None:
         active_workspace.value = int(new_workspace_id)
+        active_monitor_name.value = new_monitor_name
 
     @staticmethod
     def on_activelayout(
@@ -406,16 +434,15 @@ class EventCallbacks:
         workspace_id: str,
         workspace_name: str
     ) -> None:
-        if int(workspace_id) not in workspace_ids.value:
-            workspace_ids.value.add(int(workspace_id))
+        workspace_monitors.value[int(workspace_id)] = active_monitor_id.value
 
     @staticmethod
     def on_destroyworkspacev2(
         workspace_id: str,
         workspace_name: str
     ) -> None:
-        if int(workspace_id) in workspace_ids.value:
-            workspace_ids.value.remove(int(workspace_id))
+        if int(workspace_id) in workspace_monitors.value:
+            del workspace_monitors.value[int(workspace_id)]
 
     @staticmethod
     def on_openwindow(
@@ -424,9 +451,6 @@ class EventCallbacks:
         window_class: str,
         *_window_title: str
     ) -> None:
-        if clients_use_counter == 0:
-            return
-
         async def async_task() -> None:
             client = await get_client_by_address(window_address)
             if client is None:
@@ -442,14 +466,11 @@ class EventCallbacks:
         workspace_id: str,
         workspace_name: str
     ) -> None:
-        if clients_use_counter == 0:
-            return
-
         if window_address in clients.value.keys():
             _client = clients.value[window_address]
             _client._data["workspace"]["id"] = int(workspace_id)
             _client._data["workspace"]["name"] = workspace_name
-            _client.notify("changed")
+            _client.notify_changed()
         else:
             asyncio.create_task(clients_full_sync())
 
@@ -458,14 +479,11 @@ class EventCallbacks:
         window_address: str,
         *_window_title: str
     ) -> None:
-        if clients_use_counter == 0:
-            return
-
         window_title = ",".join(_window_title)
         if window_address in clients.value.keys():
             _client = clients.value[window_address]
             _client._data["title"] = window_title
-            _client.notify("changed")
+            _client.notify_changed()
         else:
             # NOTE: I would use clients_full_sync() here
             # but Hyprland can sometimes send this event
@@ -477,13 +495,10 @@ class EventCallbacks:
         window_address: str,
         pin_state: bool
     ) -> None:
-        if clients_use_counter == 0:
-            return
-
         if window_address in clients.value.keys():
             _client = clients.value[window_address]
             _client._data["pinned"] = pin_state
-            _client.notify("changed")
+            _client.notify_changed()
         else:
             asyncio.create_task(clients_full_sync())
 
@@ -491,13 +506,64 @@ class EventCallbacks:
     def on_closewindow(
         window_address: str
     ) -> None:
-        if clients_use_counter == 0:
-            return
-
         if window_address in clients.value.keys():
-            clients.value.pop(window_address)
+            client = clients.value.pop(window_address)
+            for monitor_id, _client in active_client.value.items():
+                if _client is client:
+                    del active_client.value[monitor_id]
+                    break
         else:
             asyncio.create_task(clients_full_sync())
+
+    @staticmethod
+    def on_activewindowv2(
+        window_address: str | None = None
+    ) -> None:
+        if window_address and window_address not in clients.value.keys():
+            asyncio.create_task(clients_full_sync())
+        elif window_address is None:
+            active_client.value[active_monitor_id.value] = None
+        else:
+            client = clients.value[window_address]
+            active_client.value[client.monitor] = client
+
+    @staticmethod
+    def on_fullscreen(
+        state: str
+    ) -> None:
+        client = active_client.value.get(active_monitor_id.value)
+        if client:
+            client._data["fullscreen"] = int(state)
+            client.notify_changed()
+
+    @staticmethod
+    def on_moveworkspacev2(
+        workspace_id: str,
+        workspace_name: str,
+        *monitor_name: str
+    ) -> None:
+        workspace_monitors.value[int(workspace_id)] = (
+            monitor_ids.value[",".join(monitor_name)]
+        )
+
+    @staticmethod
+    def on_monitoraddedv2(
+        monitor_id: str,
+        monitor_name: str,
+        *monitor_description: str
+    ) -> None:
+        monitor_ids.value[monitor_name] = int(monitor_id)
+
+    @staticmethod
+    def on_monitorremovedv2(
+        monitor_id: str,
+        monitor_name: str,
+        *monitor_description: str
+    ) -> None:
+        if monitor_name in monitor_ids.value:
+            monitor_id = monitor_ids.value[monitor_name]
+            del active_client.value[monitor_id]
+            del monitor_ids.value[monitor_name]
 
 
 class Keyboard(t.TypedDict):
@@ -540,15 +606,18 @@ async def get_active_layout(client: HyprlandClient) -> tuple[bool, str]:
     return show_layout, keyboard["active_keymap"]
 
 
-async def get_active_workspaces(client: HyprlandClient) -> list[int]:
+async def get_active_workspaces(client: HyprlandClient) -> dict[int, int]:
     workspaces = await client.query("workspaces")
     assert isinstance(workspaces, list), (
         "Workspaces has to be list. " +
         f"{type(workspaces)} != list"
     )
 
-    workspace_ids = [int(object["id"]) for object in workspaces]
-    return workspace_ids
+    workspace_monitors = {
+        int(object["id"]): int(object["monitorID"])
+        for object in workspaces
+    }
+    return workspace_monitors
 
 
 def change_night_light(value: bool) -> None:
@@ -595,7 +664,7 @@ async def clients_full_sync() -> None:
         address = _client["address"].lstrip("0x")
         if address in clients.value:
             clients.value[address]._data = _client
-            clients.value[address].notify("changed")
+            clients.value[address].notify_changed()
         else:
             clients.value[address] = Client(_client)
         addresses.append(address)
@@ -608,21 +677,11 @@ async def clients_full_sync() -> None:
 
 
 def acquire_clients() -> None:
-    global clients_use_counter
-    if clients_use_counter < 0:
-        clients_use_counter = 0
-        logger.warning("Acquire: Clients counter < 0")
-    clients_use_counter += 1
-    if clients_use_counter == 1:
-        asyncio.create_task(clients_full_sync())
+    asyncio.create_task(clients_full_sync())
 
 
 def release_clients() -> None:
-    global clients_use_counter
-    clients_use_counter -= 1
-    if clients_use_counter < 0:
-        clients_use_counter = 0
-        logger.warning("Release: Clients counter < 0")
+    pass
 
 
 async def get_monitors() -> list[MonitorDict]:
@@ -638,8 +697,14 @@ async def init() -> None:
 
     if __debug__:
         logger.debug("Loading hyprland variables")
+
+    _monitors = await get_monitors()
+    for monitor in _monitors:
+        monitor_ids.value[monitor["name"]] = monitor["id"]
+
     _active_workspace = await client.query("activeworkspace")
     active_workspace.value = int(_active_workspace["id"])
+    active_monitor_name.value = str(_active_workspace["monitor"])
     active_workspace.ready()
 
     show_layout.value, active_layout.value = await get_active_layout(client)
@@ -647,8 +712,17 @@ async def init() -> None:
     show_layout.ready()
 
     _active_workspaces = await get_active_workspaces(client)
-    workspace_ids.value = set(_active_workspaces)
-    workspace_ids.ready()
+    workspace_monitors.value = _active_workspaces
+
+    await clients_full_sync()
+
+    _active_window = await client.query("activewindow")
+    _active_window_address = (
+        str(_active_window["address"]).removeprefix("0x")
+    )
+    if _active_window_address in clients.value.keys():
+        _client = clients.value[_active_window_address]
+        active_client.value[_client.monitor] = _client
 
     try:
         _temperature = await client.raw(
