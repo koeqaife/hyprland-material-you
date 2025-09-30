@@ -8,6 +8,7 @@ import utils.system as system
 from utils.system import STATIC_SYSTEM_INFO as STATIC
 
 ICON_SIZE = 22
+last_page: str | None = None
 
 
 def open_link(url: str) -> None:
@@ -259,7 +260,7 @@ class InfoStack(gtk.Box):
         )
 
         self._last_active: widget.StackButton | None = None
-        self.current_page = "info"
+        self.current_page = last_page or "info"
         self.buttons = {
             "info": widget.StackButton(
                 "info", "Info", "info",
@@ -292,6 +293,7 @@ class InfoStack(gtk.Box):
 
         self.append(self.buttons_box)
         self.append(self.stack)
+        self.stack.set_visible_child_name(self.current_page)
         self.update_active_button()
 
     def update_active_button(self) -> None:
@@ -303,8 +305,10 @@ class InfoStack(gtk.Box):
             self._last_active = new_active
 
     def change_page(self, to: str) -> None:
+        global last_page
         self.stack.set_visible_child_name(to)
         self.current_page = to
+        last_page = to
         self.update_active_button()
 
     def destroy(self) -> None:
