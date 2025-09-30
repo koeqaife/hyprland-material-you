@@ -35,11 +35,15 @@ class NotificationPopups(gtk.Box):
 
         self.items: dict[int, NotificationRevealer] = {}
         self.handler_id = popups.watch(self.on_change)
+        self.windows_handler = opened_windows.watch(
+            "changed::sidebar", self.update_window_state
+        )
 
     def destroy(self) -> None:
         popups.unwatch(self.handler_id)
         for item in self.items.values():
             item.self_destroy()
+        opened_windows.unwatch(self.windows_handler)
         self.items.clear()
 
     def on_item_destroy(self, key: int) -> None:
@@ -49,7 +53,7 @@ class NotificationPopups(gtk.Box):
             self.remove(item)
         self.update_window_state()
 
-    def update_window_state(self) -> None:
+    def update_window_state(self, *args: t.Any) -> None:
         if (
             len(self.items) == 0
             or opened_windows.is_visible("sidebar")
