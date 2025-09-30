@@ -1000,6 +1000,7 @@ class Bar(widget.LayerWindow):
             layer=layer_shell.Layer.OVERLAY
         )
 
+        self.monitor = monitor
         self.monitor_id = monitor_id
         self.center_box = gtk.CenterBox(
             start_widget=ModulesLeft(monitor_id),
@@ -1025,7 +1026,11 @@ class Bar(widget.LayerWindow):
             glib.source_remove(self.visible_timeout)
             self.visible_timeout = -1
 
-        active_client = hyprland.active_client.value.get(self.monitor_id)
+        monitor_name = self.monitor.get_connector()
+        monitor_id = hyprland.monitor_ids.value.get(
+            monitor_name, self.monitor_id
+        )
+        active_client = hyprland.active_client.value.get(monitor_id)
         set_visible = True
         if (
             len(_opened_windows.value) > 0
