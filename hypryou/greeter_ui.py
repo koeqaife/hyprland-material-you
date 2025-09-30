@@ -236,12 +236,6 @@ class GreeterUI(gtk.ApplicationWindow):
             css_classes=("auth-message",),
             halign=gtk.Align.START
         )
-        self.auth_error = gtk.Label(
-            label="",
-            css_classes=("auth-error",),
-            halign=gtk.Align.START,
-            visible=False
-        )
         self.auth_entry = gtk.Entry(
             placeholder_text="Type here...",
         )
@@ -264,7 +258,6 @@ class GreeterUI(gtk.ApplicationWindow):
         self.auth_continue_button.connect("clicked", self.on_auth_continue)
         self.auth_box.append(self.auth_message)
         self.auth_box.append(self.auth_entry)
-        self.auth_box.append(self.auth_error)
         self.auth_box.append(self.actions_box)
         self.actions_box.append(self.auth_cancel_button)
         self.actions_box.append(self.auth_continue_button)
@@ -391,17 +384,12 @@ class GreeterUI(gtk.ApplicationWindow):
             pass
 
     def set_error(self, error: str | None) -> None:
-        # I don't really understand how greetd works
-        # And I'm a little bit lazy
-        # So I'mma set error message in both pages
         is_error = error is not None
         toggle_css_class(self.username_entry, "incorrect", is_error)
-        toggle_css_class(self.auth_entry, "incorrect", is_error)
         self.error.set_visible(is_error)
-        self.auth_error.set_visible(is_error)
-        if error is not None:
+        if is_error:
             self.error.set_label(error)
-            self.auth_error.set_label(error)
+            self.on_cancel_session()
 
     async def _handler(self, response: dict[str, t.Any]) -> None:
         if response["type"] == "success":
