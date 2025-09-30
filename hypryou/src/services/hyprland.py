@@ -542,9 +542,12 @@ class EventCallbacks:
         workspace_name: str,
         *monitor_name: str
     ) -> None:
-        workspace_monitors.value[int(workspace_id)] = (
-            monitor_ids.value[",".join(monitor_name)]
-        )
+        try:
+            workspace_monitors.value[int(workspace_id)] = (
+                monitor_ids.value[",".join(monitor_name)]
+            )
+        except KeyError:
+            pass
 
     @staticmethod
     def on_monitoraddedv2(
@@ -560,10 +563,13 @@ class EventCallbacks:
         monitor_name: str,
         *monitor_description: str
     ) -> None:
-        if monitor_name in monitor_ids.value:
-            monitor_id = monitor_ids.value[monitor_name]
-            del active_client.value[monitor_id]
-            del monitor_ids.value[monitor_name]
+        try:
+            if monitor_name in monitor_ids.value:
+                monitor_id = monitor_ids.value[monitor_name]
+                del active_client.value[monitor_id]
+                del monitor_ids.value[monitor_name]
+        except KeyError:
+            pass
 
 
 class Keyboard(t.TypedDict):
