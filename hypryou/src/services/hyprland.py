@@ -723,12 +723,13 @@ async def init() -> None:
     await clients_full_sync()
 
     _active_window = await client.query("activewindow")
-    _active_window_address = (
-        str(_active_window["address"]).removeprefix("0x")
-    )
-    if _active_window_address in clients.value.keys():
-        _client = clients.value[_active_window_address]
-        active_client.value[_client.monitor] = _client
+    if _active_window:
+        _active_window_address = (
+            str(_active_window["address"]).removeprefix("0x")
+        )
+        if _active_window_address in clients.value.keys():
+            _client = clients.value[_active_window_address]
+            active_client.value[_client.monitor] = _client
 
     try:
         _temperature = await client.raw(
