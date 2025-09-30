@@ -303,8 +303,8 @@ class NotificationItem(gtk.Box):
             self.image.set_visible(True)
             self.image_overlay.set_visible(True)
         elif icon:
-            texture = gdk.Texture.new_for_pixbuf(icon)
-            self.image.set_paintable(texture)
+            _texture = gdk.Texture.new_for_pixbuf(icon)
+            self.image.set_paintable(_texture)
             self.image.set_visible(True)
             self.image_overlay.set_visible(True)
         else:

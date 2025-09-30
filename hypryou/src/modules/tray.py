@@ -136,8 +136,8 @@ class TrayItem(gtk.Box):
             )
             image.set_paintable(texture)
         elif (pixbuf := item.get_pixbuf(64, 64)) is not None:
-            texture = gdk.Texture.new_for_pixbuf(pixbuf)
-            image.set_paintable(texture)
+            _texture = gdk.Texture.new_for_pixbuf(pixbuf)
+            image.set_paintable(_texture)
 
     def update_label(self) -> None:
         name = self._item.get_name() or "unknown"
@@ -153,7 +153,7 @@ class TrayItem(gtk.Box):
         self._item.unwatch(self.handler_id)
         if self.popover:
             self.popover.destroy()
-            self.popover = None  # type: ignore
+            self.popover = None
         self.menu_btn.set_popover(None)
 
 
