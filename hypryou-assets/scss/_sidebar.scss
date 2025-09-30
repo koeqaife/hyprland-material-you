@@ -121,7 +121,6 @@ window.sidebar {
     }
 
     box.notification {
-        @include nLayerBackground($surfaceContainer, 3);
         @include elevation(1);
         border-radius: 1.25rem;
         margin-right: 0.75rem;
