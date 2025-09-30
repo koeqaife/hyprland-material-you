@@ -45,10 +45,12 @@ window.calendar {
     }
 
     .weekdays {
-        @include nLayerBackground($surfaceContainer, 2);
-        border-radius: max(calc($hyprlandRounding - 0.5rem), 0.25rem);
         margin-bottom: 0.25rem;
         padding: 0.25rem;
+        :nth-child(6),
+        :nth-child(7) {
+            color: $onSurfaceVariant;
+        }
     }
 
     button.next {
