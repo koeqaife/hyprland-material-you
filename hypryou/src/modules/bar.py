@@ -851,119 +851,27 @@ class Applets(gtk.Box):
             self.remove(child)
 
 
-class OpenTray(gtk.Button):
-    __gtype_name__ = "OpenTrayButton"
+class OpenWindow(gtk.Button):
+    __gtype_name__ = "OpenWindowButton"
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        icon: str,
+        tooltip: str,
+        window_name: str,
+        css_classes: tuple[str, ...] = ()
+    ) -> None:
+        self.window_name = window_name
         super().__init__(
-            css_classes=("open-tray", "bar-applet"),
-            child=widget.Icon("browse"),
-            tooltip_text="System tray",
+            css_classes=css_classes,
+            child=widget.Icon(icon),
+            tooltip_text=tooltip,
             valign=gtk.Align.CENTER
         )
         self.conn_id = self.connect("clicked", self.on_clicked)
 
     def on_clicked(self, *args: t.Any) -> None:
-        toggle_window("tray")
-
-    def destroy(self) -> None:
-        self.disconnect(self.conn_id)
-
-
-class OpenCliphist(gtk.Button):
-    __gtype_name__ = "OpenCliphistButton"
-
-    def __init__(self) -> None:
-        super().__init__(
-            css_classes=("open-cliphist", "bar-applet"),
-            child=widget.Icon("content_paste"),
-            tooltip_text="Clipboard",
-            valign=gtk.Align.CENTER
-        )
-        self.conn_id = self.connect("clicked", self.on_clicked)
-
-    def on_clicked(self, *args: t.Any) -> None:
-        toggle_window("cliphist")
-
-    def destroy(self) -> None:
-        self.disconnect(self.conn_id)
-
-
-class OpenSidebar(gtk.Button):
-    __gtype_name__ = "OpenSidebarButton"
-
-    def __init__(self) -> None:
-        super().__init__(
-            css_classes=("open-sidebar", "icon-tonal"),
-            child=widget.Icon("space_dashboard"),
-            tooltip_text="Sidebar",
-            halign=gtk.Align.CENTER,
-            valign=gtk.Align.CENTER
-        )
-        self.conn_id = self.connect("clicked", self.on_clicked)
-
-    def on_clicked(self, *args: t.Any) -> None:
-        toggle_window("sidebar")
-
-    def destroy(self) -> None:
-        self.disconnect(self.conn_id)
-
-
-class OpenAppsMenu(gtk.Button):
-    __gtype_name__ = "OpenAppsMenuButton"
-
-    def __init__(self) -> None:
-        super().__init__(
-            css_classes=("open-apps-menu", "icon-tonal"),
-            child=widget.Icon("search"),
-            tooltip_text="Apps Menu",
-            halign=gtk.Align.CENTER,
-            valign=gtk.Align.CENTER
-        )
-        self.conn_id = self.connect("clicked", self.on_clicked)
-
-    def on_clicked(self, *args: t.Any) -> None:
-        toggle_window("apps_menu")
-
-    def destroy(self) -> None:
-        self.disconnect(self.conn_id)
-
-
-class OpenInfoMenu(gtk.Button):
-    __gtype_name__ = "OpenInfoMenuButton"
-
-    def __init__(self) -> None:
-        super().__init__(
-            css_classes=("open-info-menu", "icon-tonal"),
-            child=widget.Icon("info_i"),
-            tooltip_text="Info",
-            halign=gtk.Align.CENTER,
-            valign=gtk.Align.CENTER
-        )
-        self.conn_id = self.connect("clicked", self.on_clicked)
-
-    def on_clicked(self, *args: t.Any) -> None:
-        toggle_window("info")
-
-    def destroy(self) -> None:
-        self.disconnect(self.conn_id)
-
-
-class OpenClientsMenu(gtk.Button):
-    __gtype_name__ = "OpenClientsMenuButton"
-
-    def __init__(self) -> None:
-        super().__init__(
-            css_classes=("open-clients-menu", "icon-tonal"),
-            child=widget.Icon("ad_group"),
-            tooltip_text="Windows",
-            halign=gtk.Align.CENTER,
-            valign=gtk.Align.CENTER
-        )
-        self.conn_id = self.connect("clicked", self.on_clicked)
-
-    def on_clicked(self, *args: t.Any) -> None:
-        toggle_window("clients")
+        toggle_window(self.window_name)
 
     def destroy(self) -> None:
         self.disconnect(self.conn_id)
@@ -978,9 +886,24 @@ class ModulesLeft(gtk.Box):
             valign=gtk.Align.CENTER
         )
         self.children = (
-            OpenAppsMenu(),
-            OpenInfoMenu(),
-            OpenClientsMenu(),
+            OpenWindow(
+                "search",
+                "Apps Menu",
+                "apps_menu",
+                ("open-apps-menu", "icon-tonal")
+            ),
+            OpenWindow(
+                "info_i",
+                "Info",
+                "info",
+                ("open-info-menu", "icon-tonal")
+            ),
+            OpenWindow(
+                "ad_group",
+                "Windows",
+                "clients",
+                ("open-clients-menu", "icon-tonal")
+            ),
             Player(),
         )
         for child in self.children:
@@ -1023,11 +946,26 @@ class ModulesRight(gtk.Box):
         self.children = (
             KeyboardLayout(),
             Battery(),
-            OpenTray(),
-            OpenCliphist(),
+            OpenWindow(
+                "browse",
+                "System Tray",
+                "tray",
+                ("open-tray", "bar-applet")
+            ),
+            OpenWindow(
+                "content_paste",
+                "Clipboard",
+                "cliphist",
+                ("open-cliphist", "bar-applet")
+            ),
             Applets(),
             Clock(),
-            OpenSidebar()
+            OpenWindow(
+                "space_dashboard",
+                "Sidebar",
+                "sidebar",
+                ("open-sidebar", "icon-tonal")
+            )
         )
         for child in self.children:
             self.append(child)
