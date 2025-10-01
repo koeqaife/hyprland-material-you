@@ -365,12 +365,13 @@ class PopupsWindow(widget.LayerWindow):
 
     def on_upower(self, *args: t.Any) -> None:
         upower = get_upower()
-        is_critical = (
-            upower.battery_level == BatteryLevel.CRITICAL
-            or upower.percentage <= 10
-        )
-        if is_critical:
-            self.low_battery.reveal()
+        if upower.is_battery and upower.is_present:
+            is_critical = (
+                upower.battery_level == BatteryLevel.CRITICAL
+                or upower.percentage <= 10
+            )
+            if is_critical:
+                self.low_battery.reveal()
 
     def on_recorders(self, *args: t.Any) -> None:
         if len(recorders.value) > 0:
