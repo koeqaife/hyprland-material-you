@@ -283,7 +283,11 @@ class Client(Signals):
 
     @property
     def fullscreen(self) -> bool:
-        return int(self._data["fullscreen"]) != 0
+        return int(self._data["fullscreen"]) >= 2
+
+    @property
+    def maximized(self) -> bool:
+        return int(self._data["fullscreen"]) in (1, 3)
 
     @property
     def fullscreen_client(self) -> int:
@@ -531,10 +535,13 @@ class EventCallbacks:
     def on_fullscreen(
         state: str
     ) -> None:
-        client = active_client.value.get(active_monitor_id.value)
-        if client:
-            client._data["fullscreen"] = int(state)
-            client.notify_changed()
+        # Now state gives only 0/1
+        # I made a discussions on hyprland's github page
+        # https://github.com/hyprwm/Hyprland/discussions/11894
+        # Hopefully they will implement what I asked for
+        # So I will be able optimize this code
+        # But now, I have to just do full sync
+        asyncio.create_task(clients_full_sync())
 
     @staticmethod
     def on_moveworkspacev2(
@@ -547,7 +554,7 @@ class EventCallbacks:
                 monitor_ids.value[",".join(monitor_name)]
             )
         except KeyError:
-            pass
+            asyncio.create_task(clients_full_sync())
 
     @staticmethod
     def on_monitoraddedv2(
@@ -569,7 +576,7 @@ class EventCallbacks:
                 del active_client.value[monitor_id]
                 del monitor_ids.value[monitor_name]
         except KeyError:
-            pass
+            asyncio.create_task(clients_full_sync())
 
 
 class Keyboard(t.TypedDict):
@@ -666,6 +673,10 @@ async def clients_full_sync() -> None:
     output: list[ClientDict] = await client.query("clients")
     addresses: list[str] = []
 
+    _monitors = await get_monitors()
+    for monitor in _monitors:
+        monitor_ids.value[monitor["name"]] = monitor["id"]
+
     for _client in output:
         address = _client["address"].lstrip("0x")
         if address in clients.value:
@@ -678,6 +689,15 @@ async def clients_full_sync() -> None:
     for client_address in set(clients.value.keys()):
         if client_address not in addresses:
             clients.value.pop(client_address)
+
+    _active_window = await client.query("activewindow")
+    if _active_window:
+        _active_window_address = (
+            str(_active_window["address"]).removeprefix("0x")
+        )
+        if _active_window_address in clients.value.keys():
+            _client = clients.value[_active_window_address]
+            active_client.value[_client.monitor] = _client
 
     clients.notify_signal("synced", clients.value)
 
@@ -704,10 +724,6 @@ async def init() -> None:
     if __debug__:
         logger.debug("Loading hyprland variables")
 
-    _monitors = await get_monitors()
-    for monitor in _monitors:
-        monitor_ids.value[monitor["name"]] = monitor["id"]
-
     _active_workspace = await client.query("activeworkspace")
     active_workspace.value = int(_active_workspace["id"])
     active_monitor_name.value = str(_active_workspace["monitor"])
@@ -721,15 +737,6 @@ async def init() -> None:
     workspace_monitors.value = _active_workspaces
 
     await clients_full_sync()
-
-    _active_window = await client.query("activewindow")
-    if _active_window:
-        _active_window_address = (
-            str(_active_window["address"]).removeprefix("0x")
-        )
-        if _active_window_address in clients.value.keys():
-            _client = clients.value[_active_window_address]
-            active_client.value[_client.monitor] = _client
 
     try:
         _temperature = await client.raw(
