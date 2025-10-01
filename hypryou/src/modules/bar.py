@@ -1014,17 +1014,41 @@ class Bar(widget.LayerWindow):
             ),
             _opened_windows: _opened_windows.watch(self.update_hidden)
         }
+        self.setting_handler = Settings().watch(
+            "old_fullscreen_behavior", self.update_hidden, False
+        )
+        self.old_fullscreen_state: bool | None = None
         self.visible_timeout: int = -1
 
         self.set_child(self.center_box)
         self.show()
         if __debug__:
             weakref.finalize(self, lambda: logger.debug("Bar finalized"))
+        self.update_hidden()
 
     def update_hidden(self, *args: t.Any) -> None:
         if self.visible_timeout != -1:
             glib.source_remove(self.visible_timeout)
             self.visible_timeout = -1
+
+        old_fullscreen = Settings().get("old_fullscreen_behavior")
+        if old_fullscreen:
+            if self.old_fullscreen_state:
+                return
+            layer_shell.set_layer(
+                self, layer_shell.Layer.TOP
+            )
+            self.set_visible(False)
+            self.set_visible(True)
+            self.old_fullscreen_state = True
+            return
+        elif self.old_fullscreen_state is True:
+            layer_shell.set_layer(
+                self, layer_shell.Layer.OVERLAY
+            )
+            self.old_fullscreen_state = False
+            self.set_visible(False)
+            self.set_visible(True)
 
         monitor_name = self.monitor.get_connector()
         monitor_id = hyprland.monitor_ids.value.get(

@@ -134,6 +134,11 @@ class AppearancePage(gtk.ScrolledWindow):
                 "Don't show workspaces without windows",
                 "hide_empty_workspaces"
             ),
+            SettingsBoolRow(
+                "Old Fullscreen Behavior",
+                "If enabled, fullscreen behavior from <2.1.0 will be used",
+                "old_fullscreen_behavior"
+            ),
 
             Category("Icons"),
             SettingsTextRow(

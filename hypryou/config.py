@@ -151,7 +151,9 @@ default_settings: dict[str, t.Any] = {
 
     "lid_action": "dpms",
     "monitors": [],
-    "keybinds_overrides": []
+    "keybinds_overrides": [],
+
+    "old_fullscreen_behavior": False
 }
 
 
