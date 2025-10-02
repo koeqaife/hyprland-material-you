@@ -18,6 +18,7 @@ from src.services.clock import date, full_date, time
 from src.services.apps import launch_detached
 from src.services import hyprland
 from src.services.hyprland import active_workspace, workspace_ids
+from src.services.hyprland import monitor_ids
 from src.services.hyprland import active_layout, show_layout
 from src.services.mpris import MprisPlayer, current_player
 from src.services import audio
@@ -53,8 +54,13 @@ class WorkspaceButton(gtk.Button):
 class Workspaces(gtk.Box):
     __gtype_name__ = "HyprlandWorkspaces"
 
-    def __init__(self, monitor_id: int) -> None:
+    def __init__(
+        self,
+        monitor: gdk.Monitor,
+        monitor_id: int
+    ) -> None:
         self.settings = Settings()
+        self.monitor = monitor
         self.monitor_id = monitor_id
         super().__init__(
             css_classes=("workspaces",),
@@ -70,7 +76,8 @@ class Workspaces(gtk.Box):
 
         self.ref_handlers: dict[Ref[t.Any], int] = {
             active_workspace: active_workspace.watch(self.update_active),
-            workspace_ids: workspace_ids.watch(self.update_empty)
+            workspace_ids: workspace_ids.watch(self.update_empty),
+            monitor_ids: monitor_ids.watch(self.update_buttons)
         }
         self.settings_handlers = (
             self.settings.watch(
@@ -102,8 +109,12 @@ class Workspaces(gtk.Box):
             self.buttons.clear()
         if self._old_active:
             self._old_active = 0
+        monitor_id = monitor_ids.value.get(
+            self.monitor.get_connector(),
+            self.monitor_id
+        )
         monitor_multiplier = (
-            self.monitor_id + 1
+            monitor_id + 1
             if self.settings.get("separated_workspaces")
             else 1
         )
@@ -880,7 +891,11 @@ class OpenWindow(gtk.Button):
 class ModulesLeft(gtk.Box):
     __gtype_name__ = "BarModulesLeft"
 
-    def __init__(self, monitor_id: int) -> None:
+    def __init__(
+        self,
+        monitor: gdk.Monitor,
+        monitor_id: int
+    ) -> None:
         super().__init__(
             css_classes=("modules-left",),
             valign=gtk.Align.CENTER
@@ -918,13 +933,17 @@ class ModulesLeft(gtk.Box):
 class ModulesCenter(gtk.Box):
     __gtype_name__ = "BarModulesCenter"
 
-    def __init__(self, monitor_id: int) -> None:
+    def __init__(
+        self,
+        monitor: gdk.Monitor,
+        monitor_id: int
+    ) -> None:
         super().__init__(
             css_classes=("modules-center",),
             valign=gtk.Align.CENTER
         )
         self.children = (
-            Workspaces(monitor_id),
+            Workspaces(monitor, monitor_id),
         )
         for child in self.children:
             self.append(child)
@@ -938,7 +957,11 @@ class ModulesCenter(gtk.Box):
 class ModulesRight(gtk.Box):
     __gtype_name__ = "BarModulesRight"
 
-    def __init__(self, monitor_id: int) -> None:
+    def __init__(
+        self,
+        monitor: gdk.Monitor,
+        monitor_id: int
+    ) -> None:
         super().__init__(
             css_classes=("modules-right",),
             valign=gtk.Align.CENTER
@@ -1003,9 +1026,9 @@ class Bar(widget.LayerWindow):
         self.monitor = monitor
         self.monitor_id = monitor_id
         self.center_box = gtk.CenterBox(
-            start_widget=ModulesLeft(monitor_id),
-            center_widget=ModulesCenter(monitor_id),
-            end_widget=ModulesRight(monitor_id)
+            start_widget=ModulesLeft(monitor, monitor_id),
+            center_widget=ModulesCenter(monitor, monitor_id),
+            end_widget=ModulesRight(monitor, monitor_id)
         )
 
         self.ref_handlers: dict[Ref[t.Any], int] = {
