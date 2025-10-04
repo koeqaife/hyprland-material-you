@@ -353,6 +353,7 @@ class PopupsWindow(widget.LayerWindow):
         )
         self._update_visible(window_counter.value)
 
+        self.last_recorders_len = 0
         self.gaps_out_handler = Settings().watch(
             "hyprland.gaps_out", self.on_gaps_out,
             True
@@ -374,10 +375,11 @@ class PopupsWindow(widget.LayerWindow):
                 self.low_battery.reveal()
 
     def on_recorders(self, *args: t.Any) -> None:
-        if len(recorders.value) > 0:
+        if len(recorders.value) > self.last_recorders_len:
             self.mic_is_using.reveal()
-        else:
+        elif len(recorders.value) == 0:
             self.mic_is_using.un_reveal()
+        self.last_recorders_len = len(recorders.value)
 
     def show(self) -> None:
         self.timeout = None
