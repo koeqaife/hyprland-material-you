@@ -1,3 +1,4 @@
+import time
 from utils.ref import Ref
 import src.widget as widget
 from repository import gtk, gdk, glib, layer_shell, pango
@@ -361,6 +362,7 @@ class PopupsWindow(widget.LayerWindow):
         self.recorders_handler = recorders.watch(
             self.on_recorders
         )
+        self.last_upower_message = 0
         self.upower_handler = get_upower().watch("changed", self.on_upower)
         self.on_upower()
 
@@ -371,7 +373,9 @@ class PopupsWindow(widget.LayerWindow):
                 upower.battery_level == BatteryLevel.CRITICAL
                 or upower.percentage <= 10
             )
-            if is_critical:
+            now = time.monotonic()
+            if is_critical and self.last_upower_message < now - 300:
+                self.last_upower_message = time.monotonic()
                 self.low_battery.reveal()
 
     def on_recorders(self, *args: t.Any) -> None:
