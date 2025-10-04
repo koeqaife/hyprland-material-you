@@ -48,7 +48,9 @@ window.calendar {
     .weekdays {
         margin-bottom: 0.25rem;
         padding: 0.25rem;
-        color: $onSurface;
+        label {
+            color: $onSurface;
+        }
         :nth-child(6),
         :nth-child(7) {
             color: $onSurfaceVariant;
