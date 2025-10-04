@@ -14,7 +14,7 @@ import asyncio
 
 apps = Ref[list["Application"]]([], name="applications", delayed_init=True)
 frequents = Ref[dict[str, int]]({}, name="app_frequents", delayed_init=True)
-FOUND_THRESHOLD = 0.4
+FOUND_THRESHOLD = 0.47
 
 APP_FREQUENCY = pjoin(APP_CACHE_DIR, "apps-frequency.json")
 LEGACY_APP_FREQUENCY = pjoin(CACHE_DIR, "ags", "apps", "apps_frequency.json")
@@ -57,7 +57,7 @@ class Application:
         self.score = 1.0
 
         self._match: dict[str | None, float] = {
-            self.exec: -0.1,
+            self.exec: 0,
             self.entry: -0.1,
             self.description: -0.2,
             self.name: 0.1

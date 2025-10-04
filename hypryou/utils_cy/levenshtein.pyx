@@ -98,11 +98,11 @@ cpdef float compute_score(str s1, str s2):
     cdef float score = 0.85 * full + 0.15 * part
 
     if s1 and s2 and s1[0] != s2[0]:
-        score -= 0.05
+        score -= 0.1
 
     cdef int len_diff = abs(len(s1) - len(s2))
     if len_diff >= 3:
-        score -= 0.05 * len_diff / max_len
+        score -= 0.02 * len_diff / max_len
 
     cdef int common_prefix_len = 0
     cdef int min_len = min(len(s1), len(s2))
@@ -111,10 +111,10 @@ cpdef float compute_score(str s1, str s2):
             common_prefix_len += 1
         else:
             break
-    score += 0.02 * common_prefix_len
+    score += 0.04 * common_prefix_len
 
     if s1 in s2 or s2 in s1:
-        score += 0.06
+        score += 0.08
 
     if score > 1.0:
         score = 1.0
