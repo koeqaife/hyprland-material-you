@@ -32,6 +32,7 @@ class TrayItem(gtk.Box):
             css_classes=("attention-outlined",)
         )
         self.popover: dbus_menu.DBusMenuPopover | None = None
+        self.menu_btn: gtk.MenuButton | None = None
         if self._item.menu:
             self.menu_btn = gtk.MenuButton(
                 child=widget.Icon("menu"),
@@ -154,7 +155,8 @@ class TrayItem(gtk.Box):
         if self.popover:
             self.popover.destroy()
             self.popover = None
-        self.menu_btn.set_popover(None)
+        if self.menu_btn:
+            self.menu_btn.set_popover(None)
 
 
 class TrayBox(gtk.ScrolledWindow):
