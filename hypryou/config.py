@@ -56,6 +56,7 @@ default_settings: dict[str, t.Any] = {
     "power_menu_cancel_button": True,
     "secure_cliphist": False,
     "floating_sidebar": False,
+    "floating_bar": False,
     "hide_empty_workspaces": False,
     "color": "",
 

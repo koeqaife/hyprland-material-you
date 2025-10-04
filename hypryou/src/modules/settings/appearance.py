@@ -100,6 +100,11 @@ class AppearancePage(gtk.ScrolledWindow):
                 "Adds margins to the sidebar",
                 "floating_sidebar",
             ),
+            SettingsBoolRow(
+                "Floating Bar",
+                "Adds margins to the bar (will disable corners)",
+                "floating_bar",
+            ),
 
             Category("Formatting"),
             SettingsBoolRow(

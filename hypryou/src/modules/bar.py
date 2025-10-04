@@ -999,6 +999,13 @@ class ModulesRight(gtk.Box):
             self.remove(child)
 
 
+edges = (
+    layer_shell.Edge.TOP,
+    layer_shell.Edge.LEFT,
+    layer_shell.Edge.RIGHT
+)
+
+
 class Bar(widget.LayerWindow):
     __gtype_name__ = "Bar"
 
@@ -1037,9 +1044,18 @@ class Bar(widget.LayerWindow):
             ),
             _opened_windows: _opened_windows.watch(self.update_hidden)
         }
-        self.setting_handler = Settings().watch(
-            "old_fullscreen_behavior", self.update_hidden, False
-        )
+        self.settings = Settings()
+        self.settings_handlers = {
+            self.settings.watch(
+                "old_fullscreen_behavior", self.update_hidden, False
+            ),
+            self.settings.watch(
+                "floating_bar", self.change_floating, True
+            ),
+            self.settings.watch(
+                "hyprland.gaps_out", self.change_floating, False
+            )
+        }
         self.old_fullscreen_state: bool | None = None
         self.visible_timeout: int = -1
 
@@ -1048,6 +1064,19 @@ class Bar(widget.LayerWindow):
         if __debug__:
             weakref.finalize(self, lambda: logger.debug("Bar finalized"))
         self.update_hidden()
+
+    def on_gaps_out(self, value: int) -> None:
+        self.change_floating(self.settings.get("floating_bar"))
+
+    def change_floating(self, value: bool) -> None:
+        toggle_css_class(self, "floating", value)
+        if value:
+            gap = self.settings.get("hyprland.gaps_out")
+            for edge in edges:
+                layer_shell.set_margin(self, edge, gap)
+        else:
+            for edge in edges:
+                layer_shell.set_margin(self, edge, 0)
 
     def update_hidden(self, *args: t.Any) -> None:
         if self.visible_timeout != -1:
@@ -1143,6 +1172,9 @@ class Corners:
                 "corners", self.update_visible, True
             ),
             self.settings.watch(
+                "floating_bar", self.update_visible, False
+            ),
+            self.settings.watch(
                 "hyprland.gaps_out", self.update_rounding, False
             ),
             self.decoration.watch(
@@ -1202,7 +1234,11 @@ class Corners:
         self.windows.clear()
         self.corners.clear()
 
-    def update_visible(self, value: bool) -> None:
+    def update_visible(self, *args: t.Any) -> None:
+        value = (
+            not self.settings.get("floating_bar")
+            and self.settings.get("corners")
+        )
         if value and not self.windows:
             self.create_windows()
         elif self.windows:

@@ -8,6 +8,10 @@ window.bar {
     border: none;
     box-shadow: none;
 
+    &.floating {
+        border-radius: $hyprlandRounding;
+    }
+
     .modules-left,
     .modules-center,
     .modules-right {
