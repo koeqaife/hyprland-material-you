@@ -1,3 +1,4 @@
+from functools import lru_cache
 import os
 
 
@@ -136,6 +137,34 @@ def get_distro() -> str:
     except Exception:
         pass
     return "Unknown"
+
+
+@lru_cache()
+def parse_xkb_layouts(
+    rules_path: str = "/usr/share/X11/xkb/rules/evdev.lst"
+) -> dict[str, str]:
+    layouts: dict[str, str] = {}
+
+    with open(rules_path, encoding="utf-8") as f:
+        lines = f.readlines()
+
+    in_layout_section = False
+    for line in lines:
+        stripped = line.strip()
+
+        if stripped.startswith("! layout"):
+            in_layout_section = True
+            continue
+
+        if in_layout_section:
+            if stripped.startswith("!"):
+                break
+            if stripped:
+                parts = stripped.split(None, 1)
+                if len(parts) == 2:
+                    code, name = parts
+                    layouts[name] = code
+    return layouts
 
 
 STATIC_SYSTEM_INFO = {

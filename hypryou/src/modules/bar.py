@@ -4,6 +4,7 @@ from utils.ref import Ref
 from utils.styles import toggle_css_class
 from utils.format import escape_markup
 from utils.logger import logger
+from utils.system import parse_xkb_layouts
 from utils import format, downloader
 import asyncio
 from time import perf_counter
@@ -517,7 +518,12 @@ class KeyboardLayout(gtk.Label):
         self.set_visible(new_value)
 
     def update_layout(self, new_layout: str) -> None:
-        self.set_label(format.get_layout_tag(new_layout))
+        code_name = parse_xkb_layouts().get(  # parse_xkb_layouts has lru_cache
+            new_layout,
+            format.get_layout_tag(new_layout)  # Just in case
+        )
+        self.set_label(code_name)
+        self.set_tooltip_text(new_layout)
 
     def destroy(self) -> None:
         for ref, handler_id in self.handlers.items():
