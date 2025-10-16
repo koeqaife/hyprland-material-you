@@ -154,7 +154,19 @@ default_settings: dict[str, t.Any] = {
     "monitors": [],
     "keybinds_overrides": [],
 
-    "old_fullscreen_behavior": False
+    "old_fullscreen_behavior": False,
+
+    # 0 -> Show all
+    # 1 -> Hide sensitive content
+    # 2 -> Hide all content
+    # 3 -> Disable
+    "lockscreen.notifications": 3,
+    # Mpris player in lockscreen
+    "lockscreen.media": True,
+    # If use "Unlock" button
+    "lockscreen.always_reveal_input": False,
+    # New notifications counter
+    "lockscreen.notifications_counter": False
 }
 
 

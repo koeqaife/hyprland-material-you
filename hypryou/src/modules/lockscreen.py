@@ -8,9 +8,11 @@ from src.services.mpris import current_player, MprisPlayer
 from src.services.upower import get_upower
 from src.services.state import is_idle_locked
 from src.services.state import is_locked, current_wallpaper
+from src.services.notifications import notifications
 from src.modules.notifications.list import Notifications
 from src.modules.players import Player
 from src import widget
+from config import Settings
 import pwd
 import os
 from time import monotonic
@@ -46,6 +48,7 @@ class ScreenLockWindow(gtk.ApplicationWindow):
             default_width=1200
         )
 
+        self.settings = Settings().get_view_for("lockscreen")
         self.expanded = False
         self.mpris_player: MprisPlayer | None = None
         self.player_widget: ScreenLockPlayer | None = None
@@ -135,6 +138,24 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         self.battery_box.append(self.battery)
         self.info_box.append(self.battery_box)
 
+        self.notification_count: int = -1
+        if self.settings.get("notifications_counter"):
+            self.notif_box = gtk.Box(
+                css_classes=("lock-notif-box",),
+                visible=False
+            )
+            self.notif_icon = widget.Icon(
+                "notifications",
+                css_classes=("notif-icon",)
+            )
+            self.notif_counter = gtk.Label(
+                css_classes=("notif-label",),
+                label="0 new notifications"
+            )
+            self.notif_box.append(self.notif_icon)
+            self.notif_box.append(self.notif_counter)
+            self.info_box.append(self.notif_box)
+
         self.unlock_box = gtk.Box(
             css_classes=("lock-unlock-box",),
             orientation=gtk.Orientation.HORIZONTAL,
@@ -198,9 +219,15 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         self.unlock_box.append(self.btn_revealer)
         self.unlock_box.append(self.entry_revealer)
 
-        self.notifications = ScreenLockNotifications(self)
-        self.notifications.unfreeze()
-        self.box.append(self.notifications)
+        self.notifications: Notifications | None = None
+        if self.settings.get("notifications") != 3:
+            hide_content = self.settings.get("notifications") == 1
+            hide_all = self.settings.get("notifications") == 2
+            self.notifications = Notifications(
+                hide_content, False, hide_all=hide_all
+            )
+            self.notifications.unfreeze()
+            self.box.append(self.notifications)
 
         self.overlay.add_overlay(self.dim)
         self.overlay.add_overlay(self.box)
@@ -218,8 +245,10 @@ class ScreenLockWindow(gtk.ApplicationWindow):
             active_layout: active_layout.watch(self.update_layout),
             show_layout: show_layout.watch(self.update_layout),
             current_player: current_player.watch(self.update_current_player),
-            close_player: close_player.watch(self.update_current_player)
+            close_player: close_player.watch(self.update_current_player),
+            notifications: notifications.watch(self._notifications_changed)
         }
+
         self.battery_handler = get_upower().watch(
             "changed", self.update_battery
         )
@@ -236,6 +265,7 @@ class ScreenLockWindow(gtk.ApplicationWindow):
             self.change_button_icon()
 
         self.unlock_btn.grab_focus()
+        self._notifications_changed(notifications.value)
 
     def update_battery(self, *args: t.Any) -> None:
         upower = get_upower()
@@ -252,6 +282,8 @@ class ScreenLockWindow(gtk.ApplicationWindow):
     def change_button_icon(self) -> None:
         self.change_icon_timeout = None
         self.unlock_btn_icon.set_label("lock")
+        if self.settings.get("always_reveal_input"):
+            self.reveal_input(True)
 
     def close_player(self) -> None:
         if self.mpris_player is None:
@@ -306,9 +338,12 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         state: gdk.ModifierType
     ) -> bool:
         if keyval == gdk.KEY_Escape:
-            root = self.get_root()
-            if isinstance(root, gtk.Root):
-                root.set_focus(None)
+            if self.settings.get("always_reveal_input"):
+                self.unlock_entry.set_text("")
+            else:
+                root = self.get_root()
+                if isinstance(root, gtk.Root):
+                    root.set_focus(None)
             return True
         return False
 
@@ -338,18 +373,22 @@ class ScreenLockWindow(gtk.ApplicationWindow):
 
         threading.Thread(target=authenticate_and_continue, daemon=True).start()
 
+    def reveal_input(self, reveal: bool) -> None:
+        self.btn_revealer.set_reveal_child(not reveal)
+        self.entry_revealer.set_reveal_child(reveal)
+        toggle_css_class(self.unlock_box, "activated", reveal)
+
     def entry_focus_leave(self, *args: t.Any) -> None:
-        self.btn_revealer.set_reveal_child(True)
-        self.entry_revealer.set_reveal_child(False)
-        toggle_css_class(self.unlock_box, "activated", False)
+        if self.settings.get("always_reveal_input"):
+            self.reveal_input(True)
+        else:
+            self.reveal_input(False)
 
     def on_unlock_button_clicked(self, *args: t.Any) -> None:
         if monotonic() - self.showed_on < 5 and is_idle_locked.value:
             is_locked.value = False
             return
-        self.btn_revealer.set_reveal_child(False)
-        self.entry_revealer.set_reveal_child(True)
-        toggle_css_class(self.unlock_box, "activated", True)
+        self.reveal_input(True)
 
     def update_expanded(self) -> None:
         self.change_expanded(
@@ -357,8 +396,20 @@ class ScreenLockWindow(gtk.ApplicationWindow):
             self.player_widget is not None
         )
 
-    def _notifications_changed(self, is_not_empty: bool) -> None:
-        self.notifications_visible = is_not_empty
+    def _notifications_changed(self, value: dict[t.Any, t.Any]) -> None:
+        length = len(value)
+        if self.settings.get("notifications_counter"):
+            if (
+                self.notification_count > length
+                or self.notification_count == -1
+            ):
+                self.notification_count = length
+            new = length - self.notification_count
+            self.notif_counter.set_label(
+                f"{new} new notification{"s" if new != 1 else ""}"
+            )
+            self.notif_box.set_visible(new != 0)
+        self.notifications_visible = length > 0 and self.notifications
         self.update_expanded()
 
     def _mpris_timer(self) -> bool | None:
@@ -369,6 +420,8 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         return None
 
     def update_current_player(self, *args: t.Any) -> None:
+        if not self.settings.get("media"):
+            return
         current = current_player.value[1] if current_player.value else None
         if current == self.mpris_player and not close_player.value:
             return
@@ -417,7 +470,8 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         else:
             self.box.set_valign(gtk.Align.CENTER)
             self.box.set_vexpand(False)
-        self.notifications.set_visible(self.expanded)
+        if self.notifications:
+            self.notifications.set_visible(self.expanded)
         if self.player_widget:
             self.player_widget.set_visible(self.expanded)
 
@@ -449,9 +503,10 @@ class ScreenLockWindow(gtk.ApplicationWindow):
             self.player_widget = None
         if self.change_icon_timeout:
             glib.source_remove(self.change_icon_timeout)
-        self.box.remove(self.notifications)
-        self.notifications.destroy()
-        self.notifications = None  # type: ignore
+        if self.notifications:
+            self.box.remove(self.notifications)
+            self.notifications.destroy()
+            self.notifications = None
         super().destroy()
 
 
@@ -492,15 +547,6 @@ class ScreenLockPlayer(Player):
     def destroy(self) -> None:
         self.close_button.disconnect(self._close_handler)
         super().destroy()
-
-
-class ScreenLockNotifications(Notifications):
-    def __init__(self, window: ScreenLockWindow) -> None:
-        self.window = window
-        super().__init__(True, False)
-
-    def update_no_notifications(self) -> None:
-        self.window._notifications_changed(len(self.items) > 0)
 
 
 class ScreenLock:
