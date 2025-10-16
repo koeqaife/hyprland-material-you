@@ -50,6 +50,12 @@ key_binds = (
         Category.ACTIONS
     ),
     KeyBind(
+        (main_mod, "SHIFT", "R"),
+        ("exec", "hypryouctl reload"),
+        "Restart HyprYou",
+        Category.ACTIONS
+    ),
+    KeyBind(
         (main_mod, "L"),
         ("exec", "hypryouctl lock"),
         "Lock screen",
