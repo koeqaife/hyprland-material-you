@@ -30,9 +30,11 @@ class Notifications(gtk.ScrolledWindow):
         hide_sensitive_content: bool = False,
         no_notifications_label: bool = True,
         item: type[NotificationItem] = NotificationItem,
-        revealer: type[NotificationRevealer] = NotificationRevealer
+        revealer: type[NotificationRevealer] = NotificationRevealer,
+        hide_all: bool = False
     ) -> None:
         self.hide_content = hide_sensitive_content
+        self.hide_all = hide_all
         self.show_no_notifications_label = no_notifications_label
         self._item = item
         self._revealer = revealer
@@ -268,7 +270,8 @@ class Notifications(gtk.ScrolledWindow):
             if key not in self.items and key in notifications.value:
                 item = self._item(
                     item=notifications.value[key],
-                    hide_sensitive_content=self.hide_content
+                    hide_sensitive_content=self.hide_content,
+                    hide_all=self.hide_all
                 )
                 box = self.get_box_for(item)
                 self.items[key] = (

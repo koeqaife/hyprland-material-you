@@ -53,6 +53,12 @@ def get_is_sensitive(item: "NotificationItem") -> bool:
     ):
         return True
 
+    if "message" in item.item.body.lower():
+        return True
+
+    if "message" in item.item.summary.lower():
+        return True
+
     return False
 
 
@@ -63,10 +69,12 @@ class NotificationItem(gtk.Box):
         self,
         item: Notification,
         show_dismiss: bool = False,
-        hide_sensitive_content: bool = False
+        hide_sensitive_content: bool = False,
+        hide_all: bool = False
     ) -> None:
         self.is_destroyed = False
         self.hide_content = hide_sensitive_content
+        self.hide_all = hide_all
         if item.hints.get("transient") and show_dismiss:
             show_dismiss = False
         self.item = item
@@ -232,7 +240,7 @@ class NotificationItem(gtk.Box):
 
     def update_values(self, *args: t.Any) -> None:
         hide_content = (
-            self.hide_content and get_is_sensitive(self)
+            self.hide_all or (self.hide_content and get_is_sensitive(self))
         )
 
         settings = Settings()
