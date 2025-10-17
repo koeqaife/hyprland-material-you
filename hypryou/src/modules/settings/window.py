@@ -318,12 +318,11 @@ class SettingsBox(gtk.Box):
         settings_page.value = name
 
     def change_page(self, name: str) -> None:
+        if name == "default":
+            return
         last_page = self.cur_page
         if last_page:
             toggle_css_class(self.buttons[last_page], "active", False)
-        if name == "default":
-            self.stack.set_visible_child_name("default")
-            return
         self.cur_page = name
 
         # Lazy load page
