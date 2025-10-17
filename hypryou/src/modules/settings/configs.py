@@ -50,6 +50,13 @@ class ConfigsPage(gtk.ScrolledWindow):
                 ),
                 f"{info["github"]}/wiki/More-themes#discord-theme"
             ),
+            (
+                Row(
+                    "Custom Templates",
+                    "Make your own theme templates!",
+                ),
+                f"{info["github"]}/wiki/Color-Templates"
+            ),
         )
         self.box_children = (
             Category("Hyprland"),
@@ -95,8 +102,9 @@ class ConfigsPage(gtk.ScrolledWindow):
                 "Theme for Wezterm",
                 "themes.wezterm"
             ),
+            self.children_with_wiki[0][0],
             self.children_with_wiki[1][0],
-            self.children_with_wiki[0][0]
+            self.children_with_wiki[2][0],
         )
 
         for child, url in self.children_with_wiki:
