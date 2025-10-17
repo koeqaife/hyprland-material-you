@@ -280,6 +280,7 @@ class BluetoothList(gtk.Box):
             vexpand=True,
             orientation=gtk.Orientation.VERTICAL
         )
+        self.items: dict[str, BluetoothDevice] = {}
         if not self.adapter:
             self.append(
                 gtk.Label(
@@ -288,7 +289,6 @@ class BluetoothList(gtk.Box):
                 )
             )
             return
-        self.items: dict[str, BluetoothDevice] = {}
 
         for device in self.bluetooth.get_devices():
             row = BluetoothDevice(device)
@@ -325,7 +325,8 @@ class BluetoothList(gtk.Box):
                 self.remove(_row)
 
     def destroy(self, *args: t.Any) -> None:
-        self.bluetooth.disconnect(self.devices_handler)
+        if hasattr(self, "devices_handler"):
+            self.bluetooth.disconnect(self.devices_handler)
         for device in self.items.values():
             device.destroy()
 
