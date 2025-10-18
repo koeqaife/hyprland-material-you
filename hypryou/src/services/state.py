@@ -7,7 +7,7 @@ from utils.styles import reload_css
 from utils.service import Service
 from utils.colors import generate_by_settings
 from utils.logger import logger
-from repository import gdk, glib, gio
+from repository import gdk, glib, gio, gdk_pixbuf
 import random
 import typing as t
 from types import NoneType
@@ -28,10 +28,10 @@ WALLPAPER_EXTENSIONS = {
 }
 
 _opened_windows = Ref[list[str]]([], name="opened_windows")
-current_wallpaper = Ref[gdk.Texture | None](
+current_wallpaper = Ref[gdk.Texture | gdk_pixbuf.Pixbuf | None](
     None,
     name="wallpaper_texture",
-    types=(NoneType, gdk.Texture)
+    types=(NoneType, gdk.Texture, gdk_pixbuf.Pixbuf)
 )
 is_locked = Ref(False, name="is_locked")
 is_idle_locked = Ref(False, name="is_idle_locked")
@@ -42,6 +42,18 @@ settings_page = Ref[str | None](
 )
 restored_on = -1.0
 task_lock = threading.Lock()
+
+current_wallpaper_anim: "AnimationState" = {
+    "timeout_handler": -1,
+    "iter": None,
+    "animation": None
+}
+
+
+class AnimationState(t.TypedDict):
+    timeout_handler: int
+    iter: gdk_pixbuf.PixbufAnimationIter | None
+    animation: gdk_pixbuf.PixbufAnimation | None
 
 
 class OpenedWindowsWatcher(Signals):
@@ -132,21 +144,69 @@ def generate_wallpaper_texture() -> None:
     import gc
     settings = Settings()
     path = settings.get("wallpaper")
+    remove_wallpaper_animation()
 
     if task_lock.acquire():
         try:
-            file = gio.File.new_for_path(path)
-            texture = gdk.Texture.new_from_file(file)
+            anim = gdk_pixbuf.PixbufAnimation.new_from_file(path)
+            if anim.is_static_image():
+                del anim
+                file = gio.File.new_for_path(path)
+                texture = gdk.Texture.new_from_file(file)
 
-            old_texture = current_wallpaper.value
-            current_wallpaper.value = texture
+                current_wallpaper.value = texture
 
-            del file
-            if old_texture:
-                del old_texture
+                del file
+            else:
+                start_wallpaper_animation(anim)
+
             gc.collect()
         finally:
             task_lock.release()
+
+
+animation_time = glib.TimeVal()
+FPS = 1000/24
+FPS_MICROSECONDS = 1000000/24
+
+
+def start_wallpaper_animation(
+    animation: gdk_pixbuf.PixbufAnimation
+) -> None:
+    current_wallpaper_anim["animation"] = animation
+    iter = animation.get_iter(animation_time)
+    current_wallpaper_anim["iter"] = iter
+    handler_id = glib.timeout_add(FPS, step_anim)
+    current_wallpaper_anim["timeout_handler"] = handler_id
+
+    new_pixbuf = iter.get_pixbuf()
+    current_wallpaper.value = new_pixbuf
+
+
+def step_anim() -> bool:
+    animation_time.add(FPS_MICROSECONDS)
+    iter = current_wallpaper_anim["iter"]
+    if iter is None:
+        return
+
+    if iter.advance(animation_time):
+        new_pixbuf = iter.get_pixbuf()
+        current_wallpaper._value = new_pixbuf
+        current_wallpaper._signals.notify_sync("changed")
+    return True
+
+
+def stop_wallpaper_animation() -> None:
+    handler_id = current_wallpaper_anim["timeout_handler"]
+    if handler_id != -1:
+        glib.source_remove(current_wallpaper_anim["timeout_handler"])
+        current_wallpaper_anim["timeout_handler"] = -1
+    current_wallpaper_anim["iter"] = None
+
+
+def remove_wallpaper_animation() -> None:
+    stop_wallpaper_animation()
+    current_wallpaper_anim["animation"] = None
 
 
 def on_wallpapers_changed(*args: t.Any) -> None:

@@ -1,5 +1,5 @@
 from utils.logger import logger
-from repository import layer_shell, gtk, gdk, glib
+from repository import layer_shell, gtk, gdk, glib, gdk_pixbuf
 import weakref
 from src.services.state import current_wallpaper
 import typing as t
@@ -15,22 +15,49 @@ class WallpapersWidget(gtk.Stack):
             transition_type=gtk.StackTransitionType.CROSSFADE,
             transition_duration=450
         )
+        # 0 -> None, 1 -> Texture, 2 -> Pixbuf (in animation)
+        self.last_type = 0
         self.picture: gtk.Picture | None = None
         self.counter = -1
         self.handler = current_wallpaper.watch(self.update_image)
         self.update_image()
 
     def update_image(self, *args: t.Any) -> None:
-        texture = current_wallpaper.value
-        new_picture = gtk.Picture.new_for_paintable(texture)
-        new_picture.set_content_fit(gtk.ContentFit.COVER)
+        wal = current_wallpaper.value
+        last_type = self.last_type
 
-        self.counter += 1
-        self.add_named(new_picture, str(self.counter))
-        self.set_visible_child_name(str(self.counter))
+        if isinstance(wal, gdk.Texture):
+            new_picture = gtk.Picture.new_for_paintable(wal)
+            new_picture.set_content_fit(gtk.ContentFit.COVER)
 
-        self.picture = new_picture
-        glib.timeout_add(451, self.delete_old_picture)
+            self.counter += 1
+            self.add_named(new_picture, str(self.counter))
+            self.set_visible_child_name(str(self.counter))
+
+            self.picture = new_picture
+            self.last_type = 1
+        elif isinstance(wal, gdk_pixbuf.Pixbuf):
+            if self.last_type != 2:
+                new_picture = gtk.Picture.new_for_pixbuf(wal)
+                new_picture.set_content_fit(gtk.ContentFit.COVER)
+
+                self.counter += 1
+                self.add_named(new_picture, str(self.counter))
+                self.set_visible_child_name(str(self.counter))
+
+                self.picture = new_picture
+            else:
+                if not self.picture:
+                    self.picture = gtk.Picture.new_for_pixbuf(wal)
+                    self.picture.set_content_fit(gtk.ContentFit.COVER)
+                else:
+                    self.picture.set_pixbuf(wal)
+            self.last_type = 2
+        else:
+            self.last_type = 0
+
+        if last_type == 1:
+            glib.timeout_add(451, self.delete_old_picture)
 
     def delete_old_picture(self) -> None:
         for picture in list(self):  # type: ignore
