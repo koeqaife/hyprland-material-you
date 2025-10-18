@@ -48,6 +48,8 @@ current_wallpaper_anim: "AnimationState" = {
     "iter": None,
     "animation": None
 }
+# Separate variable for optimization
+is_animating = False
 
 
 class AnimationState(t.TypedDict):
@@ -165,31 +167,33 @@ def generate_wallpaper_texture() -> None:
             task_lock.release()
 
 
-animation_time = glib.TimeVal()
-FPS = 1000/24
-FPS_MICROSECONDS = 1000000/24
-
-
 def start_wallpaper_animation(
-    animation: gdk_pixbuf.PixbufAnimation
+    animation: gdk_pixbuf.PixbufAnimation | None
 ) -> None:
-    current_wallpaper_anim["animation"] = animation
-    iter = animation.get_iter(animation_time)
+    global is_animating
+    if animation is None:
+        animation = current_wallpaper_anim["animation"]
+        if animation is None:
+            raise RuntimeError("No animations are currently running")
+    else:
+        current_wallpaper_anim["animation"] = animation
+
+    iter = animation.get_iter(None)
     current_wallpaper_anim["iter"] = iter
-    handler_id = glib.timeout_add(FPS, step_anim)
+    handler_id = glib.timeout_add(1000//24, step_anim)
     current_wallpaper_anim["timeout_handler"] = handler_id
 
     new_pixbuf = iter.get_pixbuf()
     current_wallpaper.value = new_pixbuf
+    is_animating = True
 
 
 def step_anim() -> bool:
-    animation_time.add(FPS_MICROSECONDS)
     iter = current_wallpaper_anim["iter"]
     if iter is None:
         return
 
-    if iter.advance(animation_time):
+    if iter.advance(None):
         new_pixbuf = iter.get_pixbuf()
         current_wallpaper._value = new_pixbuf
         current_wallpaper._signals.notify_sync("changed")
@@ -205,8 +209,10 @@ def stop_wallpaper_animation() -> None:
 
 
 def remove_wallpaper_animation() -> None:
+    global is_animating
     stop_wallpaper_animation()
     current_wallpaper_anim["animation"] = None
+    is_animating = False
 
 
 def on_wallpapers_changed(*args: t.Any) -> None:
@@ -366,11 +372,25 @@ def on_lid_closed(is_closed: bool) -> None:
         )
 
 
+def on_active_client(value: dict[int, hyprland.Client | None]) -> None:
+    if not is_animating:
+        return
+    for client in value.values():
+        if client is None:
+            continue
+        if client.fullscreen:
+            stop_wallpaper_animation()
+            return
+
+    start_wallpaper_animation(None)
+
+
 class StateService(Service):
     def start(self) -> None:
         opened_windows.init()
         settings = Settings()
         settings.watch("wallpaper", on_wallpapers_changed, False)
         settings._signals.watch("changed", on_settings_changed)
+        hyprland.active_client.watch(on_active_client)
         lid_is_closed.watch(on_lid_closed)
         glib.idle_add(generate_wallpaper_texture)
