@@ -372,10 +372,16 @@ def on_lid_closed(is_closed: bool) -> None:
         )
 
 
-def on_active_client(value: dict[int, hyprland.Client | None]) -> None:
+def update_animation_state(*args: t.Any) -> None:
     if not is_animating:
         return
-    for client in value.values():
+
+    if is_locked.value:
+        stop_wallpaper_animation()
+        return
+
+    clients = hyprland.active_client.value
+    for client in clients.values():
         if client is None:
             continue
         if client.fullscreen:
@@ -391,6 +397,7 @@ class StateService(Service):
         settings = Settings()
         settings.watch("wallpaper", on_wallpapers_changed, False)
         settings._signals.watch("changed", on_settings_changed)
-        hyprland.active_client.watch(on_active_client)
+        hyprland.active_client.watch(update_animation_state)
+        is_locked.watch(update_animation_state)
         lid_is_closed.watch(on_lid_closed)
         glib.idle_add(generate_wallpaper_texture)

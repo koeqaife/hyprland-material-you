@@ -69,10 +69,13 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         )
 
         self.wallpaper = gtk.Picture(
-            paintable=current_wallpaper.value,
             css_classes=("lock-wallpaper",),
             content_fit=gtk.ContentFit.COVER
         )
+        if isinstance(current_wallpaper.value, gdk.Texture):
+            self.wallpaper.set_paintable(current_wallpaper.value)
+        else:
+            self.wallpaper.set_pixbuf(current_wallpaper.value)
         self.overlay = gtk.Overlay(
             child=self.wallpaper,
             css_classes=("lock-overlay",)
