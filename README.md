@@ -71,6 +71,7 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 - **Pre-built (AUR):**
   > The easiest way
   - Use `yay`, `paru` or any other AUR helper to install it.
+  - To see what packages are available just run `yay -Ss hypryou`
 
 - **Pre-built:**
   - Install needed packages from [releases](https://github.com/koeqaife/hyprland-material-you/releases)
