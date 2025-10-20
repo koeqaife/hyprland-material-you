@@ -471,7 +471,9 @@ class Player(gtk.Box):
             return
 
         if len(current_player.value) != 2:
-            self.use_image(False)
+            # Hiding both for better looking
+            self.image.set_visible(False)
+            self.icon.set_visible(False)
             self.last_changed.artUrl = None
         else:
             assert current_player.value
