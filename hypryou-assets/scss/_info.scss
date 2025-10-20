@@ -57,7 +57,7 @@ window.info {
     .system-page {
         .monitor-row, .info-row {
             @include elevation(1);
-            background-color: $surfaceContainer;
+            @include nLayerBackground($surfaceContainer, 2);
             margin-left: 0.5rem;
             margin-right: 0.5rem;
             margin-top: 0.5rem;

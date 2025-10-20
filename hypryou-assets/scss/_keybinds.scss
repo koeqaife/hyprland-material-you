@@ -11,7 +11,7 @@ window.keybinds {
     padding: 0.5rem;
 
     .category-box {
-        @include nLayerBackground($surfaceContainer, 1);
+        @include nLayerBackground($surfaceContainer, 2);
         @include elevation(1);
         border-radius: max(calc($hyprlandRounding - 0.5rem), 0.25rem);
         padding-bottom: 0.25rem;
