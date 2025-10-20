@@ -247,16 +247,24 @@ class Player(gtk.Box):
             halign=gtk.Align.START,
             valign=gtk.Align.CENTER
         )
+        self.settings = Settings()
 
         self.player_handlers: dict[MprisPlayer, int] = {}
 
-        image = gtk.Box(
-            css_classes=("image",),
-            valign=gtk.Align.CENTER,
-            halign=gtk.Align.CENTER
+        self.icon = widget.Icon(
+            "music_note",
+            visible=True,
+            css_classes=("player-icon",)
         )
 
-        label = gtk.Label(
+        self.image = gtk.Box(
+            css_classes=("image",),
+            valign=gtk.Align.CENTER,
+            halign=gtk.Align.CENTER,
+            visible=False
+        )
+
+        self.label = gtk.Label(
             ellipsize=pango.EllipsizeMode.END,
             max_width_chars=20,
             halign=gtk.Align.CENTER,
@@ -264,7 +272,7 @@ class Player(gtk.Box):
             use_markup=True
         )
 
-        btn_box = gtk.Box(
+        self.btn_box = gtk.Box(
             css_classes=("buttons",),
             valign=gtk.Align.CENTER,
             halign=gtk.Align.CENTER
@@ -282,27 +290,28 @@ class Player(gtk.Box):
                 child=widget.Icon(icon),
                 css_classes=(css_class,)
             )
-            btn_box.append(btn)
+            self.btn_box.append(btn)
             self.conns[btn] = btn.connect("clicked", handler)
             self.buttons.append(btn)
 
         self.children = (
-            image,
-            label,
-            btn_box
+            self.icon,
+            self.image,
+            self.label,
+            self.btn_box
         )
 
         for child in self.children:
             self.append(child)
 
         self.image_provider = gtk.CssProvider()
-        image.get_style_context().add_provider(
+        self.image.get_style_context().add_provider(
             self.image_provider,
             gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
 
         self.last_changed = LastChanged()
-        current_player.watch(self.on_changed)
+        self.cur_player_handler = current_player.watch(self.on_changed)
         self.on_changed()
 
         self.click_gesture = gtk.GestureClick.new()
@@ -310,7 +319,14 @@ class Player(gtk.Box):
         self.gesture_conn = (
             self.click_gesture.connect("released", self.on_click_released)
         )
+        self.setting_handlers: tuple[int] = (
+            self.settings.watch("bar_media_style", self.on_changed, False),
+        )
         self.add_controller(self.click_gesture)
+
+    def use_image(self, value: bool) -> None:
+        self.image.set_visible(value)
+        self.icon.set_visible(not value)
 
     def on_click_released(
         self,
@@ -348,8 +364,8 @@ class Player(gtk.Box):
 
     def update_buttons(self) -> None:
         current = self.get_player()
-        if not current:
-            self.children[2].set_visible(False)
+        if not current or self.settings.get("bar_media_style") == 2:
+            self.btn_box.set_visible(False)
             self.last_changed.can_go_prev = None
             self.last_changed.can_go_next = None
             self.last_changed.can_pause = None
@@ -383,11 +399,17 @@ class Player(gtk.Box):
                 self.buttons[1].set_visible(can_pause)
                 last_changed.can_pause = can_pause
 
-            self.children[2].set_visible(
+            self.btn_box.set_visible(
                 can_pause or can_go_next or can_go_prev
             )
 
     def update_label(self) -> None:
+        if self.settings.get("bar_media_style") == 2:
+            self.label.set_visible(False)
+            return
+        else:
+            self.label.set_visible(True)
+
         current = self.get_player()
         if not current:
             text = "Nothing's playing"
@@ -400,7 +422,11 @@ class Player(gtk.Box):
             artist = xesam_artist[0] if xesam_artist else None
             title = metadata.get("xesam:title")
 
-            if not artist or not title:
+            if (
+                not artist
+                or not title
+                or self.settings.get("bar_media_style") == 1
+            ):
                 text = current.get_bus_name().split(".")[3].capitalize()
                 self.last_changed.title = None
                 self.last_changed.artist = None
@@ -419,32 +445,46 @@ class Player(gtk.Box):
                 # we show title first cuz length of label is limited
                 text = f"{title} <i>- {artist}</i>"
         self.set_tooltip_markup(text)
-        self.children[1].set_label(text)
+        self.label.set_label(text)
 
     def on_download(self, filepath: str | None) -> None:
         if not self.children:
             return
         if not filepath:
-            self.children[0].set_visible(False)
+            self.use_image(False)
             return
         css = f"box {{ background-image: url('file://{filepath}'); }}"
         self.image_provider.load_from_data(css)
 
     def update_image(self) -> None:
+        if self.settings.get("bar_media_style") == 2:
+            self.use_image(False)
+            self.last_changed.artUrl = None
+            current = self.get_player()
+            if current:
+                self.icon.set_label(
+                    "pause" if current.playback_status == "Playing"
+                    else "play_arrow"
+                )
+            else:
+                self.icon.set_label("music_note")
+            return
+
         if len(current_player.value) != 2:
-            self.children[0].set_visible(False)
+            self.use_image(False)
             self.last_changed.artUrl = None
         else:
             assert current_player.value
             metadata = current_player.value[1].metadata
             art_url = metadata.get("mpris:artUrl")
-            if not art_url:
-                self.children[0].set_visible(False)
+            if not art_url or self.settings.get("bar_media_style") == 1:
+                self.use_image(False)
                 self.last_changed.artUrl = None
+                self.icon.set_label("music_note")
                 return
             if art_url == self.last_changed.artUrl:
                 return
-            self.children[0].set_visible(True)
+            self.use_image(True)
 
             self.last_changed.artUrl = art_url
             downloader.download_image_async(
@@ -455,6 +495,11 @@ class Player(gtk.Box):
         self.update_image()
         self.update_label()
         self.update_buttons()
+        toggle_css_class(
+            self,
+            "collapsed",
+            self.settings.get("bar_media_style") == 2
+        )
 
     def update_watcher(self) -> None:
         current = self.get_player()
@@ -483,7 +528,7 @@ class Player(gtk.Box):
             if isinstance(btn_child, widget.Icon):
                 btn_child.destroy()
             btn.set_child(None)
-            self.children[2].remove(btn)
+            self.btn_box.remove(btn)
         for child in self.children:
             self.remove(child)
         for _widget, conn in self.conns.items():
@@ -491,6 +536,10 @@ class Player(gtk.Box):
 
         self.click_gesture.disconnect(self.gesture_conn)
         self.remove_controller(self.click_gesture)
+        current_player.unwatch(self.cur_player_handler)
+
+        for handler_id in self.setting_handlers:
+            self.settings.unwatch(handler_id)
 
         self.children = None  # type: ignore
         self.buttons = None  # type: ignore

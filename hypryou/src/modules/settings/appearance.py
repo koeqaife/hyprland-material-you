@@ -1,6 +1,7 @@
 from utils import colors
 from src.modules.settings.base import SwitchRowTemplate
 from src.modules.settings.base import SettingsBoolRow, SettingsTextRow
+from src.modules.settings.base import SettingsDropdownRow, DropdownItem
 from src.modules.settings.base import Category
 from src.modules.settings.base import int_kwargs, float_kwargs
 import typing as t
@@ -143,6 +144,25 @@ class AppearancePage(gtk.ScrolledWindow):
                 "Old Fullscreen Behavior",
                 "If enabled, fullscreen behavior from <2.1.0 will be used",
                 "old_fullscreen_behavior"
+            ),
+            SettingsDropdownRow(
+                "Bar media player",
+                "How media player on the bar will look like",
+                "bar_media_style",
+                items=[
+                    DropdownItem(
+                        0, "Default",
+                        "Visible name and cover, not collapsed"
+                    ),
+                    DropdownItem(
+                        1, "Private",
+                        "Hidden name and cover, not collapsed"
+                    ),
+                    DropdownItem(
+                        2, "Collapsed",
+                        "Just icon on the bar, very small"
+                    )
+                ]
             ),
 
             Category("Icons"),
