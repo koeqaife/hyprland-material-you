@@ -172,7 +172,7 @@ default_settings: dict[str, t.Any] = {
     # 0 -> Default
     # 1 -> Private
     # 2 -> Collapse
-    "bar_media_style": 2
+    "bar_media_style": 0
 }
 
 
