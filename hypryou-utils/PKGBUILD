@@ -9,7 +9,6 @@ license=('GPL3')
 depends=('gtk4')
 provides=('hyprland-qtutils')
 conflicts=('hyprland-qtutils')
-replaces=('hyprland-qtutils')
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/koeqaife/hyprland-material-you/archive/refs/heads/v2.tar.gz")
 sha256sums=('SKIP')
 makedepends=(
