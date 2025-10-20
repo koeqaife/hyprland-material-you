@@ -160,7 +160,7 @@ default_settings: dict[str, t.Any] = {
     # 1 -> Hide sensitive content
     # 2 -> Hide all content
     # 3 -> Disable
-    "lockscreen.notifications": 3,
+    "lockscreen.notifications": 1,
     # Mpris player in lockscreen
     "lockscreen.media": True,
     # If use "Unlock" button
