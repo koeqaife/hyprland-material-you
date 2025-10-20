@@ -92,5 +92,5 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 - [Astal](https://github.com/Aylur/astal): For Bluetooth and WirePlumber services
 - [Gtk4LayerShell](https://github.com/wmww/gtk4-layer-shell): For LayerShell
 - [Hyprland](https://github.com/hyprwm/Hyprland): For the best TWM I've ever seen
-- Shamz: submitted it to AUR
+- [Shxmz](https://github.com/shxmz): submitted it to AUR
 - Maybe that's it
