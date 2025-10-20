@@ -453,6 +453,7 @@ class Player(gtk.Box):
         if not filepath:
             self.use_image(False)
             return
+        self.use_image(True)
         css = f"box {{ background-image: url('file://{filepath}'); }}"
         self.image_provider.load_from_data(css)
 
@@ -486,8 +487,8 @@ class Player(gtk.Box):
                 return
             if art_url == self.last_changed.artUrl:
                 return
-            self.use_image(True)
 
+            self.use_image(False)
             self.last_changed.artUrl = art_url
             downloader.download_image_async(
                 art_url, self.on_download, (24, 24), "arts"
