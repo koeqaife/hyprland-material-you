@@ -1,6 +1,6 @@
 # Maintainer: Koeqaife
 pkgname=hypryou
-_pkgname=hyprland-material-you
+_pkgname="hyprland-material-you"
 pkgver=2.1.5
 pkgrel=1
 pkgdesc="Dynamic and elegant desktop setup inspired by Material You, featuring auto-generated colors, fluid animations, and customizable user experience."
@@ -8,7 +8,7 @@ arch=('x86_64' 'aarch64')
 url="https://github.com/koeqaife/hyprland-material-you"
 install=hypryou.install
 license=('GPL3')
-source=("$_pkgname::git+https://github.com/koeqaife/hyprland-material-you.git")
+source=("$_pkgname::git+https://github.com/koeqaife/hyprland-material-you.git#tag=v$pkgver")
 sha256sums=('SKIP')
 
 depends=(
