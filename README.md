@@ -68,6 +68,10 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 <details>
     <summary>Automatic installation</summary>
 
+- **Pre-built (AUR):**
+  > The easiest way
+  - Use `yay`, `paru` or any other AUR helper to install it.
+
 - **Pre-built:**
   - Install needed packages from [releases](https://github.com/koeqaife/hyprland-material-you/releases)
   - Use `sudo pacman -U <file name>` change `<file name>` to name of the package you downloaded and make sure you're in Downloads folder
@@ -78,8 +82,6 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
   - `hypryou-greeter` - Use `makepkg -si` in `greeter/`
   - `hypryou-utils` - Use `makepkg -si` in `hypryou-utils/`
 
-> Coming soon to `AUR`!
-
 </details>
 
 ## Thanks to
@@ -89,4 +91,5 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 - [Astal](https://github.com/Aylur/astal): For Bluetooth and WirePlumber services
 - [Gtk4LayerShell](https://github.com/wmww/gtk4-layer-shell): For LayerShell
 - [Hyprland](https://github.com/hyprwm/Hyprland): For the best TWM I've ever seen
+- Shamz: submitted it to AUR
 - Maybe that's it
