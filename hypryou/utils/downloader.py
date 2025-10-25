@@ -34,6 +34,7 @@ def resize_image(
 
     if src_ratio > tgt_ratio:
         new_w = int(src_h * tgt_ratio)
+        new_h = src_h
         left = (src_w - new_w) // 2
         top = 0
     else:
