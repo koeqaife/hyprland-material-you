@@ -627,17 +627,27 @@ def generate_colors_sync(
 
 def generate_telegram_theme(path: str, bg: str) -> None:
     import zipfile
-    from PIL import Image
-
-    image = Image.new("RGB", (16, 16), bg)
+    import pyvips
     image_path = join(TEMP_DIR, "telegram", "background.png")
     os.makedirs(os.path.dirname(image_path), exist_ok=True)
-    image.save(image_path)
-    theme_path = join(CACHE_PATH, "theme.tdesktop-theme")
 
-    with zipfile.ZipFile(theme_path, "w") as zip:
-        zip.write(path, "colors.tdesktop-theme")
-        zip.write(image_path, "background.png")
+    if bg.startswith("#") and len(bg) == 7:
+        r = int(bg[1:3], 16)
+        g = int(bg[3:5], 16)
+        b = int(bg[5:7], 16)
+        color = [r, g, b]
+    else:
+        raise ValueError("Unsupported color format, expected #RRGGBB")
+
+    image = pyvips.Image.black(16, 16).new_from_image(color)
+    image.write_to_file(image_path)
+    del image
+
+    theme_path = join(CACHE_PATH, "theme.tdesktop-theme")
+    with zipfile.ZipFile(theme_path, "w") as zipf:
+        zipf.write(path, "colors.tdesktop-theme")
+        zipf.write(image_path, "background.png")
+
     os.remove(image_path)
 
 

@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import typing as t
 
 from repository import gio, glib
@@ -23,75 +24,61 @@ def resize_image(
     size: tuple[int, int],
     with_unsharp: bool = True
 ) -> str:
-    from PIL import Image, ImageFilter
+    import pyvips
     target_w, target_h = size
+    image = pyvips.Image.new_from_file(filepath, access="sequential")
 
-    with Image.open(filepath) as img:
-        # Determine the original format
-        original_format = img.format
-        
-        src_w, src_h = img.size
-        tgt_ratio = target_w / target_h
-        src_ratio = src_w / src_h
+    src_w, src_h = image.width, image.height
+    tgt_ratio = target_w / target_h
+    src_ratio = src_w / src_h
 
-        if src_ratio > tgt_ratio:
-            new_w = int(src_h * tgt_ratio)
-            new_h = src_h
-            left = (src_w - new_w) // 2
-            top = 0
-        else:
-            new_w = src_w
-            new_h = int(src_w / tgt_ratio)
-            left = 0
-            top = (src_h - new_h) // 2
+    if src_ratio > tgt_ratio:
+        new_w = int(src_h * tgt_ratio)
+        left = (src_w - new_w) // 2
+        top = 0
+    else:
+        new_h = int(src_w / tgt_ratio)
+        new_w = src_w
+        left = 0
+        top = (src_h - new_h) // 2
 
-        right = left + new_w
-        bottom = top + new_h
+    image = image.crop(left, top, new_w, new_h)
 
-        cropped = img.crop((left, top, right, bottom))
+    scale = target_w / image.width
+    image = image.resize(scale, kernel="lanczos3")
 
-        resized = cropped.resize(size, Image.Resampling.LANCZOS)
+    if with_unsharp:
+        image = image.sharpen()
 
-        if with_unsharp:
-            sharpened = resized.filter(
-                ImageFilter.UnsharpMask(radius=1, percent=5, threshold=3)
-            )
-            # Explicitly specify format when saving
-            if original_format:
-                sharpened.save(filepath, format=original_format, quality=95)
-            else:
-                # Fallback to JPEG if format is unknown
-                sharpened.save(filepath, format='JPEG', quality=95)
-        else:
-            # Explicitly specify format when saving
-            if original_format:
-                resized.save(filepath, format=original_format, quality=95)
-            else:
-                # Fallback to JPEG if format is unknown
-                resized.save(filepath, format='JPEG', quality=95)
+    image.write_to_file(filepath)
+    del image
 
     return filepath
 
 
 def finalize_image_file(temp_path: str) -> str:
-    from PIL import Image
     import uuid
-    dir_path = os.path.dirname(temp_path)
-    unique_path = os.path.join(dir_path, str(uuid.uuid4()))
-    os.rename(temp_path, unique_path)
-    with Image.open(unique_path) as img:
-        ext = img.format.lower() if img.format else 'jpeg'
-        final_path = os.path.join(dir_path, f"image.{ext}")
-        # Explicitly specify format when saving
-        img.save(final_path, format=img.format or 'JPEG')
-    os.remove(unique_path)
-    return final_path
+    import pyvips
+    dir_path = Path(temp_path).parent
+    unique_path = dir_path / str(uuid.uuid4())
+    Path(temp_path).rename(unique_path)
+
+    image = pyvips.Image.new_from_file(str(unique_path), access="sequential")
+
+    ext = unique_path.suffix.lower() if unique_path.suffix else ".jpeg"
+    final_path = dir_path / f"image{ext}"
+
+    image.write_to_file(str(final_path))
+    unique_path.unlink()
+    del image
+    return str(final_path)
 
 
 class DownloadState:
     __slots__ = (
         "stream", "temp_path",
-        "on_complete", "file"
+        "on_complete", "file",
+        "__weakref__"
     )
 
     def __init__(
@@ -130,7 +117,11 @@ class DownloadState:
             else:
                 self.file.write(data)
             self.stream.read_bytes_async(
-                4096, glib.PRIORITY_DEFAULT, None, self.read_chunk, None
+                4096,
+                glib.PRIORITY_DEFAULT,
+                None,
+                self.read_chunk,
+                None
             )
         except Exception as e:
             logger.error("Couldn't read file chunk: %s", e, exc_info=e)
@@ -145,14 +136,14 @@ def download_file_async(
     url: str,
     temp_path: str,
     on_complete: Callback
-) -> None:
+):
     file = gio.File.new_for_uri(url)
 
     def on_read(
         fileobj: gio.File,
         result: gio.AsyncResult,
         _data: t.Any
-    ) -> None:
+    ) -> DownloadState | None:
         try:
             stream = fileobj.read_finish(result)
             state = DownloadState(stream, temp_path, on_complete)

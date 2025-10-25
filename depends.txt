@@ -15,7 +15,7 @@ libgirepository
 hyprland
 dbus
 dbus-glib
-python-pillow
+python-pyvips
 cairo
 libnm
 cython

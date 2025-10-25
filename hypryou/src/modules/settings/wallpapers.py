@@ -33,17 +33,27 @@ def get_thumbnail_path(file_path: str) -> str:
 
 
 def generate_thumbnail(f: str) -> None:
-    from PIL import Image
+    import pyvips
     dest_path = get_thumbnail_path(f)
-    with Image.open(f) as img:
-        img = img.convert("RGB")
-        img.thumbnail((THUMB_SIZE, THUMB_SIZE), Image.LANCZOS)
-        img.save(dest_path, format="PNG")
+    image = pyvips.Image.new_from_file(f, access="sequential")
+
+    width = image.width
+    height = image.height
+
+    scale = min(THUMB_SIZE / width, THUMB_SIZE / height)
+
+    if scale < 1.0:
+        out = image.resize(scale)
+    else:
+        out = image
+
+    out.write_to_file(dest_path)
+    del image
 
 
 def generate_all(file_list: list[str]) -> None:
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        executor.map(generate_thumbnail, file_list)
+    for f in file_list:
+        generate_thumbnail(f)
 
 
 def spawn_thumbnail_process(
