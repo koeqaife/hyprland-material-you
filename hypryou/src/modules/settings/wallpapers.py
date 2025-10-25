@@ -12,8 +12,6 @@ import threading
 import typing as t
 import weakref
 from src.services.state import set_random_wallpaper, get_all_wallpapers
-from src.services.state import task_lock as task_lock1
-from utils.colors import task_lock as task_lock2
 from utils.debounce import sync_debounce
 from utils_cy.levenshtein import compute_score
 import src.widget as widget
@@ -34,18 +32,18 @@ def get_thumbnail_path(file_path: str) -> str:
     return join(CACHE_DIR, f"{key}_{THUMB_SIZE}x{THUMB_SIZE}.png")
 
 
-def generate_thumbnail(source_path: str, dest_path: str) -> None:
-    pixbuf = gdk_pixbuf.Pixbuf.new_from_file_at_scale(
-        source_path, THUMB_SIZE, THUMB_SIZE, True
-    )
-    pixbuf.savev(dest_path, "png", [], [])
+def generate_thumbnail(f: str) -> None:
+    from PIL import Image
+    dest_path = get_thumbnail_path(f)
+    with Image.open(f) as img:
+        img = img.convert("RGB")
+        img.thumbnail((THUMB_SIZE, THUMB_SIZE), Image.LANCZOS)
+        img.save(dest_path, format="PNG")
 
 
 def generate_all(file_list: list[str]) -> None:
-    for f in file_list:
-        dest_path = get_thumbnail_path(f)
-        if not path.exists(dest_path):
-            generate_thumbnail(f, dest_path)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        executor.map(generate_thumbnail, file_list)
 
 
 def spawn_thumbnail_process(
@@ -53,6 +51,15 @@ def spawn_thumbnail_process(
     on_done: t.Callable[[], None] | None = None
 ) -> None:
     global executor
+
+    new_paths = []
+    for f in paths:
+        dest_path = get_thumbnail_path(f)
+        if not path.exists(dest_path):
+            new_paths.append(f)
+    if not new_paths:
+        on_done()
+        return
 
     _on_done: weakref.WeakMethod[t.Any] | weakref.ReferenceType[t.Any] | None
     if on_done:
@@ -74,11 +81,7 @@ def spawn_thumbnail_process(
         if executor is not None:
             executor.shutdown(False)
 
-    if (
-        task_lock.acquire(blocking=False)
-        and not task_lock1.locked()
-        and not task_lock2.locked()
-    ):
+    if task_lock.acquire(blocking=False):
         executor = concurrent.futures.ProcessPoolExecutor(
             max_workers=1
         )
@@ -86,7 +89,7 @@ def spawn_thumbnail_process(
             future = executor.submit(
                 functools.partial(
                     generate_all,
-                    paths
+                    new_paths
                 )
             )
             future.add_done_callback(_callback)
@@ -215,9 +218,10 @@ class WallpapersList(gtk.Box):
             self._last_active = (new, new_active)
 
     def update_all(self) -> None:
+        for item in self.items.values():
+            item.load_image()
+
         def _callback() -> None:
-            for item in self.items.values():
-                item.load_image()
             current_wallpaper = self.settings.get(
                 "wallpaper"
             )
