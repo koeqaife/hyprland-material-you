@@ -141,11 +141,11 @@ class WallpaperCard(gtk.Button):
     def load_image(self) -> None:
         thumb_path = get_thumbnail_path(self.path)
 
-        if not path.exists(thumb_path):
-            return
-
-        pixbuf = gdk_pixbuf.Pixbuf.new_from_file(str(thumb_path))
-        self.image.set_pixbuf(pixbuf)
+        try:
+            pixbuf = gdk_pixbuf.Pixbuf.new_from_file(str(thumb_path))
+            self.image.set_pixbuf(pixbuf)
+        except Exception as e:
+            logger.exception(e)
 
     def destroy(self) -> None:
         self.image.set_pixbuf(None)
