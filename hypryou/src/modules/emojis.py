@@ -85,7 +85,6 @@ class EmojisBox(gtk.Box):
             hscrollbar_policy=gtk.PolicyType.EXTERNAL,
             hexpand=True
         )
-        print(self.top_bar_scroll.observe_controllers())
         self.scroll_controller = gtk.EventControllerScroll.new(
             gtk.EventControllerScrollFlags.VERTICAL |
             gtk.EventControllerScrollFlags.DISCRETE
