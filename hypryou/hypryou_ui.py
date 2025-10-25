@@ -317,7 +317,6 @@ def get_dir_size(path: str) -> int:
 def clear_cache() -> None:
     dirs = (
         os.path.join(APP_CACHE_DIR, "arts"),
-        os.path.join(APP_CACHE_DIR, "thumbnails")
     )
     for dir in dirs:
         if not os.path.isdir(dir):
