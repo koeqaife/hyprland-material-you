@@ -228,10 +228,10 @@ class WallpapersList(gtk.Box):
             self._last_active = (new, new_active)
 
     def update_all(self) -> None:
-        for item in self.items.values():
-            item.load_image()
-
         def _callback() -> None:
+            for item in self.items.values():
+                item.load_image()
+
             current_wallpaper = self.settings.get(
                 "wallpaper"
             )
