@@ -327,7 +327,7 @@ class PlayersBox(gtk.ScrolledWindow):
             orientation=gtk.Orientation.VERTICAL
         )
         self.no_items_label = gtk.Revealer(
-            child=gtk.Label(label="There isn't any players"),
+            child=gtk.Label(label="There aren't any players"),
             transition_duration=250,
             transition_type=gtk.RevealerTransitionType.SLIDE_DOWN,
             css_classes=("no-items",),
