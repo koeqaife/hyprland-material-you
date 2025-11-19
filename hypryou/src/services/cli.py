@@ -166,7 +166,7 @@ class CliRequest:
             script = (
                 f"hyprshot {" ".join(args)} -s -o '{TEMP_DIR}' "
                 "-f 'screenshot.png'",
-                f"satty -f '{TEMP_DIR}/screenshot.png'",
+                f"satty -f '{TEMP_DIR}/screenshot.png' --copy-command wl-copy",
                 f"rm {TEMP_DIR}/screenshot.png"
             )
             command = f'bash -c "{"; ".join(script)}"'
