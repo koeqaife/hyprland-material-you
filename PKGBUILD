@@ -52,6 +52,7 @@ optdepends=(
   'ttf-meslo-nerd-font-powerlevel10k: Font for alacritty'
   'alacritty: I recommend to use this terminal'
   'tela-circle-icon-theme-nord: Default icons'
+  'satty: Screenshot editor'
 )
 
 makedepends=(

@@ -1,7 +1,7 @@
 import os
 import asyncio
 import socket
-from config import socket_path, TEMP_DIR
+from config import HOME, socket_path, TEMP_DIR
 from utils.logger import logger
 from utils.styles import reload_css
 from utils.handler import exit_reload
@@ -162,16 +162,17 @@ class CliRequest:
         args.append(screenshot_mode_args[mode])
         if "freeze" in _mode:
             args.append("--freeze")
-        if shutil.which("swappy"):
+        if shutil.which("satty"):
             script = (
                 f"hyprshot {" ".join(args)} -s -o '{TEMP_DIR}' "
                 "-f 'screenshot.png'",
-                f"swappy -f '{TEMP_DIR}/screenshot.png'",
+                f"satty -f '{TEMP_DIR}/screenshot.png'",
                 f"rm {TEMP_DIR}/screenshot.png"
             )
             command = f'bash -c "{"; ".join(script)}"'
             launch_detached(command)
         else:
+            args.append(f"-o {HOME}/screenshots")
             command = f"bash -c \"hyprshot {" ".join(args)}\""
             launch_detached(command)
         return "ok"
