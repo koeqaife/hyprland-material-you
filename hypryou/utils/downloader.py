@@ -13,6 +13,34 @@ type Callback = t.Callable[[t.Optional[str]], None]
 _download_locks: dict[str, list[Callback]] = {}
 _download_mutex = threading.Lock()
 
+MAGIC_NUMBERS = {
+    b'\x89PNG\r\n\x1a\n': 'png',
+    b'\xff\xd8\xff': 'jpg',
+    b'GIF87a': 'gif',
+    b'GIF89a': 'gif',
+    b'RIFF': 'webp',
+    b'BM': 'bmp',
+    b'II*\x00': 'tiff',
+    b'MM\x00*': 'tiff',
+    b'\x00\x00\x01\x00': 'ico',
+}
+
+
+def guess_image_extension(filepath: str) -> str | None:
+    path = Path(filepath)
+    try:
+        with path.open("rb") as f:
+            header = f.read(16)
+    except Exception:
+        return None
+
+    for magic, ext in MAGIC_NUMBERS.items():
+        if header.startswith(magic):
+            if ext == 'webp' and b'WEBP' not in header:
+                continue
+            return ext
+    return None
+
 
 def get_cache_dir(url: str, subdir: str) -> str:
     name = os.path.basename(url).replace("/", "_")
@@ -44,12 +72,19 @@ def resize_image(
         top = (src_h - new_h) // 2
 
     image = image.crop(left, top, new_w, new_h)
-
     scale = target_w / image.width
     image = image.resize(scale, kernel="lanczos3")
 
     if with_unsharp:
         image = image.sharpen()
+
+    _ext = guess_image_extension(filepath)
+    if _ext:
+        ext = f".{_ext}"
+        if ext == ".jpg" and filepath.endswith(".jpeg"):
+            pass
+        elif not filepath.endswith(ext):
+            filepath += ext
 
     image.write_to_file(filepath)
     del image
