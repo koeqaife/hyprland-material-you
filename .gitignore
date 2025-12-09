@@ -12,3 +12,4 @@ venv/
 /src/
 !*/src/
 /pkg/
+/hyprland-material-you/
