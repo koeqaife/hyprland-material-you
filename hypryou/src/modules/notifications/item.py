@@ -156,12 +156,14 @@ class NotificationItem(gtk.Box):
         )
         self.image_overlay = gtk.Overlay(
             child=gtk.Box(css_classes=("body-image-size",)),
-            css_classes=("body-image",)
+            css_classes=("body-image",),
+            valign=gtk.Align.START
         )
         self.image = gtk.Picture(
             css_classes=("body-image-widget",),
             content_fit=gtk.ContentFit.SCALE_DOWN,
-            can_shrink=True
+            can_shrink=True,
+            valign=gtk.Align.START
         )
         self.image_overlay.add_overlay(self.image)
         self.text_box = gtk.Box(
