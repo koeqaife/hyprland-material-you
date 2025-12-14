@@ -94,3 +94,6 @@ HyprYou (hyprland-material-you v2). It aims to provide a modern, feature-rich, a
 - [Hyprland](https://github.com/hyprwm/Hyprland): For the best TWM I've ever seen
 - [Shxmz](https://github.com/shxmz): submitted it to AUR
 - Maybe that's it
+
+## Cool numbers (maybe)
+[![Stargazers over time](https://starchart.cc/koeqaife/hyprland-material-you.svg?variant=adaptive)](https://starchart.cc/koeqaife/hyprland-material-you)
