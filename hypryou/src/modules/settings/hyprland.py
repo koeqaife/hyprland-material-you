@@ -1,14 +1,22 @@
-from repository import gtk
+from repository import gtk, gio
+from config import HOME
 from src.modules.settings.base import int_kwargs
+from src.modules.settings.base import Row
 from src.modules.settings.base import SettingsTextRow
 from src.modules.settings.base import SettingsBoolRow
 from src.modules.settings.base import SettingsDropdownRow, DropdownItem
 from src.modules.settings.base import Category
 from src.modules.settings.base import Hint
+import typing as t
 
 
 class HyprlandPage(gtk.ScrolledWindow):
     __gtype_name__ = "SettingsHyprlandPage"
+
+    def open_hyprland_config(*args: t.Any) -> None:
+        gio.AppInfo.launch_default_for_uri(
+            f"file://{HOME}/.config/hypryou/hyprland.conf", None
+        )
 
     def __init__(self) -> None:
         self.box = gtk.Box(
@@ -21,6 +29,12 @@ class HyprlandPage(gtk.ScrolledWindow):
             hscrollbar_policy=gtk.PolicyType.NEVER
         )
         self.box_children = (
+            Category("Custom"),
+            Row(
+                "Hyprland config",
+                "Config file is located at ~/.config/hypryou/hyprland.conf",
+                self.open_hyprland_config
+            ),
             Category("General"),
             SettingsTextRow(
                 "Gaps In",
