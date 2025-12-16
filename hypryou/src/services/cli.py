@@ -13,7 +13,7 @@ from config import Settings
 import traceback
 import typing as t
 import src.services.hyprland as hyprland
-from repository import gtk, gdk
+from repository import gtk, gdk, glib, gio
 
 
 screenshot_mode_args = {
@@ -51,6 +51,45 @@ def launch_detached(exec: str) -> None:
     asyncio.create_task(
         hyprland.client.raw(f"dispatch exec {exec}")
     )
+
+
+class ScreenshotWatcher:
+    def __init__(self, path: str) -> None:
+        self.path = path
+        self.monitor: gio.FileMonitor | None = None
+
+    def start(self) -> None:
+        file = gio.File.new_for_path(self.path)
+        self.monitor = file.monitor_file(
+            gio.FileMonitorFlags.NONE,
+            None,
+        )
+        self.monitor.connect("changed", self._on_changed)
+
+    def _on_changed(
+        self,
+        monitor: gio.FileMonitor,
+        file: gio.File,
+        other_file: gio.File,
+        event_type: gio.FileMonitorEvent,
+    ) -> None:
+        if event_type in (
+            gio.FileMonitorEvent.CHANGES_DONE_HINT,
+            gio.FileMonitorEvent.MOVED,
+        ):
+            self._on_file_ready()
+
+    def _on_file_ready(self) -> None:
+        launch_detached(
+            f"satty -f {self.path} --copy-command wl-copy"
+        )
+
+        glib.idle_add(self._cleanup)
+
+    def _cleanup(self) -> bool:
+        if self.monitor:
+            self.monitor.cancel()
+        return False
 
 
 class CliRequest:
@@ -163,14 +202,12 @@ class CliRequest:
         if "freeze" in _mode:
             args.append("--freeze")
         if shutil.which("satty"):
-            script = (
+            command = (
                 f"hyprshot {" ".join(args)} -s -o '{TEMP_DIR}' "
-                "-f 'screenshot.png'",
-                f"satty -f '{TEMP_DIR}/screenshot.png' --copy-command wl-copy",
-                f"rm {TEMP_DIR}/screenshot.png"
+                "-f 'screenshot.png'"
             )
-            command = f'bash -c "{"; ".join(script)}"'
             launch_detached(command)
+            ScreenshotWatcher(f"{TEMP_DIR}/screenshot.png").start()
         else:
             args.append(f"-o {HOME}/screenshots")
             command = f"bash -c \"hyprshot {" ".join(args)}\""
@@ -271,7 +308,7 @@ async def handle_client(
 
 async def handle_request(
     data: str
-) -> tuple[str | tuple[str, bool], t.Callable[[], None] | None]:
+) -> tuple[str | tuple[str, bool], t.Callable[[], object] | None]:
     parts = data.strip().split(" ", 1)
     command = parts[0]
     args = parts[1] if len(parts) > 1 else ""
