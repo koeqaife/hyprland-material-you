@@ -53,96 +53,134 @@ def rgb_to_hex(rgb: RGB) -> str:
     return '#{:02x}{:02x}{:02x}'.format(*rgb[:3])
 
 
-def rgba_to_rgb(rgba: RGBA) -> str:
-    return f'{rgba[0]}, {rgba[1]}, {rgba[2]}'
+def hex_to_rgb(hex_color: str) -> str:
+    hex_color = hex_color.lstrip('#')
+
+    if len(hex_color) == 3:
+        hex_color = ''.join(ch * 2 for ch in hex_color)
+
+    if len(hex_color) != 6:
+        raise ValueError('Invalid hex color format')
+
+    r = int(hex_color[0:2], 16)
+    g = int(hex_color[2:4], 16)
+    b = int(hex_color[4:6], 16)
+
+    return f'{r}, {g}, {b}'
 
 
-def get_color(color_name: str) -> DynamicColor | None:
-    color = getattr(MaterialDynamicColors, color_name, None)
-    if isinstance(color, DynamicColor):
-        return color
-    else:
-        return None
+def get_colors(scheme: DynamicScheme) -> dict[str, str]:
+    color_map: dict[str, str] = {}
+
+    for color_name, color in vars(MaterialDynamicColors).items():
+        if not isinstance(color, DynamicColor):
+            continue
+        if color_name.endswith("paletteKeyColor"):
+            continue
+
+        if color is not None:
+            rgba = color.get_hct(scheme).to_rgba()
+            color_map[color_name] = rgb_to_hex(rgba)
+
+    return color_map
 
 
-class ColorsCache:
+class ColorScheme:
     __slots__ = (
-        "colors", "wallpaper", "original_color",
-        "contrast_level", "is_dark"
+        "dark", "light", "is_dark",
+        "wallpaper", "original_color",
+        "contrast_level", "_cached_all"
     )
 
     def __init__(
         self,
-        colors: DynamicScheme | dict[str, str],
-        wallpaper: str | None,
-        original_color: int | None,
-        contrast_level: int,
         is_dark: bool,
-
-        colors_dark: DynamicScheme | dict[str, str] | None = None,
-        colors_light: DynamicScheme | dict[str, str] | None = None,
+        dark: DynamicScheme | dict[str, str],
+        light: DynamicScheme | dict[str, str],
+        contrast_level: int,
+        original_color: int | None = None,
+        wallpaper: str | None = None
     ) -> None:
-        self.colors: dict[str, str] = {}
+        if isinstance(dark, DynamicScheme):
+            dark = get_colors(dark)
+        if isinstance(light, DynamicScheme):
+            light = get_colors(light)
+
+        self.is_dark = is_dark
+        self.dark = dark
+        self.light = light
         self.wallpaper = wallpaper
         self.original_color = original_color
         self.contrast_level = contrast_level
-        self.is_dark = is_dark
+        self._cached_all: dict[str, str] | None = None
 
-        if isinstance(colors, DynamicScheme):
-            for color_name in vars(MaterialDynamicColors).keys():
-                color = get_color(color_name)
-                if color is None:
-                    continue
-                self.colors[color_name] = rgb_to_hex(
-                    color.get_hct(colors).to_rgba()
-                )
-        else:
-            self.colors = colors
+    @property
+    def current_colors(self) -> dict[str, str]:
+        return self.dark if self.is_dark else self.light
 
-        _schemes = ((colors_dark, "Dark"), (colors_light, "Light"))
-        for scheme, suffix in _schemes:
-            if scheme is None:
-                continue
-            if isinstance(scheme, dict):
-                for key, value in scheme.items():
-                    self.colors[f"{key}{suffix}"] = value
-                continue
-            for color_name in vars(MaterialDynamicColors).keys():
-                color = get_color(color_name)
-                if color is None:
-                    continue
-                self.colors[f"{color_name}{suffix}"] = rgb_to_hex(
-                    color.get_hct(colors).to_rgba()
-                )
+    @property
+    def all_colors(self) -> dict[str, str]:
+        if self._cached_all:
+            return self._cached_all
+        schemes = (
+            (self.current_colors, ""),
+            (self.dark, "Dark"),
+            (self.light, "Light")
+        )
+        color_map: dict[str, str] = {}
+        for scheme, suffix in schemes:
+            for name, color in scheme.items():
+                color_map[f"{name}{suffix}"] = color
+        self._cached_all = color_map
+        return color_map
 
 
-def colors_dict(cache: ColorsCache) -> dict[str, t.Any]:
+def colors_dict(scheme: ColorScheme) -> dict[str, t.Any]:
     dict = {
-        "wallpaper": cache.wallpaper,
-        "colors": cache.colors,
-        "original_color": cache.original_color,
-        "contrast_level": cache.contrast_level,
-        "is_dark": cache.is_dark
+        "__version__": 1,
+        "wallpaper": scheme.wallpaper,
+        "dark": scheme.dark,
+        "light": scheme.light,
+        "original_color": scheme.original_color,
+        "contrast_level": scheme.contrast_level,
+        "is_dark": scheme.is_dark
     }
     return dict
 
 
-def get_cache_object(object: dict[str, t.Any] | str) -> ColorsCache:
+def restore_colors(colors: dict[str, str]) -> tuple[dict, dict]:
+    dark = {}
+    light = {}
+    for name, color in colors.items():
+        if name.endswith("Dark"):
+            dark[name.removesuffix("Dark")] = color
+        if name.endswith("Light"):
+            light[name.removesuffix("Light")] = color
+    return dark, light
+
+
+def get_cache_object(object: dict[str, t.Any] | str) -> ColorScheme:
     if isinstance(object, str):
         object = dict(json.loads(object))
 
-    colors = object["colors"]
+    version = object.get("__version__", 0)
+    if version == 0:
+        dark, light = restore_colors(object["colors"])
+    else:
+        dark = object["dark"]
+        light = object["light"]
     wallpaper = object["wallpaper"]
     original_color = object["original_color"]
     contrast_level = object.get("contrast_level", 0)
     is_dark = object["is_dark"]
 
-    return ColorsCache(
-        colors,
-        wallpaper,
-        original_color,
+    return ColorScheme(
+        is_dark,
+        dark,
+        light,
         contrast_level,
-        is_dark
+        original_color,
+        wallpaper
     )
 
 
@@ -163,37 +201,14 @@ additional = {
 }
 
 
-def generate_color_map(
-    scheme: DynamicScheme,
-    dark_scheme: DynamicScheme,
-    light_scheme: DynamicScheme
-) -> dict[str, str]:
-    _schemes = (
-        (scheme, ""),
-        (dark_scheme, "Dark"),
-        (light_scheme, "Light")
-    )
-    color_map: dict[str, str] = {}
-    for _color_name in vars(MaterialDynamicColors).keys():
-        for _scheme, suffix in _schemes:
-            color = get_color(_color_name)
-            color_name = f"{_color_name}{suffix}"
-            if color is not None:
-                rgba = color.get_hct(_scheme).to_rgba()
-                color_map[color_name] = rgb_to_hex(rgba)
-    return color_map
-
-
 class TemplateFormatter:
     def __init__(
         self,
-        scheme: DynamicScheme,
-        dark_scheme: DynamicScheme,
-        light_scheme: DynamicScheme,
+        scheme: ColorScheme,
         vars: dict[str, str],
         allowed_actions: tuple[str, ...] | tuple[()] = ()
     ) -> None:
-        self.color_map = generate_color_map(scheme, dark_scheme, light_scheme)
+        self.color_map = scheme.all_colors
         self.vars = vars
         self.post_actions = allowed_actions
 
@@ -382,15 +397,11 @@ class TemplateFormatter:
 def generate_templates(
     folder: str,
     output_folder: str,
-    scheme: DynamicScheme,
-    dark_scheme: DynamicScheme,
-    light_scheme: DynamicScheme,
-    is_dark: bool,
-    wallpaper: str | None = None,
+    scheme: ColorScheme,
     allowed_actions: tuple[str, ...] | tuple[()] = ()
 ) -> dict[str, list[str]]:
     actions: dict[str, list[str]] = {}
-    color_scheme = "dark" if is_dark else "light"
+    color_scheme = "dark" if scheme.is_dark else "light"
 
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
@@ -405,12 +416,10 @@ def generate_templates(
             template = f.read()
         formatter = TemplateFormatter(
             scheme,
-            dark_scheme,
-            light_scheme,
             {
                 "colorScheme": color_scheme,
                 "outputFolder": output_folder,
-                "wallpaper": wallpaper or ""
+                "wallpaper": scheme.wallpaper or ""
             },
             allowed_actions
         )
@@ -421,36 +430,23 @@ def generate_templates(
         if _actions:
             actions[new_path] = _actions
 
-    _schemes = (
-        (scheme, ""),
-        (dark_scheme, "Dark"),
-        (light_scheme, "Light")
-    )
     for file in ready_templates:
         _template = ""
-        for _color_name in vars(MaterialDynamicColors).keys():
-            for _scheme, suffix in _schemes:
-                color = get_color(_color_name)
-                color_name = f"{_color_name}{suffix}"
-                if color is None:
-                    continue
-
-                rgba = color.get_hct(_scheme).to_rgba()
-                hex_color = rgb_to_hex(rgba)
-                rgb_color = rgba_to_rgb(rgba)
+        for name, hex_color in scheme.all_colors.items():
+            rgb_color = hex_to_rgb(hex_color)
+            new_line = ready_templates[file].format(
+                name=name,
+                hex=hex_color,
+                rgb=rgb_color
+            )
+            _template += new_line
+            if name in additional:
                 new_line = ready_templates[file].format(
-                    name=color_name,
+                    name=additional[name],
                     hex=hex_color,
                     rgb=rgb_color
                 )
                 _template += new_line
-                if color_name in additional:
-                    new_line = ready_templates[file].format(
-                        name=additional[color_name],
-                        hex=hex_color,
-                        rgb=rgb_color
-                    )
-                    _template += new_line
 
             new_path = join(output_folder, os.path.basename(file))
             with open(new_path, 'w') as f:
@@ -566,24 +562,19 @@ def generate_colors_sync(
         False,
         contrast_level
     )
-    scheme = dark_scheme if is_dark else light_scheme
+    scheme = ColorScheme(
+        is_dark, dark_scheme, light_scheme, contrast_level,
+        use_color, image_path
+    )
 
     with open(colors_json, 'w') as f:
-        object = ColorsCache(
-            scheme, image_path, use_color, contrast_level, is_dark,
-            dark_scheme, light_scheme
-        )
-        json.dump(colors_dict(object), f, indent=2)
+        json.dump(colors_dict(scheme), f, indent=2)
 
     allowed_actions = ("compile_scss", "mark")
     post = generate_templates(
         TEMPLATES_DIR,
         CACHE_PATH,
         scheme,
-        dark_scheme,
-        light_scheme,
-        is_dark,
-        image_path,
         allowed_actions
     )
     if os.path.isdir(USER_TEMPLATES_DIR):
@@ -591,10 +582,6 @@ def generate_colors_sync(
             USER_TEMPLATES_DIR,
             CACHE_PATH,
             scheme,
-            dark_scheme,
-            light_scheme,
-            is_dark,
-            image_path,
             allowed_actions
         ))
 
@@ -619,7 +606,7 @@ def generate_colors_sync(
                 name = action.split(".", 1)[1]
                 marked[name] = file_path
 
-    post_actions(marked, object)
+    post_actions(marked, scheme)
 
     for proc in processes:
         proc.wait(15)
@@ -651,10 +638,10 @@ def generate_telegram_theme(path: str, bg: str) -> None:
     os.remove(image_path)
 
 
-def post_actions(marked: dict[str, str], colors: ColorsCache) -> None:
+def post_actions(marked: dict[str, str], scheme: ColorScheme) -> None:
     if "telegram" in marked.keys():
         path = marked["telegram"]
-        generate_telegram_theme(path, colors.colors["background"])
+        generate_telegram_theme(path, scheme.current_colors["background"])
 
 
 def compile_scss(path: str, output: str) -> "subprocess.Popen[bytes]":
@@ -803,8 +790,7 @@ def generate_by_settings(
         with open(colors_json) as f:
             content = get_cache_object(f.read())
         color = str(settings.get("color")).lstrip("#")
-        use_color = bool(color)
-        if use_color:
+        if color:
             cached_color = content.original_color
             color_int = int(color, 16)
             if color_int != cached_color or force:
@@ -864,7 +850,7 @@ def set_dark_mode(
             content.contrast_level,
             on_complete=on_complete
         )
-    except (FileNotFoundError, AssertionError, json.JSONDecodeError):
+    except (FileNotFoundError, json.JSONDecodeError):
         generate_colors(
             None,
             0x0000FF,
@@ -874,7 +860,7 @@ def set_dark_mode(
         )
 
 
-def sync() -> ColorsCache | None:
+def sync() -> ColorScheme | None:
     try:
         with open(colors_json) as f:
             content = get_cache_object(f.read())
