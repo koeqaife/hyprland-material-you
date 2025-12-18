@@ -2,6 +2,32 @@ from src.services.hyprland_keybinds.common import KeyBind, main_mod, Category
 
 key_binds = (
     KeyBind(
+        (main_mod, "%N%"),
+        (
+            "exec",
+            "sh -c 'hypryouctl change_workspace %N% "
+            "|| hyprctl dispatch workspace %N%'"
+        ),
+        "Switch workspace",
+        Category.WINDOWS
+    ),
+    KeyBind(
+        (main_mod, "Shift", "%N%"),
+        (
+            "exec",
+            "sh -c 'hypryouctl move_window %N% "
+            "|| hyprctl dispatch movetoworkspace %N%'"
+        ),
+        "Move window to workspace",
+        Category.WINDOWS
+    ),
+    KeyBind(
+        (main_mod, "CTRL", "down"),
+        ("workspace", "empty"),
+        "Switch to empty workspace",
+        Category.WINDOWS
+    ),
+    KeyBind(
         (main_mod, "Q"),
         "killactive",
         "Close window",

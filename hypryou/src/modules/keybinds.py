@@ -30,16 +30,15 @@ REPLACE = {
     "bracketleft": "[",
     "bracketright": "]",
     "backslash": "\\",
-    "apostrophe": "'"
+    "apostrophe": "'",
+    "%n%": "0-9"
 }
 
 CATEGORIES = {
     Category.ACTIONS: "action_key",
     Category.TOOLS: "build",
+    Category.WINDOWS: "overview_key",
     Category.APPS: "apps",
-    Category.WINDOWS: "select_window",
-    Category.WORKSPACES: "overview_key",
-    Category.MISC: "construction"
 }
 
 

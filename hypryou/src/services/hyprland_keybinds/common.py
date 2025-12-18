@@ -7,10 +7,8 @@ main_mod = "SUPER"
 class Category(str, Enum):
     ACTIONS = "Actions"
     TOOLS = "Tools"
+    WINDOWS = "Window management"
     APPS = "Applications"
-    WINDOWS = "Windows"
-    WORKSPACES = "Workspaces"
-    MISC = "Misc"
 
 
 @dataclass

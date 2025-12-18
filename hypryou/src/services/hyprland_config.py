@@ -5,7 +5,7 @@ from utils.logger import logger
 from utils.ref import unpack_reactive, Ref
 from src.services.hyprland_keybinds import key_binds
 from src.services.hyprland_keybinds.common import (
-    KeyBind, KeyBindHint, KeyBindOverride
+    KeyBind, KeyBindOverride
 )
 import src.services.hyprland as hyprland
 from config import config_dir, Settings, SettingsView
@@ -265,9 +265,7 @@ def generate_binds() -> str:
     output = ""
 
     for bind in key_binds:
-        if isinstance(bind, KeyBindHint):
-            continue
-        elif not isinstance(bind, KeyBind):
+        if not isinstance(bind, KeyBind):
             continue
 
         key = bind.bind
@@ -293,11 +291,20 @@ def generate_binds() -> str:
             action_str = ", ".join(action)
         else:
             action_str = action
-        bind_str = f"{key_str}, {action_str}"
-        if "mouse" in key_str:
-            output += f"bindm = {bind_str}\n"
+
+        if "%N%" in key_str:
+            for k in range(0, 10):
+                n = k if k != 0 else 10
+                _key = key_str.replace("%N%", str(k))
+                _action = action_str.replace("%N%", str(n))
+                bind_str = f"{_key}, {_action}"
+                output += f"bind = {bind_str}\n"
         else:
-            output += f"bind = {bind_str}\n"
+            bind_str = f"{key_str}, {action_str}"
+            if "mouse" in key_str:
+                output += f"bindm = {bind_str}\n"
+            else:
+                output += f"bind = {bind_str}\n"
 
     return output
 
