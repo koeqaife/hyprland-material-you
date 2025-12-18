@@ -57,6 +57,13 @@ class ConfigsPage(gtk.ScrolledWindow):
                 ),
                 f"{info["github"]}/wiki/Color-Templates"
             ),
+            (
+                Row(
+                    "Custom Color Schemes",
+                    "Use your own beautiful color schemes",
+                ),
+                f"{info["github"]}/wiki/Custom-Color-Palettes"
+            )
         )
         self.box_children = (
             Category("Hyprland"),
@@ -105,6 +112,7 @@ class ConfigsPage(gtk.ScrolledWindow):
             self.children_with_wiki[0][0],
             self.children_with_wiki[1][0],
             self.children_with_wiki[2][0],
+            self.children_with_wiki[3][0],
         )
 
         for child, url in self.children_with_wiki:
