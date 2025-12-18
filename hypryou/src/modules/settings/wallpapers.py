@@ -146,7 +146,7 @@ class WallpaperCard(gtk.Button):
         self.handler = self.connect("clicked", self.on_clicked)
 
     def on_clicked(self, *args: t.Any) -> None:
-        self.settings.set("wallpaper", self.path)
+        self.settings.set("appearance.wallpaper", self.path)
 
     def load_image(self) -> None:
         thumb_path = get_thumbnail_path(self.path)
@@ -184,7 +184,7 @@ class WallpapersList(gtk.Box):
         self._last_active: tuple[str, WallpaperCard] | None = None
         self.load_all()
         self.settings_handler = self.settings.watch(
-            "wallpaper", self.on_wallpaper_update, False
+            "appearance.wallpaper", self.on_wallpaper_update, False
         )
 
         self.search_box = gtk.Box(
@@ -233,7 +233,7 @@ class WallpapersList(gtk.Box):
                 item.load_image()
 
             current_wallpaper = self.settings.get(
-                "wallpaper"
+                "appearance.wallpaper"
             )
             self.on_wallpaper_update(current_wallpaper)
 

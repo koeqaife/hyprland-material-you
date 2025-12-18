@@ -2,6 +2,7 @@ import os
 import asyncio
 import socket
 from config import HOME, socket_path, TEMP_DIR
+from utils.colors import generate_by_settings
 from utils.logger import logger
 from utils.styles import reload_css
 from utils.handler import exit_reload
@@ -31,6 +32,7 @@ HELP = {
     "open_window": "Open window/popup",
     "close_window": "Close window/popup",
     "reload_css": "Reload CSS styles",
+    "reload_colors": "Reload colors",
     "player": "Mini playerctl: play-pause, pause, next, prev, play",
     "apps": "Launch apps: files, editor, terminal, browser",
     "lock": "Lock session",
@@ -145,6 +147,10 @@ class CliRequest:
                 hyprland.client.raw("keyword animations:enabled true")
             )
             settings.set_property("gtk-enable-animations", True)
+        return "ok"
+
+    def do_reload_colors(self, *args: str) -> str:
+        generate_by_settings(force=True)
         return "ok"
 
     def do_close_window(self, window_name: str) -> str:

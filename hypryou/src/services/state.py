@@ -139,13 +139,13 @@ def get_all_wallpapers() -> list[str]:
 def set_random_wallpaper() -> None:
     wallpapers = get_all_wallpapers()
     random_wallpaper = random.choice(wallpapers)
-    Settings().set("wallpaper", random_wallpaper)
+    Settings().set("appearance.wallpaper", random_wallpaper)
 
 
 def generate_wallpaper_texture() -> None:
     import gc
     settings = Settings()
-    path = settings.get("wallpaper")
+    path = settings.get("appearance.wallpaper")
     remove_wallpaper_animation()
 
     if task_lock.acquire():
@@ -216,7 +216,6 @@ def remove_wallpaper_animation() -> None:
 
 
 def on_wallpapers_changed(*args: t.Any) -> None:
-    generate_by_settings()
     glib.idle_add(generate_wallpaper_texture)
 
 
@@ -334,7 +333,7 @@ def on_settings_changed(key: str, value: t.Any) -> None:
         reload_css()
     elif key == "opacity":
         reload_css()
-    elif key == "color" or key == "dark_mode":
+    elif key.startswith("appearance."):
         generate_by_settings()
 
 
@@ -395,7 +394,7 @@ class StateService(Service):
     def start(self) -> None:
         opened_windows.init()
         settings = Settings()
-        settings.watch("wallpaper", on_wallpapers_changed, False)
+        settings.watch("appearance.wallpaper", on_wallpapers_changed, False)
         settings._signals.watch("changed", on_settings_changed)
         hyprland.active_client.watch(update_animation_state)
         is_locked.watch(update_animation_state)

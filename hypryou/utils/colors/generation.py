@@ -6,7 +6,6 @@ import typing as t
 import json
 import threading
 import concurrent.futures
-from materialyoucolor.scheme.scheme_tonal_spot import SchemeTonalSpot  # type: ignore # noqa
 from config import color_templates, ASSETS_DIR, CONFIG_DIR
 from config import config_dir, TEMP_DIR
 from utils.logger import logger
@@ -18,14 +17,14 @@ if t.TYPE_CHECKING:
     import subprocess
 
 from .templates import generate_templates
-from .schemes import ColorScheme
+from .schemes import ColorScheme, SchemeName, scheme_from_name
 from .cache import save_scheme, load_scheme
 
 executor: concurrent.futures.ProcessPoolExecutor | None = None
 
-
 TEMPLATES_DIR = join(ASSETS_DIR, "templates")
 USER_TEMPLATES_DIR = join(config_dir, "templates")
+USER_COLORS_FILE = join(config_dir, "colors.json")
 
 GTK3_PATH = join(CONFIG_DIR, "gtk-3.0")
 GTK4_PATH = join(CONFIG_DIR, "gtk-4.0")
@@ -83,7 +82,7 @@ def process_image(
 def update_settings() -> None:
     settings = Settings()
     gsettings = gio.Settings.new("org.gnome.desktop.interface")
-    dark_mode = settings.get("dark_mode")
+    dark_mode = settings.get("appearance.dark_mode")
 
     if settings.get("themes.gtk3") or settings.get("themes.gtk4"):
         if not dark_mode:
@@ -123,7 +122,8 @@ def generate_colors_sync(
     image_path: str | None = None,
     use_color: int | None = None,
     is_dark: bool = True,
-    contrast_level: int = 0
+    contrast_level: int = 0,
+    scheme_name: SchemeName = "tonal_spot"
 ) -> None:
     from materialyoucolor.hct import Hct  # type: ignore
 
@@ -134,19 +134,28 @@ def generate_colors_sync(
     else:
         raise TypeError("Either image_path or use_color should be not None.")
 
-    dark_scheme = SchemeTonalSpot(
+    safe_override: dict[str, dict[str, str]] | None = None
+    if os.path.isfile(USER_COLORS_FILE):
+        try:
+            with open(USER_COLORS_FILE, "r") as f:
+                safe_override = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            pass
+
+    Scheme = scheme_from_name(scheme_name)
+    dark_scheme = Scheme(
         Hct.from_int(color),
         True,
         contrast_level
     )
-    light_scheme = SchemeTonalSpot(
+    light_scheme = Scheme(
         Hct.from_int(color),
         False,
         contrast_level
     )
     scheme = ColorScheme(
         is_dark, dark_scheme, light_scheme, contrast_level,
-        use_color, image_path
+        use_color, image_path, scheme_name, safe_override
     )
 
     save_scheme(scheme)
@@ -274,7 +283,8 @@ def generate_colors(
     use_color: int | None = None,
     is_dark: bool = True,
     contrast_level: int = 0,
-    on_complete: t.Callable[[], None] | None = None
+    on_complete: t.Callable[[], None] | None = None,
+    scheme_name: SchemeName = "tonal_spot"
 ) -> None:
     import functools
     global executor
@@ -301,7 +311,8 @@ def generate_colors(
                     image_path=image_path,
                     use_color=use_color,
                     is_dark=is_dark,
-                    contrast_level=contrast_level
+                    contrast_level=contrast_level,
+                    scheme_name=scheme_name
                 )
             )
             future.add_done_callback(_callback)
@@ -316,7 +327,8 @@ def generate_colors(
 def generate_by_wallpaper(
     image_path: str,
     on_complete: t.Callable[[], None] | None = None,
-    is_dark: bool = True
+    is_dark: bool = True,
+    scheme_name: SchemeName = "tonal_spot"
 ) -> None:
     try:
         scheme = load_scheme()
@@ -325,7 +337,8 @@ def generate_by_wallpaper(
             None,
             is_dark,
             contrast_level=scheme.contrast_level,
-            on_complete=on_complete
+            on_complete=on_complete,
+            scheme_name=scheme_name
         )
     except (FileNotFoundError, json.JSONDecodeError):
         generate_colors(
@@ -340,7 +353,8 @@ def generate_by_wallpaper(
 def generate_by_color(
     color: int,
     on_complete: t.Callable[[], None] | None = None,
-    is_dark: bool = True
+    is_dark: bool = True,
+    scheme_name: SchemeName = "tonal_spot"
 ) -> None:
     try:
         scheme = load_scheme()
@@ -349,7 +363,8 @@ def generate_by_color(
             color,
             is_dark,
             contrast_level=scheme.contrast_level,
-            on_complete=on_complete
+            on_complete=on_complete,
+            scheme_name=scheme_name
         )
     except (FileNotFoundError, json.JSONDecodeError):
         generate_colors(
@@ -366,12 +381,15 @@ def generate_by_settings(
     force: bool = False
 ) -> bool:
     try:
-        settings = Settings()
+        settings = Settings().get_view_for("appearance")
         dark_mode = settings.get("dark_mode")
+        scheme_name = settings.get("scheme")
 
         scheme = load_scheme()
         color = str(settings.get("color")).lstrip("#")
         if scheme.is_dark != dark_mode:
+            force = True
+        if scheme.scheme_name != scheme_name:
             force = True
 
         if color:

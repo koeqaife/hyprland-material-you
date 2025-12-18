@@ -50,7 +50,6 @@ default_settings: dict[str, t.Any] = {
     "always_show_battery": False,
     "corners": True,
     "opacity": 1.0,
-    "wallpaper": f"{ASSETS_DIR}/default_wallpaper.jpg",
     "separated_workspaces": False,
     "one_popup_at_time": True,
     "power_menu_cancel_button": True,
@@ -58,8 +57,11 @@ default_settings: dict[str, t.Any] = {
     "floating_sidebar": False,
     "floating_bar": False,
     "hide_empty_workspaces": False,
-    "color": "",
-    "dark_mode": True,
+
+    "appearance.color": "",
+    "appearance.dark_mode": True,
+    "appearance.wallpaper": f"{ASSETS_DIR}/default_wallpaper.jpg",
+    "appearance.scheme": "tonal_spot",
 
     "themes.gtk3": True,
     "themes.gtk4": True,

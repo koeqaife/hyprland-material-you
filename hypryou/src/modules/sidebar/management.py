@@ -284,7 +284,7 @@ class ToggleButton(ManagementButton):
 
 
 def toggle_dark_mode(self: ToggleButton, value: bool) -> None:
-    Settings().set("dark_mode", value)
+    Settings().set("appearance.dark_mode", value)
 
 
 def toggle_inhibitor(self: ToggleButton, value: bool) -> None:
@@ -315,7 +315,7 @@ class ManagementFirstPage(gtk.Box):
         self.dark_mode = ToggleButton(
             "contrast",
             "Dark Mode",
-            Settings().get_ref("dark_mode"),
+            Settings().get_ref("appearance.dark_mode"),
             toggle_dark_mode
         )
         self.dnd = ToggleButton(

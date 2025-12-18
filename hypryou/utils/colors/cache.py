@@ -15,7 +15,8 @@ def _colors_dict(scheme: ColorScheme) -> dict[str, t.Any]:
         "light": scheme.light,
         "original_color": scheme.original_color,
         "contrast_level": scheme.contrast_level,
-        "is_dark": scheme.is_dark
+        "is_dark": scheme.is_dark,
+        "scheme": scheme.scheme_name
     }
     return dict
 
@@ -55,6 +56,7 @@ def get_cache_object(object: dict[str, t.Any] | str) -> ColorScheme:
     original_color = object["original_color"]
     contrast_level = object.get("contrast_level", 0)
     is_dark = object["is_dark"]
+    scheme = object.get("scheme")
 
     return ColorScheme(
         is_dark,
@@ -62,5 +64,6 @@ def get_cache_object(object: dict[str, t.Any] | str) -> ColorScheme:
         light,
         contrast_level,
         original_color,
-        wallpaper
+        wallpaper,
+        scheme
     )

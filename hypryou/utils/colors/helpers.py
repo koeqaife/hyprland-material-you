@@ -4,6 +4,10 @@ type RGB = tuple[IntFloat, IntFloat, IntFloat]
 type RGBA = tuple[IntFloat, IntFloat, IntFloat, IntFloat]
 
 
+def snake_to_pascal(s: str) -> str:
+    return ''.join(word.capitalize() for word in s.split('_'))
+
+
 def rgb_to_hex(rgb: RGB) -> str:
     return '#{:02x}{:02x}{:02x}'.format(*rgb[:3])
 

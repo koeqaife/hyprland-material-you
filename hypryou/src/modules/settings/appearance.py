@@ -23,12 +23,12 @@ class AppearancePage(gtk.ScrolledWindow):
             SettingsBoolRow(
                 "Dark Mode",
                 "Toggles dark theme",
-                "dark_mode"
+                "appearance.dark_mode"
             ),
             SettingsTextRow(
                 "Color",
                 "Use different color for UI instead of wallpapers' one",
-                "color",
+                "appearance.color",
                 "tag",
                 max_length=6
             ),
