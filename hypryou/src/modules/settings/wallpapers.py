@@ -207,7 +207,7 @@ class WallpapersList(gtk.Box):
 
     @sync_debounce(150)
     def on_search(self, *args: t.Any) -> None:
-        text = self.entry.get_text()
+        text = self.entry.get_text().lower()
         self.flow_box.remove_all()
         if len(text.strip()) == 0:
             for item in self.items.values():
@@ -215,7 +215,7 @@ class WallpapersList(gtk.Box):
             return
 
         for item in self.items.values():
-            score = compute_score(item.name.get_text(), text)
+            score = compute_score(item.name.get_text().lower(), text)
             if score >= THRESHOLD:
                 self.flow_box.append(item)
 
