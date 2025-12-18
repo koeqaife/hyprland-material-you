@@ -61,6 +61,7 @@ class ScreenshotWatcher:
         self.path = path
         self.monitor: gio.FileMonitor | None = None
         self.handler_id: int | None = None
+        self.is_ready = False
 
     def start(self) -> None:
         file = gio.File.new_for_path(self.path)
@@ -84,10 +85,14 @@ class ScreenshotWatcher:
             self._on_file_ready()
 
     def _on_file_ready(self) -> None:
+        if self.is_ready:
+            return
+
         launch_detached(
             f"satty -f {self.path} --copy-command wl-copy"
         )
 
+        self.is_ready = True
         self._cleanup()
 
     def _cleanup(self) -> bool:
