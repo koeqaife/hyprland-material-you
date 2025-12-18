@@ -3,6 +3,7 @@ from src.modules.settings.base import SettingsDropdownRow, DropdownItem
 from src.modules.settings.base import Category
 from src.modules.settings.base import int_kwargs, float_kwargs
 from repository import gtk
+from utils.colors.schemes import schemes
 
 
 class AppearancePage(gtk.ScrolledWindow):
@@ -31,6 +32,18 @@ class AppearancePage(gtk.ScrolledWindow):
                 "appearance.color",
                 "tag",
                 max_length=6
+            ),
+            SettingsDropdownRow(
+                "Color scheme",
+                "Choose your preferred scheme",
+                "appearance.scheme",
+                items=[
+                    DropdownItem(
+                        scheme_name,
+                        scheme_name.capitalize().replace("_", " ")
+                    )
+                    for scheme_name in schemes
+                ]
             ),
 
             Category("Effects"),
