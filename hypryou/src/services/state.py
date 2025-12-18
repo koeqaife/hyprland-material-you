@@ -334,7 +334,7 @@ def on_settings_changed(key: str, value: t.Any) -> None:
         reload_css()
     elif key == "opacity":
         reload_css()
-    elif key == "color":
+    elif key == "color" or key == "dark_mode":
         generate_by_settings()
 
 

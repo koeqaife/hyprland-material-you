@@ -59,6 +59,7 @@ default_settings: dict[str, t.Any] = {
     "floating_bar": False,
     "hide_empty_workspaces": False,
     "color": "",
+    "dark_mode": True,
 
     "themes.gtk3": True,
     "themes.gtk4": True,

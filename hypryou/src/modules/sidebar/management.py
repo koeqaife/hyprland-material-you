@@ -1,5 +1,5 @@
+from config import Settings
 from repository import gtk, pango, gdk, bluetooth
-from utils import colors
 from utils.ref import Ref, Computed
 from utils.styles import toggle_css_class
 import typing as t
@@ -284,7 +284,7 @@ class ToggleButton(ManagementButton):
 
 
 def toggle_dark_mode(self: ToggleButton, value: bool) -> None:
-    colors.set_dark_mode(value)
+    Settings().set("dark_mode", value)
 
 
 def toggle_inhibitor(self: ToggleButton, value: bool) -> None:
@@ -315,7 +315,7 @@ class ManagementFirstPage(gtk.Box):
         self.dark_mode = ToggleButton(
             "contrast",
             "Dark Mode",
-            colors.dark_mode,
+            Settings().get_ref("dark_mode"),
             toggle_dark_mode
         )
         self.dnd = ToggleButton(

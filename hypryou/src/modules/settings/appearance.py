@@ -1,33 +1,8 @@
-from utils import colors
-from src.modules.settings.base import SwitchRowTemplate
 from src.modules.settings.base import SettingsBoolRow, SettingsTextRow
 from src.modules.settings.base import SettingsDropdownRow, DropdownItem
 from src.modules.settings.base import Category
 from src.modules.settings.base import int_kwargs, float_kwargs
-import typing as t
 from repository import gtk
-
-
-class ToggleDarkMode(SwitchRowTemplate):
-    __gtype_name__ = "ToggleDarkMode"
-
-    def __init__(self) -> None:
-        super().__init__(
-            "Dark Mode",
-            "Toggles dark theme",
-            css_classes=("dark-mode-toggle",)
-        )
-        self.dark_mode_handler = colors.dark_mode.watch(
-            self.switch_set_active
-        )
-        self.switch_set_active(colors.dark_mode.value)
-
-    def on_switch_changed(self, *args: t.Any) -> None:
-        colors.set_dark_mode(self.switch.get_active())
-
-    def destroy(self) -> None:
-        colors.dark_mode.unwatch(self.dark_mode_handler)
-        super().destroy()
 
 
 class AppearancePage(gtk.ScrolledWindow):
@@ -45,7 +20,11 @@ class AppearancePage(gtk.ScrolledWindow):
         )
         self.children = (
             Category("Colors"),
-            ToggleDarkMode(),
+            SettingsBoolRow(
+                "Dark Mode",
+                "Toggles dark theme",
+                "dark_mode"
+            ),
             SettingsTextRow(
                 "Color",
                 "Use different color for UI instead of wallpapers' one",
