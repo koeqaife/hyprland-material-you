@@ -324,112 +324,47 @@ def generate_colors(
         )
 
 
-def generate_by_wallpaper(
-    image_path: str,
-    on_complete: t.Callable[[], None] | None = None,
-    is_dark: bool = True,
-    scheme_name: SchemeName = "tonal_spot"
-) -> None:
-    try:
-        scheme = load_scheme()
-        generate_colors(
-            image_path,
-            None,
-            is_dark,
-            contrast_level=scheme.contrast_level,
-            on_complete=on_complete,
-            scheme_name=scheme_name
-        )
-    except (FileNotFoundError, json.JSONDecodeError):
-        generate_colors(
-            image_path,
-            None,
-            is_dark,
-            0,
-            on_complete=on_complete
-        )
-
-
-def generate_by_color(
-    color: int,
-    on_complete: t.Callable[[], None] | None = None,
-    is_dark: bool = True,
-    scheme_name: SchemeName = "tonal_spot"
-) -> None:
-    try:
-        scheme = load_scheme()
-        generate_colors(
-            None,
-            color,
-            is_dark,
-            contrast_level=scheme.contrast_level,
-            on_complete=on_complete,
-            scheme_name=scheme_name
-        )
-    except (FileNotFoundError, json.JSONDecodeError):
-        generate_colors(
-            None,
-            color,
-            is_dark,
-            0,
-            on_complete=on_complete
-        )
-
-
 def generate_by_settings(
     on_complete: t.Callable[[], None] | None = None,
     force: bool = False
 ) -> bool:
-    try:
-        settings = Settings().get_view_for("appearance")
-        dark_mode = settings.get("dark_mode")
-        scheme_name = settings.get("scheme")
+    settings = Settings().get_view_for("appearance")
+    dark_mode = settings.get("dark_mode")
+    scheme_name = settings.get("scheme")
 
-        scheme = load_scheme()
-        color = str(settings.get("color")).lstrip("#")
-        if scheme.is_dark != dark_mode:
-            force = True
-        if scheme.scheme_name != scheme_name:
-            force = True
+    scheme = load_scheme()
+    color = str(settings.get("color")).lstrip("#")
+    if scheme.is_dark != dark_mode:
+        force = True
+    if scheme.scheme_name != scheme_name:
+        force = True
 
-        if color:
-            cached_color = scheme.original_color
-            color_int = int(color, 16)
-            if color_int != cached_color or force:
-                generate_by_color(color_int, on_complete, dark_mode)
-                return False
-        else:
-            wallpaper = str(settings.get("wallpaper"))
-            cached_wallpaper = scheme.wallpaper
-            if wallpaper != cached_wallpaper or force:
-                generate_by_wallpaper(wallpaper, on_complete, dark_mode)
-                return False
-        if on_complete:
-            on_complete()
-        return True
-    except (FileNotFoundError, ValueError, json.JSONDecodeError):
-        restore_palette()
-        return False
-
-
-def restore_palette(
-    on_complete: t.Callable[[], None] | None = None
-) -> None:
-    try:
-        scheme = load_scheme()
-        assert scheme.original_color is not None
-        generate_colors(
-            scheme.wallpaper,
-            scheme.original_color,
-            scheme.is_dark,
-            scheme.contrast_level,
-            on_complete=on_complete
-        )
-    except (FileNotFoundError, AssertionError, json.JSONDecodeError):
-        generate_colors(
-            None,
-            0x0000FF,
-            True,
-            0,
-            on_complete=on_complete
-        )
+    if color:
+        cached_color = scheme.original_color
+        color_int = int(color, 16)
+        if color_int != cached_color or force:
+            generate_colors(
+                None,
+                color_int,
+                dark_mode,
+                contrast_level=scheme.contrast_level,
+                on_complete=on_complete,
+                scheme_name=scheme_name
+            )
+            return False
+    else:
+        wallpaper = str(settings.get("wallpaper"))
+        cached_wallpaper = scheme.wallpaper
+        if wallpaper != cached_wallpaper or force:
+            generate_colors(
+                wallpaper,
+                None,
+                dark_mode,
+                contrast_level=scheme.contrast_level,
+                on_complete=on_complete,
+                scheme_name=scheme_name
+            )
+            return False
+    if on_complete:
+        on_complete()
+    return True

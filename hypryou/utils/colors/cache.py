@@ -38,8 +38,13 @@ def save_scheme(scheme: ColorScheme) -> None:
 
 
 def load_scheme() -> ColorScheme:
-    with open(colors_json) as f:
-        return get_cache_object(f.read())
+    try:
+        with open(colors_json) as f:
+            return get_cache_object(f.read())
+    except (json.JSONDecodeError, FileNotFoundError, ValueError):
+        return ColorScheme(
+            False, {}, {}, 0, None, None, None, None
+        )
 
 
 def get_cache_object(object: dict[str, t.Any] | str) -> ColorScheme:
