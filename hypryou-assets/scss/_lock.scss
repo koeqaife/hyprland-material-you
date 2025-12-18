@@ -5,6 +5,12 @@
 
 window.lock-screen {
     background-color: $background;
+    transition: opacity 300ms ease-out;
+    opacity: 1;
+
+    &.faded-out {
+        opacity: 0;
+    }
 
     .lock-screen-dim {
         background-color: rgba($background, 0.5);

@@ -42,7 +42,7 @@ class ScreenLockWindow(gtk.ApplicationWindow):
             close_player.value = False
         super().__init__(
             application=app,
-            css_classes=("lock-screen",),
+            css_classes=("lock-screen", "faded-out"),
             name="lock",
             default_height=800,
             default_width=1200
@@ -295,43 +295,21 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         close_player.value = True
 
     def _on_map(self, *args: t.Any) -> None:
-        self.set_opacity(0.01)
-        self._fade_in()
-
-    def _fade_in(self) -> None:
-        step: float = 0.05
-
-        def _tick() -> bool:
-            current: float = self.get_opacity() or 0.0
-            new: float = current + step
-            if new < 1.0:
-                self.set_opacity(new)
-                return True
-            self.set_opacity(1.0)
-            self.disconnect(self.map_handler)
-            return False
-
-        glib.timeout_add(15, _tick)
+        glib.idle_add(lambda: self.remove_css_class("faded-out"))
 
     def fade_out_and_destroy(
         self,
         on_done: t.Callable[[], None] | None = None
     ) -> None:
-        step: float = 0.05
+        self.add_css_class("faded-out")
 
-        def _tick() -> bool:
-            current: float = self.get_opacity() or 1.0
-            new: float = current - step
-            if new > 0.01:
-                self.set_opacity(new)
-                return True
-            self.set_opacity(0.01)
+        def _on_done() -> bool:
             if on_done:
                 on_done()
             self.destroy()
             return False
 
-        glib.timeout_add(15, _tick)
+        glib.timeout_add(320, _on_done)
 
     def on_key_pressed(
         self,
@@ -510,6 +488,7 @@ class ScreenLockWindow(gtk.ApplicationWindow):
             self.box.remove(self.notifications)
             self.notifications.destroy()
             self.notifications = None
+        self.disconnect(self.map_handler)
         super().destroy()
 
 
