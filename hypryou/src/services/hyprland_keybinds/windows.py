@@ -22,6 +22,16 @@ key_binds = (
         Category.WINDOWS
     ),
     KeyBind(
+        (main_mod, "Ctrl", "%N%"),
+        (
+            "exec",
+            "sh -c 'hypryouctl move_window_silent %N% "
+            "|| hyprctl dispatch movetoworkspacesilent %N%'"
+        ),
+        "Move window to workspace silently",
+        Category.WINDOWS
+    ),
+    KeyBind(
         (main_mod, "CTRL", "down"),
         ("workspace", "empty"),
         "Switch to empty workspace",

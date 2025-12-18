@@ -42,6 +42,7 @@ HELP = {
                   "Use 'random' instead of path to pick random"),
     "toggle_animations": "Toggle animations in gtk and hyprland",
     "move_window": "Moves window to workspace",
+    "move_window_silent": "Silently moves window to workspace",
     "change_workspace": "Changes workspace"
 }
 animations = True
@@ -264,6 +265,25 @@ class CliRequest:
             asyncio.create_task(
                 hyprland.client.raw(
                     f"dispatch movetoworkspace {_workspace_id}"
+                )
+            )
+        return "ok"
+
+    def do_move_window_silent(self, workspace_id: str) -> str:
+        if not workspace_id.isdigit():
+            return "Wrong workspace ID"
+        if not Settings().get("separated_workspaces"):
+            asyncio.create_task(
+                hyprland.client.raw(
+                    f"dispatch movetoworkspacesilent {workspace_id}"
+                )
+            )
+        else:
+            active_monitor = hyprland.active_monitor_id.value
+            _workspace_id = int(workspace_id) + (10 * active_monitor)
+            asyncio.create_task(
+                hyprland.client.raw(
+                    f"dispatch movetoworkspacesilent {_workspace_id}"
                 )
             )
         return "ok"
