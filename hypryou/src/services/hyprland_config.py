@@ -386,7 +386,9 @@ funcs = (
 
 
 def generate_config() -> None:
-    output = "\n".join(
+    output = "# DO NOT CHANGE THIS FILE, CHECK HYPRYOU SETTINGS\n"
+    output += "# FOR CUSTOM CONFIG USE hyprland.conf\n\n"
+    output += "\n".join(
         f"# -- {func.__name__} --\n{func()}" for func in funcs
     )
 
