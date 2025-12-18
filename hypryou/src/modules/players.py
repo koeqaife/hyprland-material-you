@@ -28,55 +28,54 @@ class LastChanged:
     can_pause: bool | None = None
 
 
-class Player(gtk.Box):
+class Player(gtk.Overlay):
     __gtype_name__ = "Player"
 
     def __init__(self, item: MprisPlayer) -> None:
         super().__init__(
-            valign=gtk.Align.START,
-            hexpand=True,
             css_classes=("mpris-player",),
-            orientation=gtk.Orientation.VERTICAL
+            overflow=gtk.Overflow.HIDDEN
         )
         self._item = item
+        self.player_box = gtk.Box(
+            css_classes=("player-box",),
+            hexpand=True,
+            tooltip_text=item.get_bus_name().split(".")[3].capitalize()
+        )
         self.info_box = gtk.Box(
             css_classes=("info-box",),
-            hexpand=True
+            hexpand=True,
+            orientation=gtk.Orientation.VERTICAL
         )
 
         self.image = gtk.Box(
             css_classes=("image",),
-            valign=gtk.Align.START
         )
         self.text_box = gtk.Box(
             css_classes=("text-box",),
             orientation=gtk.Orientation.VERTICAL,
             hexpand=True,
-            valign=gtk.Align.START
+            vexpand=True
         )
 
-        self.info_box.append(self.image)
-        self.info_box.append(self.text_box)
+        self.set_child(self.image)
+        self.add_overlay(self.player_box)
+        self.player_box.append(self.info_box)
 
-        self.player = gtk.Label(
-            css_classes=("player",),
-            halign=gtk.Align.END,
-            label=item.get_bus_name().split(".")[3].capitalize(),
-            tooltip_text=item.get_bus_name()
-        )
         self.title = gtk.Label(
             css_classes=("title",),
             ellipsize=pango.EllipsizeMode.END,
-            halign=gtk.Align.START,
-            valign=gtk.Align.CENTER
+            valign=gtk.Align.START,
+            hexpand=True,
+            xalign=0
         )
         self.artists = gtk.Label(
             css_classes=("artists",),
             ellipsize=pango.EllipsizeMode.END,
             halign=gtk.Align.START,
-            valign=gtk.Align.CENTER
+            valign=gtk.Align.START,
+            xalign=0
         )
-        self.text_box.append(self.player)
         self.text_box.append(self.title)
         self.text_box.append(self.artists)
 
@@ -117,9 +116,9 @@ class Player(gtk.Box):
 
         self.buttons: list[gtk.Button] = []
 
-        self.append(self.info_box)
-        self.append(self.slider)
-        self.append(self.center_box)
+        self.info_box.append(self.text_box)
+        self.info_box.append(self.slider)
+        self.info_box.append(self.center_box)
 
         self.last_changed = LastChanged()
 
@@ -292,7 +291,7 @@ class Player(gtk.Box):
 
         self.last_changed.art_url = art_url
         downloader.download_image_async(
-            art_url, self.on_download, (64, 64), "arts"
+            art_url, self.on_download, (256, 256), "arts"
         )
 
     def on_change(self) -> None:

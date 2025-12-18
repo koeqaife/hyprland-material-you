@@ -501,20 +501,21 @@ class ScreenLockPlayer(Player):
         on_close: t.Callable[[], None]
     ) -> None:
         super().__init__(item)
+        self.text_box.remove(self.title)
         self.title.set_max_width_chars(37)
         self.artists.set_max_width_chars(37)
-        self.text_box.remove(self.player)
-        self.player_box = gtk.Box(
-            css_classes=("lock-player-box",),
-            halign=gtk.Align.END
+        self.title_box = gtk.Box(
+            css_classes=("lock-title-box",)
         )
         self.close_button = gtk.Button(
             css_classes=("lock-player-close", "icon-tonal"),
-            child=widget.Icon("close")
+            child=widget.Icon("close"),
+            valign=gtk.Align.CENTER,
+            halign=gtk.Align.CENTER
         )
-        self.player_box.append(self.player)
-        self.player_box.append(self.close_button)
-        self.text_box.insert_child_after(self.player_box, None)
+        self.title_box.append(self.title)
+        self.title_box.append(self.close_button)
+        self.text_box.insert_child_after(self.title_box, None)
 
         self._close_handler = self.close_button.connect(
             "clicked", self._on_close_clicked
