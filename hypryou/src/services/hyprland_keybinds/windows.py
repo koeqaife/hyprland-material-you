@@ -12,7 +12,7 @@ key_binds = (
         Category.WINDOWS
     ),
     KeyBind(
-        (main_mod, "Shift", "%N%"),
+        (main_mod, "SHIFT", "%N%"),
         (
             "exec",
             "sh -c 'hypryouctl move_window %N% "
@@ -22,7 +22,7 @@ key_binds = (
         Category.WINDOWS
     ),
     KeyBind(
-        (main_mod, "Ctrl", "%N%"),
+        (main_mod, "CTRL", "%N%"),
         (
             "exec",
             "sh -c 'hypryouctl move_window_silent %N% "
