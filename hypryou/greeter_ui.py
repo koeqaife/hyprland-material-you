@@ -471,7 +471,6 @@ class GreeterUI(gtk.ApplicationWindow):
         async def task() -> None:
             self.stack.set_sensitive(False)
             await self.greetd.cancel_session()
-            self.set_error(None)
             self.stack.set_visible_child_name("username")
             self.username_entry.grab_focus_without_selecting()
             self.stack.set_sensitive(True)
