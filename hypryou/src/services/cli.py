@@ -13,7 +13,7 @@ from config import Settings
 import traceback
 import typing as t
 import src.services.hyprland as hyprland
-from repository import gtk, gdk, glib, gio
+from repository import gtk, gdk, gio
 
 
 screenshot_mode_args = {
@@ -57,6 +57,7 @@ class ScreenshotWatcher:
     def __init__(self, path: str) -> None:
         self.path = path
         self.monitor: gio.FileMonitor | None = None
+        self.handler_id: int | None = None
 
     def start(self) -> None:
         file = gio.File.new_for_path(self.path)
@@ -64,7 +65,7 @@ class ScreenshotWatcher:
             gio.FileMonitorFlags.NONE,
             None,
         )
-        self.monitor.connect("changed", self._on_changed)
+        self.handler_id = self.monitor.connect("changed", self._on_changed)
 
     def _on_changed(
         self,
@@ -84,12 +85,13 @@ class ScreenshotWatcher:
             f"satty -f {self.path} --copy-command wl-copy"
         )
 
-        glib.idle_add(self._cleanup)
+        self._cleanup()
 
     def _cleanup(self) -> bool:
         if self.monitor:
+            if self.handler_id:
+                self.monitor.disconnect(self.handler_id)
             self.monitor.cancel()
-        return False
 
 
 class CliRequest:
