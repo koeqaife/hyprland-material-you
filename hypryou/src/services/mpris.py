@@ -153,7 +153,7 @@ class MprisPlayer(Signals):
             self._last_changed_time = time.monotonic()
             self._cache_properties()
         else:
-            self._cache_properties(changed_properties)
+            self._cache_properties()
 
     def prop(self, property_name: str) -> t.Any:
         value = self._proxy.get_cached_property(property_name)
@@ -325,11 +325,10 @@ class MprisPlayer(Signals):
             return mpris_length / 1_000_000
         return None
 
-    def _cache_properties(self, changed: list[str] | None = None) -> None:
+    def _cache_properties(self) -> None:
         cache_proxy_properties(
             self._conn,
             self._proxy,
-            changed,
             self._cache_properties_finish
         )
 

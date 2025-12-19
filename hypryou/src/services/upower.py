@@ -176,11 +176,7 @@ class UPower(Signals):
         changed_properties_variant: glib.Variant,
         invalid_properties: list[str]
     ) -> None:
-        changed_properties = t.cast(
-            dict[str, str],
-            changed_properties_variant.unpack()
-        )
-        self.display_cache_properties(list(changed_properties.keys()))
+        self.display_cache_properties()
 
     def upower_properties_changed(
         self,
@@ -191,7 +187,7 @@ class UPower(Signals):
         changed_properties = changed_properties_variant.unpack()
         if "LidIsClosed" in changed_properties:
             lid_is_closed.value = changed_properties["LidIsClosed"]
-        self.upower_cache_properties(list(dict(changed_properties).keys()))
+        self.upower_cache_properties()
 
     def display_call_method(
         self,
@@ -210,22 +206,20 @@ class UPower(Signals):
         )
 
     def display_cache_properties(
-        self, changed: list[str] | None = None
+        self
     ) -> None:
         cache_proxy_properties(
             self._conn,
             self._display_proxy,
-            changed,
             self.display_cache_properties_finish
         )
 
     def upower_cache_properties(
-        self, changed: list[str] | None = None
+        self
     ) -> None:
         cache_proxy_properties(
             self._conn,
-            self._upower_proxy,
-            changed
+            self._upower_proxy
         )
 
     def display_cache_properties_finish(self, *args: t.Any) -> None:

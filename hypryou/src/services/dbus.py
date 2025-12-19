@@ -53,7 +53,6 @@ def subscribe_signals(connection: gio.DBusConnection) -> int:
 def cache_proxy_properties(
     conn: gio.DBusConnection,
     proxy: gio.DBusProxy,
-    changed: list[str] | None = None,
     callback: t.Callable[[], None] | None = None
 ) -> None:
     return conn.call(
@@ -67,7 +66,7 @@ def cache_proxy_properties(
         -1,
         None,
         lambda _, result: cache_proxy_properties_finish(
-            conn, proxy, result, changed, callback
+            conn, proxy, result, callback
         ),
     )
 
@@ -76,7 +75,6 @@ def cache_proxy_properties_finish(
     conn: gio.DBusConnection,
     proxy: gio.DBusProxy,
     result: gio.AsyncResult,
-    changed: list[str] | None = None,
     callback: t.Callable[..., None] | None = None
 ) -> None:
     try:
@@ -101,21 +99,13 @@ def cache_proxy_properties_finish(
 
     props = unpack_properties(props_var)
 
-    if changed is not None:
-        for prop_name in changed:
-            prop_value = props.get(prop_name)
-            if prop_value is not None:
-                proxy.set_cached_property(
-                    prop_name, prop_value.get_variant()
-                )
-    else:
-        for prop_name, prop_value in props.items():
-            proxy.set_cached_property(
-                prop_name, prop_value.get_variant()
-            )
+    for prop_name, prop_value in props.items():
+        proxy.set_cached_property(
+            prop_name, prop_value.get_variant()
+        )
 
     if callback:
-        callback(changed)
+        callback()
 
 
 class DBusService(Service):

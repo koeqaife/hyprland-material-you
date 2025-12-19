@@ -118,7 +118,7 @@ class StatusNotifierItem(Signals):
             self._cached_name = None
         if "Icon" in changed_properties:
             self._pixbufs.clear()
-        self._cache_proxy_properties(list(changed_properties.keys()))
+        self._cache_proxy_properties()
 
         self.notify("changed")
 
@@ -140,9 +140,9 @@ class StatusNotifierItem(Signals):
             )
         elif prop == "Title" or prop == "ToolTip":
             self._cached_name = None
-            self._cache_proxy_properties([prop])
+            self._cache_proxy_properties()
         else:
-            self._cache_proxy_properties([prop])
+            self._cache_proxy_properties()
         self.notify(
             "changed",
             {
@@ -321,10 +321,9 @@ class StatusNotifierItem(Signals):
         )
 
     def _cache_proxy_properties(
-        self,
-        changed: list[str] | None = None
+        self
     ) -> None:
-        cache_proxy_properties(self._conn, self._proxy, changed)
+        cache_proxy_properties(self._conn, self._proxy)
 
 
 class StatusNotifierWatcher:
