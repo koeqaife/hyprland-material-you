@@ -88,7 +88,7 @@ window.lock-screen {
         margin-bottom: 1rem;
         border-radius: 1rem;
         .lock-player-close {
-            @include elevation(2);
+            @include elevation(1);
             margin-left: 0.25rem;
             min-height: 1.5rem;
             min-width: 1.5rem;

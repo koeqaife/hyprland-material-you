@@ -9,7 +9,7 @@
     background-color: $surfaceContainer;
 
     label:not(.icon) {
-        text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+        text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
     }
     .info-box {
         padding: 1rem 1.5rem;
@@ -54,7 +54,7 @@
         trough {
             background-color: $secondaryContainer;
             min-height: 0.188rem;
-            @include elevation(2);
+            @include elevation(1);
         }
         highlight {
             background-color: $primary;
@@ -91,7 +91,7 @@
             min-height: 1.5rem;
             min-width: 1.5rem;
             &.play-pause {
-                @include elevation(2);
+                @include elevation(1);
                 background-color: $secondaryContainer;
                 &:hover {
                     background-color: color.mix($secondaryContainer, $onSurfaceVariant, 92%);
