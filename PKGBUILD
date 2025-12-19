@@ -1,7 +1,7 @@
 # Maintainer: Koeqaife
 pkgname=hypryou-git
 _pkgname="hyprland-material-you"
-pkgver=0
+pkgver=2.1.11.31.gb5c6bf7
 pkgrel=1
 pkgdesc="Dynamic and elegant desktop setup inspired by Material You, featuring auto-generated colors, fluid animations, and customizable user experience."
 arch=('x86_64' 'aarch64')
@@ -70,7 +70,7 @@ makedepends=(
 )
 
 build() {
-  cd "$srcdir/$_pkgname/$pkgname"
+  cd "$srcdir/$_pkgname/hypryou"
   python utils_cy/setup.py build_ext --build-lib utils_cy --build-temp "$(mktemp -d)"
   cd "$srcdir/$_pkgname/build"
 
@@ -87,17 +87,17 @@ build() {
 
 package() {
   mkdir -pv "$pkgdir/usr/bin"
-  mkdir -pv "$pkgdir/usr/share/$pkgname"
-  mkdir -pv "$pkgdir/usr/share/fonts/$pkgname"
-  mkdir -pv "$pkgdir/usr/lib/$pkgname"
+  mkdir -pv "$pkgdir/usr/share/hypryou"
+  mkdir -pv "$pkgdir/usr/share/fonts/hypryou"
+  mkdir -pv "$pkgdir/usr/lib/hypryou"
   mkdir -pv "$pkgdir/usr/share/licenses/$pkgname"
   mkdir -pv "$pkgdir/usr/share/wayland-sessions"
 
-  cp -a "$srcdir/$_pkgname/$pkgname/." "$pkgdir/usr/lib/$pkgname/"
-  cp -a "$srcdir/$_pkgname/$pkgname-assets/." "$pkgdir/usr/share/$pkgname/"
-  cp -a "$srcdir/$_pkgname/assets/Google Sans/." "$pkgdir/usr/share/fonts/$pkgname/Google Sans/"
-  cp -a "$srcdir/$_pkgname/assets/Google Sans Display/." "$pkgdir/usr/share/fonts/$pkgname/Google Sans Display/"
-  cp -a "$srcdir/$_pkgname/assets/Google Sans Text/." "$pkgdir/usr/share/fonts/$pkgname/Google Sans Text/"
+  cp -a "$srcdir/$_pkgname/hypryou/." "$pkgdir/usr/lib/hypryou/"
+  cp -a "$srcdir/$_pkgname/hypryou-assets/." "$pkgdir/usr/share/hypryou/"
+  cp -a "$srcdir/$_pkgname/assets/Google Sans/." "$pkgdir/usr/share/fonts/hypryou/Google Sans/"
+  cp -a "$srcdir/$_pkgname/assets/Google Sans Display/." "$pkgdir/usr/share/fonts/hypryou/Google Sans Display/"
+  cp -a "$srcdir/$_pkgname/assets/Google Sans Text/." "$pkgdir/usr/share/fonts/hypryou/Google Sans Text/"
 
   install -Dm755 "$srcdir/$_pkgname/build/hypryouctl" "$pkgdir/usr/bin/hypryouctl"
   install -Dm755 "$srcdir/$_pkgname/build/hypryou-start" "$pkgdir/usr/bin/hypryou-start"
