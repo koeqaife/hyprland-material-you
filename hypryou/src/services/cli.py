@@ -78,10 +78,7 @@ class ScreenshotWatcher:
         other_file: gio.File,
         event_type: gio.FileMonitorEvent,
     ) -> None:
-        if event_type in (
-            gio.FileMonitorEvent.CHANGES_DONE_HINT,
-            gio.FileMonitorEvent.MOVED,
-        ):
+        if event_type == gio.FileMonitorEvent.CHANGES_DONE_HINT:
             self._on_file_ready()
 
     def _on_file_ready(self) -> None:
@@ -221,7 +218,7 @@ class CliRequest:
                 "-f 'screenshot.png'"
             )
             launch_detached(command)
-            ScreenshotWatcher(f"{TEMP_DIR}/screenshot.png").start()
+            ScreenshotWatcher(f"{TEMP_DIR}/screenshot.png").start
         else:
             args.append(f"-o {HOME}/screenshots")
             command = f"bash -c \"hyprshot {" ".join(args)}\""
