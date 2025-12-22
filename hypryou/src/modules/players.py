@@ -5,6 +5,7 @@ from utils.ref import Ref
 from utils.format import format_seconds
 from utils.service import Signals
 from utils.logger import logger
+from utils.colors.generation import process_image
 import utils.downloader as downloader
 from repository import gtk, layer_shell, pango, glib, gobject
 from src.services.mpris import players, MprisPlayer, current_player
@@ -36,6 +37,13 @@ class Player(gtk.Overlay):
             css_classes=("mpris-player",),
             overflow=gtk.Overflow.HIDDEN
         )
+
+        self.css_provider = gtk.CssProvider()
+        self.get_style_context().add_provider(
+            self.css_provider,
+            gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
+
         self._item = item
         self.player_box = gtk.Box(
             css_classes=("player-box",),
@@ -59,6 +67,7 @@ class Player(gtk.Overlay):
         )
 
         self.set_child(self.image)
+        self.add_overlay(gtk.Box(css_classes=("vignette",)))
         self.add_overlay(self.player_box)
         self.player_box.append(self.info_box)
 
@@ -144,7 +153,9 @@ class Player(gtk.Overlay):
         for icon, css_class, handler in zip(icons, classes, handlers):
             btn = gtk.Button(
                 child=widget.Icon(icon),
-                css_classes=(css_class,)
+                css_classes=(css_class,),
+                halign=gtk.Align.CENTER,
+                valign=gtk.Align.CENTER
             )
             self.actions.append(btn)
             self.handlers[btn] = btn.connect("clicked", handler)
@@ -276,8 +287,11 @@ class Player(gtk.Overlay):
         if not filepath:
             self.image.set_visible(False)
             return
+        color = f"#{hex(process_image(filepath, 4))[4:]}"
+        color_css = f".mpris-player {{ --player-color: {color}; }}"
         css = f"box {{ background-image: url('file://{filepath}'); }}"
         self.image_provider.load_from_data(css)
+        self.css_provider.load_from_data(color_css)
 
     def update_image(self) -> None:
         metadata = self._item.metadata
@@ -294,12 +308,17 @@ class Player(gtk.Overlay):
             art_url, self.on_download, (256, 256), "arts"
         )
 
+    def update_classes(self) -> None:
+        playback_status = self._item.playback_status
+        toggle_css_class(self, "is-playing", playback_status == "Playing")
+
     def on_change(self) -> None:
         try:
             self.update_image()
             self.update_label()
             self.update_slider()
             self.update_buttons()
+            self.update_classes()
         except AttributeError:
             logger.warning(
                 "Couldn't update player, player attributes aren't correct."

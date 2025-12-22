@@ -9,20 +9,20 @@
     background-color: $surfaceContainer;
 
     label:not(.icon) {
-        text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+        text-shadow: 0px 0px 2px rgba($inverseOnSurface, 0.25), 0px 0px 4px rgba($inverseOnSurface, 0.35), 0px 0px 6px rgba($inverseOnSurface, 0.5);
     }
     .info-box {
-        padding: 1rem 1.5rem;
+        padding: 0.75rem 1.25rem;
     }
     .title {
         font-size: 1.125rem;
-        font-weight: 400;
+        font-weight: 500;
         color: $onSurface;
         margin-bottom: 0.125rem;
     }
     .artists {
-        font-size: 0.875rem;
-        font-weight: 400;
+        font-size: 0.9375rem;
+        font-weight: 500;
         color: $onSurfaceVariant;
         font-family: "Google Sans Text";
     }
@@ -30,7 +30,18 @@
         background-position: center;
         background-size: cover;
         background-repeat: no-repeat;
-        opacity: 0.25;
+        opacity: 0.36;
+    }
+    .vignette {
+        background: radial-gradient(
+            circle,
+            transparent 50%,
+            color-mix(
+                in srgb,
+                var(--player-color) 25%,
+                rgba($inverseOnSurface, 0.75)
+            ) 100%
+        );
     }
     .player {
         background-color: $surfaceContainerHigh;
@@ -62,10 +73,10 @@
         }
 
         slider {
-            min-height: 0;
-            min-width: 0;
-            margin: 0;
-            background-color: transparent;
+            margin-top: -0.5rem;
+            margin-bottom: -0.5rem;
+            min-height: 1rem;
+            box-shadow: none;
         }
 
         &:not(:disabled):hover trough {
@@ -84,20 +95,20 @@
             font-size: 1.125rem;
             font-weight: 400;
             font-variation-settings: "opsz" 20;
-            color: $onSecondaryContainer;
+            color: $onSurface;
         }
         button {
-            border-radius: 1.5rem;
-            min-height: 1.5rem;
-            min-width: 1.5rem;
+            @include elevation(1);
+            border-radius: 100%;
             &.play-pause {
-                @include elevation(1);
-                background-color: $secondaryContainer;
+                background-color: $secondary;
+                min-height: 1.75rem;
+                min-width: 1.75rem;
                 &:hover {
-                    background-color: color.mix($secondaryContainer, $onSurfaceVariant, 92%);
+                    background-color: color.mix($secondary, $inverseOnSurface, 92%);
                 }
                 &:active {
-                    background-color: color.mix($secondaryContainer, $onSurfaceVariant, 86%);
+                    background-color: color.mix($secondary, $inverseOnSurface, 86%);
                 }
                 &:not(:first-child) {
                     margin-left: 0.188rem;
@@ -105,8 +116,14 @@
                 &:not(:last-child) {
                     margin-right: 0.188rem;
                 }
+                .icon {
+                    color: $onSecondary;
+                }
             }
             &:not(.play-pause) {
+                background-color: $surfaceContainer;
+                min-height: 1.325rem;
+                min-width: 1.325rem;
                 &:hover {
                     background-color: color.mix($surfaceContainer, $onSurfaceVariant, 92%);
                 }
@@ -139,9 +156,30 @@ window.players {
         margin-bottom: 0.5rem;
         border-radius: max(calc($hyprlandRounding - 0.5rem), 0.25rem);
         min-width: 20.25rem;
-        outline-offset: -0.0625rem;
-        &.is-current {
-            outline: 0.0625rem solid $secondary;
+
+        &:not(.is-current) {
+            .title,
+            .artists {
+                color: $onSurfaceVariant;
+            }
+            .vignette {
+                background: radial-gradient(circle, transparent 0%, color-mix(in srgb, $surfaceContainer 20%, transparent) 70%);
+            }
+            .image {
+                opacity: 0.25;
+            }
+            button.play-pause {
+                background-color: $surfaceContainerHigh;
+                .icon {
+                    color: $onSurface;
+                }
+                &:hover {
+                    background-color: color.mix($surfaceContainer, $onSurfaceVariant, 92%);
+                }
+                &:active {
+                    background-color: color.mix($surfaceContainer, $onSurfaceVariant, 86%);
+                }
+            }
         }
         &:first-child {
             margin-top: 0.5rem;
