@@ -89,10 +89,9 @@ class MprisPlayer(Signals):
         self._bus_path = proxy.get_object_path()
         self._conn = proxy.get_connection()
 
-        self._last_position_cached = -1.0
-        self._last_known_position = -1.0
-        self._pos_changed_time = time.monotonic()
-        self._playback_status = self.playback_status
+        self._last_known_position: float | None = None
+        self._last_checked_position: float | None = None
+        self._playback_status = self.playback_status or "Stopped"
 
         self._last_changed_time = time.monotonic()
         self.conns = [
@@ -141,19 +140,12 @@ class MprisPlayer(Signals):
         changed_properties_variant: glib.Variant,
         invalid_properties: list[str]
     ) -> None:
-        changed_properties: list[str] = list(
-            changed_properties_variant.unpack().keys()
-        )
-        if "Metadata" in changed_properties:
-            # Invalidate whole cache just for case
-            self._last_position_cached = -1.0
-            self._last_known_position = -1.0
-            self._pos_changed_time = time.monotonic()
-            self._playback_status = self.playback_status
-            self._last_changed_time = time.monotonic()
-            self._cache_properties()
-        else:
-            self._cache_properties()
+        # Invalidate whole cache just for case
+        self._last_known_position = None
+        self._last_checked_position = None
+        self._playback_status = self.playback_status or "Stopped"
+
+        self._cache_properties()
 
     def prop(self, property_name: str) -> t.Any:
         value = self._proxy.get_cached_property(property_name)
@@ -276,14 +268,15 @@ class MprisPlayer(Signals):
             float: Position in seconds
         """
         now = time.monotonic()
-        if self._last_known_position == -1:
-            delta = now - self._last_position_cached
-            real_position = self.cached_position / 1_000_000 + delta
-            self._last_known_position = real_position
-            self._pos_changed_time = time.monotonic()
-        if self._playback_status == "Playing":
-            delta = now - self._pos_changed_time
-            return self._last_known_position + delta
+        cached = self.cached_position / 1_000_000
+        if self._last_checked_position is None:
+            delta = now - self._last_changed_time
+            self._last_known_position = cached + delta
+        elif self.playback_status == "Playing":
+            delta = now - self._last_checked_position
+            self._last_known_position += delta
+
+        self._last_checked_position = now
         return self._last_known_position
 
     @property
@@ -334,16 +327,8 @@ class MprisPlayer(Signals):
 
     def _cache_properties_finish(
         self,
-        changed: list[str] | None = None,
         *args: t.Any
     ) -> None:
-        if changed is None or "Position" in changed:
-            self._last_position_cached = time.monotonic()
-        if changed and "PlaybackStatus" in changed:
-            self._last_known_position = self.position
-            self._pos_changed_time = time.monotonic()
-            self._playback_status = self.playback_status
-
         self._last_changed_time = time.monotonic()
         update_current_player()
 
