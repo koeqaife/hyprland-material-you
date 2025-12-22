@@ -26,13 +26,10 @@ window.audio {
         outline-offset: -0.0625rem;
 
         &.muted {
-            outline: 0.0625rem solid $outlineVariant;
+            opacity: 0.5;
         }
         &:not(:only-child).is-default {
             outline: 0.0625rem solid $primary;
-        }
-        &.is-default.muted {
-            outline: 0.0625rem dashed $secondary;
         }
 
         .icon,
