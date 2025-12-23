@@ -84,12 +84,12 @@ class ScreenshotWatcher:
     def _on_file_ready(self) -> None:
         if self.is_ready:
             return
+        self.is_ready = True
 
         launch_detached(
             f"satty -f {self.path} --copy-command wl-copy"
         )
 
-        self.is_ready = True
         self._cleanup()
 
     def _cleanup(self) -> bool:
