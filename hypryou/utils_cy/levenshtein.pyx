@@ -95,7 +95,7 @@ cpdef float compute_score(str s1, str s2):
     elif len(s2) < len(s1):
         part = partial_ratio(s2, s1)
 
-    cdef float score = 0.85 * full + 0.15 * part
+    cdef float score = 0.5 * full + 0.5 * part
 
     if s1 and s2 and s1[0] != s2[0]:
         score -= 0.1

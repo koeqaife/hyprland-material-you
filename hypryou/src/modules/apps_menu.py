@@ -172,8 +172,8 @@ class AppsBox(gtk.Box):
         for item in items:
             if item[1].get_reveal_child() and (
                 not highest
-                or item[0].score + item[0].frequency / 50 >
-                highest[0].score + highest[0].frequency / 50
+                or item[0].score + min(item[0].frequency / 50, 0.1) >
+                highest[0].score + min(highest[0].frequency / 50, 0.1)
             ):
                 highest = item
 
