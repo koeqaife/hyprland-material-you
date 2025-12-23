@@ -33,15 +33,28 @@
         opacity: 0.36;
     }
     .vignette {
-        background: radial-gradient(
-            circle,
-            transparent 50%,
-            color-mix(
-                in srgb,
-                var(--player-color) 25%,
-                rgba($inverseOnSurface, 0.75)
-            ) 100%
-        );
+        // prettier-ignore
+        background:
+            radial-gradient(
+                circle at center,
+                rgba(0, 0, 0, 0) 42%,
+                color-mix(
+                    in srgb,
+                    var(--player-color) 12%,
+                    rgba($inverseOnSurface, 0.35)
+                ) 82%,
+                color-mix(
+                    in srgb,
+                    var(--player-color) 18%,
+                    rgba($inverseOnSurface, 0.8)
+                ) 100%
+            ),
+            linear-gradient(
+                to top,
+                rgba($inverseOnSurface, 0.6) 0%,
+                rgba($inverseOnSurface, 0.35) 35%,
+                rgba($inverseOnSurface, 0.0) 65%
+            );
     }
     .player {
         background-color: $surfaceContainerHigh;
