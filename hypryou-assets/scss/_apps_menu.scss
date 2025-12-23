@@ -43,7 +43,6 @@ window.apps-menu {
         }
         &:focus-within {
             background-color: color.mix($surfaceContainer, $onSurfaceVariant, 88%);
-            outline: none;
         }
     }
 

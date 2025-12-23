@@ -39,7 +39,6 @@ window.power-menu {
         }
         &:focus-within {
             background-color: color.mix($surfaceContainer, $onSurfaceVariant, 88%);
-            outline: none;
         }
         &:first-child {
             margin-top: 0.5rem;

@@ -38,7 +38,6 @@ window.cliphist {
         }
         &:focus-within {
             background-color: color.mix($surfaceContainer, $onSurfaceVariant, 88%);
-            outline: none;
         }
 
         .preview {
@@ -65,7 +64,6 @@ window.cliphist {
         @include elevation(1);
         @include nLayerBackground($surfaceContainerHigh, 2);
         margin: 0.5rem;
-        outline: none;
         border-radius: 2.75rem;
         color: $onSurface;
         min-height: 2.75rem;

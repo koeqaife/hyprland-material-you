@@ -50,7 +50,8 @@ window.settings {
                 &:hover {
                     background-color: color.mix($secondaryContainer, $onSurfaceVariant, 88%);
                 }
-                &:active {
+                &:active,
+                &:focus-visible {
                     background-color: color.mix($secondaryContainer, $onSurfaceVariant, 80%);
                 }
             }
@@ -64,7 +65,8 @@ window.settings {
                 &:hover {
                     background-color: color.mix(transparent, $onSurfaceVariant, 92%);
                 }
-                &:active {
+                &:active,
+                &:focus-visible {
                     background-color: color.mix(transparent, $onSurfaceVariant, 90%);
                 }
             }
@@ -305,7 +307,6 @@ window.settings {
 
             color: $onSurface;
             min-height: 2rem;
-            outline: none;
             background-color: transparent;
 
             placeholder {
@@ -378,7 +379,6 @@ window.settings {
             color: $onSurface;
             min-height: 0;
             padding: 0;
-            outline: none;
             background-color: transparent;
             placeholder {
                 opacity: 1;
