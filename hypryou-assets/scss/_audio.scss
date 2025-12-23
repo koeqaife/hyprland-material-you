@@ -29,7 +29,7 @@ window.audio {
             opacity: 0.5;
         }
         &:not(:only-child).is-default {
-            outline: 0.0625rem solid $primary;
+            outline: 0.0625rem solid $outlineVariant;
         }
 
         .icon,
