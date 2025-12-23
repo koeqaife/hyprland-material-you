@@ -55,6 +55,7 @@
                 rgba($inverseOnSurface, 0.35) 35%,
                 rgba($inverseOnSurface, 0.0) 65%
             );
+        transition: background 0.3s ease;
     }
     .player {
         background-color: $surfaceContainerHigh;
@@ -176,7 +177,19 @@ window.players {
                 color: $onSurfaceVariant;
             }
             .vignette {
-                background: radial-gradient(circle, transparent 0%, color-mix(in srgb, $surfaceContainer 20%, transparent) 70%);
+                // prettier-ignore
+                background:
+                    radial-gradient(
+                        circle,
+                        transparent 0%,
+                        color-mix(in srgb, $surfaceContainer 20%, transparent) 100%
+                    ),
+                    linear-gradient(
+                        to top,
+                        rgba($inverseOnSurface, 0.6) 0%,
+                        rgba($inverseOnSurface, 0.35) 35%,
+                        rgba($inverseOnSurface, 0) 65%
+                    );
             }
             .image {
                 opacity: 0.25;
