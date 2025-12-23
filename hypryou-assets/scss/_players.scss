@@ -40,12 +40,12 @@
                 rgba(0, 0, 0, 0) 42%,
                 color-mix(
                     in srgb,
-                    var(--player-color) 12%,
+                    var(--player-color) 24%,
                     rgba($inverseOnSurface, 0.35)
                 ) 82%,
                 color-mix(
                     in srgb,
-                    var(--player-color) 18%,
+                    var(--player-color) 30%,
                     rgba($inverseOnSurface, 0.8)
                 ) 100%
             ),
