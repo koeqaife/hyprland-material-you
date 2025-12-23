@@ -218,7 +218,7 @@ class CliRequest:
                 "-f 'screenshot.png'"
             )
             launch_detached(command)
-            ScreenshotWatcher(f"{TEMP_DIR}/screenshot.png").start
+            ScreenshotWatcher(f"{TEMP_DIR}/screenshot.png").start()
         else:
             args.append(f"-o {HOME}/screenshots")
             command = f"bash -c \"hyprshot {" ".join(args)}\""
