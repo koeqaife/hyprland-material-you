@@ -56,6 +56,9 @@ class ClipItem(gtk.Revealer):
         self.update_search(search)
 
         self.on_click_handler = self.button.connect("clicked", self.on_click)
+        self.on_activate_handler = self.button.connect(
+            "activate", self._on_activate
+        )
 
     def idle_widget(self) -> None:
         self.button.set_child(None)
@@ -175,6 +178,7 @@ class ClipItem(gtk.Revealer):
 
     def destroy(self) -> None:
         self.button.disconnect(self.on_click_handler)
+        self.button.disconnect(self.on_activate_handler)
 
 
 class ClipHistoryBox(gtk.Box):

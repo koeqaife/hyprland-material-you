@@ -70,6 +70,9 @@ class AppItem(gtk.Revealer):
         self.update_search(search)
 
         self.on_click_handler = self.button.connect("clicked", self.on_click)
+        self.on_activate_handler = self.button.connect(
+            "activate", self._on_click
+        )
 
     def _on_click(self, *args: t.Any) -> None:
         self.launch()
@@ -86,6 +89,7 @@ class AppItem(gtk.Revealer):
 
     def destroy(self) -> None:
         self.button.disconnect(self.on_click_handler)
+        self.button.disconnect(self.on_activate_handler)
         del self.on_click
 
 
