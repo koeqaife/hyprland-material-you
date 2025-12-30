@@ -39,6 +39,7 @@ Versions:
 "Used" means I used this version when I was developing, so these versions are 100% compatible
 PLEASE USE LATEST VERSIONS OF PACKAGES AND CHECK USED VERSION ONLY IF SOMETHING IS BROKEN
 
+- Hyprland: Minimum 0.53.0
 - Python: Recommended >= 3.13, Minimum >= 3.12
 - python-gobject: Used 3.52.3-3
 - libgirepository: Used 1.84.0-1
