@@ -1,6 +1,7 @@
 import os
 import asyncio
 import socket
+import threading
 from config import HOME, socket_path, TEMP_DIR
 from utils.colors import generate_by_settings
 from utils.logger import logger
@@ -62,6 +63,7 @@ class ScreenshotWatcher:
         self.monitor: gio.FileMonitor | None = None
         self.handler_id: int | None = None
         self.is_ready = False
+        self.lock = threading.Lock()
 
     def start(self) -> None:
         file = gio.File.new_for_path(self.path)
@@ -78,8 +80,9 @@ class ScreenshotWatcher:
         other_file: gio.File,
         event_type: gio.FileMonitorEvent,
     ) -> None:
-        if event_type == gio.FileMonitorEvent.CHANGES_DONE_HINT:
-            self._on_file_ready()
+        with self.lock:
+            if event_type == gio.FileMonitorEvent.CHANGES_DONE_HINT:
+                self._on_file_ready()
 
     def _on_file_ready(self) -> None:
         if self.is_ready:
