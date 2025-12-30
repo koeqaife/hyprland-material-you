@@ -89,7 +89,8 @@ class LinkButton(gtk.Button):
             css_classes=css_classes + ("link-btn",),
             child=self.box,
             vexpand=True,
-            hexpand=True
+            hexpand=True,
+            valign=gtk.Align.START
         )
 
 
@@ -99,7 +100,8 @@ class InfoPage(gtk.ScrolledWindow):
     def __init__(self) -> None:
         self.box = gtk.Box(
             css_classes=("page-box",),
-            orientation=gtk.Orientation.VERTICAL
+            orientation=gtk.Orientation.VERTICAL,
+            valign=gtk.Align.START
         )
         super().__init__(
             css_classes=("info-page", "settings-page",),
@@ -119,7 +121,8 @@ class InfoPage(gtk.ScrolledWindow):
         )
         self.links_box = gtk.Box(
             css_classes=("links-box",),
-            homogeneous=True
+            homogeneous=True,
+            valign=gtk.Align.START
         )
         self.links_box.append(self.github_button)
         self.links_box.append(self.discord_button)
