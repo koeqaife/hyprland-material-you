@@ -200,8 +200,8 @@ def generate_blur() -> str:
     xray = settings.get("blur.xray")
 
     output = (
-        "layerrule = blur, hypryou-.*",
-        "layerrule = ignorealpha 0.85, hypryou-.*",
+        "layerrulev2 = blur, hypryou-.*",
+        "layerrulev2 = ignorealpha 0.85, hypryou-.*",
         BLUR.format("true" if xray else "false")
     )
     return "\n".join(output)
@@ -209,7 +209,7 @@ def generate_blur() -> str:
 
 def generate_noanim() -> str:
     return "\n".join(
-        f"layerrule = noanim, {layer}"
+        f"layerrulev2 = noanim, {layer}"
         for layer in noanim_layers
     ) + "\n"
 
