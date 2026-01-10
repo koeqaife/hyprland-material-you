@@ -211,9 +211,13 @@ def generate_monitors() -> str:
 
 def generate_blur() -> str:
     settings = Settings().get_view_for("blur")
-    blur = settings.get("enabled")
-    if not blur:
-        return "# Blur is disabled by settings \n"
+    if not settings.get("enabled"):
+        output = "# Blur is disabled by settings \n"
+        output += "decoration {\n"
+        output += "    blur {\n"
+        output += "        enabled = false\n"
+        output += "    }\n}\n"
+        return output
 
     xray = settings.get("xray")
 
@@ -237,8 +241,7 @@ def generate_blur() -> str:
 
 def generate_shadow() -> str:
     settings = Settings().get_view_for("shadow")
-    blur = settings.get("enabled")
-    if not blur:
+    if not settings.get("enabled"):
         output = "# Shadow are disabled by settings \n"
         output += "decoration {\n"
         output += "    shadow {\n"
