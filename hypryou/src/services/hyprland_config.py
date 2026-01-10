@@ -28,7 +28,25 @@ BLUR = """
 decoration {{
     blur {{
         enabled = true
-        xray = {}
+        xray = {xray}
+        size = {size}
+        passes = {passes}
+        noise = {noise}
+        contrast = {contrast}
+        vibrancy_darkness = {vibrancy_darkness}
+        vibrancy = {vibrancy}
+    }}
+}}
+"""
+
+SHADOW = """decoration {{
+    shadow {{
+        enabled = true
+        range = {range}
+        render_power = {render_power}
+        color = 0x{color}
+        offset = {offset_x}, {offset_y}
+        scale = {scale}
     }}
 }}
 """
@@ -192,19 +210,53 @@ def generate_monitors() -> str:
 
 
 def generate_blur() -> str:
-    settings = Settings()
-    blur = settings.get("blur.enabled")
+    settings = Settings().get_view_for("blur")
+    blur = settings.get("enabled")
     if not blur:
         return "# Blur is disabled by settings \n"
 
-    xray = settings.get("blur.xray")
+    xray = settings.get("xray")
 
     output = (
         "layerrule = match:namespace hypryou-.*, blur on",
+        "layerrule = match:namespace hypryou-.*, xray "
+        "on" if xray else "off",
         "layerrule = match:namespace hypryou-.*, ignore_alpha 0.85",
-        BLUR.format("true" if xray else "false")
+        BLUR.format(
+            xray="true" if xray else "false",
+            size=settings.get("size"),
+            passes=settings.get("passes"),
+            noise=settings.get("noise"),
+            contrast=settings.get("contrast"),
+            vibrancy_darkness=settings.get("vibrancy_darkness"),
+            vibrancy=settings.get("vibrancy"),
+        )
     )
     return "\n".join(output)
+
+
+def generate_shadow() -> str:
+    settings = Settings().get_view_for("shadow")
+    blur = settings.get("enabled")
+    if not blur:
+        return "# Shadow is disabled by settings \n"
+
+    return SHADOW.format(
+        range=settings.get("range"),
+        render_power=settings.get("render_power"),
+        color=settings.get("color"),
+        offset_x=settings.get("offset_x"),
+        offset_y=settings.get("offset_y"),
+        scale=settings.get("scale"),
+    )
+
+
+def generate_opacity() -> str:
+    settings = Settings().get_view_for("opacity")
+    output = "decoration {\n"
+    for key in ("active", "inactive", "fullscreen"):
+        output += f"    {key}_opacity = {settings.get(key)}\n"
+    return output + "}\n"
 
 
 def generate_noanim() -> str:
@@ -381,7 +433,9 @@ funcs = (
     generate_monitors,
     generate_general,
     generate_decoration,
-    generate_misc
+    generate_misc,
+    generate_shadow,
+    generate_opacity
 )
 
 

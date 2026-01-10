@@ -51,7 +51,6 @@ default_settings: dict[str, t.Any] = {
     "is_24hr_clock": True,
     "always_show_battery": False,
     "corners": True,
-    "opacity": 1.0,
     "separated_workspaces": False,
     "one_popup_at_time": True,
     "power_menu_cancel_button": True,
@@ -77,6 +76,25 @@ default_settings: dict[str, t.Any] = {
 
     "blur.enabled": True,
     "blur.xray": True,
+    "blur.size": "4",
+    "blur.passes": "3",
+    "blur.noise": "0.05",
+    "blur.contrast": "1",
+    "blur.vibrancy_darkness": "0.5",
+    "blur.vibrancy": "0.3",
+
+    "shadow.enabled": True,
+    "shadow.range": "10",
+    "shadow.render_power": "5",
+    "shadow.color": "3f000000",
+    "shadow.offset_x": "0",
+    "shadow.offset_y": "2",
+    "shadow.scale": "1.0",
+
+    "opacity": 1.0,
+    "opacity.active": 1.0,
+    "opacity.inactive": 1.0,
+    "opacity.fullscreen": 1.0,
 
     "apps.enabled": True,
     "apps.browser": "firefox",
