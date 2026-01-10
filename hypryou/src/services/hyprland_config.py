@@ -239,7 +239,12 @@ def generate_shadow() -> str:
     settings = Settings().get_view_for("shadow")
     blur = settings.get("enabled")
     if not blur:
-        return "# Shadow is disabled by settings \n"
+        output = "# Shadow are disabled by settings \n"
+        output += "decoration {\n"
+        output += "    shadow {\n"
+        output += "        enabled = false\n"
+        output += "    }\n}\n"
+        return output
 
     return SHADOW.format(
         range=settings.get("range"),
