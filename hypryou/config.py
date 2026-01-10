@@ -32,9 +32,11 @@ state_dir = pjoin(
     os.environ["HYPRLAND_INSTANCE_SIGNATURE"]
 )
 # NOTE: ~/wallpaper is for backward compatibility with v1
+# Someone asked me to add ~/Pictures/Wallpapers :P
 wallpaper_dirs = [
     pjoin(PICTURES_DIR, "wallpapers"),
-    pjoin(HOME, "wallpaper")
+    pjoin(HOME, "wallpaper"),
+    pjoin(PICTURES_DIR, "Wallpapers")
 ]
 
 info = {
