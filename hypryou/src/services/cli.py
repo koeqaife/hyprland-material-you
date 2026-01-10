@@ -17,7 +17,7 @@ import typing as t
 import src.services.hyprland as hyprland
 from repository import gtk, gdk, gio
 
-
+TMP_SCREENSHOT_FILE = f"{TEMP_DIR}/screenshot.png"
 screenshot_mode_args = {
     "region": "-m region",
     "active": "-m active -m output",
@@ -49,6 +49,7 @@ HELP = {
     "change_workspace": "Changes workspace"
 }
 animations = True
+screenshot_watcher: "ScreenshotWatcher | None" = None
 
 
 def launch_detached(exec: str) -> None:
@@ -60,18 +61,22 @@ def launch_detached(exec: str) -> None:
 class ScreenshotWatcher:
     def __init__(self, path: str) -> None:
         self.path = path
+        self.started = False
+        self.is_ready: bool | None = None  # None is if uninitialized
         self.monitor: gio.FileMonitor | None = None
         self.handler_id: int | None = None
-        self.is_ready = False
-        self.lock = threading.Lock()
+        self.file = gio.File.new_for_path(self.path)
 
     def start(self) -> None:
-        file = gio.File.new_for_path(self.path)
-        self.monitor = file.monitor_file(
+        self.is_ready = False
+        if self.started:
+            return
+        self.monitor = self.file.monitor_file(
             gio.FileMonitorFlags.NONE,
             None,
         )
         self.handler_id = self.monitor.connect("changed", self._on_changed)
+        self.started = True
 
     def _on_changed(
         self,
@@ -80,26 +85,17 @@ class ScreenshotWatcher:
         other_file: gio.File,
         event_type: gio.FileMonitorEvent,
     ) -> None:
-        with self.lock:
-            if event_type == gio.FileMonitorEvent.CHANGES_DONE_HINT:
-                self._on_file_ready()
+        if event_type == gio.FileMonitorEvent.CHANGES_DONE_HINT:
+            self._on_file_ready()
 
     def _on_file_ready(self) -> None:
-        if self.is_ready:
+        if self.is_ready is not False:
             return
         self.is_ready = True
 
         launch_detached(
             f"satty -f {self.path} --copy-command wl-copy"
         )
-
-        self._cleanup()
-
-    def _cleanup(self) -> bool:
-        if self.monitor:
-            if self.handler_id:
-                self.monitor.disconnect(self.handler_id)
-            self.monitor.cancel()
 
 
 class CliRequest:
@@ -216,12 +212,17 @@ class CliRequest:
         if "freeze" in _mode:
             args.append("--freeze")
         if shutil.which("satty"):
+            global screenshot_watcher
             command = (
                 f"hyprshot {" ".join(args)} -s -o '{TEMP_DIR}' "
                 "-f 'screenshot.png'"
             )
             launch_detached(command)
-            ScreenshotWatcher(f"{TEMP_DIR}/screenshot.png").start()
+
+            if screenshot_watcher is None:
+                screenshot_watcher = ScreenshotWatcher(TMP_SCREENSHOT_FILE)
+
+            screenshot_watcher.start()
         else:
             args.append(f"-o {HOME}/Pictures/screenshots")
             command = f"bash -c \"hyprshot {" ".join(args)}\""
