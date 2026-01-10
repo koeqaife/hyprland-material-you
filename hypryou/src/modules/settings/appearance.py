@@ -1,7 +1,6 @@
 from src.modules.settings.base import SettingsBoolRow, SettingsTextRow
 from src.modules.settings.base import SettingsDropdownRow, DropdownItem
 from src.modules.settings.base import Category
-from src.modules.settings.base import int_kwargs, float_kwargs
 from repository import gtk
 from utils.colors.schemes import schemes
 
@@ -44,43 +43,6 @@ class AppearancePage(gtk.ScrolledWindow):
                     )
                     for scheme_name in schemes
                 ]
-            ),
-
-            Category("Effects"),
-            SettingsBoolRow(
-                "Blur",
-                "Adds blur to windows and to UI",
-                "blur.enabled"
-            ),
-            SettingsBoolRow(
-                "Blur XRay",
-                "Adds xray effect to blur",
-                "blur.xray",
-                depends_on={"blur.enabled"}
-            ),
-            SettingsTextRow(
-                "UI Opacity",
-                "Changes opacity of UI (minimum: 85%)",
-                "opacity",
-                right_icon="percent",
-                max_length=3,
-                transform_fn=lambda v: str(round(float(v) * 100)),
-                transform2_fn=lambda v: min(max(float(v) / 100, 0.85), 1.0),
-                test_text=lambda v: v.isdigit()
-            ),
-            SettingsTextRow(
-                "Rounding",
-                "Rounded corners' radius (in layout px)",
-                "hyprland.decoration.rounding",
-                max_width_chars=3,
-                **int_kwargs
-            ),
-            SettingsTextRow(
-                "Rounding Power",
-                "Adjusts the curve used for rounding corners",
-                "hyprland.decoration.rounding_power",
-                max_width_chars=3,
-                **float_kwargs
             ),
 
             Category("Layout"),

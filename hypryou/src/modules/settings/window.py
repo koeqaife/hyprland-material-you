@@ -54,6 +54,7 @@ def get_pages() -> dict[str, Page]:
     from src.modules.settings.hyprland import HyprlandPage
     from src.modules.settings.configs import ConfigsPage
     from src.modules.settings.lockscreen import LockscreenPage
+    from src.modules.settings.effects import EffectsPage
 
     pages = {
         "network": Page(
@@ -133,6 +134,12 @@ def get_pages() -> dict[str, Page]:
             icon="lock",
             icon_fill=True,
             widget=LockscreenPage
+        ),
+        "effects": Page(
+            title="Effects",
+            icon="format_paint",
+            icon_fill=True,
+            widget=EffectsPage
         )
     }
     return pages
@@ -143,6 +150,7 @@ sidebar = (
     "bluetooth",
     "separator",
     "appearance",
+    "effects",
     "wallpaper",
     "separator",
     "input",
