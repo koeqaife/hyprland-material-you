@@ -219,8 +219,8 @@ def generate_blur() -> str:
 
     output = (
         "layerrule = match:namespace hypryou-.*, blur on",
-        "layerrule = match:namespace hypryou-.*, xray "
-        "on" if xray else "off",
+        "layerrule = match:namespace hypryou-.*, xray " +
+        ("on" if xray else "off"),
         "layerrule = match:namespace hypryou-.*, ignore_alpha 0.85",
         BLUR.format(
             xray="true" if xray else "false",
