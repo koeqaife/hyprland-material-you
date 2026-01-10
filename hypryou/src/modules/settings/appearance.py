@@ -55,7 +55,8 @@ class AppearancePage(gtk.ScrolledWindow):
             SettingsBoolRow(
                 "Blur XRay",
                 "Adds xray effect to blur",
-                "blur.xray"
+                "blur.xray",
+                depends_on={"blur.enabled"}
             ),
             SettingsTextRow(
                 "UI Opacity",
@@ -86,7 +87,8 @@ class AppearancePage(gtk.ScrolledWindow):
             SettingsBoolRow(
                 "Screen corners",
                 "Adds round corners to the top of the screen under the bar",
-                "corners"
+                "corners",
+                conflicts_with={"floating_bar"}
             ),
             SettingsBoolRow(
                 "Floating Sidebar",
@@ -95,7 +97,7 @@ class AppearancePage(gtk.ScrolledWindow):
             ),
             SettingsBoolRow(
                 "Floating Bar",
-                "Adds margins to the bar (will disable corners)",
+                "Adds margins to the bar (conflicts with corners)",
                 "floating_bar",
             ),
 

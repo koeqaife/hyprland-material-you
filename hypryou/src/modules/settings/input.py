@@ -26,36 +26,42 @@ class InputPage(gtk.ScrolledWindow):
                 "Keyboard model",
                 "Specifies the physical model of the keyboard",
                 "input.kb_model",
+                depends_on={"input.enabled"},
                 max_width_chars=12
             ),
             SettingsTextRow(
                 "Keyboard layouts",
                 "List of active keyboard layouts (e.g., us, ru)",
                 "input.kb_layout",
+                depends_on={"input.enabled"},
                 max_width_chars=12
             ),
             SettingsTextRow(
                 "Keyboard variant",
                 "Optional layout variant for the selected layout",
                 "input.kb_variant",
+                depends_on={"input.enabled"},
                 max_width_chars=12
             ),
             SettingsTextRow(
                 "Keyboard options",
                 "XKB options like key behavior and modifier tweaks",
                 "input.kb_options",
+                depends_on={"input.enabled"},
                 max_width_chars=12
             ),
             SettingsTextRow(
                 "Keyboard rules",
                 "Name of the XKB ruleset",
                 "input.kb_rules",
+                depends_on={"input.enabled"},
                 max_width_chars=12
             ),
             SettingsDropdownRow(
                 "Change layout keybind",
                 "Combination used to switch between layouts",
                 "input.change_layout",
+                depends_on={"input.enabled"},
                 items=[
                     DropdownItem("", "None"),
                     DropdownItem("grp:shift_caps_toggle", "Shift+Caps Lock"),
@@ -71,17 +77,20 @@ class InputPage(gtk.ScrolledWindow):
             SettingsBoolRow(
                 "Numlock by default",
                 "Enable Num Lock on startup",
-                "input.numlock_by_default"
+                "input.numlock_by_default",
+                depends_on={"input.enabled"},
             ),
             SettingsBoolRow(
                 "Use keybinds by current layout",
                 "Match keybinds to current keyboard layout symbols",
-                "input.resolve_binds_by_sym"
+                "input.resolve_binds_by_sym",
+                depends_on={"input.enabled"},
             ),
             SettingsTextRow(
                 "Key repeat rate",
                 "Repeats per second for held keys",
                 "input.repeat_rate",
+                depends_on={"input.enabled"},
                 max_width_chars=6,
                 **int_kwargs
             ),
@@ -89,6 +98,7 @@ class InputPage(gtk.ScrolledWindow):
                 "Key repeat delay",
                 "Delay before key repeats, in ms",
                 "input.repeat_delay",
+                depends_on={"input.enabled"},
                 max_width_chars=6,
                 **int_kwargs
             ),
@@ -98,6 +108,7 @@ class InputPage(gtk.ScrolledWindow):
                 "Mouse sensitivity",
                 "Cursor speed adjustment",
                 "input.sensitivity",
+                depends_on={"input.enabled"},
                 max_width_chars=6,
                 **float_kwargs
             ),
@@ -105,6 +116,7 @@ class InputPage(gtk.ScrolledWindow):
                 "Pointer acceleration profile",
                 "How your cursor accelerates with movement",
                 "input.accel_profile",
+                depends_on={"input.enabled"},
                 items=[
                     DropdownItem("", "Default"),
                     DropdownItem(
@@ -120,17 +132,20 @@ class InputPage(gtk.ScrolledWindow):
             SettingsBoolRow(
                 "Force no acceleration",
                 "Disable pointer acceleration completely",
-                "input.force_no_accel"
+                "input.force_no_accel",
+                depends_on={"input.enabled"},
             ),
             SettingsBoolRow(
                 "Left handed",
                 "Swap mouse buttons for left-handed use",
-                "input.left_handed"
+                "input.left_handed",
+                depends_on={"input.enabled"},
             ),
             SettingsDropdownRow(
                 "Scroll method",
                 "Choose how scrolling is performed",
                 "input.scroll_method",
+                depends_on={"input.enabled"},
                 items=[
                     DropdownItem("", "Default"),
                     DropdownItem(
@@ -155,11 +170,13 @@ class InputPage(gtk.ScrolledWindow):
                 "Natural scrolling",
                 "Invert scroll direction for intuitive movement",
                 "input.natural_scroll",
+                depends_on={"input.enabled"},
             ),
             SettingsDropdownRow(
                 "Focus mode",
                 "Controls window focus behavior on mouse move or click",
                 "input.follow_mouse",
+                depends_on={"input.enabled"},
                 items=[
                     DropdownItem(
                         0, "Standard",
@@ -183,6 +200,7 @@ class InputPage(gtk.ScrolledWindow):
                 "Focus follow threshold",
                 "Cursor distance to change focus (Focus Follow mode)",
                 "input.follow_mouse_threshold",
+                depends_on={"input.enabled"},
                 max_width_chars=4,
                 **float_kwargs
             ),
@@ -190,6 +208,7 @@ class InputPage(gtk.ScrolledWindow):
                 "Focus on close",
                 "Behavior of focus when you close window",
                 "input.focus_on_close",
+                depends_on={"input.enabled"},
                 items=[
                     DropdownItem(0, "Next window"),
                     DropdownItem(1, "Under cursor")
@@ -198,12 +217,14 @@ class InputPage(gtk.ScrolledWindow):
             SettingsBoolRow(
                 "Mouse refocus",
                 "Change focus on hover only when crossing window boundary",
-                "input.mouse_refocus"
+                "input.mouse_refocus",
+                depends_on={"input.enabled"},
             ),
             SettingsDropdownRow(
                 "Float switch override focus",
                 "Focus behavior when toggling floating windows",
                 "input.float_switch_override_focus",
+                depends_on={"input.enabled"},
                 items=[
                     DropdownItem(
                         0, "Off",
@@ -224,52 +245,61 @@ class InputPage(gtk.ScrolledWindow):
             SettingsBoolRow(
                 "Touchpad settings enabled",
                 "If disabled hyprland's default settings will be used",
-                "input.touchpad.enabled"
+                "input.touchpad.enabled",
             ),
             SettingsBoolRow(
                 "Disable while typing",
                 "Touchpad won't work when you're typing",
-                "input.touchpad.disable_while_typing"
+                "input.touchpad.disable_while_typing",
+                depends_on={"input.touchpad.enabled"},
             ),
             SettingsBoolRow(
                 "Natural scrolling",
                 "Invert touchpad scroll direction for intuitive movement",
-                "input.touchpad.natural_scroll"
+                "input.touchpad.natural_scroll",
+                depends_on={"input.touchpad.enabled"},
             ),
             SettingsBoolRow(
                 "Middle button emulation",
                 "Left and right click would be interpreted as a middle click",
-                "input.touchpad.middle_button_emulation"
+                "input.touchpad.middle_button_emulation",
+                depends_on={"input.touchpad.enabled"},
             ),
             SettingsBoolRow(
                 "Clickfinger behavior",
                 "Map 1-3 finger taps to left, right, and middle click",
-                "input.touchpad.clickfinger_behavior"
+                "input.touchpad.clickfinger_behavior",
+                depends_on={"input.touchpad.enabled"},
             ),
             SettingsBoolRow(
                 "Tap-to-click",
                 "Tap with 1-3 fingers to click left, right, or middle button",
-                "input.touchpad.tap_to_click"
+                "input.touchpad.tap_to_click",
+                depends_on={"input.touchpad.enabled"},
             ),
             SettingsBoolRow(
                 "Tap-to-drag",
                 "Enable dragging by tapping and holding",
-                "input.touchpad.tap_and_drag"
+                "input.touchpad.tap_and_drag",
+                depends_on={"input.touchpad.enabled"},
             ),
             SettingsBoolRow(
                 "Flip X",
                 "Reverse horizontal movement direction",
-                "input.touchpad.flip_x"
+                "input.touchpad.flip_x",
+                depends_on={"input.touchpad.enabled"},
             ),
             SettingsBoolRow(
                 "Flip Y",
                 "Reverse vertical movement direction",
-                "input.touchpad.flip_y"
+                "input.touchpad.flip_y",
+                depends_on={"input.touchpad.enabled"},
             ),
             SettingsTextRow(
                 "Scroll factor",
                 "Multiplier applied to the amount of scroll movement",
                 "input.touchpad.scroll_factor",
+                depends_on={"input.touchpad.enabled"},
                 **float_kwargs,
                 max_width_chars=4
             ),
@@ -277,6 +307,7 @@ class InputPage(gtk.ScrolledWindow):
                 "Tap button map",
                 "Assign buttons to fingers taps",
                 "input.touchpad.tap_button_map",
+                depends_on={"input.touchpad.enabled"},
                 items=[
                     DropdownItem(
                         "lrm", "LRM",

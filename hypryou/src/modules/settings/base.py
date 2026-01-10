@@ -427,6 +427,25 @@ class DropdownRow(DropdownRowTemplate):
             method(self, self.get_current())  # type: ignore
 
 
+def generate_depends(
+    depends_on: set[str] | None,
+    conflicts_with: set[str] | None,
+    depends_callback: t.Callable[..., t.Any],
+    conflict_callback: t.Callable[..., t.Any]
+) -> list[int]:
+    settings = Settings()
+    handlers: list[str] = []
+
+    if depends_on:
+        for depend in depends_on:
+            handlers.append(settings.watch(depend, depends_callback, False))
+    if conflicts_with:
+        for conflict in conflicts_with:
+            handlers.append(settings.watch(conflict, conflict_callback, False))
+
+    return handlers
+
+
 class SettingsBoolRow(SwitchRowTemplate):
     __gtype_name__ = "SettingsBoolRow"
 
@@ -436,20 +455,38 @@ class SettingsBoolRow(SwitchRowTemplate):
         description: str | None,
         key: str,
         css_classes: tuple[str, ...] = (),
+        depends_on: set[str] | None = None,
+        conflicts_with: set[str] | None = None,
         **props: t.Any
     ) -> None:
         super().__init__(label, description, css_classes, **props)
         self.key = key
+        self.depends_on = depends_on
+        self.conflicts_with = conflicts_with
         self.settings = Settings()
-        self.settings_handler = self.settings.watch(
-            key, self.switch_set_active, True
-        )
+        self.settings_handlers = [
+            self.settings.watch(
+                key, self.switch_set_active, True
+            ),
+            *generate_depends(
+                depends_on, conflicts_with,
+                self.on_settings_depends,
+                self.on_settings_conflict,
+            )
+        ]
+
+    def on_settings_conflict(self, value: t.Any) -> None:
+        self.set_sensitive(not value)
+
+    def on_settings_depends(self, value: t.Any) -> None:
+        self.set_sensitive(value)
 
     def on_switch_changed(self, *args: t.Any) -> None:
         self.settings.set(self.key, self.switch.get_active())
 
     def destroy(self) -> None:
-        self.settings.unwatch(self.settings_handler)
+        for handler in self.settings_handlers:
+            self.settings.unwatch(handler)
 
 
 class SettingsTextRow(TextRowTemplate):
@@ -468,12 +505,16 @@ class SettingsTextRow(TextRowTemplate):
         test_text: t.Callable[[str], bool] | None = None,
         css_classes: tuple[str, ...] = (),
         max_width_chars: int | None = None,
+        depends_on: set[str] | None = None,
+        conflicts_with: set[str] | None = None,
         **props: t.Any
     ) -> None:
         self.key = key
         self.transform_fn = transform_fn
         self.transform2_fn = transform2_fn
         self.test_text = test_text
+        self.depends_on = depends_on
+        self.conflicts_with = conflicts_with
         self.settings = Settings()
         super().__init__(
             label, description, left_icon, right_icon,
@@ -481,9 +522,22 @@ class SettingsTextRow(TextRowTemplate):
             **props
         )
 
-        self.settings_handler = self.settings.watch(
-            key, self.on_setting_updated
-        )
+        self.settings_handlers = [
+            self.settings.watch(
+                key, self.on_setting_updated, True
+            ),
+            *generate_depends(
+                depends_on, conflicts_with,
+                self.on_settings_depends,
+                self.on_settings_conflict,
+            )
+        ]
+
+    def on_settings_conflict(self, value: t.Any) -> None:
+        self.set_sensitive(not value)
+
+    def on_settings_depends(self, value: t.Any) -> None:
+        self.set_sensitive(value)
 
     def on_setting_updated(self, new_value: t.Any) -> None:
         value = (
@@ -495,7 +549,8 @@ class SettingsTextRow(TextRowTemplate):
 
     def destroy(self) -> None:
         super().destroy()
-        self.settings.unwatch(self.settings_handler)
+        for handler in self.settings_handlers:
+            self.settings.unwatch(handler)
 
     def on_text_changed(self, *args: t.Any) -> None:
         text = self.entry.get_text()
@@ -522,19 +577,37 @@ class SettingsDropdownRow(DropdownRowTemplate):
         key: str,
         items: list[DropdownItem],
         css_classes: tuple[str, ...] = (),
+        depends_on: set[str] | None = None,
+        conflicts_with: set[str] | None = None,
         **props: t.Any
     ) -> None:
         self.key = key
+        self.depends_on = depends_on
+        self.conflicts_with = conflicts_with
         self.settings = Settings()
         super().__init__(label, description, items, css_classes, **props)
 
-        self.settings_handler = self.settings.watch(
-            key, self.set_current
-        )
+        self.settings_handlers = [
+            self.settings.watch(
+                key, self.set_current, True
+            ),
+            *generate_depends(
+                depends_on, conflicts_with,
+                self.on_settings_depends,
+                self.on_settings_conflict,
+            )
+        ]
+
+    def on_settings_conflict(self, value: t.Any) -> None:
+        self.set_sensitive(not value)
+
+    def on_settings_depends(self, value: t.Any) -> None:
+        self.set_sensitive(value)
 
     def destroy(self) -> None:
         super().destroy()
-        self.settings.unwatch(self.settings_handler)
+        for handler in self.settings_handlers:
+            self.settings.unwatch(handler)
 
     def on_item_selected(self, *args: t.Any) -> None:
         item = self.get_current()
