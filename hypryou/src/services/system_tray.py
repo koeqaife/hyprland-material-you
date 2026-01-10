@@ -135,9 +135,7 @@ class StatusNotifierItem(Signals):
 
         if prop == "Icon":
             self._pixbufs.clear()
-            self._cache_proxy_properties(
-                ["IconName", "IconPixmap"]
-            )
+            self._cache_proxy_properties()
         elif prop == "Title" or prop == "ToolTip":
             self._cached_name = None
             self._cache_proxy_properties()
