@@ -438,10 +438,10 @@ def generate_depends(
 
     if depends_on:
         for depend in depends_on:
-            handlers.append(settings.watch(depend, depends_callback, False))
+            handlers.append(settings.watch(depend, depends_callback, True))
     if conflicts_with:
         for conflict in conflicts_with:
-            handlers.append(settings.watch(conflict, conflict_callback, False))
+            handlers.append(settings.watch(conflict, conflict_callback, True))
 
     return handlers
 
