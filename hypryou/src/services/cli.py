@@ -1,7 +1,6 @@
 import os
 import asyncio
 import socket
-import threading
 from config import HOME, socket_path, TEMP_DIR
 from utils.colors import generate_by_settings
 from utils.logger import logger
