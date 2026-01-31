@@ -1019,10 +1019,15 @@ class NetworkTraffic(gtk.Label):
             css_classes=("bar-applet", "network-speed"),
             valign=gtk.Align.CENTER
         )
+        self.settings = Settings()
         self.last_rx = 0
         self.last_tx = 0
-        self.update()
-        glib.timeout_add(1000, self.update)
+        self.timer_id = None
+
+        self.setting_handler = self.settings.watch(
+            "show_network_speed", self.on_setting_changed
+        )
+        self.on_setting_changed(self.settings.get("show_network_speed"))
 
     def get_bytes(self):
         rx = 0
@@ -1032,8 +1037,7 @@ class NetworkTraffic(gtk.Label):
                 lines = f.readlines()[2:]
                 for line in lines:
                     data = line.split()
-                    iface = data[0].strip(":")
-                    if iface == "lo": continue
+                    if data[0].strip(":") == "lo": continue
                     rx += int(data[1])
                     tx += int(data[9])
         except: pass
@@ -1047,7 +1051,12 @@ class NetworkTraffic(gtk.Label):
         return f"{speed} B/s"
 
     def update(self):
+        if not self.get_visible():
+            self.timer_id = None
+            return False
+
         rx, tx = self.get_bytes()
+
         if self.last_rx == 0:
             self.last_rx = rx
             self.last_tx = tx
@@ -1062,6 +1071,21 @@ class NetworkTraffic(gtk.Label):
         text = f"↓ {self.format_speed(rx_speed)}   ↑ {self.format_speed(tx_speed)}"
         self.set_label(text)
         return True
+
+    def on_setting_changed(self, value: bool) -> None:
+        self.set_visible(value)
+        if value:
+            if self.timer_id is None:
+                self.last_rx = 0
+                self.last_tx = 0
+                self.update()
+                self.timer_id = glib.timeout_add(1000, self.update)
+
+    def destroy(self) -> None:
+        self.settings.unwatch(self.setting_handler)
+        if self.timer_id:
+            glib.source_remove(self.timer_id)
+        super().destroy()
 
 class ModulesRight(gtk.Box):
     __gtype_name__ = "BarModulesRight"
