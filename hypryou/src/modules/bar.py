@@ -1011,6 +1011,57 @@ class ModulesCenter(gtk.Box):
             child.destroy()
             self.remove(child)
 
+class NetworkTraffic(gtk.Label):
+    __gtype_name__ = "NetworkTraffic"
+
+    def __init__(self) -> None:
+        super().__init__(
+            css_classes=("bar-applet", "network-speed"),
+            valign=gtk.Align.CENTER
+        )
+        self.last_rx = 0
+        self.last_tx = 0
+        self.update()
+        glib.timeout_add(1000, self.update)
+
+    def get_bytes(self):
+        rx = 0
+        tx = 0
+        try:
+            with open("/proc/net/dev") as f:
+                lines = f.readlines()[2:]
+                for line in lines:
+                    data = line.split()
+                    iface = data[0].strip(":")
+                    if iface == "lo": continue
+                    rx += int(data[1])
+                    tx += int(data[9])
+        except: pass
+        return rx, tx
+
+    def format_speed(self, speed):
+        if speed > 1024 * 1024:
+            return f"{speed / 1024 / 1024:.1f} Mb/s"
+        if speed > 1024:
+            return f"{speed / 1024:.0f} Kb/s"
+        return f"{speed} B/s"
+
+    def update(self):
+        rx, tx = self.get_bytes()
+        if self.last_rx == 0:
+            self.last_rx = rx
+            self.last_tx = tx
+            return True
+
+        rx_speed = rx - self.last_rx
+        tx_speed = tx - self.last_tx
+
+        self.last_rx = rx
+        self.last_tx = tx
+
+        text = f"↓ {self.format_speed(rx_speed)}   ↑ {self.format_speed(tx_speed)}"
+        self.set_label(text)
+        return True
 
 class ModulesRight(gtk.Box):
     __gtype_name__ = "BarModulesRight"
@@ -1025,6 +1076,7 @@ class ModulesRight(gtk.Box):
             valign=gtk.Align.CENTER
         )
         self.children = (
+            NetworkTraffic(),
             KeyboardLayout(),
             Battery(),
             OpenWindow(
