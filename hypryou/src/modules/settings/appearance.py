@@ -69,11 +69,7 @@ class AppearancePage(gtk.ScrolledWindow):
                 "Changes the time format from 13:00 to 1 PM and vice versa",
                 "is_24hr_clock",
             ),
-            SettingsBoolRow(
-                "Show network speed",
-                "Shows upload and download speed on the bar",
-                "show_network_speed"
-            ),
+            
 
             Category("Behavior"),
             SettingsBoolRow(
@@ -100,6 +96,11 @@ class AppearancePage(gtk.ScrolledWindow):
                 "Hide empty workspaces",
                 "Don't show workspaces without windows",
                 "hide_empty_workspaces"
+            ),
+            SettingsBoolRow(
+                "Show network speed",
+                "Shows upload and download speed on the bar",
+                "show_network_speed"
             ),
             SettingsBoolRow(
                 "Old Fullscreen Behavior",

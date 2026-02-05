@@ -1043,6 +1043,7 @@ class NetworkTraffic(gtk.Label):
         except: pass
         return rx, tx
 
+
     def format_speed(self, speed):
         if speed > 1024 * 1024:
             return f"{speed / 1024 / 1024:.1f} Mb/s"
@@ -1050,11 +1051,8 @@ class NetworkTraffic(gtk.Label):
             return f"{speed / 1024:.0f} Kb/s"
         return f"{speed} B/s"
 
-    def update(self):
-        if not self.get_visible():
-            self.timer_id = None
-            return False
 
+    def update(self):
         rx, tx = self.get_bytes()
 
         if self.last_rx == 0:
@@ -1072,6 +1070,7 @@ class NetworkTraffic(gtk.Label):
         self.set_label(text)
         return True
 
+
     def on_setting_changed(self, value: bool) -> None:
         self.set_visible(value)
         if value:
@@ -1080,12 +1079,17 @@ class NetworkTraffic(gtk.Label):
                 self.last_tx = 0
                 self.update()
                 self.timer_id = glib.timeout_add(1000, self.update)
+        else:
+            if self.timer_id:
+                glib.source_remove(self.timer_id)
+                self.timer_id = None
 
-    def destroy(self) -> None:
+
+    def destroy(self, *args) -> None:
         self.settings.unwatch(self.setting_handler)
         if self.timer_id:
             glib.source_remove(self.timer_id)
-        super().destroy()
+            self.timer_id = None
 
 class ModulesRight(gtk.Box):
     __gtype_name__ = "BarModulesRight"
