@@ -69,7 +69,6 @@ class AppearancePage(gtk.ScrolledWindow):
                 "Changes the time format from 13:00 to 1 PM and vice versa",
                 "is_24hr_clock",
             ),
-            
 
             Category("Behavior"),
             SettingsBoolRow(
