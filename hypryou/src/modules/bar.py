@@ -1043,14 +1043,12 @@ class NetworkTraffic(gtk.Label):
         except: pass
         return rx, tx
 
-
     def format_speed(self, speed):
         if speed > 1024 * 1024:
             return f"{speed / 1024 / 1024:.1f} Mb/s"
         if speed > 1024:
             return f"{speed / 1024:.0f} Kb/s"
         return f"{speed} B/s"
-
 
     def update(self):
         rx, tx = self.get_bytes()
@@ -1070,7 +1068,6 @@ class NetworkTraffic(gtk.Label):
         self.set_label(text)
         return True
 
-
     def on_setting_changed(self, value: bool) -> None:
         self.set_visible(value)
         if value:
@@ -1083,7 +1080,6 @@ class NetworkTraffic(gtk.Label):
             if self.timer_id:
                 glib.source_remove(self.timer_id)
                 self.timer_id = None
-
 
     def destroy(self, *args) -> None:
         self.settings.unwatch(self.setting_handler)
