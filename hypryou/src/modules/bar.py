@@ -1078,7 +1078,7 @@ class NetworkTraffic(gtk.Label):
                 self.last_rx = 0
                 self.last_tx = 0
                 self.update()
-                self.timer_id = glib.timeout_add(1000, self.update)
+                self.timer_id = glib.timeout_add_seconds(1, self.update)
         else:
             if self.timer_id:
                 glib.source_remove(self.timer_id)
