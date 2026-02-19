@@ -49,6 +49,7 @@ info = {
 
 default_settings: dict[str, t.Any] = {
     "is_24hr_clock": True,
+    "show_network_speed": False,
     "always_show_battery": False,
     "corners": True,
     "separated_workspaces": False,

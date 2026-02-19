@@ -97,6 +97,11 @@ class AppearancePage(gtk.ScrolledWindow):
                 "hide_empty_workspaces"
             ),
             SettingsBoolRow(
+                "Show network speed",
+                "Shows upload and download speed on the bar",
+                "show_network_speed"
+            ),
+            SettingsBoolRow(
                 "Old Fullscreen Behavior",
                 "If enabled, fullscreen behavior from <2.1.0 will be used",
                 "old_fullscreen_behavior"

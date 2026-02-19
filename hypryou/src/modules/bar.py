@@ -1011,6 +1011,81 @@ class ModulesCenter(gtk.Box):
             child.destroy()
             self.remove(child)
 
+class NetworkTraffic(gtk.Label):
+    __gtype_name__ = "NetworkTraffic"
+
+    def __init__(self) -> None:
+        super().__init__(
+            css_classes=("bar-applet", "network-speed"),
+            valign=gtk.Align.CENTER
+        )
+        self.settings = Settings()
+        self.last_rx = 0
+        self.last_tx = 0
+        self.timer_id = None
+
+        self.setting_handler = self.settings.watch(
+            "show_network_speed", self.on_setting_changed
+        )
+        self.on_setting_changed(self.settings.get("show_network_speed"))
+
+    def get_bytes(self):
+        rx = 0
+        tx = 0
+        try:
+            with open("/proc/net/dev") as f:
+                lines = f.readlines()[2:]
+                for line in lines:
+                    data = line.split()
+                    if data[0].strip(":") == "lo": continue
+                    rx += int(data[1])
+                    tx += int(data[9])
+        except: pass
+        return rx, tx
+
+    def format_speed(self, speed):
+        if speed > 1024 * 1024:
+            return f"{speed / 1024 / 1024:.1f} Mb/s"
+        if speed > 1024:
+            return f"{speed / 1024:.0f} Kb/s"
+        return f"{speed} B/s"
+
+    def update(self):
+        rx, tx = self.get_bytes()
+
+        if self.last_rx == 0:
+            self.last_rx = rx
+            self.last_tx = tx
+            return True
+
+        rx_speed = rx - self.last_rx
+        tx_speed = tx - self.last_tx
+
+        self.last_rx = rx
+        self.last_tx = tx
+
+        text = f"↓ {self.format_speed(rx_speed)}   ↑ {self.format_speed(tx_speed)}"
+        self.set_label(text)
+        return True
+
+    def on_setting_changed(self, value: bool) -> None:
+        self.set_visible(value)
+        if value:
+            if self.timer_id is None:
+                self.last_rx = 0
+                self.last_tx = 0
+                self.update()
+                self.timer_id = glib.timeout_add_seconds(1, self.update)
+        else:
+            if self.timer_id:
+                glib.source_remove(self.timer_id)
+                self.timer_id = None
+
+    def destroy(self, *args) -> None:
+        self.settings.unwatch(self.setting_handler)
+        if self.timer_id:
+            glib.source_remove(self.timer_id)
+            self.timer_id = None
 
 class ModulesRight(gtk.Box):
     __gtype_name__ = "BarModulesRight"
@@ -1025,6 +1100,7 @@ class ModulesRight(gtk.Box):
             valign=gtk.Align.CENTER
         )
         self.children = (
+            NetworkTraffic(),
             KeyboardLayout(),
             Battery(),
             OpenWindow(
