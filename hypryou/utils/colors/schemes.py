@@ -1,6 +1,6 @@
 from materialyoucolor.dynamiccolor.material_dynamic_colors import DynamicColor  # type: ignore # noqa
 from materialyoucolor.dynamiccolor.material_dynamic_colors import MaterialDynamicColors  # noqa
-from materialyoucolor.scheme.dynamic_scheme import DynamicScheme  # type: ignore # noqa
+from materialyoucolor.dynamiccolor.dynamic_scheme import DynamicScheme  # type: ignore # noqa
 import importlib
 from .helpers import rgb_to_hex, snake_to_pascal
 import typing as t
