@@ -248,10 +248,9 @@ class NotificationItem(gtk.Box):
         settings = Settings()
         self.app_title.set_label(self.item.app_name)
 
-        _datetime = datetime.datetime.now()
         self.time.set_label(
             get_formatted_time(
-                _datetime,
+                self.item.created_at,
                 not settings.get("is_24hr_clock")
             )
         )

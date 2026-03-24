@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from enum import Enum
 import time
 from config import ASSETS_DIR
@@ -166,6 +167,7 @@ class Notification(Signals):
     ) -> None:
         super().__init__({"changed"})
         self.id = id
+        self.created_at = datetime.datetime.now()
         self.watcher = watcher
         self.cached_app_icon: tuple[str, gio.Icon | str | None] | None = None
         self.set_values(**kwargs)
