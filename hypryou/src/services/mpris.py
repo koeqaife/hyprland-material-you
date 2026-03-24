@@ -113,6 +113,7 @@ class MprisPlayer(Signals):
     ) -> None:
         if signal_name == "Seeked":
             args = t.cast(tuple[float], signal_args.unpack())
+            self._last_checked_position = time.monotonic()
             self._last_known_position = args[0] / 1_000_000
             self._pos_changed_time = time.monotonic()
             self._last_changed_time = time.monotonic()
@@ -329,7 +330,13 @@ class MprisPlayer(Signals):
         self,
         *args: t.Any
     ) -> None:
-        self._last_changed_time = time.monotonic()
+        now = time.monotonic()
+        self._last_changed_time = now
+
+        cached = self.cached_position / 1_000_000
+        self._last_known_position = cached
+        self._last_checked_position = now
+
         update_current_player()
 
         self.notify("changed")
