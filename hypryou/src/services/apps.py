@@ -14,7 +14,6 @@ import asyncio
 
 apps = Ref[list["Application"]]([], name="applications", delayed_init=True)
 frequents = Ref[dict[str, int]]({}, name="app_frequents", delayed_init=True)
-FOUND_THRESHOLD = 0.47
 
 APP_FREQUENCY = pjoin(APP_CACHE_DIR, "apps-frequency.json")
 LEGACY_APP_FREQUENCY = pjoin(CACHE_DIR, "ags", "apps", "apps_frequency.json")
@@ -54,13 +53,10 @@ class Application:
         self.entry = app.get_id()
         self.keywords = app.get_keywords()
         self.frequency = 0
-        self.score = 1.0
 
         self._match: dict[str | None, float] = {
-            self.exec: 0,
-            self.entry: -0.1,
-            self.description: -0.2,
-            self.name: 0.1
+            self.entry: 1,
+            self.name: 1
         }
 
     def launch(self) -> None:
@@ -69,22 +65,19 @@ class Application:
         if self.exec is not None:
             launch_detached(self.exec)
 
-    def match(self, pattern: str) -> bool:
+    def match(self, pattern: str) -> int:
         scores: list[float] = []
 
         normalized_pattern = pattern.strip().lower()
 
-        for property, bonus in self._match.items():
+        for property, multiplier in self._match.items():
             if property is None:
                 continue
 
             normalized_property = property.lower()
 
             score = compute_score(normalized_property, normalized_pattern)
-            score += bonus
-            if score >= FOUND_THRESHOLD:
-                self.score = score
-                return True
+            score *= multiplier
 
             scores.append(score)
 
@@ -100,8 +93,7 @@ class Application:
                     ) - 1.5
                 )
 
-        self.score = max(scores) if scores else 0.0
-        return self.score > FOUND_THRESHOLD
+        return max(scores) if scores else 0.0
 
 
 def increase_frequency(entry: str) -> None:

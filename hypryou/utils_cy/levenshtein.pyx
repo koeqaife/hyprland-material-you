@@ -13,6 +13,12 @@ cdef inline int min2(int a, int b) nogil:
 cdef inline int max2(int a, int b) nogil:
     return a if a > b else b
 
+cdef inline float min2float(float a, float b) nogil:
+    return a if a < b else b
+
+cdef inline float max2float(float a, float b) nogil:
+    return a if a > b else b
+
 cpdef int levenshtein_distance(str s1, str s2):
     cdef int len1 = len(s1)
     cdef int len2 = len(s2)
@@ -95,14 +101,14 @@ cpdef float compute_score(str s1, str s2):
     elif len(s2) < len(s1):
         part = partial_ratio(s2, s1)
 
-    cdef float score = 0.5 * full + 0.5 * part
+    cdef float score = max2float(part * 0.75, full * 0.6)
 
     if s1 and s2 and s1[0] != s2[0]:
         score -= 0.1
 
     cdef int len_diff = abs(len(s1) - len(s2))
-    if len_diff >= 3:
-        score -= 0.02 * len_diff / max_len
+    if len_diff >= 1:
+        score -= 0.035 * len_diff / max_len
 
     cdef int common_prefix_len = 0
     cdef int min_len = min(len(s1), len(s2))
@@ -111,10 +117,7 @@ cpdef float compute_score(str s1, str s2):
             common_prefix_len += 1
         else:
             break
-    score += 0.04 * common_prefix_len
-
-    if s1 in s2 or s2 in s1:
-        score += 0.08
+    score += 0.02 * common_prefix_len
 
     if score > 1.0:
         score = 1.0

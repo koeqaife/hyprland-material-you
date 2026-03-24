@@ -1,4 +1,6 @@
 from functools import lru_cache
+import heapq
+import math
 from repository import gtk, gdk, layer_shell, glib, pango
 from src.services.apps import Application, apps, reload as apps_reload
 from utils.debounce import sync_debounce
@@ -33,7 +35,7 @@ def cache_icon(icon: str | None) -> gtk.IconPaintable | None:
 class AppItem(gtk.Revealer):
     __gtype_name__ = "AppItem"
 
-    def __init__(self, item: Application, search: str) -> None:
+    def __init__(self, item: Application) -> None:
         self.on_click = sync_debounce(750, 1, True)(self._on_click)
         self.box = gtk.Box(
             css_classes=("app-item-box",)
@@ -47,7 +49,8 @@ class AppItem(gtk.Revealer):
             css_classes=("app-item-revealer",),
             child=self.button,
             transition_duration=250,
-            transition_type=gtk.RevealerTransitionType.SLIDE_DOWN
+            transition_type=gtk.RevealerTransitionType.SLIDE_DOWN,
+            reveal_child=True
         )
         self.item = item
 
@@ -67,8 +70,6 @@ class AppItem(gtk.Revealer):
         self.box.append(self.icon)
         self.box.append(self.label)
 
-        self.update_search(search)
-
         self.on_click_handler = self.button.connect("clicked", self.on_click)
         self.on_activate_handler = self.button.connect(
             "activate", self._on_click
@@ -80,12 +81,6 @@ class AppItem(gtk.Revealer):
     def launch(self, *args: t.Any) -> None:
         close_window("apps_menu")
         self.item.launch()
-
-    def update_search(self, search: str) -> None:
-        if not search or not search.strip():
-            self.set_reveal_child(True)
-        else:
-            self.set_reveal_child(self.item.match(search))
 
     def destroy(self) -> None:
         self.button.disconnect(self.on_click_handler)
@@ -141,24 +136,31 @@ class AppsBox(gtk.Box):
         self.update_apps(apps.value)
         self.handler_id = apps.watch(self.update_apps)
 
-        self.last_highest: tuple[Application, AppItem] | None = None
+        self.last_highest: AppItem | None = None
 
         if __debug__:
             weakref.finalize(self, lambda: logger.debug("AppsBox finalized"))
 
     def on_entry_enter(self, *args: t.Any) -> None:
         if self.last_highest:
-            self.last_highest[1].launch()
+            self.last_highest.item.launch()
 
     @sync_debounce(150)
     def on_search(self, *args: t.Any) -> None:
         text = self.entry.get_text()
-        for item in self._apps.values():
-            item.update_search(text)
+        if not text or not text.strip():
+            for item in self._apps.values():
+                item.set_reveal_child(True)
+
         if len(text.strip()) > 0:
-            self.hint_highest()
+            scores: dict[AppItem, int] = {app: app.item.match(text) for app in self._apps.values()}
+            top_search = heapq.nlargest(8, scores.items(), key=lambda item: item[1])
+            search = {app: score for app, score in top_search}
+            for item in self._apps.values():
+                item.set_reveal_child(item in search.keys())
+            self.hint_highest(search)
         elif self.last_highest:
-            toggle_css_class(self.last_highest[1], "highest", False)
+            toggle_css_class(self.last_highest, "highest", False)
             self.last_highest = None
 
     def destroy(self) -> None:
@@ -170,26 +172,25 @@ class AppsBox(gtk.Box):
         apps.unwatch(self.handler_id)
         cache_icon.cache_clear()
 
-    def hint_highest(self) -> None:
-        items = list(self._apps.items())
-        highest: tuple[Application, AppItem] | None = None
-        for item in items:
-            if item[1].get_reveal_child() and (
+    def hint_highest(self, top_search: dict[AppItem, int]) -> None:
+        highest: AppItem | None = None
+        for item, score in top_search.items():
+            if item.get_reveal_child() and (
                 not highest
-                or item[0].score + min(item[0].frequency / 50, 0.1) >
-                highest[0].score + min(highest[0].frequency / 50, 0.1)
+                or score + 0.02 * math.log1p(item.item.frequency) >
+                top_search[highest] + 0.02 * math.log1p(highest.item.frequency)
             ):
                 highest = item
 
         if not highest and self.last_highest:
-            toggle_css_class(self.last_highest[1], "highest", False)
+            toggle_css_class(self.last_highest, "highest", False)
             self.last_highest = None
         elif not highest:
             return
-        elif not self.last_highest or self.last_highest[1] is not highest[1]:
-            toggle_css_class(highest[1], "highest", True)
+        elif not self.last_highest or self.last_highest is not highest:
+            toggle_css_class(highest, "highest", True)
             if self.last_highest:
-                toggle_css_class(self.last_highest[1], "highest", False)
+                toggle_css_class(self.last_highest, "highest", False)
             self.last_highest = highest
 
     def sort_by_frequent(self) -> None:
@@ -215,7 +216,7 @@ class AppsBox(gtk.Box):
         to_remove = existing - desired
 
         for app in to_add:
-            widget = AppItem(app, self.search)
+            widget = AppItem(app)
             self._apps[app] = widget
 
         for app in to_remove:
