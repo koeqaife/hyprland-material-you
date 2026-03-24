@@ -146,12 +146,14 @@ def generate_colors_sync(
     dark_scheme = Scheme(
         Hct.from_int(color),
         True,
-        contrast_level
+        contrast_level,
+        spec_version="2021"
     )
     light_scheme = Scheme(
         Hct.from_int(color),
         False,
-        contrast_level
+        contrast_level,
+        spec_version="2021"
     )
     scheme = ColorScheme(
         is_dark, dark_scheme, light_scheme, contrast_level,

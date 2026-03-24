@@ -1,6 +1,7 @@
 from materialyoucolor.dynamiccolor.material_dynamic_colors import DynamicColor  # type: ignore # noqa
 from materialyoucolor.dynamiccolor.material_dynamic_colors import MaterialDynamicColors  # noqa
-from materialyoucolor.scheme.dynamic_scheme import DynamicScheme  # type: ignore # noqa
+from materialyoucolor.dynamiccolor.color_spec import COLOR_NAMES  # noqa
+from materialyoucolor.dynamiccolor.dynamic_scheme import DynamicScheme  # type: ignore # noqa
 import importlib
 from .helpers import rgb_to_hex, snake_to_pascal
 import typing as t
@@ -15,6 +16,7 @@ schemes: tuple[SchemeName] = (
     "fruit_salad", "monochrome", "neutral",
     "rainbow", "tonal_spot", "vibrant"
 )
+mdc = MaterialDynamicColors(spec="2025")
 
 
 def scheme_from_name(scheme_name: SchemeName) -> type[DynamicScheme]:
@@ -28,7 +30,8 @@ def scheme_from_name(scheme_name: SchemeName) -> type[DynamicScheme]:
 def get_colors(scheme: DynamicScheme) -> dict[str, str]:
     color_map: dict[str, str] = {}
 
-    for color_name, color in vars(MaterialDynamicColors).items():
+    for color_name in COLOR_NAMES:
+        color = getattr(mdc, color_name)
         if not isinstance(color, DynamicColor):
             continue
         if color_name.endswith("paletteKeyColor"):
