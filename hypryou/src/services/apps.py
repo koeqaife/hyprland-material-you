@@ -5,7 +5,7 @@ from utils_cy.levenshtein import compute_score
 from utils.service import Service
 from utils.logger import logger
 from utils.ref import Ref
-from config import APP_CACHE_DIR, CACHE_DIR
+from config import APP_CACHE_DIR, CACHE_DIR, Settings
 from os.path import join as pjoin
 import os.path as path
 import json
@@ -48,6 +48,7 @@ class Application:
 
         self.icon = app.get_string("Icon")
         self.exec = app.get_string("Exec")
+        self.is_terminal = app.get_boolean("Terminal")
         self.description = app.get_description()
         self.name = app.get_name()
         self.entry = app.get_id()
@@ -63,7 +64,10 @@ class Application:
         if self.entry is not None:
             increase_frequency(self.entry)
         if self.exec is not None:
-            launch_detached(self.exec)
+            if self.is_terminal:
+                launch_detached(f"{Settings().get("apps.terminal")} -e {self.exec}")
+            else:
+                launch_detached(self.exec)
 
     def match(self, pattern: str) -> int:
         scores: list[float] = []
