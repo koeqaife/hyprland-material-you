@@ -1011,27 +1011,70 @@ class ModulesCenter(gtk.Box):
             child.destroy()
             self.remove(child)
 
-class NetworkTraffic(gtk.Label):
+
+class NetworkTraffic(gtk.Box):
     __gtype_name__ = "NetworkTraffic"
 
     def __init__(self) -> None:
         super().__init__(
             css_classes=("bar-applet", "network-speed"),
-            valign=gtk.Align.CENTER
+            valign=gtk.Align.CENTER,
+            orientation=gtk.Orientation.HORIZONTAL,
+            halign=gtk.Align.CENTER,
+            hexpand=False
         )
         self.settings = Settings()
         self.last_rx = 0
         self.last_tx = 0
         self.timer_id = None
 
+        self.download_box = gtk.Box(
+            css_classes=("download-box",),
+            orientation=gtk.Orientation.HORIZONTAL,
+            hexpand=True
+        )
+        self.download_icon = widget.Icon(
+            "download",
+            css_classes=("download-icon",),
+        )
+        self.download_label = gtk.Label(
+            label="0 Kb/s",
+            css_classes=("download-label",),
+            hexpand=True
+        )
+
+        self.upload_box = gtk.Box(
+            css_classes=("upload-box",),
+            orientation=gtk.Orientation.HORIZONTAL,
+            hexpand=True
+        )
+        self.upload_icon = widget.Icon(
+            "upload",
+            css_classes=("upload-icon",)
+        )
+        self.upload_label = gtk.Label(
+            label="0 Kb/s",
+            css_classes=("upload-label",),
+            hexpand=True
+        )
+
+        self.download_box.append(self.download_icon)
+        self.download_box.append(self.download_label)
+
+        self.upload_box.append(self.upload_icon)
+        self.upload_box.append(self.upload_label)
+
+        self.append(self.download_box)
+        self.append(self.upload_box)
+
         self.setting_handler = self.settings.watch(
             "show_network_speed", self.on_setting_changed
         )
-        self.on_setting_changed(self.settings.get("show_network_speed"))
 
     def get_bytes(self):
         rx = 0
         tx = 0
+
         try:
             with open("/proc/net/dev") as f:
                 lines = f.readlines()[2:]
@@ -1040,7 +1083,9 @@ class NetworkTraffic(gtk.Label):
                     if data[0].strip(":") == "lo": continue
                     rx += int(data[1])
                     tx += int(data[9])
-        except: pass
+        except Exception:
+            pass
+
         return rx, tx
 
     def format_speed(self, speed):
@@ -1048,6 +1093,7 @@ class NetworkTraffic(gtk.Label):
             return f"{speed / 1024 / 1024:.1f} Mb/s"
         if speed > 1024:
             return f"{speed / 1024:.0f} Kb/s"
+
         return f"{speed} B/s"
 
     def update(self):
@@ -1064,8 +1110,8 @@ class NetworkTraffic(gtk.Label):
         self.last_rx = rx
         self.last_tx = tx
 
-        text = f"↓ {self.format_speed(rx_speed)}   ↑ {self.format_speed(tx_speed)}"
-        self.set_label(text)
+        self.download_label.set_label(self.format_speed(rx_speed))
+        self.upload_label.set_label(self.format_speed(tx_speed))
         return True
 
     def on_setting_changed(self, value: bool) -> None:
@@ -1086,6 +1132,7 @@ class NetworkTraffic(gtk.Label):
         if self.timer_id:
             glib.source_remove(self.timer_id)
             self.timer_id = None
+
 
 class ModulesRight(gtk.Box):
     __gtype_name__ = "BarModulesRight"

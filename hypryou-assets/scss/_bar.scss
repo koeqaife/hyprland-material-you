@@ -248,4 +248,37 @@ window.bar {
             }
         }
     }
+
+    .network-speed {
+        min-width: 11rem;
+        .icon {
+            margin-right: 0.25rem;
+            font-size: 1.25rem;
+            font-variation-settings: "opsz" 20;
+            font-weight: 500;
+        }
+        .upload-icon {
+            color: $tertiary;
+        }
+        .download-icon {
+            color: $primary;
+        }
+
+        .upload-label {
+            color: $tertiary;
+            font-weight: 500;
+        }
+        .download-label {
+            color: $primary;
+            font-weight: 500;
+        }
+
+        .upload-box, .download-box {
+            min-width: 5.25rem;
+        }
+
+        > :first-child {
+            margin-right: 0.5rem;
+        }
+    }
 }
