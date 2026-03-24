@@ -57,7 +57,7 @@ key_binds = (
     ),
     KeyBind(
         (main_mod, "J"),
-        "togglesplit",
+        ("layoutmsg", "togglesplit"),
         "Toggle split mode",
         Category.WINDOWS
     ),
