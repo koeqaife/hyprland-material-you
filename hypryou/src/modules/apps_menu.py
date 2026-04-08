@@ -1,7 +1,7 @@
 from functools import lru_cache
 import heapq
 import math
-from repository import gtk, gdk, layer_shell, glib, pango
+from repository import gtk, gdk, layer_shell, glib, pango, gio
 from src.services.apps import Application, apps, reload as apps_reload
 from utils.debounce import sync_debounce
 from utils.styles import toggle_css_class
@@ -13,7 +13,7 @@ from src import widget
 
 
 @lru_cache(512)
-def cache_icon(icon: str | None) -> gtk.IconPaintable | None:
+def cache_icon(icon: gio.Icon | None) -> gtk.IconPaintable | None:
     display = gdk.Display.get_default()
     icon_theme = gtk.IconTheme.get_for_display(display)
 
@@ -21,14 +21,23 @@ def cache_icon(icon: str | None) -> gtk.IconPaintable | None:
         texture = icon_theme.lookup_icon(
             "image-missing", None, 32, 1,
             gtk.TextDirection.LTR,
-            gtk.IconLookupFlags.FORCE_SYMBOLIC
+            gtk.IconLookupFlags.FORCE_REGULAR
         )
     else:
-        texture = icon_theme.lookup_icon(
-            icon, "image-missing", 32, 1,
+        texture = icon_theme.lookup_by_gicon(
+            icon,
+            32,
+            1,
             gtk.TextDirection.LTR,
-            gtk.IconLookupFlags.FORCE_SYMBOLIC
+            gtk.IconLookupFlags.FORCE_REGULAR,
         )
+
+        if texture is None:
+            texture = icon_theme.lookup_icon(
+                "image-missing", None, 32, 1,
+                gtk.TextDirection.LTR,
+                gtk.IconLookupFlags.FORCE_REGULAR
+            )
     return texture
 
 

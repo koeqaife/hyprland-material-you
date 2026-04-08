@@ -46,7 +46,7 @@ class Application:
     ) -> None:
         self.app_info = app
 
-        self.icon = app.get_string("Icon")
+        self.icon = app.get_icon()
         self.exec = app.get_string("Exec")
         self.is_terminal = app.get_boolean("Terminal")
         self.description = app.get_description()
