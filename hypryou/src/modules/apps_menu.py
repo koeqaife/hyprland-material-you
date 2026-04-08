@@ -19,7 +19,7 @@ def cache_icon(icon: gio.Icon | None) -> gtk.IconPaintable | None:
 
     if icon is None:
         texture = icon_theme.lookup_icon(
-            "image-missing", None, 32, 1,
+            "application-x-executable", None, 32, 1,
             gtk.TextDirection.LTR,
             gtk.IconLookupFlags.FORCE_REGULAR
         )
@@ -34,7 +34,7 @@ def cache_icon(icon: gio.Icon | None) -> gtk.IconPaintable | None:
 
         if texture is None:
             texture = icon_theme.lookup_icon(
-                "image-missing", None, 32, 1,
+                "application-x-executable", None, 32, 1,
                 gtk.TextDirection.LTR,
                 gtk.IconLookupFlags.FORCE_REGULAR
             )
