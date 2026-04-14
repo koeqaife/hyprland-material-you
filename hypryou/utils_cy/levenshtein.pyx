@@ -128,38 +128,53 @@ cpdef float compute_score(str s1, str s2):
 
 
 cpdef float compute_text_match_score(str s1, str s2):
+    if not s1 and not s2:
+        return 1.0
+
     if s1 == s2:
         return 1.0
 
+    s1 = s1.strip().lower()
+    s2 = s2.strip().lower()
+
+    cdef int len1 = len(s1)
+    cdef int len2 = len(s2)
+
+    if len1 == 0 or len2 == 0:
+        return 0.0
+
     cdef int dist = levenshtein_distance(s1, s2)
-    cdef float max_len = max2(len(s1), len(s2))
-    if max_len == 0:
-        return 1.0
+    cdef float max_len = max2(len1, len2)
+
     cdef float full = 1.0 - (dist / max_len)
 
     cdef float part = 0.0
-    if len(s1) < len(s2):
+    if len1 < len2:
         part = partial_ratio(s1, s2)
-    elif len(s2) < len(s1):
+    elif len2 < len1:
         part = partial_ratio(s2, s1)
 
-    cdef float score = 0.5 * full + 0.5 * part
+    cdef float score
+    if abs(len1 - len2) < 5:
+        score = 0.7 * full + 0.3 * part
+    else:
+        score = 0.4 * full + 0.6 * part
 
-    cdef int len_diff = abs(len(s1) - len(s2))
-    if len_diff >= 10:
-        score -= 0.02 * len_diff / max_len
+    if s1 in s2 or s2 in s1:
+        score += 0.15
+
+    cdef int len_diff = abs(len1 - len2)
+    score -= 0.1 * (len_diff / max_len)
 
     cdef int common_prefix_len = 0
-    cdef int min_len = min(len(s1), len(s2))
+    cdef int min_len = min(len1, len2)
     for i in range(min_len):
         if s1[i] == s2[i]:
             common_prefix_len += 1
         else:
             break
-    score += 0.01 * common_prefix_len
 
-    if s1 in s2 or s2 in s1:
-        score += 0.2
+    score += 0.015 * common_prefix_len
 
     if score > 1.0:
         score = 1.0
@@ -170,23 +185,24 @@ cpdef float compute_text_match_score(str s1, str s2):
 
 
 cpdef float token_set_ratio(str s1, str s2):
-    cdef set tokens1 = set(s1.lower().split())
-    cdef set tokens2 = set(s2.lower().split())
+    s1 = s1.lower().replace("(", " ").replace(")", " ").replace(",", " ")
+    s2 = s2.lower().replace("(", " ").replace(")", " ").replace(",", " ")
 
-    cdef set intersection = tokens1.intersection(tokens2)
-    cdef set diff1 = tokens1.difference(tokens2)
-    cdef set diff2 = tokens2.difference(tokens1)
+    cdef set tokens1 = set(s1.split())
+    cdef set tokens2 = set(s2.split())
 
-    cdef str sorted_intersection = " ".join(sorted(intersection))
-    cdef str sorted_diff1 = " ".join(sorted(diff1))
-    cdef str sorted_diff2 = " ".join(sorted(diff2))
+    if not tokens1 or not tokens2:
+        return 0.0
 
-    cdef str combined1 = (sorted_intersection + " " + sorted_diff1).strip()
-    cdef str combined2 = (sorted_intersection + " " + sorted_diff2).strip()
-    cdef str base = sorted_intersection
+    cdef int common = len(tokens1.intersection(tokens2))
+    cdef int total = len(tokens1) + len(tokens2) - common
 
-    cdef float score1 = compute_score(base, combined1)
-    cdef float score2 = compute_score(base, combined2)
-    cdef float score3 = compute_score(combined1, combined2)
+    cdef float score = common / total
 
-    return max(score1, score2, score3)
+    cdef int extra = abs(len(tokens1) - len(tokens2))
+    score -= 0.02 * extra
+
+    if score < 0.0:
+        score = 0.0
+
+    return score

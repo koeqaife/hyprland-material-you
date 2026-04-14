@@ -1,29 +1,26 @@
-import re
-import typing as t
-import weakref
-
-from repository import glib, gtk, layer_shell, pango
-from src import widget
-from src.services.cliphist import (
-    clear_tmp,
-    copy_by_id,
-    items,
-    repopulate,
-    save_cache_file,
-)
+from repository import gtk, layer_shell, glib, pango
+from src.services.cliphist import items, repopulate, save_cache_file
+from src.services.cliphist import clear_tmp
+from src.services.cliphist import copy_by_id
 from src.services.state import close_window
+from utils_cy.levenshtein import compute_text_match_score
+from utils_cy.levenshtein import token_set_ratio
+from utils.styles import toggle_css_class
 from utils.debounce import sync_debounce
 from utils.logger import logger
-from utils.styles import toggle_css_class
-from utils_cy.levenshtein import compute_text_match_score, token_set_ratio
+from src import widget
+import weakref
+import re
+import typing as t
 
-FOUND_THRESHOLD = 0.5
-data_regex = re.compile(r"\[\[ binary data (\d+) (KiB|MiB) (\w+) (\d+)x(\d+) \]\]")
+FOUND_THRESHOLD = 0.45
+data_regex = re.compile(
+    r"\[\[ binary data (\d+) (KiB|MiB) (\w+) (\d+)x(\d+) \]\]"
+)
 
 
 def normalize_string(s: str) -> str:
     s = re.sub(r"[-_]", " ", s)
-    s = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", s)
     return s.lower()
 
 
@@ -32,19 +29,22 @@ class ClipItem(gtk.Revealer):
 
     def __init__(self, item: tuple[str, str], search: str) -> None:
         self.on_activate = sync_debounce(750, 1, True)(self._on_activate)
-        self.button = gtk.Button(css_classes=("cliphist-item",), tooltip_text=item[1])
+        self.button = gtk.Button(
+            css_classes=("cliphist-item",),
+            tooltip_text=item[1]
+        )
         super().__init__(
             css_classes=("cliphist-item-revealer",),
             child=self.button,
             transition_duration=250,
-            transition_type=gtk.RevealerTransitionType.SLIDE_DOWN,
+            transition_type=gtk.RevealerTransitionType.SLIDE_DOWN
         )
         self.score = -1.0
         self.item = item
         self.show_image = False
         self._child: gtk.Box | gtk.Label | None = None
 
-        self.search_strings = (self.item[1], normalize_string(self.item[1]))
+        self.search_string = normalize_string(self.item[1])
 
         self.check_is_image()
         self.update_widget()
@@ -52,7 +52,9 @@ class ClipItem(gtk.Revealer):
         self.update_search(search)
 
         self.on_click_handler = self.button.connect("clicked", self.on_click)
-        self.on_activate_handler = self.button.connect("activate", self._on_activate)
+        self.on_activate_handler = self.button.connect(
+            "activate", self._on_activate
+        )
 
     def idle_widget(self) -> None:
         self.button.set_child(None)
@@ -65,7 +67,9 @@ class ClipItem(gtk.Revealer):
             file = save_cache_file(self.item[0])
 
             image_widget = gtk.Box(
-                css_classes=("preview",), halign=gtk.Align.START, valign=gtk.Align.START
+                css_classes=("preview",),
+                halign=gtk.Align.START,
+                valign=gtk.Align.START
             )
             self.button.set_child(image_widget)
             self._child = image_widget
@@ -79,18 +83,19 @@ class ClipItem(gtk.Revealer):
             if width_rem > max_width_rem:
                 new_height_rem = (200 / width_px) * max_width_rem
                 css += (
-                    f"min-height: {new_height_rem:.2f}rem; "
-                    + f"min-width: {max_width_rem:.2f}rem;"
+                    f"min-height: {new_height_rem:.2f}rem; " +
+                    f"min-width: {max_width_rem:.2f}rem;"
                 )
             else:
                 css += (
-                    f"min-height: {200 / 16:.2f}rem; "
-                    + f"min-width: {width_rem:.2f}rem;"
+                    f"min-height: {200/16:.2f}rem; " +
+                    f"min-width: {width_rem:.2f}rem;"
                 )
 
             css_provider = gtk.CssProvider()
             image_widget.get_style_context().add_provider(
-                css_provider, gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+                css_provider,
+                gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
             )
             css_provider.load_from_data(f"box {{ {css} }}")
         elif not self.show_image and not isinstance(self._child, gtk.Label):
@@ -98,10 +103,10 @@ class ClipItem(gtk.Revealer):
                 format = self.format.capitalize()
                 label_widget = gtk.Label(
                     label=(
-                        f"{format} image ({self.width}x{self.height}), "
-                        + "click to reveal."
+                        f"{format} image ({self.width}x{self.height}), " +
+                        "click to reveal."
                     ),
-                    css_classes=("label",),
+                    css_classes=("label",)
                 )
                 self.button.set_child(label_widget)
                 self._child = label_widget
@@ -110,7 +115,7 @@ class ClipItem(gtk.Revealer):
                     label=self.item[1],
                     ellipsize=pango.EllipsizeMode.END,
                     css_classes=("label",),
-                    halign=gtk.Align.START,
+                    halign=gtk.Align.START
                 )
                 self.button.set_child(label_widget)
                 self._child = label_widget
@@ -145,25 +150,22 @@ class ClipItem(gtk.Revealer):
         close_window("cliphist")
         copy_by_id(self.item[0])
 
-    def update_search(self, search: str, search_normalized: str = "") -> None:
+    def update_search(self, search: str) -> None:
         if not search or not search.strip():
             self.set_reveal_child(True)
             self.score = -1
         else:
-            scores = []
-            for string in self.search_strings:
-                raw_score = compute_text_match_score(string, search)
-                normalized_score = (
-                    compute_text_match_score(string, search_normalized)
-                    if search_normalized
-                    else -1
-                )
-                score = max(raw_score, normalized_score)
-                scores.append(score)
+            search = normalize_string(search)
+            string = self.search_string
+            raw_score = compute_text_match_score(string, search)
+            token_score = token_set_ratio(string, search)
+            score = 0.6 * raw_score + 0.4 * token_score
 
-            max_score = max(*scores)
-            self.set_reveal_child(max_score >= FOUND_THRESHOLD)
-            self.score = max_score
+            self.set_reveal_child(
+                score >= FOUND_THRESHOLD
+                or search in string
+            )
+            self.score = score
 
     def destroy(self) -> None:
         self.button.disconnect(self.on_click_handler)
@@ -179,31 +181,35 @@ class ClipHistoryBox(gtk.Box):
             css_classes=("cliphist-box",),
             orientation=gtk.Orientation.VERTICAL,
             vexpand=True,
-            halign=gtk.Align.FILL,
+            halign=gtk.Align.FILL
         )
         self.list = gtk.Box(
             css_classes=("cliphist-list",),
             orientation=gtk.Orientation.VERTICAL,
-            vexpand=True,
+            vexpand=True
         )
         self.scrollable = gtk.ScrolledWindow(
             css_classes=("cliphist-scrollable",),
             hscrollbar_policy=gtk.PolicyType.NEVER,
             vscrollbar_policy=gtk.PolicyType.AUTOMATIC,
             child=self.list,
-            vexpand=True,
+            vexpand=True
         )
 
-        self.search_box = gtk.Box(css_classes=("misc--search", "search"))
+        self.search_box = gtk.Box(
+            css_classes=("misc--search", "search")
+        )
         self.entry_icon = widget.Icon("search")
         self.entry = gtk.Entry(
-            css_classes=("entry",), placeholder_text="Search", hexpand=True
+            css_classes=("entry",),
+            placeholder_text="Search",
+            hexpand=True
         )
         self.search_box.append(self.entry_icon)
         self.search_box.append(self.entry)
         self.entry_handlers = (
             self.entry.connect("notify::text", self.on_search),
-            self.entry.connect("activate", self.on_entry_enter),
+            self.entry.connect("activate", self.on_entry_enter)
         )
 
         self._items: dict[str, ClipItem] = {}
@@ -226,10 +232,8 @@ class ClipHistoryBox(gtk.Box):
     @sync_debounce(150)
     def on_search(self, *args: t.Any) -> None:
         text = self.entry.get_text()
-        self.search = text
-        normalized = normalize_string(text)
         for item in self._items.values():
-            item.update_search(text, normalized)
+            item.update_search(text)
         if len(text.strip()) > 0:
             self.hint_highest()
         elif self.last_highest:
@@ -254,7 +258,8 @@ class ClipHistoryBox(gtk.Box):
         highest: tuple[str, ClipItem] | None = None
         for item in items:
             if item[1].get_reveal_child() and (
-                not highest or item[1].score > highest[1].score
+                not highest
+                or item[1].score > highest[1].score
             ):
                 highest = item
 
@@ -294,7 +299,10 @@ class ClipHistoryWindow(widget.LayerWindow):
     def __init__(self, app: gtk.Application) -> None:
         super().__init__(
             app,
-            anchors={"top": True, "right": True},
+            anchors={
+                "top": True,
+                "right": True
+            },
             css_classes=("cliphist",),
             keymode=layer_shell.KeyboardMode.ON_DEMAND,
             layer=layer_shell.Layer.OVERLAY,
@@ -302,13 +310,15 @@ class ClipHistoryWindow(widget.LayerWindow):
             name="cliphist",
             height=1,
             width=1,
-            setup_popup=True,
+            setup_popup=True
         )
         self.name = "cliphist"
         self._child: ClipHistoryBox | None = None
 
         if __debug__:
-            weakref.finalize(self, lambda: logger.debug("ClipHistoryWindow finalized"))
+            weakref.finalize(
+                self, lambda: logger.debug("ClipHistoryWindow finalized")
+            )
 
     def on_show(self) -> None:
         glib.idle_add(repopulate)
