@@ -152,7 +152,7 @@ class AppsBox(gtk.Box):
 
     def on_entry_enter(self, *args: t.Any) -> None:
         if self.last_highest:
-            self.last_highest.item.launch()
+            self.last_highest.launch()
 
     @sync_debounce(150)
     def on_search(self, *args: t.Any) -> None:
