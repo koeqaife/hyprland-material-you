@@ -267,8 +267,7 @@ class AppsWindow(widget.LayerWindow):
         if not self._child:
             self._child = AppsBox()
             self.set_child(self._child)
-        else:
-            self._child.entry.grab_focus()
+        self._child.entry.grab_focus()
 
     def on_hide(self) -> None:
         if self._child:
