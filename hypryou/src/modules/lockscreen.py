@@ -304,9 +304,9 @@ class ScreenLockWindow(gtk.ApplicationWindow):
         self.add_css_class("faded-out")
 
         def _on_done() -> bool:
+            self.destroy()
             if on_done:
                 on_done()
-            self.destroy()
             return False
 
         glib.timeout_add(320, _on_done)
