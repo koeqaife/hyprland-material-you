@@ -191,7 +191,7 @@ default_settings: dict[str, t.Any] = {
     "lockscreen.always_reveal_input": False,
     # New notifications counter
     "lockscreen.notifications_counter": False,
-
+    "lockscreen.application": "Default",
     # Mpris player on bar
     # 0 -> Default
     # 1 -> Private

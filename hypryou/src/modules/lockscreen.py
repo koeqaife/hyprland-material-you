@@ -536,6 +536,7 @@ class ScreenLock:
         return cls(app)
 
     def __init__(self, app: gtk.Application) -> None:
+        self.settings = Settings().get_view_for("lockscreen")
         self.app = app
         self.lock_instance = session_lock.Instance.new()
         self.lock_instance.connect("locked", self.on_locked)
@@ -555,11 +556,34 @@ class ScreenLock:
                 self.unlock()
 
     def lock(self) -> None:
+        lockscreen_app = self.settings.get("application")
+        
+        # 1. Xử lý Lockscreen ngoại vi (hyprlock, etc.)
+        if lockscreen_app != "Default":
+            import subprocess
+            try:
+                # Dùng run để tránh zombie, check=True để bắt lỗi nếu app không tồn tại
+                subprocess.run([lockscreen_app], check=True)
+                # Sau khi lockscreen ngoại vi kết thúc, ta coi như đã unlock
+                is_locked.value = False 
+                return
+            except subprocess.CalledProcessError as e:
+                logger.error(f"External lockscreen exited with error: {e}")
+            except Exception as e:
+                logger.error(f"Failed to launch {lockscreen_app}: {e}")
+                # Nếu lỗi thì rơi xuống (fall back) dùng lockscreen mặc định bên dưới
+        
+        # 2. Default HyprYou lockscreen behavior
         if not self.lock_instance.lock():
+            logger.warning("Failed to acquire session lock.")
             return
 
         display: gdk.Display = gdk.Display.get_default()
         blocked_input.value = False
+        
+        # Clear windows cũ nếu còn sót (safety check)
+        self.windows.clear()
+
         for monitor in display.get_monitors():
             window = ScreenLockWindow(self.app)
             self.windows[t.cast(gdk.Monitor, monitor)] = window

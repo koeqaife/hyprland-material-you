@@ -17,6 +17,15 @@ class LockscreenPage(gtk.ScrolledWindow):
             hscrollbar_policy=gtk.PolicyType.NEVER
         )
         self.box_children = (
+            SettingsDropdownRow(
+                "Lockscreen Application",
+                "Choose which application to use for lockscreen (experimental)",
+                "lockscreen.application",
+                items=[
+                    DropdownItem("hyprlock", "hyprlock"),
+                    DropdownItem("Default", "Default"),
+                ]
+            ),
             SettingsBoolRow(
                 "Media player",
                 "Show playing media player",
