@@ -47,7 +47,3 @@ def copy_extension(editor):
         if dest.exists():
             shutil.rmtree(dest)
         shutil.copytree(source, dest)
-
-get_editor_type()
-prevent_recopy()
-copy_extensions()
