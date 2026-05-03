@@ -7,7 +7,7 @@ pkgdesc="Dynamic and elegant desktop setup inspired by Material You, featuring a
 arch=('x86_64' 'aarch64')
 provides=('hypryou')
 conflicts=('hypryou')
-url="https://github.com/koeqaife/hyprland-material-you"
+url="https://github.com/Marmarek-here/hyprland-material-you-fork"
 install=hypryou.install
 license=('GPL3')
 
