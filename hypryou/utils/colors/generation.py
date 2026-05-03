@@ -292,17 +292,21 @@ def generate_colors(
     global executor
 
     def _callback(future: concurrent.futures.Future[None]) -> None:
-        try:
-            future.result()
-        except Exception as e:
-            logger.error("Couldn't generate colors: %s", e, exc_info=e)
+    try:
+        future.result()
+    except Exception as e:
+        logger.error("Couldn't generate colors: %s", e, exc_info=e)
 
-        glib.idle_add(default_on_complete)
-        if on_complete:
-            on_complete()
-        if executor is not None:
-            executor.shutdown(False)
-        task_lock.release()
+    # ← ВСТАВИТЬ ЗДЕСЬ
+    from utils.vscode_theme import copy_extension
+    copy_extension()
+
+    glib.idle_add(default_on_complete)
+    if on_complete:
+        on_complete()
+    if executor is not None:
+        executor.shutdown(False)
+    task_lock.release()
 
     if task_lock.acquire(blocking=False):
         executor = concurrent.futures.ProcessPoolExecutor(max_workers=1)
