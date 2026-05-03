@@ -330,30 +330,28 @@ class ScreenLockWindow(gtk.ApplicationWindow):
 
     def on_text_changed(self, *args: t.Any) -> None:
         toggle_css_class(self.unlock_box, "invalid", False)
-
+    def _trigger_unlock(self) -> bool:
+        is_locked.value = False
+        return False
     def on_entry_activate(self, *args: t.Any) -> None:
         if blocked_input.value:
             return
         password = self.unlock_entry.get_text()
 
         self.unlock_entry.set_editable(False)
-
         def authenticate_and_continue() -> None:
             blocked_input.value = True
             is_correct = check_password(username, password)
-
             def on_done() -> None:
                 blocked_input.value = False
                 self.unlock_entry.set_editable(True)
                 if is_correct:
-                    is_locked.value = False
+                    glib.idle_add(self._trigger_unlock)
                 else:
                     toggle_css_class(self.unlock_box, "invalid", True)
-
             glib.idle_add(on_done)
 
         threading.Thread(target=authenticate_and_continue, daemon=True).start()
-
     def reveal_input(self, reveal: bool) -> None:
         self.btn_revealer.set_reveal_child(not reveal)
         self.entry_revealer.set_reveal_child(reveal)
@@ -586,6 +584,17 @@ class ScreenLock:
         blocked_input.value = False
 
         for window in windows:
+            # 1. Ngắt tất cả các Ref watch ngay lập tức để tránh gọi hàm update khi đang xóa
+            for ref, handler_id in window.ref_handlers.items():
+                ref.unwatch(handler_id)
+            window.ref_handlers.clear()
+            
+            # 2. Dừng các timer
+            if window.mpris_timer:
+                glib.source_remove(window.mpris_timer)
+                window.mpris_timer = None
+                
+            # 3. Sau đó mới chạy animation
             window.fade_out_and_destroy(on_done=on_window_done)
 
     def on_locked(self, lock_instance: session_lock.Instance) -> None:
