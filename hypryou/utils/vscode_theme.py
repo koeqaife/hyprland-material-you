@@ -31,7 +31,7 @@ def prevent_recopy(source, dest):
 
 def copy_extension(editor):
     home = Path.home()
-    source = home / ".cache/hypryou/colors/hypryouvscode"
+    source = Path("/usr/lib/hypryou/hypryouvscode")
     
     if editor == "vscode":
         dest = home / ".vscode/extensions/hypryouvscode"
