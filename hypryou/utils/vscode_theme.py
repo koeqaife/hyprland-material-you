@@ -38,7 +38,7 @@ def ensure_symlink(cache_file: Path, target: Path):
 
 def copy_extension():
     home = Path.home()
-    source = Path("/usr/lib/hypryou/hypryouvscode")
+    source = Path("/usr/lib/hypryou/themes/hypryouvscode")
     cache_colors = Path.home() / ".cache/hypryou/colors/colors.json"
 
     editor = get_editor_type()
