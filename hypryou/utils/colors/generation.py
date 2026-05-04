@@ -2,6 +2,7 @@ from utils_cy.helpers import downsample_image_rgb
 import os
 import hashlib
 from os.path import join
+from ..utils.vscode_theme import copy_extension
 import typing as t
 import json
 import threading
@@ -296,9 +297,7 @@ def generate_colors(
         future.result()
     except Exception as e:
         logger.error("Couldn't generate colors: %s", e, exc_info=e)
-
-    # ← ВСТАВИТЬ ЗДЕСЬ
-    from utils.vscode_theme import copy_extension
+        #VS Code
     copy_extension()
 
     glib.idle_add(default_on_complete)
