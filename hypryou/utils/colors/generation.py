@@ -2,7 +2,7 @@ from utils_cy.helpers import downsample_image_rgb
 import os
 import hashlib
 from os.path import join
-from ..utils.vscode_theme import copy_extension
+from ..vscode_theme import copy_extension
 import typing as t
 import json
 import threading
