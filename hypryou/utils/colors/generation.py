@@ -3,6 +3,8 @@ import os
 import hashlib
 from os.path import join
 from ..vscode_theme import copy_extension
+from ..vscode_theme import update_theme
+from ..fish_themer import update_fish_themes
 import typing as t
 import json
 import threading
@@ -279,6 +281,8 @@ def default_on_complete() -> None:
     update_settings()
     update_gtk3()
     update_gtk4()
+    update_fish_themes()
+    update_theme()
 
 
 def generate_colors(
