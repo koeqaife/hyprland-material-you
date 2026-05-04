@@ -1,49 +1,52 @@
 import os
 from pathlib import Path
 import shutil
+import logging
 
-# Get the editor
+logger = logging.getLogger(__name__)
+
 def get_editor_type():
     home = Path.home()
     
-    # Checking for the extensions folder specifically is safer
     if (home / ".vscode/extensions").exists():
         return "vscode"
     elif (home / ".vscode-oss/extensions").exists():
         return "codium"
     return None
 
-def prevent_recopy(source, dest):
-    # If the destination doesn't exist at all, we definitely need to copy
+def is_up_to_date(source, dest):
     if not dest.exists():
         return False
     
-    # Get the last modification time of both
-    source_time = os.path.getmtime(source)
-    dest_time = os.path.getmtime(dest)
+    source_time = source.stat().st_mtime
+    dest_time = dest.stat().st_mtime
     
-    # If source is newer than destination, return False (meaning "don't prevent")
-    if source_time > dest_time:
-        return False
-        
-    # If destination is newer or equal, we can safely prevent the recopy
-    return True
+    return dest_time >= source_time
 
-def copy_extension(editor):
+def copy_extension():
     home = Path.home()
     source = Path("/usr/lib/hypryou/hypryouvscode")
+    editor = get_editor_type()
     
     if editor == "vscode":
         dest = home / ".vscode/extensions/hypryouvscode"
-    else:
+    elif editor == "codium":
         dest = home / ".vscode-oss/extensions/hypryouvscode"
+    else:
+        logger.error("No editor found!")
+        return
 
-    if source.exists():
-        if prevent_recopy(source, dest):
-            print(f"Theme for {editor} is already up to date. Skipping...")
-            return
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    
+    if not source.exists():
+        logger.error("Source extension not found")
+        return
 
-        print(f"Updating theme for {editor}...")
-        if dest.exists():
-            shutil.rmtree(dest)
-        shutil.copytree(source, dest)
+    if is_up_to_date(source, dest):
+        logger.info(f"Theme for {editor} is already up to date. Skipping...")
+        return
+
+    logger.info(f"Updating theme for {editor}...")
+    if dest.exists():
+        shutil.rmtree(dest)
+    shutil.copytree(source, dest)
