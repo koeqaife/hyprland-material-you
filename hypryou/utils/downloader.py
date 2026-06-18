@@ -215,10 +215,19 @@ def download_image_async(
             callback(None)
             return
 
+        if not os.path.exists(path):
+            callback(None)
+            return
+
         ext = os.path.splitext(path)[1]
         temp_path = os.path.join(cache_dir, f"image{ext}")
         os.makedirs(cache_dir, exist_ok=True)
-        shutil.copy(path, temp_path)
+        
+        try:
+            shutil.copy(path, temp_path)
+        except FileNotFoundError:
+            callback(None)
+            return
 
         if size:
             temp_path = resize_image(temp_path, size)
