@@ -30,5 +30,11 @@ key_binds = (
         ("exec", "hypryouctl apps files"),
         "File Manager",
         Category.APPS
+    ),
+    KeyBind(
+        (main_mod, "SHIFT", "L"),
+        ("exec", "sh -c \"TERM=$(hypryouctl apps terminal); $TERM -e sh -c 'btop; read' & sleep 0.1; $TERM -e sh -c 'fastfetch; read' & sleep 0.1; $TERM -e sh -c 'htop; read' & sleep 0.1; $TERM -e sh -c 'cava; read' & sleep 0.1; $TERM -e sh -c 'cmatrix; read'\""),
+        "Launch system dashboard",
+        Category.APPS
     )
 )
