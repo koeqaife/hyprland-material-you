@@ -49,7 +49,7 @@ def update_theme(script_path: Path):
 
 def copy_extension():
     home = Path.home()
-    source = Path("/usr/lib/hypryou/themes/marmarek-here.hypryouvscode-1.0.1")
+    source = Path("/usr/share/hypryou/themes/marmarek-here.hypryouvscode-1.0.1")
     cache_colors = home / ".cache/hypryou/colors/colors.json"
 
     editor = get_editor_type()
