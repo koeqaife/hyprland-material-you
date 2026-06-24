@@ -1,9 +1,9 @@
 {
-  "name": "marmarek-here.hypryouvscode-1.0.1",
+  "name": "hypryou.hypryou",
   "displayName": "HyprYou",
   "description": "A VS Code theme generated from HyprYou's Material 3 Expressive palette.",
   "version": "1.0.1",
-  "publisher": "marmarek-here",
+  "publisher": "hypryou",
   "scripts": {
     "build:theme": "node scripts/generate-theme.mjs",
     "prepare": "npm run build:theme"

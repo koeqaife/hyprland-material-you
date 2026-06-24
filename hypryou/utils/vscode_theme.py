@@ -49,7 +49,7 @@ def update_theme(script_path: Path):
 
 def copy_extension():
     home = Path.home()
-    source = Path("/usr/share/hypryou/themes/marmarek-here.hypryouvscode-1.0.1")
+    source = Path("/usr/share/hypryou/templates/hypryou.hypryou")
     cache_colors = home / ".cache/hypryou/colors/colors.json"
 
     editor = get_editor_type()
@@ -57,7 +57,7 @@ def copy_extension():
         logger.error("No VS Code or Codium directory found!")
         return
 
-    dest = home / (f".{editor}/extensions/marmarek-here.hypryouvscode-1.0.1")
+    dest = home / (f".{editor}/extensions/hypryou.hypryou")
     
     # 1. Sync extension files
     if not source.exists():

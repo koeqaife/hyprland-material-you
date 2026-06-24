@@ -4,12 +4,12 @@ from pathlib import Path
 
 def install_fish_themes():
     # Define paths
-    source_dir = Path("/usr/share/hypryou/themes/fish")
+    source_dir = Path("/usr/share/hypryou/templates/fish")
     fish_config_dir = Path.home() / ".config/fish"
     functions_dir = fish_config_dir / "functions"
     config_file = fish_config_dir / "config.fish"
     
-    files_to_copy = ["hypryou_colors.fish", "update-vscode-theme.fish"]
+    files_to_copy = ["hypryou_colors.fish", "update-vscode-theme.fish", "update-codium-theme.fish"]
 
     # 1. Check if fish is installed/exists in config
     if not fish_config_dir.exists():
