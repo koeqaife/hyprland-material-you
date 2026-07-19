@@ -389,8 +389,7 @@ class PopupsWindow(widget.LayerWindow):
         self.last_recorders_len = len(recorders.value)
 
     def show(self) -> None:
-        # Mapping a non-lock surface while the session is locked blocks the
-        # main loop until the watchdog kills the app (Hyprland stubs it).
+        # Mapping a non-lock surface while the session is locked blocks the main loop until the watchdog kills the app (Hyprland stubs it).
         if is_locked.value:
             return
         self.timeout = None
