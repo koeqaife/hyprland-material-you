@@ -3,6 +3,7 @@ from repository import gtk, bluetooth, gdk, gio, glib
 from src.modules.settings.base import RowTemplate
 from src.services.apps import launch_detached
 import typing as t
+from utils.logger import logger
 from utils.styles import toggle_css_class
 import src.widget as widget
 from collections import defaultdict
@@ -92,7 +93,12 @@ class BluetoothToggle(RowTemplate):
         if self.discovering_handler and self.adapter:
             self.adapter.disconnect(self.discovering_handler)
         if self.adapter and self.adapter.get_discovering():
-            self.adapter.stop_discovery()
+            try:
+                self.adapter.stop_discovery()
+            except glib.GError:
+                logger.warning(
+                    "Failed to stop bluetooth discovery", exc_info=True
+                )
 
 
 icons_map = defaultdict(
