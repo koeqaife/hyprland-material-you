@@ -10,7 +10,7 @@ from src.services.audio import volume, volume_icon, speaker_name
 from src.services.audio import mic_volume, mic_icon, mic_name
 from src.services.audio import recorders
 import typing as t
-from src.services.state import opened_windows
+from src.services.state import opened_windows, is_locked
 from src.services.upower import BatteryLevel, get_upower
 from config import Settings
 from math import ceil
@@ -352,6 +352,9 @@ class PopupsWindow(widget.LayerWindow):
         self.handler = window_counter.watch(
             self._update_visible
         )
+        self.lock_handler = is_locked.watch(
+            self._on_lock_changed
+        )
         self._update_visible(window_counter.value)
 
         self.last_recorders_len = 0
@@ -386,6 +389,10 @@ class PopupsWindow(widget.LayerWindow):
         self.last_recorders_len = len(recorders.value)
 
     def show(self) -> None:
+        # Mapping a non-lock surface while the session is locked blocks the
+        # main loop until the watchdog kills the app (Hyprland stubs it).
+        if is_locked.value:
+            return
         self.timeout = None
         super().show()
 
@@ -395,6 +402,10 @@ class PopupsWindow(widget.LayerWindow):
         if counter > 0:
             return
         super().hide()
+
+    def _on_lock_changed(self, locked: bool) -> None:
+        if not locked:
+            self._update_visible(window_counter.value)
 
     def _update_visible(self, new: dict[int, int]) -> None:
         new_counter = new[self.num]
@@ -412,5 +423,6 @@ class PopupsWindow(widget.LayerWindow):
         self.volume.destroy()
         recorders.unwatch(self.recorders_handler)
         get_upower().unwatch(self.upower_handler)
+        is_locked.unwatch(self.lock_handler)
         del window_counter.value[self.num]
         super().destroy()
