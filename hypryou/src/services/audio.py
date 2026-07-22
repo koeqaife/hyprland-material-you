@@ -89,7 +89,7 @@ class AudioService(Service):
 
     # Speaker: Volume
     def on_volume_ref_changed(self, new_value: float) -> None:
-        volume = self.default_speaker.get_volume() * 100.0
+        volume = self.default_speaker.get_volume() * 100.0 # keep the current vol after restart 
         if volume == new_value:
             return
         self.default_speaker.set_volume(new_value / 100.0)
@@ -139,7 +139,7 @@ class AudioService(Service):
     def app_init(self) -> None:
         if not self.success:
             return
-        volume.value = self.default_speaker.get_volume()
+        volume.value = self.default_speaker.get_volume() * 100.0
         volume.watch(self.on_volume_ref_changed)
         volume_muted.watch(self.on_muted_ref_changed)
         self.default_speaker.connect("notify::volume", self.on_volume_changed)
@@ -175,3 +175,13 @@ class AudioService(Service):
                 f"{node}-removed",
                 lambda _, n, c=container: c.value.discard(n)
             )
+
+        
+        for speaker in self.audio.get_speakers() or ():
+            speakers.value.add(speaker)
+        for microphone in self.audio.get_microphones() or ():
+            microphones.value.add(microphone)
+        for stream in self.audio.get_streams() or ():
+            streams.value.add(stream)
+        for recorder in self.audio.get_recorders() or ():
+            recorders.value.add(recorder)
