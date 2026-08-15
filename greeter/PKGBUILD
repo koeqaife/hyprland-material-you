@@ -1,8 +1,8 @@
 # Maintainer: Koeqaife
 
 pkgname=hypryou-greeter
-pkgver=1.0.1
-pkgrel=4
+pkgver=1.0.2
+pkgrel=1
 pkgdesc="Greetd config for hypryou greeter"
 arch=('any')
 license=('custom')

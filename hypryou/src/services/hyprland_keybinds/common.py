@@ -14,7 +14,7 @@ class Category(str, Enum):
 @dataclass
 class KeyBind:
     bind: tuple[str, ...]
-    action: tuple[str, ...] | str
+    action: str
     description: str | None = None
     category: Category | None = None
 

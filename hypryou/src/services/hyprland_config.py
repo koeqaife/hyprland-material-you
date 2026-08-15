@@ -12,7 +12,7 @@ from config import config_dir, Settings, SettingsView
 import os
 import typing as t
 
-generated_config = os.path.join(config_dir, "hyprland_generated.conf")
+generated_config = os.path.join(config_dir, "hyprland_generated.lua")
 keybind_overrides = Ref[dict[str, KeyBindOverride]](
     {}, name="keybind_overrides",
     delayed_init=True
@@ -24,33 +24,8 @@ noanim_layers = [
     "hypryou-wallpapers.*"
 ]
 
-BLUR = """
-decoration {{
-    blur {{
-        enabled = true
-        xray = {xray}
-        size = {size}
-        passes = {passes}
-        noise = {noise}
-        contrast = {contrast}
-        vibrancy_darkness = {vibrancy_darkness}
-        vibrancy = {vibrancy}
-    }}
-}}
-"""
-
-SHADOW = """decoration {{
-    shadow {{
-        enabled = true
-        range = {range}
-        render_power = {render_power}
-        color = 0x{color}
-        offset = {offset_x}, {offset_y}
-        scale = {scale}
-    }}
-}}
-"""
-
+type SerializableType = str | bool | int | float | tuple | list
+type HyprlandConfig = dict[str, SerializableType | HyprlandConfig]
 
 type HyprlandConfigGroupKeys = list[str | tuple[str, str]]
 
@@ -108,14 +83,51 @@ input_touchpad_keys = t.cast(HyprlandConfigGroup, {
     ]
 })
 
+current_config: HyprlandConfig = {}
+
+
+def get_category(config: HyprlandConfig, name: str) -> HyprlandConfig:
+    if category := config.get(name):
+        if isinstance(category) == "dict":
+            return category
+        else:
+            raise TypeError("Key already exists and it's not dict!")
+
+    new_dict = {}
+    config[name] = new_dict
+    return new_dict
+
+
+def set_key(
+    config: HyprlandConfig,
+    key: str,
+    value: SerializableType
+) -> None:
+    if not isinstance(key, str):
+        raise TypeError("Key must be str!")
+    if not isinstance(value, (str, bool, int, float)):
+        raise TypeError("Bad type of value! Got:" + type(value).__name__)
+
+    if isinstance(key, str) and len(key.strip()) == 0:
+        return
+
+    if (
+        old_value := config.get(key)
+        and not isinstance(old_value, type(value))
+    ):
+        raise TypeError(
+            "Type mismatch in existing key. " +
+            f"{type(old_value)} != {type(value)}"
+        )
+
+    config[key] = value
+
 
 def generate_keys(
     keys: HyprlandConfigGroupKeys,
     settings: SettingsView | Settings,
-    transform_fn: t.Callable[[t.Any], str] | None = None,
-    prefix: str = ""
+    config: HyprlandConfig
 ) -> str:
-    output = ""
     for _value in keys:
         if isinstance(_value, tuple):
             key, replace = _value
@@ -123,10 +135,7 @@ def generate_keys(
             key, replace = _value, _value
 
         value = settings.get(key)
-        transformed = transform_fn(value) if transform_fn else value
-        if transformed is not None:
-            output += f"{prefix}{replace} = {transformed}\n"
-    return output
+        set_key(config, replace, value)
 
 
 def bool_convert(value: t.Any) -> str:
@@ -134,24 +143,19 @@ def bool_convert(value: t.Any) -> str:
 
 
 def generate_input() -> str:
-    indent = "    "
     settings = Settings().get_view_for("input")
     if not settings.get("enabled"):
-        return "# Disabled by settings"
+        return "-- Disabled by settings"
 
-    output = "\n"
-    output += generate_keys(
-        input_keys["str"], settings,
-        prefix=indent
+    input_category = get_category(current_config, "input")
+    generate_keys(
+        input_keys["str"], settings, input_category
     )
-    output += generate_keys(
-        input_keys["bool"], settings,
-        transform_fn=bool_convert,
-        prefix=indent
+    generate_keys(
+        input_keys["bool"], settings, input_category
     )
-    output += generate_keys(
-        input_keys["digit"], settings,
-        prefix=indent
+    generate_keys(
+        input_keys["digit"], settings, input_category
     )
 
     options = str(settings.get("kb_options")).strip()
@@ -161,115 +165,153 @@ def generate_input() -> str:
             options += f", {change_layout}"
         else:
             options = change_layout
-    output += f"{indent}kb_options = {options}\n"
+
+    set_key(input_category, "kb_options", options)
 
     touchpad_settings = settings.get_view_for("touchpad")
     if touchpad_settings.get("enabled"):
-        indent2 = indent * 2
-        output2 = ""
-        output2 += generate_keys(
+        touchpad_category = get_category(input_category, "touchpad")
+        generate_keys(
             input_touchpad_keys["str"], touchpad_settings,
-            prefix=indent2
+            touchpad_category
         )
-        output2 += generate_keys(
+        generate_keys(
             input_touchpad_keys["bool"], touchpad_settings,
-            transform_fn=bool_convert,
-            prefix=indent2
+            touchpad_category
         )
-        output2 += generate_keys(
+        generate_keys(
             input_touchpad_keys["digit"], touchpad_settings,
-            prefix=indent2
+            touchpad_category
         )
-        output += f"{indent}touchpad {{\n{output2}{indent}}}\n"
-    else:
-        output += f"{indent}# Touchpad settings disabled by settings\n"
-
-    return f"input {{{output}}}\n"
 
 
 def generate_monitors() -> str:
-    output = ""
+    output = '\n'
     monitors: list[dict[str, str]] = Settings().get("monitors")
-    if len(monitors) == 0:
-        output += "monitor = , preferred, auto, 1\n"
-    else:
+    if len(monitors) != 0:
         for monitor in monitors:
-            if isinstance(monitor, str):
-                output += f"monitor = {monitor}\n"
-                continue
             if not isinstance(monitor, dict):
                 continue
 
-            output += "monitorv2 {\n"
+            output += "hl.monitor({\n"
             for key, value in monitor.items():
                 if not value:
                     continue
-                output += f"    {key} = {value}\n"
-            output += "}\n"
+                output += f"    {key} = {serialize_value(value)}\n"
+            output += ")}\n"
     return output
 
 
-def generate_blur() -> str:
+def make_layer_rule(namespace: str, key: str, value: SerializableType) -> str:
+    indent = " " * 4
+    output = "hl.layer_rule({\n"
+    output += f"{indent}match = {{ namespace = \"{namespace}\" }},\n"
+    output += f"{indent}{key} = {serialize_value(value)}"
+    output += "})\n"
+    return output
+
+
+def generate_blur() -> str | None:
     settings = Settings().get_view_for("blur")
     if not settings.get("enabled"):
-        output = "# Blur is disabled by settings \n"
-        output += "decoration {\n"
-        output += "    blur {\n"
-        output += "        enabled = false\n"
-        output += "    }\n}\n"
-        return output
+        return
 
     xray = settings.get("xray")
 
     output = (
-        "layerrule = match:namespace hypryou-.*, blur on",
-        "layerrule = match:namespace hypryou-.*, xray " +
-        ("on" if xray else "off"),
-        "layerrule = match:namespace hypryou-.*, ignore_alpha 0.85",
-        BLUR.format(
-            xray="true" if xray else "false",
-            size=settings.get("size"),
-            passes=settings.get("passes"),
-            noise=settings.get("noise"),
-            contrast=settings.get("contrast"),
-            vibrancy_darkness=settings.get("vibrancy_darkness"),
-            vibrancy=settings.get("vibrancy"),
-        )
+        make_layer_rule("hypryou-.*", "blur", True),
+        make_layer_rule("hypryou-.*", "xray", True),
+        make_layer_rule("hypryou-.*", "ignore_alpha", 0.85)
     )
+    blur_category = get_category(
+        get_category(current_config, "decoration"),
+        "blur"
+    )
+    set_key(blur_category, "xray", xray)
+    set_key(blur_category, "size", settings.get("size"))
+    set_key(blur_category, "passes", settings.get("passes"))
+    set_key(blur_category, "noise", settings.get("noise"))
+    set_key(blur_category, "contrast", settings.get("contrast"))
+    set_key(blur_category, "vibrancy_darkness", settings.get("vibrancy_darkness"))
+    set_key(blur_category, "vibrancy", settings.get("vibrancy"))
+
     return "\n".join(output)
 
 
-def generate_shadow() -> str:
+def serialize_value(value: SerializableType) -> str | None:
+    if isinstance(value, (int, float)):
+        return f"{value}"
+    if isinstance(value, str):
+        return f"\"{value}\""
+    if isinstance(value, bool):
+        return bool_convert(value)
+
+    if isinstance(value, (list, tuple)):
+        output = []
+        for element in value:
+            serialized = serialize_value(element)
+            if serialized is not None:
+                output.append(serialized)
+        return "{" + ", ".join(output) + "}"
+
+    return None
+
+
+def generate_insides_config(
+    config: HyprlandConfig,
+    indent: str
+) -> str:
+    output = ""
+    for key, value in current_config.items():
+        if isinstance(value, dict):
+            output += f"{indent}{key} = " + "{\n"
+            output += generate_insides_config(config, indent * 2)
+            output += f"{indent}" + "},\n"
+
+        value = serialize_value(value)
+        if not value:
+            continue
+        
+        output += f"{indent}{key} = {value},\n"
+
+    return output
+
+def generate_config() -> str:
+    indent = " " * 4
+    output = generate_insides_config(current_config, indent)
+    
+    return f"hl.config({{\n{output}\n}})\n"
+
+
+def generate_shadow() -> None:
     settings = Settings().get_view_for("shadow")
     if not settings.get("enabled"):
-        output = "# Shadow are disabled by settings \n"
-        output += "decoration {\n"
-        output += "    shadow {\n"
-        output += "        enabled = false\n"
-        output += "    }\n}\n"
-        return output
+        return
 
-    return SHADOW.format(
-        range=settings.get("range"),
-        render_power=settings.get("render_power"),
-        color=settings.get("color"),
-        offset_x=settings.get("offset_x"),
-        offset_y=settings.get("offset_y"),
-        scale=settings.get("scale"),
+    shadow_category = get_category(
+        get_category(current_config, "decoration"),
+        "blur"
     )
+    set_key(shadow_category, "range", settings.get("range"))
+    set_key(shadow_category, "render_power", settings.get("render_power"))
+    set_key(shadow_category, "color", f"0x{settings.get("color")}")
+    set_key(
+        shadow_category, "offset",
+        (settings.get("offset_x"), settings.get("offset_y"))
+    )
+    set_key(shadow_category, "scale", settings.get("scale"))
 
 
-def generate_opacity() -> str:
+def generate_opacity() -> None:
     settings = Settings().get_view_for("opacity")
-    output = "decoration {\n"
+    decoration_category = get_category(current_config, "decoration")
     for key in ("active", "inactive", "fullscreen"):
-        output += f"    {key}_opacity = {settings.get(key)}\n"
-    return output + "}\n"
+        set_key(decoration_category, f"{key}_opacity", settings.get(key))
 
 
 def generate_noanim() -> str:
     return "\n".join(
-        f"layerrule = match:namespace {layer}, no_anim on"
+        make_layer_rule(layer, "no_anim", True)
         for layer in noanim_layers
     ) + "\n"
 
@@ -280,8 +322,8 @@ def generate_cursor_settings() -> str:
     cursor_size = settings.get("cursor.size")
 
     return (
-        f"env = XCURSOR_SIZE,{cursor_size}\n" +
-        f"exec-once = hyprctl setcursor {cursor} {cursor_size}\n"
+        f"hl.env(\"XCURSOR_SIZE\", {cursor_size})\n" +
+        f"hl.exec_cmd(\"hyprctl setcursor {cursor} {cursor_size}\")\n"
     )
 
 
@@ -329,28 +371,15 @@ def generate_binds() -> str:
             continue
 
         key = bind.bind
-        action = bind.action
+        action_str = bind.action
         if bind.id in keybind_overrides.value.keys():
             override = keybind_overrides.value[bind.id]
             if override.bind:
                 key = override.bind
             if override.action:
-                action = override.action
+                action_str = override.action
 
-        if len(key) == 2:
-            key_str = ", ".join(key)
-        elif len(key) == 3:
-            key_str = f"{key[0]} {key[1]}, {key[2]}"
-        elif len(key) == 1:
-            key_str = f",{key[0]}"
-        else:
-            logger.warning(f"Bind {bind} has wrong length of bind")
-            continue
-
-        if isinstance(action, tuple):
-            action_str = ", ".join(action)
-        else:
-            action_str = action
+        key_str = serialize_value(" + ".join(key))
 
         if "%N%" in key_str:
             for k in range(0, 10):
@@ -358,13 +387,13 @@ def generate_binds() -> str:
                 _key = key_str.replace("%N%", str(k))
                 _action = action_str.replace("%N%", str(n))
                 bind_str = f"{_key}, {_action}"
-                output += f"bind = {bind_str}\n"
+                output += f"hl.bind({bind_str})\n"
         else:
             bind_str = f"{key_str}, {action_str}"
             if "mouse" in key_str:
-                output += f"bindm = {bind_str}\n"
+                output += f"hl.bind({bind_str}, {{ mouse = true }})\n"
             else:
-                output += f"bind = {bind_str}\n"
+                output += f"hl.bind({bind_str})\n"
 
     return output
 
@@ -386,49 +415,44 @@ def generate_env() -> str:
         }
     else:
         output += "# Apps env vars were disabled by settings\n"
-    lines = [f"env = {key}, {value}" for key, value in env_vars.items()]
+    lines = [f"hl.env({key}, {value})" for key, value in env_vars.items()]
     if len(lines) > 0:
         output += "\n".join(lines) + "\n"
     return output
 
 
-def generate_general() -> str:
+def generate_general() -> None:
     settings = Settings().get_view_for("hyprland")
     snap = settings.get_view_for("snap")
 
-    output = ""
+    general = get_category(current_config, "general")
     for key in ("gaps_in", "gaps_out", "border_size", "layout"):
-        output += f"    {key} = {settings.get(key)}\n"
+        set_key(general, key, settings.get(key))
 
-    snap_output = ""
+    snap = get_category(general, "snap")
     for key in ("enabled", "window_gap", "monitor_gap",
                 "border_overlap", "respect_gaps"):
         _value = snap.get(key)
         value = str(_value).lower() if isinstance(_value, bool) else _value
-        snap_output += f"        {key} = {value}\n"
+        set_key(snap, key, value)
         if key == "enabled" and not _value:
             break
-    output += f"    snap {{\n{snap_output}    }}\n"
-
-    return f"general {{\n{output}}}\n"
 
 
-def generate_misc() -> str:
+def generate_misc() -> None:
     settings = Settings().get_view_for("hyprland.misc")
-    output = ""
+    misc = get_category(current_config, "misc")
     for key in ("vrr", "middle_click_paste"):
         _value = settings.get(key)
         value = str(_value).lower() if isinstance(_value, bool) else _value
-        output += f"   {key} = {value}\n"
-    return f"misc {{\n{output}}}\n"
+        set_key(misc, key, value)
 
 
-def generate_decoration() -> str:
+def generate_decoration() -> None:
     settings = Settings().get_view_for("hyprland.decoration")
-    output = ""
+    decoration = get_category(current_config, "decoration")
     for key in ("rounding", "rounding_power"):
-        output += f"   {key} = {settings.get(key)}\n"
-    return f"decoration {{\n{output}}}\n"
+        set_key(decoration, key, settings.get(key))
 
 
 funcs = (
@@ -443,16 +467,18 @@ funcs = (
     generate_decoration,
     generate_misc,
     generate_shadow,
-    generate_opacity
+    generate_opacity,
+    generate_config
 )
 
 
 def generate_config() -> None:
     output = "# DO NOT CHANGE THIS FILE, CHECK HYPRYOU SETTINGS\n"
     output += "# FOR CUSTOM CONFIG USE hyprland.conf\n\n"
-    output += "\n".join(
-        f"# -- {func.__name__} --\n{func()}" for func in funcs
-    )
+    for func in funcs:
+        func_output = func()
+        if func_output:
+            output += f"# -- {func.__name__} --\n{func_output}\n"
 
     try:
         with open(generated_config, "r") as f:

@@ -2,4 +2,4 @@
 vt = 1
 
 [default_session]
-command = "start-hyprland -- --config /usr/share/hypryou/greeter/hyprland.conf"
+command = "start-hyprland -- --config /usr/share/hypryou/greeter/hyprland.lua"
