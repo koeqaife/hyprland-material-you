@@ -271,17 +271,17 @@ class CliRequest:
         if not workspace_id.isdigit():
             return "Wrong workspace ID"
         if not Settings().get("separated_workspaces"):
-            asyncio.create_task(
-                hyprland.client.dispatch(
-                    f"move({{ workspace = {workspace_id}, follow = true }})"
-                )
-            )
+            asyncio.create_task(hyprland.client.dispatch(
+                "window.move" +
+                f"({{ workspace = {workspace_id}, follow = true }})"
+            ))
         else:
             active_monitor = hyprland.active_monitor_id.value
             _workspace_id = int(workspace_id) + (10 * active_monitor)
             asyncio.create_task(
                 hyprland.client.dispatch(
-                    f"move({{ workspace = {_workspace_id}, follow = true }})"
+                    "window.move" +
+                    f"({{ workspace = {_workspace_id}, follow = true }})"
                 )
             )
         return "ok"
@@ -290,19 +290,17 @@ class CliRequest:
         if not workspace_id.isdigit():
             return "Wrong workspace ID"
         if not Settings().get("separated_workspaces"):
-            asyncio.create_task(
-                hyprland.client.dispatch(
-                    f"move({{ workspace = {workspace_id}, follow = false }})"
-                )
-            )
+            asyncio.create_task(hyprland.client.dispatch(
+                "window.move" +
+                f"({{ workspace = {workspace_id}, follow = false }})"
+            ))
         else:
             active_monitor = hyprland.active_monitor_id.value
             _workspace_id = int(workspace_id) + (10 * active_monitor)
-            asyncio.create_task(
-                hyprland.client.dispatch(
-                    f"move({{ workspace = {_workspace_id}, follow = false }})"
-                )
-            )
+            asyncio.create_task(hyprland.client.dispatch(
+                "window.move" +
+                f"({{ workspace = {_workspace_id}, follow = false }})"
+            ))
         return "ok"
 
 
