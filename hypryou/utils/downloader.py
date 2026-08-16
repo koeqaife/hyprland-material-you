@@ -1,3 +1,4 @@
+import hashlib
 import os
 from pathlib import Path
 import typing as t
@@ -43,8 +44,8 @@ def guess_image_extension(filepath: str) -> str | None:
 
 
 def get_cache_dir(url: str, subdir: str) -> str:
-    name = os.path.basename(url).replace("/", "_")
-    return os.path.join(APP_CACHE_DIR, subdir, name)
+    key = hashlib.sha256(url.encode("utf-8")).hexdigest()
+    return os.path.join(APP_CACHE_DIR, subdir, key)
 
 
 def resize_image(
