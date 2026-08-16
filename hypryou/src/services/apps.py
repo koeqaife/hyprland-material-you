@@ -35,7 +35,7 @@ def launch_detached(exec: str) -> None:
         logger.debug("Running %s", exec)
 
     asyncio.create_task(
-        hyprland.client.raw(f"dispatch exec {exec}")
+        hyprland.client.exec(exec)
     )
 
 

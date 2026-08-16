@@ -46,7 +46,11 @@ class WorkspaceButton(gtk.Button):
         self.connected = self.connect("clicked", self.on_clicked)
 
     def on_clicked(self, *args: t.Any) -> None:
-        asyncio.create_task(hyprland.client.dispatch(f"workspace {self.id}"))
+        asyncio.create_task(
+            hyprland.client.dispatch(
+                f"focus({{ workspace = {self.id} }})"
+            )
+        )
 
     def destroy(self) -> None:
         self.disconnect(self.connected)
@@ -158,7 +162,9 @@ class Workspaces(gtk.Box):
             self._last_scroll = now
             action = "+1" if dy < 0 else "-1"
             asyncio.create_task(
-                hyprland.client.dispatch(f"workspace {action}")
+                hyprland.client.dispatch(
+                    f"focus({{ workspace = {action} }})"
+                )
             )
 
     def update_active(
@@ -1080,7 +1086,8 @@ class NetworkTraffic(gtk.Box):
                 lines = f.readlines()[2:]
                 for line in lines:
                     data = line.split()
-                    if data[0].strip(":") == "lo": continue
+                    if data[0].strip(":") == "lo":
+                        continue
                     rx += int(data[1])
                     tx += int(data[9])
         except Exception:

@@ -394,15 +394,21 @@ class HyprlandClient(Signals):
         await writer.wait_closed()
         return data.decode().strip()
 
+    async def dispatch(self, subcommand: str) -> str:
+        return await self.raw(f"dispatch 'hl.dsp.{subcommand}'")
+
+    async def dpms(self, value: t.Literal["toggle", "on", "off"]) -> str:
+        return await self.dispatch(f"dpms({{action = {value}}})")
+
+    async def exec(self, to_exec: str) -> str:
+        return await self.dispatch(f"exec_cmd(\"{to_exec}\")")
+
     async def query(self, command: HyprlandQueryType | str) -> t.Any:
         raw_result = await self.raw(f"j/{command}")
         try:
             return json.loads(raw_result)
         except json.JSONDecodeError:
             return raw_result
-
-    async def dispatch(self, subcommand: str) -> str:
-        return await self.raw(f"dispatch {subcommand}")
 
 
 client: HyprlandClient
@@ -774,7 +780,6 @@ class HyprlandService(AsyncService):
         await init()
 
     async def start(self) -> None:
-        global client
         if __debug__:
             logger.debug("Connecting to hyprland")
         await client.connect()

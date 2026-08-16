@@ -438,8 +438,9 @@ class SettingsWatcher:
     def on_open(self) -> None:
         ws = hyprland.active_workspace.value
         asyncio.create_task(
-            hyprland.client.raw(
-                f"dispatch movetoworkspace {ws},title:HyprYou Settings"
+            hyprland.client.dispatch(
+                f"move({{ workspace = {ws}, " +
+                "window = \"title:HyprYou Settings\" }})"
             )
         )
 

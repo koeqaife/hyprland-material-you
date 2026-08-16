@@ -4,6 +4,18 @@ from enum import Enum
 main_mod = "SUPER"
 
 
+def serialize_string(string: str) -> str:
+    return string.replace("\"", '\\"')
+
+
+def make_exec(exec: str) -> str:
+    return f"hl.dsp.exec_cmd(\"{serialize_string(exec)}\")"
+
+
+def make_dispatch(string: str) -> str:
+    return f"hl.dsp.{string}"
+
+
 class Category(str, Enum):
     ACTIONS = "Actions"
     TOOLS = "Tools"
@@ -27,7 +39,7 @@ class KeyBind:
 class KeyBindOverride:
     id: str
     bind: tuple[str, ...] | None
-    action: tuple[str, ...] | str | None
+    action: str | None
 
 
 @dataclass

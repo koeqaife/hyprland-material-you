@@ -82,7 +82,7 @@ def get_sessions() -> list[SessionDict]:
 
 def on_lid_closed(is_closed: bool) -> None:
     asyncio.create_task(
-        hyprland.client.raw(f"dispatch dpms {"off" if is_closed else "on"}")
+        hyprland.client.dpms("off" if is_closed else "on")
     )
 
 

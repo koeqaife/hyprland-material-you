@@ -126,14 +126,14 @@ class ScreenSaver:
             if __debug__:
                 logger.debug("Is inhibited!")
             return
-        asyncio.create_task(hyprland.client.raw("dispatch dpms off"))
+        asyncio.create_task(hyprland.client.dpms("off"))
 
     def dpms_on(self, *args: t.Any) -> None:
         if __debug__:
             logger.debug(
                 "Idle: Turning on screen"
             )
-        asyncio.create_task(hyprland.client.raw("dispatch dpms on"))
+        asyncio.create_task(hyprland.client.dpms("on"))
 
     def on_lock(self, *args: t.Any) -> None:
         if __debug__:

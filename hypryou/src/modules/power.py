@@ -87,7 +87,7 @@ class PowerMenu(gtk.Box):
         if Settings().get("secure_cliphist"):
             cliphist.secure_clear()
         asyncio.create_task(
-            hyprland.client.raw("dispatch exit")
+            hyprland.client.dispatch("exit()")
         )
 
     def on_restart(self, *args: t.Any) -> None:

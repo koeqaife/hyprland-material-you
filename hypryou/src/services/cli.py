@@ -53,7 +53,7 @@ screenshot_watcher: "ScreenshotWatcher | None" = None
 
 def launch_detached(exec: str) -> None:
     asyncio.create_task(
-        hyprland.client.raw(f"dispatch exec {exec}")
+        hyprland.client.exec(exec)
     )
 
 
@@ -253,13 +253,17 @@ class CliRequest:
             return "Wrong workspace ID"
         if not Settings().get("separated_workspaces"):
             asyncio.create_task(
-                hyprland.client.raw(f"dispatch workspace {workspace_id}")
+                hyprland.client.dispatch(
+                    f"focus({{ workspace = {workspace_id} }})"
+                )
             )
         else:
             active_monitor = hyprland.active_monitor_id.value
             _workspace_id = int(workspace_id) + (10 * active_monitor)
             asyncio.create_task(
-                hyprland.client.raw(f"dispatch workspace {_workspace_id}")
+                hyprland.client.dispatch(
+                    f"focus({{ workspace = {_workspace_id} }})"
+                )
             )
         return "ok"
 
@@ -268,14 +272,16 @@ class CliRequest:
             return "Wrong workspace ID"
         if not Settings().get("separated_workspaces"):
             asyncio.create_task(
-                hyprland.client.raw(f"dispatch movetoworkspace {workspace_id}")
+                hyprland.client.dispatch(
+                    f"move({{ workspace = {workspace_id}, follow = true }})"
+                )
             )
         else:
             active_monitor = hyprland.active_monitor_id.value
             _workspace_id = int(workspace_id) + (10 * active_monitor)
             asyncio.create_task(
-                hyprland.client.raw(
-                    f"dispatch movetoworkspace {_workspace_id}"
+                hyprland.client.dispatch(
+                    f"move({{ workspace = {_workspace_id}, follow = true }})"
                 )
             )
         return "ok"
@@ -285,16 +291,16 @@ class CliRequest:
             return "Wrong workspace ID"
         if not Settings().get("separated_workspaces"):
             asyncio.create_task(
-                hyprland.client.raw(
-                    f"dispatch movetoworkspacesilent {workspace_id}"
+                hyprland.client.dispatch(
+                    f"move({{ workspace = {workspace_id}, follow = false }})"
                 )
             )
         else:
             active_monitor = hyprland.active_monitor_id.value
             _workspace_id = int(workspace_id) + (10 * active_monitor)
             asyncio.create_task(
-                hyprland.client.raw(
-                    f"dispatch movetoworkspacesilent {_workspace_id}"
+                hyprland.client.dispatch(
+                    f"move({{ workspace = {_workspace_id}, follow = false }})"
                 )
             )
         return "ok"

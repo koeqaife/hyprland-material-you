@@ -340,7 +340,7 @@ def on_settings_changed(key: str, value: t.Any) -> None:
 def on_lid_closed(is_closed: bool) -> None:
     if not is_closed:
         asyncio.create_task(
-            hyprland.client.raw("dispatch dpms on")
+            hyprland.client.dpms("on")
         )
         return
 
@@ -367,7 +367,7 @@ def on_lid_closed(is_closed: bool) -> None:
             logger.debug("Turning off displays")
         is_locked.value = True
         asyncio.create_task(
-            hyprland.client.raw("dispatch dpms off")
+            hyprland.client.dpms("off")
         )
 
 

@@ -1,61 +1,64 @@
-from src.services.hyprland_keybinds.common import KeyBind, main_mod, Category
+from src.services.hyprland_keybinds.common import (
+    KeyBind, main_mod, Category,
+    make_exec
+)
 
 key_binds = (
     KeyBind(
         (main_mod, "Z"),
-        ("exec", "hypryouctl toggle_window players"),
+        make_exec("hypryouctl toggle_window players"),
         "Players",
         Category.TOOLS
     ),
     KeyBind(
         (main_mod, "period"),
-        ("exec", "hypryouctl open_window emojis"),
+        make_exec("hypryouctl open_window emojis"),
         "Emoji picker",
         Category.TOOLS
     ),
     KeyBind(
         (main_mod, "CTRL", "C"),
-        ("exec", "hypryouctl toggle_window cliphist"),
+        make_exec("hypryouctl toggle_window cliphist"),
     ),
     KeyBind(
         (main_mod, "V"),
-        ("exec", "hypryouctl toggle_window cliphist"),
+        make_exec("hypryouctl toggle_window cliphist"),
         "Clipboard history",
         Category.TOOLS
     ),
     KeyBind(
         (main_mod, "SLASH"),
-        ("exec", "hypryouctl toggle_window keybindings"),
+        make_exec("hypryouctl toggle_window keybindings"),
         "List of keybindings",
         Category.TOOLS
     ),
     KeyBind(
         (main_mod, "CTRL", "W"),
-        ("exec", "hypryouctl settings wallpaper"),
+        make_exec("hypryouctl settings wallpaper"),
         "Open wallpaper settings",
         Category.TOOLS
     ),
     KeyBind(
         (main_mod, "SPACE"),
-        ("exec", "hypryouctl toggle_window apps_menu"),
+        make_exec("hypryouctl toggle_window apps_menu"),
         "App Launcher",
         Category.TOOLS
     ),
     KeyBind(
         (main_mod, "W"),
-        ("exec", "hypryouctl toggle_window sidebar"),
+        make_exec("hypryouctl toggle_window sidebar"),
         "Sidebar",
         Category.TOOLS
     ),
     KeyBind(
         (main_mod, "A"),
-        ("exec", "hypryouctl toggle_window clients"),
+        make_exec("hypryouctl toggle_window clients"),
         "Opened windows",
         Category.TOOLS
     ),
     KeyBind(
         (main_mod, "D"),
-        ("exec", "hypryouctl settings"),
+        make_exec("hypryouctl settings"),
         "Open settings",
         Category.TOOLS
     )

@@ -2,12 +2,12 @@ local mainMod = "SUPER"
 
 hl.bind(
     mainMod .. " + mouse_down",
-    hl.dsp.workspace({ workspace = "e+1" })
+    hl.dsp.focus({ workspace = "e+1" })
 )
 
 hl.bind(
     mainMod .. " + mouse_up",
-    hl.dsp.workspace({ workspace = "e-1" })
+    hl.dsp.focus({ workspace = "e+1" })
 )
 
 hl.bind(

@@ -74,8 +74,8 @@ class ClientItem(gtk.Box):
         button_number = gesture.get_current_button()
         if button_number == gdk.BUTTON_PRIMARY:
             asyncio.create_task(
-                hyprland.client.raw(
-                    f"dispatch focuswindow address:{self._item.address}"
+                hyprland.client.dispatch(
+                    f"focus({{ window = \"address:{self._item.address}\" }})"
                 )
             )
         elif button_number == gdk.BUTTON_SECONDARY:
