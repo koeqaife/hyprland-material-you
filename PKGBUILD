@@ -27,7 +27,7 @@ depends=(
   'python-pam'
   'gtk4'
   'libgirepository'
-  'hyprland>=0.53.0'
+  'hyprland>=0.56.2'
   'dbus'
   'dbus-glib'
   'python-pyvips'
