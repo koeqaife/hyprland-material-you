@@ -1,6 +1,6 @@
 from utils.format import capitalize_first
 from utils.logger import logger
-from repository import gtk, layer_shell, gdk, glib
+from repository import gtk, layer_shell, gdk, glib, pango
 from src.services.system_tray import StatusNotifierItem, items
 import weakref
 import typing as t
@@ -58,7 +58,9 @@ class TrayItem(gtk.Box):
         self.children = (
             self.image_overlay,
             gtk.Label(
-                css_classes=("app-label",)
+                css_classes=("app-label",),
+                ellipsize=pango.EllipsizeMode.END,
+                max_width_chars=16
             ),
             btn_box
         )
@@ -142,6 +144,10 @@ class TrayItem(gtk.Box):
 
     def update_label(self) -> None:
         name = self._item.get_name() or "unknown"
+
+        if len(name) > 16:
+            name = self._item.id  # Id is usually shorter
+
         label = capitalize_first(name)
         self.children[1].set_label(label)
 
