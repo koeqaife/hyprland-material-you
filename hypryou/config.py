@@ -17,6 +17,8 @@ ORIGINAL_DIR = "/usr/lib/hypryou"
 TEMP_DIR = f"/tmp/hypryou-{os.getenv("USER", "unknown")}"
 ASSETS_DIR = "/usr/share/hypryou"
 
+SETTINGS_VERSION = 1
+
 color_templates = pjoin(APP_CACHE_DIR, "colors")
 styles_output = pjoin(APP_CACHE_DIR, "style.css")
 scss_variables = pjoin(TEMP_DIR, "_variables.scss")
@@ -267,6 +269,12 @@ class Settings:
         self._values[key] = ref
 
     def _update_values(self, new: dict[str, t.Any]) -> None:
+        version = new.pop("__version__", 0)
+
+        if version == 0:
+            # Resetting overrides due to new hyprland syntax
+            new.pop("keybinds_overrides", None)
+
         for key, value in new.items():
             if key not in default_settings.keys():
                 continue
@@ -285,6 +293,7 @@ class Settings:
         if not self._allow_saving:
             return
         new_dict = self.unpack()
+        new_dict["__version__"] = SETTINGS_VERSION
         if new_dict != self._file_dict:
             with open(settings_path, 'w') as f:
                 self._file_dict = new_dict
