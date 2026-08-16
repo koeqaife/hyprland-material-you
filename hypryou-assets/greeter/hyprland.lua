@@ -37,6 +37,6 @@ hl.on("hyprland.start", function ()
 
     hl.exec_cmd(
         "bash -c 'python -O /usr/lib/hypryou/greeter_ui.py; "
-        .. "hyprctl dispatch exit'"
+        .. "hyprctl dispatch hl.dsp.exit()'"
     )
 end)
