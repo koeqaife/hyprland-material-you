@@ -132,7 +132,6 @@ def generate_keys(
             key, replace = _value, _value
 
         value = settings.get(key)
-        print(key, replace)
         set_key(config, replace, value)
 
 
@@ -183,6 +182,19 @@ def generate_input() -> str:
         )
 
 
+def text_to_bool(value: str) -> bool:
+    if value == "0":
+        return False
+    if value == "1":
+        return True
+    if value.lower() == "true":
+        return True
+    if value.lower() == "false":
+        return False
+
+    return bool(value)
+
+
 def generate_monitors() -> str:
     output = '\n'
     monitors: list[dict[str, str]] = Settings().get("monitors")
@@ -198,7 +210,7 @@ def generate_monitors() -> str:
                 if key == "vrr":
                     value = int(value)
                 if key == "disabled":
-                    value = bool(value)
+                    value = text_to_bool(value)
                 if key == "bitdepth":
                     value = int(value)
                 output += f"    {key} = {serialize_value(value)},\n"
@@ -299,7 +311,7 @@ def generate_shadow() -> None:
 
     shadow_category = get_category(
         get_category(current_config, "decoration"),
-        "blur"
+        "shadow"
     )
     set_key(shadow_category, "range", settings.get("range"))
     set_key(shadow_category, "render_power", settings.get("render_power"))
@@ -484,7 +496,7 @@ funcs = (
 )
 
 
-def generate_config() -> None:
+def generate_config(reload: bool = False) -> None:
     global current_config
     current_config = {}
 
@@ -505,10 +517,15 @@ def generate_config() -> None:
         with open(generated_config, "w") as f:
             f.write(output)
 
+    if reload:
+        asyncio.create_task(
+            hyprland.client.raw("reload")
+        )
+
 
 @sync_debounce(100)
 def on_settings_changed(key: str, value: str) -> None:
-    generate_config()
+    generate_config(True)
 
 
 def keybind_overrides_changed(value: KeybindOverridesRaw) -> None:
@@ -525,7 +542,7 @@ class HyprlandConfigService(Service):
         settings.watch("keybinds_overrides", keybind_overrides_changed, False)
         keybind_overrides_changed(settings.get("keybinds_overrides"))
         keybind_overrides.ready()
-        generate_config()
+        generate_config(True)
 
     async def check_errors(self) -> None:
         await asyncio.sleep(2.5)

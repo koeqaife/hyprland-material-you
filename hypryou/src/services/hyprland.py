@@ -392,10 +392,11 @@ class HyprlandClient(Signals):
 
         writer.close()
         await writer.wait_closed()
-        return data.decode().strip()
+        data = data.decode().strip()
+        return data
 
     async def dispatch(self, subcommand: str) -> str:
-        return await self.raw(f"dispatch 'hl.dsp.{subcommand}'")
+        return await self.raw(f"dispatch hl.dsp.{subcommand}")
 
     async def dpms(self, value: t.Literal["toggle", "on", "off"]) -> str:
         return await self.dispatch(f"dpms({{action = {value}}})")

@@ -18,10 +18,6 @@ key_binds = (
         make_exec("hypryouctl player previous")
     ),
     KeyBind(
-        ("XF86Lock"),
-        make_exec("hypryouctl lock")
-    ),
-    KeyBind(
         ("XF86Tools"),
         make_exec("hypryouctl settings")
     ),
