@@ -65,7 +65,9 @@ class Application:
             increase_frequency(self.entry)
         if self.exec is not None:
             if self.is_terminal:
-                launch_detached(f"{Settings().get("apps.terminal")} -e {self.exec}")
+                launch_detached(
+                    f"{Settings().get("apps.terminal")} -e {self.exec}"
+                )
             else:
                 launch_detached(self.exec)
 
