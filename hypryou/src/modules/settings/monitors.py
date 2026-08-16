@@ -22,6 +22,13 @@ from src.modules.settings.base import SwitchRow
 # Me in the future: O_O; WHAT THE HELLY I'VE DONE??!?!?!?
 
 
+def bool_to_digit_str(b: bool) -> str:
+    if isinstance(b, str):
+        return b
+
+    return "1" if b else "0"
+
+
 def check_position(value: str) -> bool:
     try:
         x, y = value.split("x")
@@ -523,30 +530,41 @@ class MonitorsPage(gtk.Box):
         self.bitdepth.entry_update_text(bitdepth)
 
     def update_vrr(self, monitor: MonitorDict) -> None:
-        vrr = self.get_setting("vrr", monitor) or ""
+        vrr = (
+            self.get_setting("vrr", monitor)
+            or bool_to_digit_str(monitor["vrr"])
+        )
         self.vrr.set_current(vrr)
 
     def update_mirror(self, monitor: MonitorDict) -> None:
-        mirror = self.get_setting("mirror", monitor) or ""
+        mirror = self.get_setting("mirror", monitor) or monitor["mirrorOf"]
         self.mirror.entry_update_text(mirror)
         self.mirror.entry.set_max_width_chars(
             min(max(map(len, self.monitors.keys())), 15)
         )
 
     def update_transform(self, monitor: MonitorDict) -> None:
-        transform = self.get_setting("transform", monitor) or "0"
+        transform = (
+            self.get_setting("transform", monitor)
+            or monitor["transform"]
+        )
         self.transform.set_current(transform)
 
     def update_color_management(self, monitor: MonitorDict) -> None:
-        cm = self.get_setting("cm", monitor) or "srgb"
+        cm = (
+            self.get_setting("cm", monitor)
+            or monitor["colorManagementPreset"]
+        )
         self.color_management.set_current(cm)
 
     def update_enabled(self, monitor: MonitorDict) -> None:
-        disabled = self.get_setting("disabled", monitor) or "0"
-        self.monitor_enabled.switch_set_active(disabled == "0")
+        disabled = self.get_setting("disabled", monitor)
+        if not disabled:
+            self.update_setting("disabled", "0")
+        self.monitor_enabled.switch_set_active((disabled or "0") == "0")
 
     def update_scale(self, monitor: MonitorDict) -> None:
-        scale = self.get_setting("scale", monitor) or "1"
+        scale = self.get_setting("scale", monitor) or str(monitor["scale"])
         self.scale.entry_update_text(str(int(float(scale) * 100)))
 
     def update_position(self, monitor: MonitorDict) -> None:
@@ -571,6 +589,8 @@ class MonitorsPage(gtk.Box):
             else:
                 self.mode_selector.set_current("custom")
                 self.custom_mode.entry_update_text(mode)
+        elif self.modes_items:
+            self.update_setting("mode", self.modes_items[0].value)
 
     def destroy(self) -> None:
         for child in self.children:
