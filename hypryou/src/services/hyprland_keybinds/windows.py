@@ -1,14 +1,14 @@
 from src.services.hyprland_keybinds.common import (
     KeyBind, main_mod, Category,
-    make_exec, make_dispatch
+    make_exec, make_dispatch, make_hyprctl_dispatch
 )
 
 key_binds = (
     KeyBind(
         (main_mod, "%N%"),
         make_exec(
-            "sh -c 'hypryouctl change_workspace %N% || " +
-            make_dispatch("focus({ workspace = %N% })")
+            "hypryouctl change_workspace %N% || " +
+            make_hyprctl_dispatch("focus({ workspace = %N% })")
         ),
         "Switch workspace",
         Category.WINDOWS
@@ -16,8 +16,8 @@ key_binds = (
     KeyBind(
         (main_mod, "SHIFT", "%N%"),
         make_exec(
-            "sh -c 'hypryouctl move_window %N% || " +
-            make_dispatch('move({ workspace = %N%, follow = true })')
+            "hypryouctl move_window %N% || " +
+            make_hyprctl_dispatch('move({ workspace = %N%, follow = true })')
         ),
         "Move window to workspace",
         Category.WINDOWS
@@ -25,8 +25,8 @@ key_binds = (
     KeyBind(
         (main_mod, "CTRL", "%N%"),
         make_exec(
-            "sh -c 'hypryouctl move_window_silent %N% || " +
-            make_dispatch('move({ workspace = %N%, follow = false })')
+            "hypryouctl move_window_silent %N% || " +
+            make_hyprctl_dispatch('move({ workspace = %N%, follow = false })')
         ),
         "Move window to workspace silently",
         Category.WINDOWS

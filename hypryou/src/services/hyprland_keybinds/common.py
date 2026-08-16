@@ -16,6 +16,10 @@ def make_dispatch(string: str) -> str:
     return f"hl.dsp.{string}"
 
 
+def make_hyprctl_dispatch(string: str) -> str:
+    return f"hyprctl dispatch 'hl.dsp.{string}'"
+
+
 class Category(str, Enum):
     ACTIONS = "Actions"
     TOOLS = "Tools"
