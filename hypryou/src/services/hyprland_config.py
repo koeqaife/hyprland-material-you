@@ -402,6 +402,10 @@ def generate_binds() -> str:
             if override.action:
                 action_str = override.action
 
+        if any(str(k).upper() in ("NULL", "NONE") for k in
+               (key if isinstance(key, tuple) else (key,))):
+            continue
+
         if isinstance(key, tuple):
             key_str = serialize_value(" + ".join(key))
         else:
