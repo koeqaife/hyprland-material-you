@@ -213,6 +213,8 @@ def generate_monitors() -> str:
                     value = text_to_bool(value)
                 if key == "bitdepth":
                     value = int(value)
+                if key == "transform":
+                    value = int(value)
                 output += f"    {key} = {serialize_value(value)},\n"
             output += "})\n"
     return output
