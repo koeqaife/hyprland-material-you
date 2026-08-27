@@ -213,6 +213,8 @@ def generate_monitors() -> str:
                     value = text_to_bool(value)
                 if key == "bitdepth":
                     value = int(value)
+                if key == "transform":
+                    value = int(value)
                 output += f"    {key} = {serialize_value(value)},\n"
             output += "})\n"
     return output
@@ -399,6 +401,10 @@ def generate_binds() -> str:
                 key = override.bind
             if override.action:
                 action_str = override.action
+
+        if any(str(k).upper() in ("NULL", "NONE") for k in
+               (key if isinstance(key, tuple) else (key,))):
+            continue
 
         if isinstance(key, tuple):
             key_str = serialize_value(" + ".join(key))
