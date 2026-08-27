@@ -7,8 +7,8 @@ from repository import gio, glib
 from utils.logger import logger
 import typing as t
 from pywayland.client.display import Display
-from pywayland.protocol.wayland.wl_seat import WlSeat
-from pywayland.protocol.ext_idle_notify_v1.ext_idle_notifier_v1 import (
+from pywayland.protocol.wayland import WlSeat
+from pywayland.protocol.ext_idle_notify_v1 import (
     ExtIdleNotifierV1, ExtIdleNotifierV1Proxy as Notifier
 )
 from src.services import hyprland
@@ -19,8 +19,8 @@ from src.services.mpris import players
 from config import Settings
 
 if t.TYPE_CHECKING:
-    from pywayland.protocol.wayland.wl_registry import WlRegistryProxy
-    from pywayland.protocol.ext_idle_notify_v1.ext_idle_notification_v1 import (  # noqa: E501
+    from pywayland.protocol.wayland import WlRegistryProxy
+    from pywayland.protocol.ext_idle_notify_v1 import (
         ExtIdleNotificationV1Proxy as Notification
     )
 
