@@ -1,15 +1,21 @@
 ---@param path string
 local function dofileOrCreate(path)
-    local ok, err = pcall(function ()
-        dofile(path)
-    end)
-
-    if not ok then
-        local file = io.open(path, "w")
-        if file then
-            file:close()
+    local existing = io.open(path, "r")
+    if existing then
+        existing:close()
+        local ok, err = pcall(function ()
             dofile(path)
+        end)
+        if not ok then
+            print("hypryou: config error in " .. path .. ": " .. tostring(err))
         end
+        return
+    end
+
+    local file = io.open(path, "w")
+    if file then
+        file:close()
+        dofile(path)
     end
 end
 
