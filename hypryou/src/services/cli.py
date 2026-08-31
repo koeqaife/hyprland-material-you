@@ -235,7 +235,7 @@ class CliRequest:
             set_random_wallpaper()
         else:
             if os.path.isfile(wallpaper):
-                Settings().set("wallpaper", wallpaper)
+                Settings().set("appearance.wallpaper", wallpaper)
             else:
                 return "Is not a file!"
         return "ok"
