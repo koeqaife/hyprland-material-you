@@ -163,7 +163,7 @@ class Workspaces(gtk.Box):
             action = "+1" if dy < 0 else "-1"
             asyncio.create_task(
                 hyprland.client.dispatch(
-                    f"focus({{ workspace = {action} }})"
+                    f"focus({{ workspace = \"{action}\" }})"
                 )
             )
 
