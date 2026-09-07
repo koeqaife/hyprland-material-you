@@ -402,7 +402,9 @@ class HyprlandClient(Signals):
         return await self.dispatch(f"dpms({{action = {value}}})")
 
     async def exec(self, to_exec: str) -> str:
-        return await self.dispatch(f"exec_cmd(\"{to_exec}\")")
+        return await self.dispatch(
+            f"exec_cmd(\"{to_exec.replace('"', '\\"')}\")"
+        )
 
     async def query(self, command: HyprlandQueryType | str) -> t.Any:
         raw_result = await self.raw(f"j/{command}")
@@ -412,7 +414,7 @@ class HyprlandClient(Signals):
             return raw_result
 
 
-client: HyprlandClient
+client: HyprlandClient = None
 
 
 class EventCallbacks:
