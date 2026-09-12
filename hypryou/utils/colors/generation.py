@@ -2,6 +2,8 @@ from utils_cy.helpers import downsample_image_rgb
 import os
 import hashlib
 from os.path import join
+from ..vscode_theme import copy_extension
+from ..fish_themer import update_fish_themes
 import typing as t
 import json
 import threading
@@ -278,7 +280,7 @@ def default_on_complete() -> None:
     update_settings()
     update_gtk3()
     update_gtk4()
-
+    update_fish_themes()
 
 def generate_colors(
     image_path: str | None = None,
@@ -294,15 +296,16 @@ def generate_colors(
     def _callback(future: concurrent.futures.Future[None]) -> None:
         try:
             future.result()
+            copy_extension() # VS Code theme copying/generating/updating
         except Exception as e:
             logger.error("Couldn't generate colors: %s", e, exc_info=e)
 
-        glib.idle_add(default_on_complete)
-        if on_complete:
-            on_complete()
-        if executor is not None:
-            executor.shutdown(False)
-        task_lock.release()
+    glib.idle_add(default_on_complete)
+    if on_complete:
+        on_complete()
+    if executor is not None:
+        executor.shutdown(False)
+    task_lock.release()
 
     if task_lock.acquire(blocking=False):
         executor = concurrent.futures.ProcessPoolExecutor(max_workers=1)
