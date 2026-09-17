@@ -215,6 +215,8 @@ def generate_monitors() -> str:
                     value = int(value)
                 if key == "transform":
                     value = int(value)
+                if key == "sdrbrightness":
+                    value = float(value)
                 output += f"    {key} = {serialize_value(value)},\n"
             output += "})\n"
     return output

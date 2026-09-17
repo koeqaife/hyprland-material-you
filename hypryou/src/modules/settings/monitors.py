@@ -1,3 +1,4 @@
+import math
 import types
 from utils.ref import Ref
 from utils.styles import toggle_css_class
@@ -251,7 +252,7 @@ class MonitorsPage(gtk.Box):
                     "Same as hdr with edid primaries"
                 )
             ],
-            on_selected=self.make_dropdown_handler("cm")
+            on_selected=self.on_color_management
         )
 
         self.transform = DropdownRow(
@@ -297,6 +298,15 @@ class MonitorsPage(gtk.Box):
             max_width_chars=3
         )
 
+        self.sdr_brightness = TextRow(
+            "SDR brightness",
+            "Brightness multiplier for SDR content in HDR mode (default 1.0)",
+            on_text_changed=self.on_sdr_brightness,
+            max_length=5,
+            max_width_chars=4
+        )
+        self.sdr_brightness.set_visible(False)
+
         self.children = (
             self.monitor_selector,
             gtk.Separator(),
@@ -306,6 +316,7 @@ class MonitorsPage(gtk.Box):
             self.position,
             self.scale,
             self.color_management,
+            self.sdr_brightness,
             self.transform,
             self.mirror,
             self.vrr,
@@ -490,6 +501,33 @@ class MonitorsPage(gtk.Box):
 
         self.update_setting("bitdepth", value)
 
+    def on_sdr_brightness(self, row: TextRow, value: str) -> None:
+        # Empty value falls back to Hyprland's default (1.0)
+        if not value:
+            toggle_css_class(row.entry_box, "incorrect", False)
+            self.update_setting("sdrbrightness", "")
+            return
+        try:
+            number = float(value)
+        except ValueError:
+            number = 0.0
+        # Hyprland ignores values <= 0, there's no upper limit
+        if not (math.isfinite(number) and number > 0):
+            toggle_css_class(row.entry_box, "incorrect", True)
+            return
+        toggle_css_class(row.entry_box, "incorrect", False)
+        self.update_setting("sdrbrightness", value)
+
+    def on_color_management(
+        self, row: DropdownRow, item: DropdownItem
+    ) -> None:
+        if item is None:
+            return
+        self.update_setting("cm", item.value)
+        self.sdr_brightness.set_visible(
+            item.value in ("hdr", "hdredid")
+        )
+
     # Handler generators
 
     def make_text_handler(self, key: str) -> t.Callable[[TextRow, str], None]:
@@ -519,11 +557,25 @@ class MonitorsPage(gtk.Box):
         self.update_enabled(monitor)
         self.update_scale(monitor)
         self.update_color_management(monitor)
+        self.update_sdr_brightness(monitor)
         self.update_mirror(monitor)
         self.update_vrr(monitor)
         self.update_transform(monitor)
         self.update_bitdepth(monitor)
         glib.idle_add(self.sync_finished)
+
+    def update_sdr_brightness(self, monitor: MonitorDict) -> None:
+        cm = (
+            self.get_setting("cm", monitor)
+            or monitor["colorManagementPreset"]
+        )
+        is_hdr = cm in ("hdr", "hdredid")
+        self.sdr_brightness.set_visible(is_hdr)
+        brightness = (
+            self.get_setting("sdrbrightness", monitor)
+            or str(monitor["sdrBrightness"])
+        )
+        self.sdr_brightness.entry_update_text(brightness)
 
     def update_bitdepth(self, monitor: MonitorDict) -> None:
         bitdepth = self.get_setting("bitdepth", monitor) or ""

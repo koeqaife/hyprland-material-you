@@ -132,6 +132,8 @@ class MonitorDict(t.TypedDict):
     currentFormat: str
     mirrorOf: str
     availableModes: list[str]
+    colorManagementPreset: str
+    sdrBrightness: float
 
 
 class Client(Signals):
