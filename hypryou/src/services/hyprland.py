@@ -48,6 +48,47 @@ active_client = Ref[dict[int, "Client | None"]](
     name="active_client",
 )
 
+INTERNAL_OUTPUT_PREFIXES = ("eDP", "LVDS", "DSI")
+
+
+def _monitor_positions() -> dict[str, tuple[int, int]]:
+    positions: dict[str, tuple[int, int]] = {}
+    display = gdk.Display.get_default()
+    if display is None:
+        return positions
+    for monitor in display.get_monitors():
+        connector = monitor.get_connector()
+        if connector is None:
+            continue
+        geometry = monitor.get_geometry()
+        positions[connector] = (geometry.x, geometry.y)
+    return positions
+
+
+def get_workspace_slot(monitor_name: str, fallback: int = -1) -> int:
+    # Which block of workspaces a monitor gets when they are separated.
+    # By default that is the Hyprland monitor id, but that id depends on
+    # the order the outputs were added, so on a laptop the panel ends up
+    # on 11-20 whenever the external screen happens to come first, and
+    # back on 1-10 once it is unplugged.
+    ids = monitor_ids.value
+    if monitor_name not in ids:
+        return fallback
+    order = Settings().get("workspace_monitor_order")
+    if order not in ("position", "internal", "external"):
+        return ids[monitor_name]
+    positions = _monitor_positions()
+
+    def rank(name: str) -> tuple[bool, int, int, int]:
+        internal = name.startswith(INTERNAL_OUTPUT_PREFIXES)
+        last = internal if order == "external" else not internal
+        x, y = positions.get(name, (0, 0))
+        # Monitors of the wanted kind come first, then left to right.
+        # The id keeps the order stable while positions are unknown.
+        return (last and order != "position", x, y, ids[name])
+
+    return sorted(ids, key=rank).index(monitor_name)
+
 
 type HyprlandQueryType = t.Literal[
     "activewindow",
