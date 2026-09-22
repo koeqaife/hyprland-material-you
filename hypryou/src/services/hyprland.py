@@ -65,6 +65,21 @@ def _monitor_positions() -> dict[str, tuple[int, int]]:
     return positions
 
 
+def _monitor_groups() -> dict[str, int]:
+    groups: dict[str, int] = {}
+    monitors = Settings().get("monitors")
+    if not isinstance(monitors, list):
+        return groups
+    for monitor in monitors:
+        if not isinstance(monitor, dict):
+            continue
+        name = monitor.get("output")
+        group = str(monitor.get("workspace_group") or "")
+        if name and group.isdigit() and int(group) > 0:
+            groups[name] = int(group) - 1
+    return groups
+
+
 def get_workspace_slot(monitor_name: str, fallback: int = -1) -> int:
     # Which block of workspaces a monitor gets when they are separated.
     # By default that is the Hyprland monitor id, but that id depends on
@@ -75,11 +90,15 @@ def get_workspace_slot(monitor_name: str, fallback: int = -1) -> int:
     if monitor_name not in ids:
         return fallback
     order = Settings().get("workspace_monitor_order")
-    if order not in ("position", "internal", "external"):
+    sort_by_kind = order in ("position", "internal", "external")
+    groups = _monitor_groups()
+    if not sort_by_kind and not groups:
         return ids[monitor_name]
-    positions = _monitor_positions()
+    positions = _monitor_positions() if sort_by_kind else {}
 
     def rank(name: str) -> tuple[bool, int, int, int]:
+        if not sort_by_kind:
+            return (False, 0, 0, ids[name])
         internal = name.startswith(INTERNAL_OUTPUT_PREFIXES)
         last = internal if order == "external" else not internal
         x, y = positions.get(name, (0, 0))
@@ -87,7 +106,26 @@ def get_workspace_slot(monitor_name: str, fallback: int = -1) -> int:
         # The id keeps the order stable while positions are unknown.
         return (last and order != "position", x, y, ids[name])
 
-    return sorted(ids, key=rank).index(monitor_name)
+    ordered = sorted(ids, key=rank)
+    # A monitor with a group of its own lands on that block; the rest
+    # fill whatever is left, in the order chosen above. Two monitors
+    # asking for the same block is a typo, so the first one keeps it.
+    slots: dict[str, int] = {}
+    taken: set[int] = set()
+    for name in ordered:
+        group = groups.get(name)
+        if group is not None and group not in taken:
+            slots[name] = group
+            taken.add(group)
+    free = 0
+    for name in ordered:
+        if name in slots:
+            continue
+        while free in taken:
+            free += 1
+        slots[name] = free
+        free += 1
+    return slots[monitor_name]
 
 
 type HyprlandQueryType = t.Literal[
