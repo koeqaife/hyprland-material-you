@@ -48,7 +48,9 @@ active_client = Ref[dict[int, "Client | None"]](
     name="active_client",
 )
 
-INTERNAL_OUTPUT_PREFIXES = ("eDP", "LVDS", "DSI")
+INTERNAL_OUTPUT_PREFIXES = (
+    "eDP", "LVDS", "DSI", "DPI", "SPI"
+)
 
 
 def _monitor_positions() -> dict[str, tuple[int, int]]:
