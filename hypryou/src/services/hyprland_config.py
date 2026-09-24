@@ -225,6 +225,42 @@ def generate_monitors() -> str:
     return output
 
 
+def generate_workspace_rules() -> str | None:
+    rules = unpack_reactive(Settings().get("workspace_rules"))
+    if not isinstance(rules, list):
+        return None
+
+    output = ""
+    taken: set[int] = set()
+    has_default: set[str] = set()
+    for rule in rules:
+        if not isinstance(rule, dict):
+            continue
+        monitor = str(rule.get("monitor") or "")
+        workspaces = hyprland.parse_workspaces(
+            str(rule.get("workspaces") or "")
+        )
+        if not monitor or not workspaces:
+            continue
+        for workspace in workspaces:
+            if workspace in taken:
+                # Two rules asking for the same workspace is a typo, so the
+                # one written first keeps it.
+                continue
+            taken.add(workspace)
+            args = f'workspace = "{workspace}", '
+            args += f"monitor = {serialize_value(monitor)}"
+            if monitor not in has_default:
+                # The monitor opens on the first workspace it keeps instead
+                # of grabbing whatever number happens to be free. Only one
+                # of them can be the default, even across several rules.
+                args += ", default = true"
+                has_default.add(monitor)
+            output += "hl.workspace_rule({ " + args + " })\n"
+
+    return output or None
+
+
 def make_layer_rule(namespace: str, key: str, value: SerializableType) -> str:
     indent = " " * 4
     output = "hl.layer_rule({\n"
@@ -498,6 +534,7 @@ funcs = (
     generate_blur,
     generate_input,
     generate_monitors,
+    generate_workspace_rules,
     generate_general,
     generate_decoration,
     generate_misc,

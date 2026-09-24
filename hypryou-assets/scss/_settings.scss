@@ -224,6 +224,24 @@ window.settings {
         }
     }
 
+    .editable-list {
+        .editable-list-row {
+            .fields {
+                dropdown {
+                    margin-right: 0.5rem;
+                }
+            }
+
+            .remove-button {
+                margin-left: 0.5rem;
+            }
+        }
+
+        .add-button {
+            margin-left: 0.5rem;
+        }
+    }
+
     .info-page {
         .info-row {
             .logo {

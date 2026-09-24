@@ -1,6 +1,7 @@
 from repository import gtk, gdk, gio, gobject
 import typing as t
 from config import Settings
+from utils.ref import unpack_reactive
 import src.widget as widget
 from utils.styles import toggle_css_class
 from utils.debounce import sync_debounce
@@ -612,6 +613,172 @@ class SettingsDropdownRow(DropdownRowTemplate):
     def on_item_selected(self, *args: t.Any) -> None:
         item = self.get_current()
         self.settings.set(self.key, item.value)
+
+
+class EditableListRow(gtk.Box):
+    """One entry of an EditableList: its fields plus a remove button."""
+
+    __gtype_name__ = "SettingsEditableListRow"
+
+    def __init__(
+        self,
+        on_remove: t.Callable[[t.Self], None],
+        css_classes: tuple[str, ...] = ()
+    ) -> None:
+        super().__init__(
+            css_classes=("settings-row", "editable-list-row", *css_classes),
+            hexpand=True,
+            valign=gtk.Align.START
+        )
+        self._on_remove = weakref.WeakMethod(on_remove)
+
+        self.fields = gtk.Box(
+            css_classes=("fields",),
+            hexpand=True,
+            halign=gtk.Align.END,
+            valign=gtk.Align.CENTER
+        )
+        self.remove_button = gtk.Button(
+            child=widget.Icon("close"),
+            css_classes=("icon-tonal", "remove-button"),
+            valign=gtk.Align.CENTER
+        )
+        self.remove_handler = self.remove_button.connect(
+            "clicked", self.on_remove_clicked
+        )
+        self.append(self.fields)
+        self.append(self.remove_button)
+
+    def add_field(self, child: gtk.Widget) -> None:
+        self.fields.append(child)
+
+    def on_remove_clicked(self, *args: t.Any) -> None:
+        method = self._on_remove()
+        if callable(method):
+            method(self)  # type: ignore
+
+    def get_value(self) -> dict[str, str]:
+        return {}
+
+    def destroy(self) -> None:
+        self.remove_button.disconnect(self.remove_handler)
+
+
+class EditableList(gtk.Box):
+    """A list the user adds rows to and removes them from.
+
+    Subclasses decide what a row looks like and what an empty one holds;
+    everything the rows contain is stored back into one settings key.
+    """
+
+    __gtype_name__ = "SettingsEditableList"
+
+    def __init__(
+        self,
+        label: str,
+        description: str | None,
+        key: str,
+        add_label: str = "Add",
+        css_classes: tuple[str, ...] = ()
+    ) -> None:
+        super().__init__(
+            css_classes=("editable-list", *css_classes),
+            orientation=gtk.Orientation.VERTICAL,
+            hexpand=True
+        )
+        self.settings = Settings()
+        self.key = key
+        self.rows: list[EditableListRow] = []
+        self._loading = False
+
+        self.header = RowTemplate(
+            label, description, ("editable-list-header",), False
+        )
+        self.add_button = gtk.Button(
+            label=add_label,
+            css_classes=("tonal", "add-button"),
+            valign=gtk.Align.CENTER
+        )
+        self.add_handler = self.add_button.connect(
+            "clicked", self.on_add_clicked
+        )
+        self.header.append(self.add_button)
+        self.rows_box = gtk.Box(
+            css_classes=("rows",),
+            orientation=gtk.Orientation.VERTICAL
+        )
+        self.append(self.header)
+        self.append(self.rows_box)
+
+        self.load()
+        # The key can change while the window is open (sync_settings, a
+        # second window). Without this the stale rows were written back on
+        # the next click and undid that change.
+        self.watch_handler = self.settings.watch(
+            key, self.on_setting_changed, False
+        )
+
+    def create_row(self, value: dict[str, str]) -> EditableListRow:
+        raise NotImplementedError
+
+    def empty_value(self) -> dict[str, str]:
+        return {}
+
+    def load(self) -> None:
+        self._loading = True
+        for row in tuple(self.rows):
+            self.drop_row(row)
+        # Settings hand back a ReactiveList once the key has a ref, and
+        # that is not a list, so anything stored would be dropped here.
+        values = unpack_reactive(self.settings.get(self.key))
+        if isinstance(values, list):
+            for value in values:
+                if isinstance(value, dict):
+                    self.add_row(value)
+        self._loading = False
+        self.validate()
+
+    def on_setting_changed(self, value: t.Any) -> None:
+        if unpack_reactive(value) == [row.get_value() for row in self.rows]:
+            # Our own save coming back; reloading would steal the focus.
+            return
+        self.load()
+
+    def validate(self) -> None:
+        """Lets a subclass point at rows that will not do what they say."""
+
+    def add_row(self, value: dict[str, str]) -> None:
+        row = self.create_row(value)
+        self.rows.append(row)
+        self.rows_box.append(row)
+
+    def drop_row(self, row: EditableListRow) -> None:
+        if row not in self.rows:
+            return
+        self.rows_box.remove(row)
+        self.rows.remove(row)
+        row.destroy()
+
+    def on_add_clicked(self, *args: t.Any) -> None:
+        self.add_row(self.empty_value())
+        self.save()
+
+    def on_remove(self, row: EditableListRow) -> None:
+        self.drop_row(row)
+        self.save()
+
+    def save(self, *args: t.Any) -> None:
+        if self._loading:
+            return
+        self.settings.set(self.key, [row.get_value() for row in self.rows])
+        self.validate()
+
+    def destroy(self) -> None:
+        self.settings.unwatch(self.watch_handler)
+        self.add_button.disconnect(self.add_handler)
+        self.header.destroy()
+        for row in self.rows:
+            row.destroy()
 
 
 class Category(gtk.Label):
