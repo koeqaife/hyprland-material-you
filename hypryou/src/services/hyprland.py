@@ -2,7 +2,7 @@ import asyncio
 from enum import Enum
 import os
 from asyncio import StreamReader, StreamWriter
-from utils.ref import Ref, Computed
+from utils.ref import Ref, Computed, unpack_reactive
 from utils.logger import logger
 import typing as t
 import json
@@ -69,7 +69,10 @@ def _monitor_positions() -> dict[str, tuple[int, int]]:
 
 def _monitor_groups() -> dict[str, int]:
     groups: dict[str, int] = {}
-    monitors = Settings().get("monitors")
+    # Settings hand back a ReactiveList once the key has a ref of its own,
+    # and that is not a list, so every group was dropped here as soon as
+    # the settings window had been opened.
+    monitors = unpack_reactive(Settings().get("monitors"))
     if not isinstance(monitors, list):
         return groups
     for monitor in monitors:
