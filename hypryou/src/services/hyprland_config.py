@@ -207,6 +207,9 @@ def generate_monitors() -> str:
             for key, value in monitor.items():
                 if not value:
                     continue
+                if key == "workspace_group":
+                    # HyprYou's own, not a Hyprland monitor keyword.
+                    continue
                 if key == "vrr":
                     value = int(value)
                 if key == "disabled":

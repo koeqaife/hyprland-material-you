@@ -214,6 +214,14 @@ class MonitorsPage(gtk.Box):
             max_width_chars=10
         )
 
+        self.workspace_group = TextRow(
+            "Workspace group",
+            "Which block of workspaces this monitor gets (1, 2, 3...)",
+            on_text_changed=self.on_workspace_group,
+            max_length=2,
+            max_width_chars=3
+        )
+
         self.scale = TextRow(
             "Scale",
             "Monitor scale",
@@ -314,6 +322,7 @@ class MonitorsPage(gtk.Box):
             self.mode_selector,
             self.custom_mode,
             self.position,
+            self.workspace_group,
             self.scale,
             self.color_management,
             self.sdr_brightness,
@@ -463,6 +472,13 @@ class MonitorsPage(gtk.Box):
         else:
             toggle_css_class(row.entry_box, "incorrect", True)
 
+    def on_workspace_group(self, row: TextRow, text: str) -> None:
+        if text == "" or (text.isdigit() and int(text) > 0):
+            toggle_css_class(row.entry_box, "incorrect", False)
+            self.update_setting("workspace_group", text)
+        else:
+            toggle_css_class(row.entry_box, "incorrect", True)
+
     def on_select_mode(self, row: DropdownRow, item: DropdownItem) -> None:
         if item is None:
             return
@@ -554,6 +570,7 @@ class MonitorsPage(gtk.Box):
         self._finished = False
         self.update_modes(monitor)
         self.update_position(monitor)
+        self.update_workspace_group(monitor)
         self.update_enabled(monitor)
         self.update_scale(monitor)
         self.update_color_management(monitor)
@@ -622,6 +639,10 @@ class MonitorsPage(gtk.Box):
     def update_position(self, monitor: MonitorDict) -> None:
         pos = self.get_setting("position", monitor) or "auto"
         self.position.entry_update_text(pos)
+
+    def update_workspace_group(self, monitor: MonitorDict) -> None:
+        group = self.get_setting("workspace_group", monitor) or ""
+        self.workspace_group.entry_update_text(group)
 
     def update_modes(self, monitor: MonitorDict) -> None:
         if not monitor:

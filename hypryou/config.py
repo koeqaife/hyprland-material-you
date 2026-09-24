@@ -55,6 +55,7 @@ default_settings: dict[str, t.Any] = {
     "always_show_battery": False,
     "corners": True,
     "separated_workspaces": False,
+    "workspace_monitor_order": "",
     "one_popup_at_time": True,
     "power_menu_cancel_button": True,
     "secure_cliphist": False,

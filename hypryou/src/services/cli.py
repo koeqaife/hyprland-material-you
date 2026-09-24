@@ -258,7 +258,10 @@ class CliRequest:
                 )
             )
         else:
-            active_monitor = hyprland.active_monitor_id.value
+            active_monitor = hyprland.get_workspace_slot(
+                hyprland.active_monitor_name.value,
+                hyprland.active_monitor_id.value
+            )
             _workspace_id = int(workspace_id) + (10 * active_monitor)
             asyncio.create_task(
                 hyprland.client.dispatch(
@@ -276,7 +279,10 @@ class CliRequest:
                 f"({{ workspace = {workspace_id}, follow = true }})"
             ))
         else:
-            active_monitor = hyprland.active_monitor_id.value
+            active_monitor = hyprland.get_workspace_slot(
+                hyprland.active_monitor_name.value,
+                hyprland.active_monitor_id.value
+            )
             _workspace_id = int(workspace_id) + (10 * active_monitor)
             asyncio.create_task(
                 hyprland.client.dispatch(
@@ -295,7 +301,10 @@ class CliRequest:
                 f"({{ workspace = {workspace_id}, follow = false }})"
             ))
         else:
-            active_monitor = hyprland.active_monitor_id.value
+            active_monitor = hyprland.get_workspace_slot(
+                hyprland.active_monitor_name.value,
+                hyprland.active_monitor_id.value
+            )
             _workspace_id = int(workspace_id) + (10 * active_monitor)
             asyncio.create_task(hyprland.client.dispatch(
                 "window.move" +

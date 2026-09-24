@@ -76,6 +76,18 @@ class AppearancePage(gtk.ScrolledWindow):
                 "Workspaces are split per monitor (e.g. 1-10, 11-20)",
                 "separated_workspaces"
             ),
+            SettingsDropdownRow(
+                "First workspaces",
+                "Which monitor gets workspaces 1-10",
+                "workspace_monitor_order",
+                items=[
+                    DropdownItem("", "Hyprland monitor order"),
+                    DropdownItem("position", "Left to right"),
+                    DropdownItem("internal", "Built-in display first"),
+                    DropdownItem("external", "External displays first"),
+                ],
+                depends_on={"separated_workspaces"}
+            ),
             SettingsBoolRow(
                 "Cancel button in power menu",
                 "Shows a cancel button in the power menu",

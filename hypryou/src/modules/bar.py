@@ -89,6 +89,9 @@ class Workspaces(gtk.Box):
                 "separated_workspaces", self.update_buttons, False
             ),
             self.settings.watch(
+                "workspace_monitor_order", self.update_buttons, False
+            ),
+            self.settings.watch(
                 "hide_empty_workspaces", self.on_hide_empty, False
             ),
         )
@@ -114,7 +117,7 @@ class Workspaces(gtk.Box):
             self.buttons.clear()
         if self._old_active:
             self._old_active = 0
-        monitor_id = monitor_ids.value.get(
+        monitor_id = hyprland.get_workspace_slot(
             self.monitor.get_connector(),
             self.monitor_id
         )
