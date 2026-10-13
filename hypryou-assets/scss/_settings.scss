@@ -298,8 +298,27 @@ window.settings {
     }
 
     .keybinds-page {
-        .reset-button {
+        .reset-button,
+        .disable-button {
             margin-left: 0.5rem;
+        }
+
+        .custom-keybind-row {
+            .remove-button {
+                margin-left: 0.5rem;
+            }
+
+            entry.name-entry {
+                font-size: 1rem;
+                color: $onSurface;
+                padding-left: 0;
+                border-color: transparent;
+
+                &:focus-within {
+                    padding-left: 0.75rem;
+                    border-color: $primary;
+                }
+            }
         }
 
         .entries-box {

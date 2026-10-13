@@ -448,11 +448,55 @@ def generate_overrides(raw: KeybindOverridesRaw) -> dict[str, KeyBindOverride]:
     return overrides
 
 
+def lua_string(value: str) -> str:
+    # serialize_value() does not escape, which is fine for our own values
+    # but not for a command someone typed with quotes in it.
+    value = value.replace("\\", "\\\\").replace('"', '\\"')
+    return '"' + value.replace("\n", " ") + '"'
+
+
+def generate_custom_binds() -> str:
+    output = ""
+    binds = unpack_reactive(Settings().get("custom_keybinds"))
+    if not isinstance(binds, list):
+        return output
+    for bind in binds:
+        if not isinstance(bind, dict):
+            continue
+        key = str(bind.get("bind") or "").strip()
+        command = str(bind.get("command") or "").strip()
+        if not key or not command:
+            continue
+        if command.startswith("hl."):
+            # Same form as the action of a default bind.
+            action = command
+        else:
+            action = f"hl.dsp.exec_cmd({lua_string(command)})"
+        name = str(bind.get("name") or "").strip()
+        options = f", {{ description = {lua_string(name)} }}" if name else ""
+        line = f"hl.bind({lua_string(key)}, {action}{options})"
+        # An action is typed by hand, and one syntax error in this file
+        # makes Hyprland skip all of it: monitors, binds, rules. Loading
+        # each custom bind on its own keeps a typo inside its own line.
+        output += (
+            f"do local f, e = load({lua_string(line)}) "
+            "if f then f = pcall(f) end "
+            "if not f then print(\"hypryou: custom bind "
+            f"{lua_string(key)[1:-1]} skipped\") end end\n"
+        )
+    return output
+
+
 def generate_binds() -> str:
     output = ""
+    disabled = unpack_reactive(Settings().get("disabled_keybinds"))
+    if not isinstance(disabled, list):
+        disabled = []
 
     for bind in key_binds:
         if not isinstance(bind, KeyBind):
+            continue
+        if bind.id in disabled:
             continue
 
         key = bind.bind
@@ -487,6 +531,9 @@ def generate_binds() -> str:
             else:
                 output += f"hl.bind({bind_str})\n"
 
+    # Hyprland runs every bind on a key, so a custom bind on a key that a
+    # default still uses runs both; the settings page warns about that.
+    output += generate_custom_binds()
     return output
 
 
