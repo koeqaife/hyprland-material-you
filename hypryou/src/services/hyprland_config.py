@@ -258,6 +258,27 @@ def generate_workspace_rules() -> str | None:
                 has_default.add(monitor)
             output += "hl.workspace_rule({ " + args + " })\n"
 
+    if Settings().get("separated_workspaces"):
+        # The bar sends each monitor to its own block of ten, but Hyprland
+        # never heard about the blocks, so a workspace was born on whatever
+        # monitor had focus and the bind for 9 jumped to the other screen.
+        # Binding every block to the monitor that owns it keeps the two in
+        # step. Rules written by hand above still win.
+        for monitor in sorted(hyprland.monitor_ids.value):
+            slot = hyprland.get_workspace_slot(monitor)
+            if slot < 0:
+                continue
+            for workspace in range(slot * 10 + 1, slot * 10 + 11):
+                if workspace in taken:
+                    continue
+                taken.add(workspace)
+                args = f'workspace = "{workspace}", '
+                args += f"monitor = {serialize_value(monitor)}"
+                if monitor not in has_default:
+                    args += ", default = true"
+                    has_default.add(monitor)
+                output += "hl.workspace_rule({ " + args + " })\n"
+
     return output or None
 
 
@@ -544,7 +565,7 @@ funcs = (
 )
 
 
-def generate_config(reload: bool = False) -> None:
+def generate_config(reload: bool | t.Literal["if_changed"] = False) -> None:
     global current_config
     current_config = {}
 
@@ -561,10 +582,13 @@ def generate_config(reload: bool = False) -> None:
     except FileNotFoundError:
         current_content = ""
 
-    if current_content != output:
+    changed = current_content != output
+    if changed:
         with open(generated_config, "w") as f:
             f.write(output)
 
+    if reload == "if_changed":
+        reload = changed
     if reload:
         asyncio.create_task(
             hyprland.client.raw("reload")
@@ -574,6 +598,14 @@ def generate_config(reload: bool = False) -> None:
 @sync_debounce(100)
 def on_settings_changed(key: str, value: str) -> None:
     generate_config(True)
+
+
+@sync_debounce(500)
+def on_monitors_changed(*args: t.Any) -> None:
+    # Plugging a screen in or out moves the blocks around, and the rules
+    # name monitors, so they have to follow. A plain reload also reports
+    # the monitors again; skipping it when nothing changed avoids a loop.
+    generate_config("if_changed")
 
 
 def keybind_overrides_changed(value: KeybindOverridesRaw) -> None:
@@ -590,6 +622,7 @@ class HyprlandConfigService(Service):
         settings.watch("keybinds_overrides", keybind_overrides_changed, False)
         keybind_overrides_changed(settings.get("keybinds_overrides"))
         keybind_overrides.ready()
+        hyprland.monitor_ids.watch(on_monitors_changed)
         generate_config(True)
 
     async def check_errors(self) -> None:

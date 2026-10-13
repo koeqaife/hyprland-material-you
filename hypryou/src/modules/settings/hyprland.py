@@ -204,8 +204,8 @@ class HyprlandPage(gtk.ScrolledWindow):
             Category("Workspaces"),
             WorkspaceRulesList(),
             Hint(
-                "A workspace bound to a monitor always opens there, "
-                "and the first one becomes that monitor's default"
+                "With per-monitor workspaces each monitor already keeps "
+                "its block. Add a rule only to change that"
             ),
 
             Category("Snap"),

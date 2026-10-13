@@ -73,12 +73,12 @@ class AppearancePage(gtk.ScrolledWindow):
             Category("Behavior"),
             SettingsBoolRow(
                 "Per-monitor workspaces",
-                "Workspaces are split per monitor (e.g. 1-10, 11-20)",
+                "Each monitor keeps its own block (1-10, 11-20, ...)",
                 "separated_workspaces"
             ),
             SettingsDropdownRow(
                 "First workspaces",
-                "Which monitor gets workspaces 1-10",
+                "Which monitor gets 1-10. Exceptions go in Hyprland > Workspaces",
                 "workspace_monitor_order",
                 items=[
                     DropdownItem("", "Hyprland monitor order"),
