@@ -805,7 +805,9 @@ class Hint(gtk.Label):
             label=text,
             hexpand=True,
             halign=gtk.Align.CENTER,
-            justify=gtk.Justification.CENTER
+            justify=gtk.Justification.CENTER,
+            wrap=True,
+            wrap_mode=gtk.WrapMode.WORD
         )
 
     def destroy(self) -> None:
