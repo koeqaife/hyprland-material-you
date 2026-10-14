@@ -78,13 +78,13 @@ class AppearancePage(gtk.ScrolledWindow):
             ),
             SettingsDropdownRow(
                 "First workspaces",
-                "Which monitor gets 1-10. Exceptions go in Hyprland > Workspaces",
+                "Which monitor gets 1-10, find exceptions in Hyprland",
                 "workspace_monitor_order",
                 items=[
-                    DropdownItem("", "Hyprland monitor order"),
+                    DropdownItem("", "Hyprland order"),
                     DropdownItem("position", "Left to right"),
-                    DropdownItem("internal", "Built-in display first"),
-                    DropdownItem("external", "External displays first"),
+                    DropdownItem("internal", "Built-in first"),
+                    DropdownItem("external", "External first"),
                 ],
                 depends_on={"separated_workspaces"}
             ),
