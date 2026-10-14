@@ -229,6 +229,11 @@ window.settings {
             .fields {
                 dropdown {
                     margin-right: 0.5rem;
+
+                    button {
+                        padding-top: 0.25rem;
+                        padding-bottom: 0.25rem;
+                    }
                 }
             }
 
