@@ -19,7 +19,7 @@ from utils.logger import logger, setup_logger
 from src.variables import Globals
 from config import Settings, ASSETS_DIR, makedirs, APP_CACHE_DIR
 
-from gi.events import GLibEventLoopPolicy  # type: ignore[import-untyped]
+from gi.events import GLibEventLoop  # type: ignore[import-untyped]
 import asyncio
 from utils.handler import set_fatal_handler, ExitSignals
 from utils.handler import exit_error, exit_hung
@@ -75,8 +75,9 @@ from src.modules.calendar import CalendarWindow
 
 from src.modules.settings.wallpapers import executor as wallpaper_executor
 
+loop = GLibEventLoop()
+
 APP_START = time.perf_counter()
-loop: glib.MainLoop
 
 services: tuple[AsyncService | Service, ...] = (
     StateService(),
@@ -340,7 +341,6 @@ def init() -> None:
     clear_cache()
     makedirs()
     settings = Settings()
-    asyncio.set_event_loop_policy(GLibEventLoopPolicy())
 
     if settings.get("secure_cliphist"):
         cliphist.secure_clear()
@@ -350,10 +350,8 @@ def init() -> None:
 
 
 def main() -> None:
-    global loop
     if __debug__:
         logger.debug("Starting app")
-    loop = glib.MainLoop()
     start_watchdog(7.5)
 
     app = HyprYou(application_id="com.koeqaife.hypryou")
@@ -458,5 +456,6 @@ atexit.register(cleanup)
 
 
 if __name__ == "__main__":
-    init()
-    main()
+    with loop:
+        init()
+        main()
