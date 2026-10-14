@@ -695,9 +695,10 @@ class EditableList(gtk.Box):
             label, description, ("editable-list-header",), False
         )
         self.add_button = gtk.Button(
-            label=add_label,
-            css_classes=("tonal", "add-button"),
-            valign=gtk.Align.CENTER
+            tooltip_text=add_label,
+            css_classes=("icon-tonal", "add-button"),
+            valign=gtk.Align.CENTER,
+            child=widget.Icon("add")
         )
         self.add_handler = self.add_button.connect(
             "clicked", self.on_add_clicked
