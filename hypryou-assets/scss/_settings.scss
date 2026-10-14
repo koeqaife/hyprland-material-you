@@ -224,6 +224,29 @@ window.settings {
         }
     }
 
+    .editable-list {
+        .editable-list-row {
+            .fields {
+                dropdown {
+                    margin-right: 0.5rem;
+
+                    button {
+                        padding-top: 0.25rem;
+                        padding-bottom: 0.25rem;
+                    }
+                }
+            }
+
+            .remove-button {
+                margin-left: 0.5rem;
+            }
+        }
+
+        .add-button {
+            margin-left: 0.5rem;
+        }
+    }
+
     .info-page {
         .info-row {
             .logo {
@@ -280,8 +303,27 @@ window.settings {
     }
 
     .keybinds-page {
-        .reset-button {
+        .reset-button,
+        .disable-button {
             margin-left: 0.5rem;
+        }
+
+        .custom-keybind-row {
+            .remove-button {
+                margin-left: 0.5rem;
+            }
+
+            entry.name-entry {
+                font-size: 1rem;
+                color: $onSurface;
+                padding-left: 0;
+                border-color: transparent;
+
+                &:focus-within {
+                    padding-left: 0.75rem;
+                    border-color: $primary;
+                }
+            }
         }
 
         .entries-box {

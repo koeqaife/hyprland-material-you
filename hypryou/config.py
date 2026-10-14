@@ -56,6 +56,7 @@ default_settings: dict[str, t.Any] = {
     "corners": True,
     "separated_workspaces": False,
     "workspace_monitor_order": "",
+    "workspace_rules": [],
     "one_popup_at_time": True,
     "power_menu_cancel_button": True,
     "secure_cliphist": False,
@@ -180,6 +181,8 @@ default_settings: dict[str, t.Any] = {
     "lid_action": "dpms",
     "monitors": [],
     "keybinds_overrides": [],
+    "disabled_keybinds": [],
+    "custom_keybinds": [],
 
     "old_fullscreen_behavior": False,
 

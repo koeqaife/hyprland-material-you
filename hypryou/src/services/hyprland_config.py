@@ -225,6 +225,63 @@ def generate_monitors() -> str:
     return output
 
 
+def generate_workspace_rules() -> str | None:
+    rules = unpack_reactive(Settings().get("workspace_rules"))
+    if not isinstance(rules, list):
+        return None
+
+    output = ""
+    taken: set[int] = set()
+    has_default: set[str] = set()
+    for rule in rules:
+        if not isinstance(rule, dict):
+            continue
+        monitor = str(rule.get("monitor") or "")
+        workspaces = hyprland.parse_workspaces(
+            str(rule.get("workspaces") or "")
+        )
+        if not monitor or not workspaces:
+            continue
+        for workspace in workspaces:
+            if workspace in taken:
+                # Two rules asking for the same workspace is a typo, so the
+                # one written first keeps it.
+                continue
+            taken.add(workspace)
+            args = f'workspace = "{workspace}", '
+            args += f"monitor = {serialize_value(monitor)}"
+            if monitor not in has_default:
+                # The monitor opens on the first workspace it keeps instead
+                # of grabbing whatever number happens to be free. Only one
+                # of them can be the default, even across several rules.
+                args += ", default = true"
+                has_default.add(monitor)
+            output += "hl.workspace_rule({ " + args + " })\n"
+
+    if Settings().get("separated_workspaces"):
+        # The bar sends each monitor to its own block of ten, but Hyprland
+        # never heard about the blocks, so a workspace was born on whatever
+        # monitor had focus and the bind for 9 jumped to the other screen.
+        # Binding every block to the monitor that owns it keeps the two in
+        # step. Rules written by hand above still win.
+        for monitor in sorted(hyprland.monitor_ids.value):
+            slot = hyprland.get_workspace_slot(monitor)
+            if slot < 0:
+                continue
+            for workspace in range(slot * 10 + 1, slot * 10 + 11):
+                if workspace in taken:
+                    continue
+                taken.add(workspace)
+                args = f'workspace = "{workspace}", '
+                args += f"monitor = {serialize_value(monitor)}"
+                if monitor not in has_default:
+                    args += ", default = true"
+                    has_default.add(monitor)
+                output += "hl.workspace_rule({ " + args + " })\n"
+
+    return output or None
+
+
 def make_layer_rule(namespace: str, key: str, value: SerializableType) -> str:
     indent = " " * 4
     output = "hl.layer_rule({\n"
@@ -391,11 +448,55 @@ def generate_overrides(raw: KeybindOverridesRaw) -> dict[str, KeyBindOverride]:
     return overrides
 
 
+def lua_string(value: str) -> str:
+    # serialize_value() does not escape, which is fine for our own values
+    # but not for a command someone typed with quotes in it.
+    value = value.replace("\\", "\\\\").replace('"', '\\"')
+    return '"' + value.replace("\n", " ") + '"'
+
+
+def generate_custom_binds() -> str:
+    output = ""
+    binds = unpack_reactive(Settings().get("custom_keybinds"))
+    if not isinstance(binds, list):
+        return output
+    for bind in binds:
+        if not isinstance(bind, dict):
+            continue
+        key = str(bind.get("bind") or "").strip()
+        command = str(bind.get("command") or "").strip()
+        if not key or not command:
+            continue
+        if command.startswith("hl."):
+            # Same form as the action of a default bind.
+            action = command
+        else:
+            action = f"hl.dsp.exec_cmd({lua_string(command)})"
+        name = str(bind.get("name") or "").strip()
+        options = f", {{ description = {lua_string(name)} }}" if name else ""
+        line = f"hl.bind({lua_string(key)}, {action}{options})"
+        # An action is typed by hand, and one syntax error in this file
+        # makes Hyprland skip all of it: monitors, binds, rules. Loading
+        # each custom bind on its own keeps a typo inside its own line.
+        output += (
+            f"do local f, e = load({lua_string(line)}) "
+            "if f then f = pcall(f) end "
+            "if not f then print(\"hypryou: custom bind "
+            f"{lua_string(key)[1:-1]} skipped\") end end\n"
+        )
+    return output
+
+
 def generate_binds() -> str:
     output = ""
+    disabled = unpack_reactive(Settings().get("disabled_keybinds"))
+    if not isinstance(disabled, list):
+        disabled = []
 
     for bind in key_binds:
         if not isinstance(bind, KeyBind):
+            continue
+        if bind.id in disabled:
             continue
 
         key = bind.bind
@@ -430,6 +531,9 @@ def generate_binds() -> str:
             else:
                 output += f"hl.bind({bind_str})\n"
 
+    # Hyprland runs every bind on a key, so a custom bind on a key that a
+    # default still uses runs both; the settings page warns about that.
+    output += generate_custom_binds()
     return output
 
 
@@ -498,6 +602,7 @@ funcs = (
     generate_blur,
     generate_input,
     generate_monitors,
+    generate_workspace_rules,
     generate_general,
     generate_decoration,
     generate_misc,
@@ -507,7 +612,7 @@ funcs = (
 )
 
 
-def generate_config(reload: bool = False) -> None:
+def generate_config(reload: bool | t.Literal["if_changed"] = False) -> None:
     global current_config
     current_config = {}
 
@@ -524,10 +629,13 @@ def generate_config(reload: bool = False) -> None:
     except FileNotFoundError:
         current_content = ""
 
-    if current_content != output:
+    changed = current_content != output
+    if changed:
         with open(generated_config, "w") as f:
             f.write(output)
 
+    if reload == "if_changed":
+        reload = changed
     if reload:
         asyncio.create_task(
             hyprland.client.raw("reload")
@@ -537,6 +645,14 @@ def generate_config(reload: bool = False) -> None:
 @sync_debounce(100)
 def on_settings_changed(key: str, value: str) -> None:
     generate_config(True)
+
+
+@sync_debounce(500)
+def on_monitors_changed(*args: t.Any) -> None:
+    # Plugging a screen in or out moves the blocks around, and the rules
+    # name monitors, so they have to follow. A plain reload also reports
+    # the monitors again; skipping it when nothing changed avoids a loop.
+    generate_config("if_changed")
 
 
 def keybind_overrides_changed(value: KeybindOverridesRaw) -> None:
@@ -553,6 +669,7 @@ class HyprlandConfigService(Service):
         settings.watch("keybinds_overrides", keybind_overrides_changed, False)
         keybind_overrides_changed(settings.get("keybinds_overrides"))
         keybind_overrides.ready()
+        hyprland.monitor_ids.watch(on_monitors_changed)
         generate_config(True)
 
     async def check_errors(self) -> None:

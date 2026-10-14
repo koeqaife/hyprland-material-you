@@ -2,7 +2,7 @@ import asyncio
 from enum import Enum
 import os
 from asyncio import StreamReader, StreamWriter
-from utils.ref import Ref, Computed
+from utils.ref import Ref, Computed, unpack_reactive
 from utils.logger import logger
 import typing as t
 import json
@@ -67,9 +67,37 @@ def _monitor_positions() -> dict[str, tuple[int, int]]:
     return positions
 
 
+def parse_workspaces(value: str) -> list[int]:
+    # "1-10, 15" becomes every id in that range plus 15. Ranges have to be
+    # written out because workspace filters like r[1-10] only match the
+    # workspaces that already exist, and the ones we care about do not yet.
+    workspaces: list[int] = []
+    for part in value.replace(" ", "").split(","):
+        if not part:
+            continue
+        start, _, end = part.partition("-")
+        if not start.isdigit():
+            continue
+        if not end:
+            first = last = int(start)
+        elif end.isdigit():
+            first, last = int(start), int(end)
+        else:
+            continue
+        if last < first or last - first > 99:
+            continue
+        for workspace in range(first, last + 1):
+            if workspace > 0 and workspace not in workspaces:
+                workspaces.append(workspace)
+    return workspaces
+
+
 def _monitor_groups() -> dict[str, int]:
     groups: dict[str, int] = {}
-    monitors = Settings().get("monitors")
+    # Settings hand back a ReactiveList once the key has a ref of its own,
+    # and that is not a list, so every group was dropped here as soon as
+    # the settings window had been opened.
+    monitors = unpack_reactive(Settings().get("monitors"))
     if not isinstance(monitors, list):
         return groups
     for monitor in monitors:
@@ -79,6 +107,29 @@ def _monitor_groups() -> dict[str, int]:
         group = str(monitor.get("workspace_group") or "")
         if name and group.isdigit() and int(group) > 0:
             groups[name] = int(group) - 1
+    return groups
+
+
+def _rule_groups() -> dict[str, int]:
+    # A monitor bound to workspaces in the config owns the block those
+    # workspaces sit in, so the bar and the compositor agree on who has what.
+    groups: dict[str, int] = {}
+    rules = unpack_reactive(Settings().get("workspace_rules"))
+    if not isinstance(rules, list):
+        return groups
+    for rule in rules:
+        if not isinstance(rule, dict):
+            continue
+        name = rule.get("monitor")
+        workspaces = parse_workspaces(str(rule.get("workspaces") or ""))
+        if not name or not workspaces or name in groups:
+            continue
+        block = (min(workspaces) - 1) // 10
+        if (max(workspaces) - 1) // 10 != block:
+            # A rule reaching across blocks says nothing about which one the
+            # monitor owns, so the bar keeps doing what it did before.
+            continue
+        groups[name] = block
     return groups
 
 
@@ -93,7 +144,9 @@ def get_workspace_slot(monitor_name: str, fallback: int = -1) -> int:
         return fallback
     order = Settings().get("workspace_monitor_order")
     sort_by_kind = order in ("position", "internal", "external")
-    groups = _monitor_groups()
+    groups = _rule_groups()
+    # An explicit group still wins over the one the rules imply.
+    groups.update(_monitor_groups())
     if not sort_by_kind and not groups:
         return ids[monitor_name]
     positions = _monitor_positions() if sort_by_kind else {}

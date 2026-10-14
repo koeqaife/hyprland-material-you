@@ -33,6 +33,7 @@ gtk3_css = join(color_templates, "compiled", "gtk-3.0.css")
 gtk4_css = join(color_templates, "compiled", "gtk-4.0.css")
 
 task_lock = threading.Lock()
+regenerate_pending = False
 
 
 def process_image(
@@ -273,11 +274,23 @@ def update_gtk4() -> None:
     update_gtk("themes.gtk4", gtk4_css, GTK4_PATH)
 
 
+def reload_hyprland() -> None:
+    import asyncio
+    import src.services.hyprland as hyprland
+    try:
+        asyncio.create_task(hyprland.client.raw("reload"))
+    except Exception as e:
+        logger.warning("Couldn't reload hyprland: %s", e)
+
+
 def default_on_complete() -> None:
     reload_css()
     update_settings()
     update_gtk3()
     update_gtk4()
+    # colors-hyprland.lua is only read on reload, and the reload that
+    # follows a settings change runs before the colors are generated
+    reload_hyprland()
 
 
 def generate_colors(
@@ -304,6 +317,11 @@ def generate_colors(
             executor.shutdown(False)
         task_lock.release()
 
+        global regenerate_pending
+        if regenerate_pending:
+            regenerate_pending = False
+            glib.idle_add(lambda: generate_by_settings() and False)
+
     if task_lock.acquire(blocking=False):
         executor = concurrent.futures.ProcessPoolExecutor(max_workers=1)
         try:
@@ -321,8 +339,10 @@ def generate_colors(
         except Exception:
             task_lock.release()
     else:
+        global regenerate_pending
+        regenerate_pending = True
         logger.warning(
-            "Another task is already running, skipping the new task."
+            "Another task is already running, regenerating after it."
         )
 
 
