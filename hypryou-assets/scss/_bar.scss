@@ -196,6 +196,9 @@ window.bar {
             min-width: 1.5rem;
             margin-right: 0.375rem;
         }
+        &.narrow {
+            min-width: 8rem;
+        }
         &.collapsed {
             min-width: 2rem;
             @include nLayerBackground($surfaceContainerHigh, 3);
