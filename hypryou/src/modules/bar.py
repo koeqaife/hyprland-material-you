@@ -29,6 +29,48 @@ import typing as t
 
 dummy_region = cairo.Region()
 
+# Free width a hidden module needs beyond its own size before it comes back,
+# so the bar does not flicker at the edge.
+FIT_SLACK = 8
+# Milliseconds to wait for a fit step to be drawn before measuring again
+FIT_DELAY = 100
+
+
+class FitHideable:
+    """Lets the bar hide a module that does not fit without overriding the
+    module's own visibility logic."""
+    _fit_hidden = False
+    _wanted_visible: bool | None = None
+
+    def set_visible(self, visible: bool) -> None:
+        self._wanted_visible = visible
+        super().set_visible(visible and not self._fit_hidden)  # type: ignore
+
+    def set_fit_hidden(self, hidden: bool) -> None:
+        if self._wanted_visible is None:
+            self._wanted_visible = self.get_visible()  # type: ignore
+        self._fit_hidden = hidden
+        super().set_visible(  # type: ignore
+            self._wanted_visible and not hidden
+        )
+
+
+class FitLayout(gtk.CenterLayout):
+    """Center layout that reports every allocation to the bar."""
+    __gtype_name__ = "BarFitLayout"
+
+    def __init__(self, on_allocate: t.Callable[[], None]) -> None:
+        super().__init__()
+        self.on_allocate = weakref.WeakMethod(on_allocate)
+
+    def do_allocate(
+        self, widget: gtk.Widget, width: int, height: int, baseline: int
+    ) -> None:
+        gtk.CenterLayout.do_allocate(self, widget, width, height, baseline)
+        callback = self.on_allocate()
+        if callback:
+            callback()
+
 
 class WorkspaceButton(gtk.Button):
     __gtype_name__ = "HyprlandWorkspaceButton"
@@ -249,6 +291,7 @@ class LastChanged:
 
 class Player(gtk.Box):
     __gtype_name__ = "MprisPlayer"
+    fit_collapsed = False
 
     def __init__(self) -> None:
         super().__init__(
@@ -373,7 +416,7 @@ class Player(gtk.Box):
 
     def update_buttons(self) -> None:
         current = self.get_player()
-        if not current or self.settings.get("bar_media_style") == 2:
+        if not current or self.is_collapsed():
             self.btn_box.set_visible(False)
             self.last_changed.can_go_prev = None
             self.last_changed.can_go_next = None
@@ -413,7 +456,7 @@ class Player(gtk.Box):
             )
 
     def update_label(self) -> None:
-        if self.settings.get("bar_media_style") == 2:
+        if self.is_collapsed():
             self.label.set_visible(False)
             return
         else:
@@ -467,7 +510,7 @@ class Player(gtk.Box):
         self.image_provider.load_from_data(css)
 
     def update_image(self) -> None:
-        if self.settings.get("bar_media_style") == 2:
+        if self.is_collapsed():
             self.use_image(False)
             self.last_changed.artUrl = None
             current = self.get_player()
@@ -510,8 +553,23 @@ class Player(gtk.Box):
         toggle_css_class(
             self,
             "collapsed",
-            self.settings.get("bar_media_style") == 2
+            self.is_collapsed()
         )
+
+    def is_collapsed(self) -> bool:
+        return (
+            self.fit_collapsed
+            or self.settings.get("bar_media_style") == 2
+        )
+
+    def set_fit_narrow(self, narrow: bool) -> None:
+        # Drops the fixed width; the title shrinks to the space left
+        toggle_css_class(self, "narrow", narrow)
+
+    def set_fit_hidden(self, hidden: bool) -> None:
+        # Collapsing keeps only the icon
+        self.fit_collapsed = hidden
+        self.update_all()
 
     def update_watcher(self) -> None:
         current = self.get_player()
@@ -559,7 +617,7 @@ class Player(gtk.Box):
         self.image_provider = None  # type: ignore
 
 
-class KeyboardLayout(gtk.Label):
+class KeyboardLayout(FitHideable, gtk.Label):
     __gtype_name__ = "KeyboardLayoutApplet"
 
     def __init__(self) -> None:
@@ -591,7 +649,7 @@ class KeyboardLayout(gtk.Label):
             ref.unwatch(handler_id)
 
 
-class Battery(gtk.Box):
+class Battery(FitHideable, gtk.Box):
     __gtype_name__ = "BatteryApplet"
 
     def __init__(self) -> None:
@@ -929,7 +987,7 @@ class Applets(gtk.Box):
             self.remove(child)
 
 
-class OpenWindow(gtk.Button):
+class OpenWindow(FitHideable, gtk.Button):
     __gtype_name__ = "OpenWindowButton"
 
     def __init__(
@@ -988,6 +1046,7 @@ class ModulesLeft(gtk.Box):
             ),
             Player(),
         )
+        self.player = self.children[3]
         for child in self.children:
             self.append(child)
 
@@ -1021,7 +1080,7 @@ class ModulesCenter(gtk.Box):
             self.remove(child)
 
 
-class NetworkTraffic(gtk.Box):
+class NetworkTraffic(FitHideable, gtk.Box):
     __gtype_name__ = "NetworkTraffic"
 
     def __init__(self) -> None:
@@ -1181,6 +1240,10 @@ class ModulesRight(gtk.Box):
                 ("open-sidebar", "icon-tonal")
             )
         )
+        (
+            self.network_traffic, self.keyboard_layout, self.battery,
+            self.tray, self.cliphist
+        ) = self.children[:5]
         for child in self.children:
             self.append(child)
 
@@ -1223,10 +1286,34 @@ class Bar(widget.LayerWindow):
 
         self.monitor = monitor
         self.monitor_id = monitor_id
-        self.center_box = gtk.CenterBox(
-            start_widget=ModulesLeft(monitor, monitor_id),
-            center_widget=ModulesCenter(monitor, monitor_id),
-            end_widget=ModulesRight(monitor, monitor_id)
+        modules_left = ModulesLeft(monitor, monitor_id)
+        modules_right = ModulesRight(monitor, monitor_id)
+        self.center_box = gtk.CenterBox()
+        self.center_box.set_layout_manager(FitLayout(self.on_layout))
+        self.center_box.set_start_widget(modules_left)
+        self.center_box.set_center_widget(
+            ModulesCenter(monitor, monitor_id)
+        )
+        self.center_box.set_end_widget(modules_right)
+
+        # Applied in order while the bar is wider than the monitor
+        self.fit_steps: tuple[t.Callable[[bool], None], ...] = (
+            modules_right.network_traffic.set_fit_hidden,
+            modules_right.keyboard_layout.set_fit_hidden,
+            modules_left.player.set_fit_narrow,
+            modules_left.player.set_fit_hidden,
+            modules_right.cliphist.set_fit_hidden,
+            modules_right.tray.set_fit_hidden,
+            modules_right.battery.set_fit_hidden
+        )
+        self.fit_level = 0
+        self.fit_logged_level = 0
+        self.fit_savings: list[int] = []
+        self.fit_needed_before = 0
+        self.fit_pending = False
+        self.fit_idle = -1
+        self.geometry_handler = monitor.connect(
+            "notify::geometry", self.queue_fit
         )
 
         self.ref_handlers: dict[Ref[t.Any], int] = {
@@ -1256,11 +1343,76 @@ class Bar(widget.LayerWindow):
             weakref.finalize(self, lambda: logger.debug("Bar finalized"))
         self.update_hidden()
 
+    def available_width(self) -> int:
+        width = self.monitor.get_geometry().width
+        if self.settings.get("floating_bar"):
+            width -= 2 * self.settings.get("hyprland.gaps_out")
+        return int(width)
+
+    def needed_width(self) -> int:
+        return int(self.measure(gtk.Orientation.HORIZONTAL, -1)[0])
+
+    def on_layout(self) -> None:
+        if self.fit_idle != -1:
+            return
+        needed = self.needed_width()
+        available = self.available_width()
+        if (
+            needed > available and self.fit_level < len(self.fit_steps)
+        ) or (
+            self.fit_level > 0
+            and needed + self.fit_savings[-1] + FIT_SLACK <= available
+        ):
+            self.queue_fit()
+
+    def queue_fit(self, *args: t.Any) -> None:
+        if self.fit_idle == -1:
+            self.fit_idle = glib.idle_add(self.fit)
+
+    def fit(self) -> bool:
+        # One step at a time: css class changes only apply on the next frame
+        self.fit_idle = -1
+        available = self.available_width()
+        if available <= 0:
+            return False
+        needed = self.needed_width()
+        if self.fit_pending:
+            self.fit_savings[-1] = self.fit_needed_before - needed
+            self.fit_pending = False
+
+        if (
+            self.fit_level > 0
+            and needed + self.fit_savings[-1] + FIT_SLACK <= available
+        ):
+            self.fit_level -= 1
+            self.fit_steps[self.fit_level](False)
+            self.fit_savings.pop()
+        elif needed > available and self.fit_level < len(self.fit_steps):
+            self.fit_steps[self.fit_level](True)
+            self.fit_level += 1
+            self.fit_savings.append(0)
+            self.fit_needed_before = needed
+            self.fit_pending = True
+        else:
+            if self.fit_level != self.fit_logged_level:
+                self.fit_logged_level = self.fit_level
+                logger.info(
+                    "Bar on %s: %dpx available, needs %dpx, "
+                    "%d fit step(s) applied (saved %s)",
+                    self.monitor.get_connector(), available, needed,
+                    self.fit_level, self.fit_savings
+                )
+            return False
+
+        self.fit_idle = glib.timeout_add(FIT_DELAY, self.fit)
+        return False
+
     def on_gaps_out(self, value: int) -> None:
         self.change_floating(self.settings.get("floating_bar"))
 
     def change_floating(self, value: bool) -> None:
         toggle_css_class(self, "floating", value)
+        self.queue_fit()
         if value:
             gap = self.settings.get("hyprland.gaps_out")
             for edge in edges:
@@ -1324,6 +1476,10 @@ class Bar(widget.LayerWindow):
             )
 
     def destroy(self) -> None:
+        if self.fit_idle != -1:
+            glib.source_remove(self.fit_idle)
+            self.fit_idle = -1
+        self.monitor.disconnect(self.geometry_handler)
         box = self.center_box
         start_widget = box.get_start_widget()
         center_widget = box.get_center_widget()
