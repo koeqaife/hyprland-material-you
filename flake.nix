@@ -87,6 +87,10 @@
                   "$f"
               done
 
+            grep -rIl --include='*.py' '/usr/share/X11/xkb' . | while read -r f; do
+              sed -i "s|/usr/share/X11/xkb|${pkgs.xkeyboard_config}/share/X11/xkb|g" "$f"
+            done
+
             grep -rIl --include='*.py' 'libgtk4-layer-shell.so' . | while read -r f; do
               sed -i "s|libgtk4-layer-shell.so|${pkgs.gtk4-layer-shell}/lib/libgtk4-layer-shell.so|g" "$f"
             done
