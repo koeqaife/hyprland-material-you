@@ -62,7 +62,7 @@
             graphene
             libadwaita
             gtk4-layer-shell
-            networkmanager
+            networkmanager # libnm typelib
             upower
             dbus
             dbus-glib
@@ -86,6 +86,10 @@
                   -e "s|/usr/bin/hypryou|$out/bin/hypryou|g" \
                   "$f"
               done
+
+            grep -rIl --include='*.py' 'libgtk4-layer-shell.so' . | while read -r f; do
+              sed -i "s|libgtk4-layer-shell.so|${pkgs.gtk4-layer-shell}/lib/libgtk4-layer-shell.so|g" "$f"
+            done
           '';
 
           buildPhase = ''
@@ -130,6 +134,12 @@
           preFixup = ''
             gappsWrapperArgs+=(
               --prefix PATH : ${lib.makeBinPath runtimeTools}
+              --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [
+                pkgs.gtk4-layer-shell
+                pkgs.gtk4
+                pkgs.glib
+                pkgs.vips
+              ]}
             )
           '';
 
@@ -157,16 +167,26 @@
         {
           options.programs.hypryou = {
             enable = lib.mkEnableOption "the HyprYou (Material You) Hyprland session";
+
             package = lib.mkOption {
               type = lib.types.package;
               default = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
+              defaultText = lib.literalExpression "hypryou.packages.\${system}.default";
               description = "The hypryou package to use.";
+            };
+
+            extraPackages = lib.mkOption {
+              type = lib.types.listOf lib.types.package;
+              default = with pkgs; [ alacritty satty ];
+              description = "Optional packages recommended upstream (terminal, screenshot editor).";
             };
           };
 
           config = lib.mkIf cfg.enable {
             services.displayManager.sessionPackages = [ cfg.package ];
-            environment.systemPackages = [ cfg.package ];
+
+            environment.systemPackages =
+              [ cfg.package pkgs.adw-gtk3 ] ++ cfg.extraPackages;
 
             fonts.packages = [ cfg.package pkgs.material-symbols ];
 
