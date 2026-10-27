@@ -293,20 +293,19 @@ def make_layer_rule(namespace: str, key: str, value: SerializableType) -> str:
 
 def generate_blur() -> str | None:
     settings = Settings().get_view_for("blur")
-    if not settings.get("enabled"):
-        return
 
     xray = settings.get("xray")
 
     output = (
         make_layer_rule("hypryou-.*", "blur", True),
-        make_layer_rule("hypryou-.*", "xray", True),
+        make_layer_rule("hypryou-.*", "xray", xray),
         make_layer_rule("hypryou-.*", "ignore_alpha", 0.85)
     )
     blur_category = get_category(
         get_category(current_config, "decoration"),
         "blur"
     )
+    set_key(blur_category, "enabled", settings.get("enabled"))
     set_key(blur_category, "xray", xray)
     set_key(blur_category, "size", settings.get("size"))
     set_key(blur_category, "passes", settings.get("passes"))
@@ -617,7 +616,7 @@ def generate_config(reload: bool | t.Literal["if_changed"] = False) -> None:
     current_config = {}
 
     output = "-- DO NOT CHANGE THIS FILE, CHECK HYPRYOU SETTINGS\n"
-    output += "-- FOR CUSTOM CONFIG USE hyprland.conf\n\n"
+    output += "-- FOR CUSTOM CONFIG USE hyprland.lua\n\n"
     for func in funcs:
         func_output = func()
         if func_output:
