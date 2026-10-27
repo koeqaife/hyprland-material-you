@@ -398,7 +398,7 @@ class PopupsWindow(widget.LayerWindow):
 
     def hide(self) -> None:
         self.timeout = None
-        counter = window_counter.value[self.num]
+        counter = window_counter.value.get(self.num, 0)
         if counter > 0:
             return
         super().hide()
@@ -408,7 +408,7 @@ class PopupsWindow(widget.LayerWindow):
             self._update_visible(window_counter.value)
 
     def _update_visible(self, new: dict[int, int]) -> None:
-        new_counter = new[self.num]
+        new_counter = new.get(self.num, 0)
         if new_counter > 0:
             self.show()
         else:
@@ -425,5 +425,6 @@ class PopupsWindow(widget.LayerWindow):
         get_upower().unwatch(self.upower_handler)
         is_locked.unwatch(self.lock_handler)
         window_counter.unwatch(self.handler)
-        del window_counter.value[self.num]
+        if window_counter.value.get(self.num):
+            del window_counter.value[self.num]
         super().destroy()
