@@ -369,13 +369,12 @@ def generate_hl_config() -> str:
 
 def generate_shadow() -> None:
     settings = Settings().get_view_for("shadow")
-    if not settings.get("enabled"):
-        return
 
     shadow_category = get_category(
         get_category(current_config, "decoration"),
         "shadow"
     )
+    set_key(shadow_category, "enabled", settings.get("enabled"))
     set_key(shadow_category, "range", settings.get("range"))
     set_key(shadow_category, "render_power", settings.get("render_power"))
     set_key(shadow_category, "color", f"0x{settings.get("color")}")
