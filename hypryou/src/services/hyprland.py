@@ -774,6 +774,7 @@ async def get_active_workspaces(client: HyprlandClient) -> dict[int, int]:
     workspace_monitors = {
         int(object["id"]): int(object["monitorID"])
         for object in workspaces
+        if object.get("monitorID") is not None
     }
     return workspace_monitors
 
