@@ -132,6 +132,10 @@ def generate_keys(
             key, replace = _value, _value
 
         value = settings.get(key)
+        if isinstance(value, str) and not value.strip():
+            # Hyprland 0.57 rejects empty strings for keys such as
+            # accel_profile; leaving the key out keeps Hyprland's default.
+            continue
         set_key(config, replace, value)
 
 
