@@ -5,7 +5,6 @@
 
 window.keybinds {
     @include nLayerBackground($background, 1);
-    min-width: 60rem;
     border-radius: $hyprlandRounding;
     border: 0.0625rem solid $layerBorderColor;
     padding: 0.5rem;
