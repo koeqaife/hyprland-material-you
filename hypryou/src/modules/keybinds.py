@@ -61,6 +61,8 @@ MODMASK_NAMES = (
 
 # Leaves room for the gaps around the window on the active monitor.
 MAX_HEIGHT_FRACTION = 0.85
+MAX_WIDTH_FRACTION = 0.95
+COLUMNS = 3
 
 
 def effective_bind(keybind: KeyBind) -> tuple[str, ...] | None:
@@ -121,16 +123,17 @@ class KeybindWidget(gtk.Box):
 class KeybindsBox(gtk.FlowBox):
     __gtype_name__ = "KeybindsBox"
 
-    def __init__(self) -> None:
+    def __init__(self, on_resize: t.Callable[[], None]) -> None:
         super().__init__(
             css_classes=("keybinds-box",),
             selection_mode=gtk.SelectionMode.NONE,
             hexpand=True,
-            max_children_per_line=3,
+            max_children_per_line=COLUMNS,
             row_spacing=2,
             column_spacing=2
         )
         self.destroyed = False
+        self.on_resize = on_resize
         self.boxes: dict[Category, gtk.Box] = {}
         for category, icon in CATEGORIES.items():
             box = self.make_category(category, icon)
@@ -210,6 +213,7 @@ class KeybindsBox(gtk.FlowBox):
         for hint in hints:
             self.other_box.append(KeybindWidget(hint))
         self.append(self.other_box)
+        self.on_resize()
 
     def destroy(self) -> None:
         self.destroyed = True
@@ -251,22 +255,49 @@ class KeybindsWindow(widget.LayerWindow):
                 self, lambda: logger.debug("InfoWindow finalized")
             )
 
-    def update_max_height(self) -> None:
+    def monitor_size(self) -> tuple[int, int] | None:
         display = gdk.Display.get_default()
         if display is None:
-            return
+            return None
         for monitor in display.get_monitors():
             if monitor.get_connector() == hyprland.active_monitor_name.value:
-                height = monitor.get_geometry().height
-                self.scroll.set_max_content_height(
-                    int(height * MAX_HEIGHT_FRACTION)
-                )
-                return
+                geometry = monitor.get_geometry()
+                return geometry.width, geometry.height
+        return None
+
+    def fit_size(self) -> None:
+        # The window starts at 1x1 and so takes its minimum size, which a
+        # scrolled window keeps small. Ask for the width of the widest
+        # columns and the height they need, up to most of the monitor.
+        if self._child is None:
+            return
+        widths: list[int] = []
+        child = self._child.get_first_child()
+        while child is not None:
+            widths.append(child.measure(gtk.Orientation.HORIZONTAL, -1)[1])
+            child = child.get_next_sibling()
+        if not widths:
+            return
+        per_line = min(COLUMNS, len(widths))
+        width = sum(sorted(widths, reverse=True)[:per_line])
+        width += self._child.get_column_spacing() * (per_line - 1)
+
+        size = self.monitor_size()
+        max_height = -1
+        if size is not None:
+            width = min(width, int(size[0] * MAX_WIDTH_FRACTION))
+            max_height = int(size[1] * MAX_HEIGHT_FRACTION)
+
+        self.box.set_size_request(width, -1)
+        height = self.box.measure(gtk.Orientation.VERTICAL, width)[1]
+        if max_height > 0:
+            height = min(height, max_height)
+        self.scroll.set_min_content_height(height)
 
     def on_show(self) -> None:
-        self.update_max_height()
-        self._child = KeybindsBox()
+        self._child = KeybindsBox(self.fit_size)
         self.box.append(self._child)
+        self.fit_size()
 
     def on_hide(self) -> None:
         if self._child:
