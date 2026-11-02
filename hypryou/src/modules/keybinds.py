@@ -52,12 +52,11 @@ CUSTOM_ICON = "keyboard"
 # Same length as the longest default category, so custom groups line up
 # with the others instead of growing into one long column.
 CUSTOM_GROUP_SIZE = 10
-# Groups per page: two rows of three on a wide monitor, three rows of two
-# on a narrow one. The first page keeps the default categories.
-PAGE_SIZE = 6
 COLUMNS = 3
-# Leaves room for the gaps around the window on the active monitor.
+GAP = 2
+# Leaves room for the gaps around the window and the page buttons.
 MAX_WIDTH_FRACTION = 0.95
+MAX_HEIGHT_FRACTION = 0.75
 
 # Bits of the modmask that `hyprctl binds` reports, in the order the
 # window shows them.
@@ -217,75 +216,41 @@ def make_category(name: str, icon: str) -> gtk.Box:
     return box
 
 
-def make_page() -> gtk.FlowBox:
-    return gtk.FlowBox(
-        css_classes=("keybinds-box",),
-        selection_mode=gtk.SelectionMode.NONE,
-        hexpand=True,
-        valign=gtk.Align.START,
-        max_children_per_line=COLUMNS,
-        row_spacing=2,
-        column_spacing=2
-    )
-
-
 class KeybindsBox(gtk.Box):
     __gtype_name__ = "KeybindsBox"
 
-    def __init__(self, extra: list[KeyBindHint] | None = None) -> None:
+    def __init__(self, extra: list[KeyBindHint] | None) -> None:
         super().__init__(
             css_classes=("keybinds-pages",),
             orientation=gtk.Orientation.VERTICAL
         )
-        boxes: dict[Category, gtk.Box] = {}
-        groups: list[gtk.Box] = []
-        for category, icon in CATEGORIES.items():
-            boxes[category] = make_category(category, icon)
-            groups.append(boxes[category])
-        for keybind in key_binds:
-            if not keybind.description or not keybind.category:
-                continue
-            if isinstance(keybind, KeyBind):
-                bind = effective_bind(keybind)
-                if bind is None:
-                    continue
-                keybind = KeyBindHint(
-                    bind, keybind.description, keybind.category
-                )
-            boxes[keybind.category].append(KeybindWidget(keybind))
-
-        hints = custom_hints() + (extra or [])
-        chunks = [
-            hints[i:i + CUSTOM_GROUP_SIZE]
-            for i in range(0, len(hints), CUSTOM_GROUP_SIZE)
-        ]
-        for number, chunk in enumerate(chunks, start=1):
-            name = CUSTOM_CATEGORY
-            if len(chunks) > 1:
-                name = f"{CUSTOM_CATEGORY} {number}"
-            box = make_category(name, CUSTOM_ICON)
-            for hint in chunk:
-                box.append(KeybindWidget(hint))
-            groups.append(box)
-
-        self.pages: list[gtk.FlowBox] = []
-        for i in range(0, len(groups), PAGE_SIZE):
-            page = make_page()
-            for group in groups[i:i + PAGE_SIZE]:
-                page.append(group)
-            self.pages.append(page)
-
+        # The groups only get the window's styles, and so their real size,
+        # once they are inside it; they wait here until build() lays them
+        # out.
+        self.groups = self.make_groups(extra or [])
+        self.holder = gtk.Box(visible=False)
+        for group in self.groups:
+            self.holder.append(group)
+        self.append(self.holder)
+        self.pages: list[gtk.Box] = []
+        self.buttons: list[gtk.Button] = []
         self.current = 0
+
+    def build(self, monitor: tuple[int, int] | None) -> None:
+        columns, max_height = self.fit(self.groups, monitor)
+        for group in self.groups:
+            self.holder.remove(group)
+        self.remove(self.holder)
+        self.pages = self.lay_out(self.groups, columns, max_height)
+
         self.stack = gtk.Stack(
             transition_type=gtk.StackTransitionType.SLIDE_LEFT_RIGHT,
-            transition_duration=200,
-            vhomogeneous=False
+            transition_duration=200
         )
         for page in self.pages:
             self.stack.add_child(page)
         self.append(self.stack)
 
-        self.buttons: list[gtk.Button] = []
         if len(self.pages) > 1:
             # Holding the box weakly keeps the buttons from keeping it
             # alive after the window closes.
@@ -311,7 +276,102 @@ class KeybindsBox(gtk.Box):
             self.append(buttons_box)
         self.set_page(0)
 
+    def make_groups(self, extra: list[KeyBindHint]) -> list[gtk.Box]:
+        boxes: dict[Category, gtk.Box] = {}
+        groups: list[gtk.Box] = []
+        for category, icon in CATEGORIES.items():
+            boxes[category] = make_category(category, icon)
+            groups.append(boxes[category])
+        for keybind in key_binds:
+            if not keybind.description or not keybind.category:
+                continue
+            if isinstance(keybind, KeyBind):
+                bind = effective_bind(keybind)
+                if bind is None:
+                    continue
+                keybind = KeyBindHint(
+                    bind, keybind.description, keybind.category
+                )
+            boxes[keybind.category].append(KeybindWidget(keybind))
+
+        hints = custom_hints() + extra
+        chunks = [
+            hints[i:i + CUSTOM_GROUP_SIZE]
+            for i in range(0, len(hints), CUSTOM_GROUP_SIZE)
+        ]
+        for number, chunk in enumerate(chunks, start=1):
+            name = CUSTOM_CATEGORY
+            if len(chunks) > 1:
+                name = f"{CUSTOM_CATEGORY} {number}"
+            box = make_category(name, CUSTOM_ICON)
+            for hint in chunk:
+                box.append(KeybindWidget(hint))
+            groups.append(box)
+        return groups
+
+    def fit(
+        self,
+        groups: list[gtk.Box],
+        monitor: tuple[int, int] | None
+    ) -> tuple[int, int]:
+        """Columns that fit the monitor's width, and a page's height."""
+        if monitor is None:
+            return COLUMNS, -1
+        widest = max(
+            group.measure(gtk.Orientation.HORIZONTAL, -1)[1]
+            for group in groups
+        )
+        columns = COLUMNS
+        while (
+            columns > 1
+            and widest * columns + GAP * (columns - 1)
+            > monitor[0] * MAX_WIDTH_FRACTION
+        ):
+            columns -= 1
+        return columns, int(monitor[1] * MAX_HEIGHT_FRACTION)
+
+    def lay_out(
+        self,
+        groups: list[gtk.Box],
+        columns: int,
+        max_height: int
+    ) -> list[gtk.Box]:
+        # Each group goes under the shortest column, so a short group
+        # leaves no gap below it. A group that fits under no column
+        # starts the next page.
+        pages: list[gtk.Box] = []
+        stacks: list[gtk.Box] = []
+        heights: list[int] = []
+        for group in groups:
+            height = group.measure(gtk.Orientation.VERTICAL, -1)[1]
+            shortest = heights.index(min(heights)) if heights else -1
+            if (
+                not stacks
+                or (
+                    max_height > 0
+                    and heights[shortest] > 0
+                    and heights[shortest] + GAP + height > max_height
+                )
+            ):
+                page = gtk.Box(spacing=GAP, valign=gtk.Align.START)
+                stacks = []
+                for _ in range(columns):
+                    stack = gtk.Box(
+                        orientation=gtk.Orientation.VERTICAL,
+                        spacing=GAP
+                    )
+                    page.append(stack)
+                    stacks.append(stack)
+                heights = [0] * columns
+                pages.append(page)
+                shortest = 0
+            stacks[shortest].append(group)
+            heights[shortest] += height + (GAP if heights[shortest] else 0)
+        return pages
+
     def set_page(self, index: int) -> None:
+        if not self.pages:
+            return
         index = max(0, min(index, len(self.pages) - 1))
         self.current = index
         self.stack.set_visible_child(self.pages[index])
@@ -323,26 +383,6 @@ class KeybindsBox(gtk.Box):
 
     def move_page(self, step: int) -> None:
         self.set_page(self.current + step)
-
-    def set_columns(self, columns: int) -> None:
-        # The window starts at 1x1 and takes its minimum size, which a
-        # flow box would make one column wide.
-        for page in self.pages:
-            page.set_min_children_per_line(columns)
-            page.set_max_children_per_line(columns)
-
-    def natural_width(self, columns: int) -> int:
-        widest = 0
-        for page in self.pages:
-            widths: list[int] = []
-            child = page.get_first_child()
-            while child is not None:
-                widths.append(child.measure(gtk.Orientation.HORIZONTAL, -1)[1])
-                child = child.get_next_sibling()
-            width = sum(sorted(widths, reverse=True)[:columns])
-            width += page.get_column_spacing() * (columns - 1)
-            widest = max(widest, width)
-        return widest
 
     def destroy(self) -> None:
         self.buttons.clear()
@@ -375,13 +415,14 @@ class KeybindsWindow(widget.LayerWindow):
                 self, lambda: logger.debug("InfoWindow finalized")
             )
 
-    def monitor_width(self) -> int | None:
+    def monitor_size(self) -> tuple[int, int] | None:
         display = gdk.Display.get_default()
         if display is None:
             return None
         for monitor in display.get_monitors():
             if monitor.get_connector() == hyprland.active_monitor_name.value:
-                return int(monitor.get_geometry().width)
+                geometry = monitor.get_geometry()
+                return int(geometry.width), int(geometry.height)
         return None
 
     def on_key_press(
@@ -407,15 +448,8 @@ class KeybindsWindow(widget.LayerWindow):
     def show_list(self, extra: list[KeyBindHint] | None = None) -> None:
         self.on_hide()
         self._child = KeybindsBox(extra)
-        # Three columns where they fit, two on a narrow monitor.
-        columns = COLUMNS
-        width = self.monitor_width()
-        if width is not None:
-            limit = width * MAX_WIDTH_FRACTION
-            while columns > 1 and self._child.natural_width(columns) > limit:
-                columns -= 1
-        self._child.set_columns(columns)
         self.box.append(self._child)
+        self._child.build(self.monitor_size())
 
     def on_hide(self) -> None:
         if self._child:
