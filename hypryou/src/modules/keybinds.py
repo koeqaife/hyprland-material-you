@@ -1,5 +1,6 @@
 from repository import layer_shell, gtk, gdk
 import asyncio
+import re
 import weakref
 import typing as t
 from utils.logger import logger
@@ -52,6 +53,9 @@ CUSTOM_ICON = "keyboard"
 # Same length as the longest default category, so custom groups line up
 # with the others instead of growing into one long column.
 CUSTOM_GROUP_SIZE = 10
+# "Group: what it does" puts a custom bind under its own title, or into a
+# default category of that name.
+GROUP_PREFIX = re.compile(r"^\s*([^:]{1,32}?)\s*:\s+(\S.*)$")
 COLUMNS = 3
 GAP = 2
 # Leaves room for the gaps around the window and the page buttons.
@@ -195,11 +199,21 @@ async def add_config_binds(
         window.show_list(hints)
 
 
-def make_category(name: str, icon: str) -> gtk.Box:
+def split_group(description: str) -> tuple[str | None, str]:
+    match = GROUP_PREFIX.match(description)
+    if match is None:
+        return None, description
+    return match.group(1), match.group(2)
+
+
+def make_category(name: str | None, icon: str) -> gtk.Box:
     box = gtk.Box(
         css_classes=("category-box",),
         orientation=gtk.Orientation.VERTICAL
     )
+    if name is None:
+        # The rest of a group that went on in another box.
+        return box
     label_box = gtk.Box(
         css_classes=("label-box",)
     )
@@ -294,18 +308,29 @@ class KeybindsBox(gtk.Box):
                 )
             boxes[keybind.category].append(KeybindWidget(keybind))
 
-        hints = custom_hints() + extra
-        chunks = [
-            hints[i:i + CUSTOM_GROUP_SIZE]
-            for i in range(0, len(hints), CUSTOM_GROUP_SIZE)
-        ]
-        # The groups share one title: they are placed by height, not in
-        # reading order, so numbers would read out of order.
-        for chunk in chunks:
-            box = make_category(CUSTOM_CATEGORY, CUSTOM_ICON)
-            for hint in chunk:
-                box.append(KeybindWidget(hint))
-            groups.append(box)
+        titles = {category.value.lower(): category for category in boxes}
+        grouped: dict[str, list[KeyBindHint]] = {}
+        for hint in custom_hints() + extra:
+            group, description = split_group(hint.description or "")
+            hint = KeyBindHint(hint.bind, description)
+            category = titles.get((group or "").lower())
+            if category is not None:
+                boxes[category].append(KeybindWidget(hint))
+                continue
+            grouped.setdefault(group or CUSTOM_CATEGORY, []).append(hint)
+
+        # Ungrouped binds come last, under the plain custom title.
+        if CUSTOM_CATEGORY in grouped:
+            grouped[CUSTOM_CATEGORY] = grouped.pop(CUSTOM_CATEGORY)
+        for title, hints in grouped.items():
+            for start in range(0, len(hints), CUSTOM_GROUP_SIZE):
+                # Only the first box of a long group carries its title.
+                box = make_category(
+                    title if start == 0 else None, CUSTOM_ICON
+                )
+                for hint in hints[start:start + CUSTOM_GROUP_SIZE]:
+                    box.append(KeybindWidget(hint))
+                groups.append(box)
         return groups
 
     def fit(
