@@ -299,11 +299,10 @@ class KeybindsBox(gtk.Box):
             hints[i:i + CUSTOM_GROUP_SIZE]
             for i in range(0, len(hints), CUSTOM_GROUP_SIZE)
         ]
-        for number, chunk in enumerate(chunks, start=1):
-            name = CUSTOM_CATEGORY
-            if len(chunks) > 1:
-                name = f"{CUSTOM_CATEGORY} {number}"
-            box = make_category(name, CUSTOM_ICON)
+        # The groups share one title: they are placed by height, not in
+        # reading order, so numbers would read out of order.
+        for chunk in chunks:
+            box = make_category(CUSTOM_CATEGORY, CUSTOM_ICON)
             for hint in chunk:
                 box.append(KeybindWidget(hint))
             groups.append(box)
