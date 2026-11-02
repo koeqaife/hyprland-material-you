@@ -132,6 +132,10 @@ def generate_keys(
             key, replace = _value, _value
 
         value = settings.get(key)
+        if isinstance(value, str) and not value.strip():
+            # Hyprland 0.57 rejects empty strings for keys such as
+            # accel_profile; leaving the key out keeps Hyprland's default.
+            continue
         set_key(config, replace, value)
 
 
@@ -515,25 +519,19 @@ def generate_binds() -> str:
         else:
             key_str = serialize_value(key)
 
-        # The description lets `hyprctl binds` and the keybindings window
-        # tell what a bind does; with a Lua action, `arg` is only a number.
-        options: list[str] = []
-        if "mouse" in key_str:
-            options.append("mouse = true")
-        if bind.description:
-            options.append(f"description = {lua_string(bind.description)}")
-        options_str = f", {{ {', '.join(options)} }}" if options else ""
-
         if "%N%" in key_str:
             for k in range(0, 10):
                 n = k if k != 0 else 10
                 _key = key_str.replace("%N%", str(k))
                 _action = action_str.replace("%N%", str(n))
                 bind_str = f"{_key}, {_action}"
-                output += f"hl.bind({bind_str}{options_str})\n"
+                output += f"hl.bind({bind_str})\n"
         else:
             bind_str = f"{key_str}, {action_str}"
-            output += f"hl.bind({bind_str}{options_str})\n"
+            if "mouse" in key_str:
+                output += f"hl.bind({bind_str}, {{ mouse = true }})\n"
+            else:
+                output += f"hl.bind({bind_str})\n"
 
     # Hyprland runs every bind on a key, so a custom bind on a key that a
     # default still uses runs both; the settings page warns about that.

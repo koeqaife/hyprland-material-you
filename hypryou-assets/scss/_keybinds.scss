@@ -64,6 +64,27 @@ window.keybinds {
         font-weight: 400;
     }
 
+    .page-buttons {
+        margin-top: 0.5rem;
+        button {
+            @include nLayerBackground($surfaceContainer, 2);
+            min-width: 2rem;
+            min-height: 2rem;
+            border-radius: 1rem;
+            color: $onSurfaceVariant;
+            &:not(:last-child) {
+                margin-right: 0.25rem;
+            }
+            &:hover {
+                background-color: color.mix($surfaceContainer, $onSurface, 90%);
+            }
+            &.active {
+                background-color: $primary;
+                color: $onPrimary;
+            }
+        }
+    }
+
     separator {
         margin-top: 0.25rem;
         margin-bottom: 0.25rem;
