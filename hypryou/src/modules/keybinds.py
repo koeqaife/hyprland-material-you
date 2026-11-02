@@ -1,4 +1,5 @@
 from repository import layer_shell, gtk, gdk
+import asyncio
 import weakref
 import typing as t
 from utils.logger import logger
@@ -57,6 +58,15 @@ PAGE_SIZE = 6
 COLUMNS = 3
 # Leaves room for the gaps around the window on the active monitor.
 MAX_WIDTH_FRACTION = 0.95
+
+# Bits of the modmask that `hyprctl binds` reports, in the order the
+# window shows them.
+MODMASK_NAMES = (
+    (64, "SUPER"),
+    (4, "CTRL"),
+    (8, "ALT"),
+    (1, "SHIFT"),
+)
 
 PREVIOUS_PAGE_KEYS = (gdk.KEY_Left, gdk.KEY_Page_Up)
 NEXT_PAGE_KEYS = (gdk.KEY_Right, gdk.KEY_Page_Down)
@@ -131,6 +141,61 @@ class KeybindWidget(gtk.Box):
         )
 
 
+def bind_from_hyprctl(item: dict[str, t.Any]) -> tuple[str, ...]:
+    modmask = int(item.get("modmask") or 0)
+    keys = [name for bit, name in MODMASK_NAMES if modmask & bit]
+    keys.append(str(item.get("key") or ""))
+    return tuple(keys)
+
+
+async def config_hints() -> list[KeyBindHint]:
+    """Described binds from the user's hyprland.lua.
+
+    That file is loaded by Hyprland only, so its binds never reach
+    HyprYou's runtime and have to be read back from Hyprland. Binds that
+    HyprYou already lists are skipped by their description.
+    """
+    try:
+        binds = await hyprland.client.query("binds")
+    except Exception as e:
+        logger.warning("Couldn't read binds from Hyprland: %s", e)
+        return []
+    if not isinstance(binds, list):
+        return []
+    known = {
+        keybind.description for keybind in key_binds
+        if keybind.description
+    }
+    known.update(hint.description for hint in custom_hints())
+    seen: set[tuple[tuple[str, ...], str]] = set()
+    hints: list[KeyBindHint] = []
+    for item in binds:
+        if not isinstance(item, dict) or item.get("submap"):
+            continue
+        description = str(item.get("description") or "").strip()
+        if not description or description in known:
+            continue
+        bind = bind_from_hyprctl(item)
+        if not bind[-1] or (bind, description) in seen:
+            continue
+        seen.add((bind, description))
+        hints.append(KeyBindHint(bind, description))
+    return hints
+
+
+async def add_config_binds(
+    window_ref: "weakref.ref[KeybindsWindow]",
+    child: "weakref.ref[KeybindsBox]"
+) -> None:
+    hints = await config_hints()
+    window = window_ref()
+    if window is None or not hints:
+        return
+    # Only if the window still shows the list this query was made for.
+    if child() is not None and window._child is child():
+        window.show_list(hints)
+
+
 def make_category(name: str, icon: str) -> gtk.Box:
     box = gtk.Box(
         css_classes=("category-box",),
@@ -167,7 +232,7 @@ def make_page() -> gtk.FlowBox:
 class KeybindsBox(gtk.Box):
     __gtype_name__ = "KeybindsBox"
 
-    def __init__(self) -> None:
+    def __init__(self, extra: list[KeyBindHint] | None = None) -> None:
         super().__init__(
             css_classes=("keybinds-pages",),
             orientation=gtk.Orientation.VERTICAL
@@ -189,7 +254,7 @@ class KeybindsBox(gtk.Box):
                 )
             boxes[keybind.category].append(KeybindWidget(keybind))
 
-        hints = custom_hints()
+        hints = custom_hints() + (extra or [])
         chunks = [
             hints[i:i + CUSTOM_GROUP_SIZE]
             for i in range(0, len(hints), CUSTOM_GROUP_SIZE)
@@ -333,7 +398,15 @@ class KeybindsWindow(widget.LayerWindow):
         super().on_key_press(controller, keyval, *args)
 
     def on_show(self) -> None:
-        self._child = KeybindsBox()
+        self.show_list()
+        if self._child is not None:
+            asyncio.create_task(
+                add_config_binds(weakref.ref(self), weakref.ref(self._child))
+            )
+
+    def show_list(self, extra: list[KeyBindHint] | None = None) -> None:
+        self.on_hide()
+        self._child = KeybindsBox(extra)
         # Three columns where they fit, two on a narrow monitor.
         columns = COLUMNS
         width = self.monitor_width()
