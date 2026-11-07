@@ -1331,6 +1331,9 @@ class Bar(widget.LayerWindow):
                 "floating_bar", self.change_floating, True
             ),
             self.settings.watch(
+                "transparent_bar", self.change_transparent, True
+            ),
+            self.settings.watch(
                 "hyprland.gaps_out", self.change_floating, False
             )
         }
@@ -1420,6 +1423,9 @@ class Bar(widget.LayerWindow):
         else:
             for edge in edges:
                 layer_shell.set_margin(self, edge, 0)
+
+    def change_transparent(self, value: bool) -> None:
+        toggle_css_class(self, "transparent", value)
 
     def update_hidden(self, *args: t.Any) -> None:
         if self.visible_timeout != -1:
@@ -1522,6 +1528,9 @@ class Corners:
                 "floating_bar", self.update_visible, False
             ),
             self.settings.watch(
+                "transparent_bar", self.update_visible, False
+            ),
+            self.settings.watch(
                 "hyprland.gaps_out", self.update_rounding, False
             ),
             self.decoration.watch(
@@ -1584,6 +1593,7 @@ class Corners:
     def update_visible(self, *args: t.Any) -> None:
         value = (
             not self.settings.get("floating_bar")
+            and not self.settings.get("transparent_bar")
             and self.settings.get("corners")
         )
         if value and not self.windows:

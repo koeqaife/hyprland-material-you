@@ -62,6 +62,7 @@ default_settings: dict[str, t.Any] = {
     "secure_cliphist": False,
     "floating_sidebar": False,
     "floating_bar": False,
+    "transparent_bar": False,
     "hide_empty_workspaces": False,
 
     "appearance.color": "",

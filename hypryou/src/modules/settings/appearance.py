@@ -62,6 +62,11 @@ class AppearancePage(gtk.ScrolledWindow):
                 "Adds margins to the bar (conflicts with corners)",
                 "floating_bar",
             ),
+            SettingsBoolRow(
+                "Transparent Bar",
+                "Removes the background of the bar (hides corners)",
+                "transparent_bar",
+            ),
 
             Category("Formatting"),
             SettingsBoolRow(

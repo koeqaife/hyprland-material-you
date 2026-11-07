@@ -8,6 +8,10 @@ window.bar {
     border: none;
     box-shadow: none;
 
+    &.transparent {
+        background-color: transparent;
+    }
+
     &.floating {
         border-radius: $hyprlandRounding;
     }
