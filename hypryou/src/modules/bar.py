@@ -1503,6 +1503,8 @@ class Bar(widget.LayerWindow):
         self.close()
         for ref, handler in self.ref_handlers.items():
             ref.unwatch(handler)
+        for handler in self.settings_handlers:
+            self.settings.unwatch(handler)
         super().destroy()
 
 
