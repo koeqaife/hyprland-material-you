@@ -242,7 +242,9 @@ class MprisPlayer(Signals):
 
     @property
     def metadata(self) -> MprisMetadata:
-        return t.cast(MprisMetadata, self.prop("Metadata"))
+        # Players are allowed to leave it out until they have something to
+        # play.
+        return t.cast(MprisMetadata, self.prop("Metadata") or {})
 
     @property
     def volume(self) -> float:
