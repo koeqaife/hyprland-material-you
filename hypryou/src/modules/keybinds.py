@@ -169,7 +169,9 @@ async def config_hints() -> list[KeyBindHint]:
         keybind.description for keybind in key_binds
         if keybind.description
     }
-    known.update(hint.description for hint in custom_hints())
+    known.update(
+        hint.description for hint in custom_hints() if hint.description
+    )
     seen: set[tuple[tuple[str, ...], str]] = set()
     hints: list[KeyBindHint] = []
     for item in binds:
@@ -192,10 +194,12 @@ async def add_config_binds(
 ) -> None:
     hints = await config_hints()
     window = window_ref()
-    if window is None or not hints:
+    if window is None:
         return
+    window.config_hints = hints
     # Only if the window still shows the list this query was made for.
-    if child() is not None and window._child is child():
+    box = child()
+    if box is not None and window._child is box and box.extra != hints:
         window.show_list(hints)
 
 
@@ -238,11 +242,14 @@ class KeybindsBox(gtk.Box):
             css_classes=("keybinds-pages",),
             orientation=gtk.Orientation.VERTICAL
         )
+        self.extra = extra or []
+        # Whether each group goes on from the one before it.
+        self.continues: list[bool] = []
         # The groups only get the window's styles, and so their real size,
-        # once they are inside it; they wait here until build() lays them
-        # out.
-        self.groups = self.make_groups(extra or [])
-        self.holder = gtk.Box(visible=False)
+        # once they are inside it and visible; they wait here until build()
+        # lays them out, which happens before anything is drawn.
+        self.groups = self.make_groups(self.extra)
+        self.holder = gtk.Box()
         for group in self.groups:
             self.holder.append(group)
         self.append(self.holder)
@@ -252,10 +259,16 @@ class KeybindsBox(gtk.Box):
 
     def build(self, monitor: tuple[int, int] | None) -> None:
         columns, max_height = self.fit(self.groups, monitor)
+        # Measured here because a group loses the window's styles, and so
+        # its real size, as soon as it leaves the holder.
+        sizes = [
+            group.measure(gtk.Orientation.VERTICAL, -1)[1]
+            for group in self.groups
+        ]
         for group in self.groups:
             self.holder.remove(group)
         self.remove(self.holder)
-        self.pages = self.lay_out(self.groups, columns, max_height)
+        self.pages = self.lay_out(self.groups, sizes, columns, max_height)
 
         self.stack = gtk.Stack(
             transition_type=gtk.StackTransitionType.SLIDE_LEFT_RIGHT,
@@ -296,26 +309,27 @@ class KeybindsBox(gtk.Box):
         for category, icon in CATEGORIES.items():
             boxes[category] = make_category(category, icon)
             groups.append(boxes[category])
+        self.continues = [False] * len(groups)
         for keybind in key_binds:
-            if not keybind.description or not keybind.category:
+            section = keybind.category
+            if not keybind.description or not section:
                 continue
+            shown: KeyBind | KeyBindHint = keybind
             if isinstance(keybind, KeyBind):
                 bind = effective_bind(keybind)
                 if bind is None:
                     continue
-                keybind = KeyBindHint(
-                    bind, keybind.description, keybind.category
-                )
-            boxes[keybind.category].append(KeybindWidget(keybind))
+                shown = KeyBindHint(bind, keybind.description, section)
+            boxes[section].append(KeybindWidget(shown))
 
         titles = {category.value.lower(): category for category in boxes}
         grouped: dict[str, list[KeyBindHint]] = {}
         for hint in custom_hints() + extra:
             group, description = split_group(hint.description or "")
             hint = KeyBindHint(hint.bind, description)
-            category = titles.get((group or "").lower())
-            if category is not None:
-                boxes[category].append(KeybindWidget(hint))
+            default = titles.get((group or "").lower())
+            if default is not None:
+                boxes[default].append(KeybindWidget(hint))
                 continue
             grouped.setdefault(group or CUSTOM_CATEGORY, []).append(hint)
 
@@ -331,6 +345,7 @@ class KeybindsBox(gtk.Box):
                 for hint in hints[start:start + CUSTOM_GROUP_SIZE]:
                     box.append(KeybindWidget(hint))
                 groups.append(box)
+                self.continues.append(start > 0)
         return groups
 
     def fit(
@@ -357,26 +372,43 @@ class KeybindsBox(gtk.Box):
     def lay_out(
         self,
         groups: list[gtk.Box],
+        sizes: list[int],
         columns: int,
         max_height: int
     ) -> list[gtk.Box]:
         # Each group goes under the shortest column, so a short group
-        # leaves no gap below it. A group that fits under no column
-        # starts the next page.
+        # leaves no gap below it. A long group flows like text instead,
+        # from the leftmost column with room and only ever to the right,
+        # so its parts stay in reading order. A group that fits nowhere
+        # it may go starts the next page.
         pages: list[gtk.Box] = []
         stacks: list[gtk.Box] = []
         heights: list[int] = []
-        for group in groups:
-            height = group.measure(gtk.Orientation.VERTICAL, -1)[1]
+        column = 0
+
+        def fits(index: int, height: int) -> bool:
+            return (
+                max_height <= 0
+                or heights[index] == 0
+                or heights[index] + GAP + height <= max_height
+            )
+
+        for number, (group, height) in enumerate(zip(groups, sizes)):
+            continues = self.continues[number]
+            leads = (
+                number + 1 < len(groups) and self.continues[number + 1]
+            )
             shortest = heights.index(min(heights)) if heights else -1
-            if (
-                not stacks
-                or (
-                    max_height > 0
-                    and heights[shortest] > 0
-                    and heights[shortest] + GAP + height > max_height
+            if stacks and (continues or leads):
+                shortest = next(
+                    (
+                        index
+                        for index in range(column if continues else 0, columns)
+                        if fits(index, height)
+                    ),
+                    -1
                 )
-            ):
+            if not stacks or shortest < 0 or not fits(shortest, height):
                 page = gtk.Box(spacing=GAP, valign=gtk.Align.START)
                 stacks = []
                 for _ in range(columns):
@@ -391,6 +423,7 @@ class KeybindsBox(gtk.Box):
                 shortest = 0
             stacks[shortest].append(group)
             heights[shortest] += height + (GAP if heights[shortest] else 0)
+            column = shortest
         return pages
 
     def set_page(self, index: int) -> None:
@@ -433,6 +466,9 @@ class KeybindsWindow(widget.LayerWindow):
             child=self.box
         )
         self._child: KeybindsBox | None = None
+        # Last described binds from hyprland.lua, so only the first opening
+        # has to build the list twice.
+        self.config_hints: list[KeyBindHint] = []
 
         if __debug__:
             weakref.finalize(
@@ -463,7 +499,7 @@ class KeybindsWindow(widget.LayerWindow):
         super().on_key_press(controller, keyval, *args)
 
     def on_show(self) -> None:
-        self.show_list()
+        self.show_list(self.config_hints)
         if self._child is not None:
             asyncio.create_task(
                 add_config_binds(weakref.ref(self), weakref.ref(self._child))
