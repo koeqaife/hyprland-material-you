@@ -47,6 +47,11 @@ active_client = Ref[dict[int, "Client | None"]](
     {},
     name="active_client",
 )
+# Connector names of the monitors that show at least one window right now
+occupied_monitors = Ref[set[str]](
+    set(),
+    name="occupied_monitors"
+)
 
 INTERNAL_OUTPUT_PREFIXES = (
     "eDP", "LVDS", "DSI", "DPI", "SPI"
@@ -560,6 +565,11 @@ class EventCallbacks:
         new_workspace_name: str
     ) -> None:
         active_workspace.value = int(new_workspace_id)
+        asyncio.create_task(sync_visible_workspaces())
+
+    @staticmethod
+    def on_activespecialv2(*_args: str) -> None:
+        asyncio.create_task(sync_visible_workspaces())
 
     @staticmethod
     def on_focusedmonv2(
@@ -568,6 +578,7 @@ class EventCallbacks:
     ) -> None:
         active_workspace.value = int(new_workspace_id)
         active_monitor_name.value = new_monitor_name
+        asyncio.create_task(sync_visible_workspaces())
 
     @staticmethod
     def on_activelayout(
@@ -620,6 +631,7 @@ class EventCallbacks:
             _client._data["workspace"]["id"] = int(workspace_id)
             _client._data["workspace"]["name"] = workspace_name
             _client.notify_changed()
+            update_occupied_monitors()
         else:
             asyncio.create_task(clients_full_sync())
 
@@ -694,6 +706,7 @@ class EventCallbacks:
         workspace_name: str,
         *monitor_name: str
     ) -> None:
+        asyncio.create_task(sync_visible_workspaces())
         try:
             workspace_monitors.value[int(workspace_id)] = (
                 monitor_ids.value[",".join(monitor_name)]
@@ -708,6 +721,7 @@ class EventCallbacks:
         *monitor_description: str
     ) -> None:
         monitor_ids.value[monitor_name] = int(monitor_id)
+        asyncio.create_task(sync_visible_workspaces())
 
     @staticmethod
     def on_monitorremovedv2(
@@ -715,6 +729,7 @@ class EventCallbacks:
         monitor_name: str,
         *monitor_description: str
     ) -> None:
+        asyncio.create_task(sync_visible_workspaces())
         try:
             if monitor_name in monitor_ids.value:
                 monitor_id = monitor_ids.value[monitor_name]
@@ -846,6 +861,7 @@ async def clients_full_sync() -> None:
             active_client.value[_client.monitor] = _client
 
     clients.notify_signal("synced", clients.value)
+    update_occupied_monitors()
 
 
 def acquire_clients() -> None:
@@ -858,6 +874,53 @@ def release_clients() -> None:
 
 async def get_monitors() -> list[MonitorDict]:
     return t.cast(list[MonitorDict], await client.query("monitors all"))
+
+
+# Workspace id -> connector name, for every workspace on screen
+_visible_workspaces: dict[int, str] = {}
+_visible_sync_running = False
+_visible_sync_again = False
+
+
+def update_occupied_monitors(*args: t.Any) -> None:
+    occupied_monitors.value = {
+        _visible_workspaces[window.workspace_id]
+        for window in clients.value.values()
+        if window.mapped
+        and not window.hidden
+        and window.workspace_id in _visible_workspaces
+    }
+
+
+async def sync_visible_workspaces() -> None:
+    # A single switch sends several events in no fixed order, and replies
+    # can overtake each other. So ask Hyprland, one query at a time.
+    global _visible_workspaces, _visible_sync_running, _visible_sync_again
+    if _visible_sync_running:
+        _visible_sync_again = True
+        return
+    _visible_sync_running = True
+    try:
+        while True:
+            _visible_sync_again = False
+            monitors = await get_monitors()
+            if isinstance(monitors, list):
+                _visible_workspaces = {
+                    workspace["id"]: monitor["name"]
+                    for monitor in monitors
+                    if not monitor["disabled"]
+                    for workspace in (
+                        monitor["activeWorkspace"],
+                        monitor["specialWorkspace"]
+                    )
+                    # Hyprland leaves the id out when nothing is open there
+                    if workspace.get("id")
+                }
+                update_occupied_monitors()
+            if not _visible_sync_again:
+                break
+    finally:
+        _visible_sync_running = False
 
 
 async def init() -> None:
@@ -882,7 +945,9 @@ async def init() -> None:
     _active_workspaces = await get_active_workspaces(client)
     workspace_monitors.value = _active_workspaces
 
+    clients.watch(update_occupied_monitors)
     await clients_full_sync()
+    await sync_visible_workspaces()
 
     try:
         _temperature = await client.raw(

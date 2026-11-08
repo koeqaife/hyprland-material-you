@@ -50,6 +50,11 @@ tooltip label {
 
 .corner {
     color: rgba($background, $layerOpacity);
+    transition: opacity 200ms;
+
+    &.transparent {
+        opacity: 0;
+    }
 }
 
 .misc--search {

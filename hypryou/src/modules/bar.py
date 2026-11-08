@@ -36,6 +36,15 @@ FIT_SLACK = 8
 FIT_DELAY = 100
 
 
+def is_bar_transparent(monitor: gdk.Monitor) -> bool:
+    mode = Settings().get("bar_background")
+    if mode == "auto":
+        return (
+            monitor.get_connector() not in hyprland.occupied_monitors.value
+        )
+    return bool(mode == "transparent")
+
+
 class FitHideable:
     """Lets the bar hide a module that does not fit without overriding the
     module's own visibility logic."""
@@ -1320,7 +1329,10 @@ class Bar(widget.LayerWindow):
             hyprland.active_client: hyprland.active_client.watch(
                 self.update_hidden
             ),
-            _opened_windows: _opened_windows.watch(self.update_hidden)
+            _opened_windows: _opened_windows.watch(self.update_hidden),
+            hyprland.occupied_monitors: hyprland.occupied_monitors.watch(
+                self.update_background
+            )
         }
         self.settings = Settings()
         self.settings_handlers = {
@@ -1331,7 +1343,7 @@ class Bar(widget.LayerWindow):
                 "floating_bar", self.change_floating, True
             ),
             self.settings.watch(
-                "transparent_bar", self.change_transparent, True
+                "bar_background", self.update_background, True
             ),
             self.settings.watch(
                 "hyprland.gaps_out", self.change_floating, False
@@ -1424,8 +1436,8 @@ class Bar(widget.LayerWindow):
             for edge in edges:
                 layer_shell.set_margin(self, edge, 0)
 
-    def change_transparent(self, value: bool) -> None:
-        toggle_css_class(self, "transparent", value)
+    def update_background(self, *args: t.Any) -> None:
+        toggle_css_class(self, "transparent", is_bar_transparent(self.monitor))
 
     def update_hidden(self, *args: t.Any) -> None:
         if self.visible_timeout != -1:
@@ -1530,7 +1542,7 @@ class Corners:
                 "floating_bar", self.update_visible, False
             ),
             self.settings.watch(
-                "transparent_bar", self.update_visible, False
+                "bar_background", self.update_visible, False
             ),
             self.settings.watch(
                 "hyprland.gaps_out", self.update_rounding, False
@@ -1538,6 +1550,9 @@ class Corners:
             self.decoration.watch(
                 "rounding", self.update_rounding, False
             )
+        )
+        self.occupied_handler = hyprland.occupied_monitors.watch(
+            self.update_transparent
         )
 
     def get_radius(self) -> int:
@@ -1548,7 +1563,7 @@ class Corners:
     def update_rounding(self, *args: t.Any) -> None:
         if self.windows:
             self.destroy_windows()
-        self.create_windows()
+            self.create_windows()
 
     def create_windows(self) -> None:
         for is_on_left in (True, False):
@@ -1580,8 +1595,17 @@ class Corners:
                 surface.set_input_region(
                     dummy_region  # type: ignore[arg-type]
                 )
+        self.update_transparent()
+
+    def update_transparent(self, *args: t.Any) -> None:
+        # Fading the corners out avoids recreating their windows every time
+        # the workspace changes
+        transparent = is_bar_transparent(self.monitor)
+        for corner in self.corners:
+            toggle_css_class(corner, "transparent", transparent)
 
     def destroy(self) -> None:
+        hyprland.occupied_monitors.unwatch(self.occupied_handler)
         self.destroy_windows()
         for handler in self.handlers:
             self.settings.unwatch(handler)
@@ -1595,10 +1619,11 @@ class Corners:
     def update_visible(self, *args: t.Any) -> None:
         value = (
             not self.settings.get("floating_bar")
-            and not self.settings.get("transparent_bar")
+            and self.settings.get("bar_background") != "transparent"
             and self.settings.get("corners")
         )
         if value and not self.windows:
             self.create_windows()
-        elif self.windows:
+        elif not value and self.windows:
             self.destroy_windows()
+        self.update_transparent()
