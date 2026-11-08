@@ -876,19 +876,20 @@ async def get_monitors() -> list[MonitorDict]:
     return t.cast(list[MonitorDict], await client.query("monitors all"))
 
 
-# Workspace id -> connector name, for every workspace on screen
-_visible_workspaces: dict[int, str] = {}
+# Workspace name -> connector name, for every workspace on screen.
+# Names, because Hyprland gives special workspaces no id.
+_visible_workspaces: dict[str, str] = {}
 _visible_sync_running = False
 _visible_sync_again = False
 
 
 def update_occupied_monitors(*args: t.Any) -> None:
     occupied_monitors.value = {
-        _visible_workspaces[window.workspace_id]
+        _visible_workspaces[window.workspace_name]
         for window in clients.value.values()
         if window.mapped
         and not window.hidden
-        and window.workspace_id in _visible_workspaces
+        and window.workspace_name in _visible_workspaces
     }
 
 
@@ -906,15 +907,15 @@ async def sync_visible_workspaces() -> None:
             monitors = await get_monitors()
             if isinstance(monitors, list):
                 _visible_workspaces = {
-                    workspace["id"]: monitor["name"]
+                    workspace["name"]: monitor["name"]
                     for monitor in monitors
                     if not monitor["disabled"]
                     for workspace in (
                         monitor["activeWorkspace"],
                         monitor["specialWorkspace"]
                     )
-                    # Hyprland leaves the id out when nothing is open there
-                    if workspace.get("id")
+                    # The name is empty when no special workspace is open
+                    if workspace.get("name")
                 }
                 update_occupied_monitors()
             if not _visible_sync_again:
