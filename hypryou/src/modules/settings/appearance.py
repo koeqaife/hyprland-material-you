@@ -64,7 +64,7 @@ class AppearancePage(gtk.ScrolledWindow):
             ),
             SettingsDropdownRow(
                 "Bar background",
-                "Auto keeps the bar transparent until a window is on screen",
+                "Auto is transparent on empty workspaces",
                 "bar_background",
                 [
                     DropdownItem("solid", "Solid"),
