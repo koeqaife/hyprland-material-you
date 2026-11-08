@@ -255,26 +255,10 @@ class DBusMenuPopover(gtk.PopoverMenu):
         params: glib.Variant,
         user_data: t.Any,
     ) -> None:
-        try:
-            maybe = params.unpack()
-            if not maybe:
-                return
-            first = maybe[0]
-            if isinstance(first, (list, tuple)) and len(first) >= 1:
-                items = [it[0] for it in first]
-                if items:
-                    self._request_layout()
-                    return
-        except Exception as e:
-            logger.exception(e)
-        try:
-            item_id, props = params.unpack()
-        except Exception as e:
-            logger.exception(e)
-            return
-        action_name = self._id_to_action.get(item_id)
-        if not action_name:
-            return
+        # ItemsPropertiesUpdated carries (updated, removed), and either list
+        # can be the empty one. ItemPropertiesUpdated is about a single item.
+        if signal == "ItemPropertiesUpdated" or any(params.unpack()):
+            self._request_layout()
 
     def _set_fallback_menu(self) -> None:
         fallback = gio.Menu()
