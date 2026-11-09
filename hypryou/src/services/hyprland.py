@@ -53,6 +53,9 @@ occupied_monitors = Ref[set[str]](
     name="occupied_monitors"
 )
 
+# Hyprland's first special workspace id, for windows reported without one
+SPECIAL_WORKSPACE_ID = -99
+
 INTERNAL_OUTPUT_PREFIXES = (
     "eDP", "LVDS", "DSI", "DPI", "SPI"
 )
@@ -70,6 +73,15 @@ def _monitor_positions() -> dict[str, tuple[int, int]]:
         geometry = monitor.get_geometry()
         positions[connector] = (geometry.x, geometry.y)
     return positions
+
+
+def parse_workspace_id(value: str) -> int | None:
+    # Special workspaces have no id: Hyprland leaves it out of its JSON and
+    # sends their name in its place in events.
+    try:
+        return int(value)
+    except ValueError:
+        return None
 
 
 def parse_workspaces(value: str) -> list[int]:
@@ -352,7 +364,7 @@ class Client(Signals):
 
     @property
     def workspace_id(self) -> int:
-        return self._data["workspace"]["id"]
+        return self._data["workspace"].get("id", SPECIAL_WORKSPACE_ID)
 
     @property
     def workspace_name(self) -> str:
@@ -594,15 +606,18 @@ class EventCallbacks:
         workspace_id: str,
         workspace_name: str
     ) -> None:
-        workspace_monitors.value[int(workspace_id)] = active_monitor_id.value
+        parsed_id = parse_workspace_id(workspace_id)
+        if parsed_id is not None:
+            workspace_monitors.value[parsed_id] = active_monitor_id.value
 
     @staticmethod
     def on_destroyworkspacev2(
         workspace_id: str,
         workspace_name: str
     ) -> None:
-        if int(workspace_id) in workspace_monitors.value:
-            del workspace_monitors.value[int(workspace_id)]
+        parsed_id = parse_workspace_id(workspace_id)
+        if parsed_id in workspace_monitors.value:
+            del workspace_monitors.value[parsed_id]
 
     @staticmethod
     def on_openwindow(
@@ -628,7 +643,11 @@ class EventCallbacks:
     ) -> None:
         if window_address in clients.value.keys():
             _client = clients.value[window_address]
-            _client._data["workspace"]["id"] = int(workspace_id)
+            parsed_id = parse_workspace_id(workspace_id)
+            if parsed_id is None:
+                _client._data["workspace"].pop("id", None)
+            else:
+                _client._data["workspace"]["id"] = parsed_id
             _client._data["workspace"]["name"] = workspace_name
             _client.notify_changed()
             update_occupied_monitors()
@@ -707,8 +726,11 @@ class EventCallbacks:
         *monitor_name: str
     ) -> None:
         asyncio.create_task(sync_visible_workspaces())
+        parsed_id = parse_workspace_id(workspace_id)
+        if parsed_id is None:
+            return
         try:
-            workspace_monitors.value[int(workspace_id)] = (
+            workspace_monitors.value[parsed_id] = (
                 monitor_ids.value[",".join(monitor_name)]
             )
         except KeyError:
@@ -789,7 +811,7 @@ async def get_active_workspaces(client: HyprlandClient) -> dict[int, int]:
     workspace_monitors = {
         int(object["id"]): int(object["monitorID"])
         for object in workspaces
-        if object.get("monitorID") is not None
+        if object.get("monitorID") is not None and "id" in object
     }
     return workspace_monitors
 
