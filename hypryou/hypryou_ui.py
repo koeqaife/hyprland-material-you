@@ -281,7 +281,7 @@ class HyprYou(gtk.Application):
                         "Removing corners for monitor: %s",
                         monitor.get_model()
                     )
-                self.corners[monitor].destroy_windows()
+                self.corners[monitor].destroy()
                 del self.corners[monitor]
 
         for i, monitor in enumerate(list(monitors)):  # type: ignore[assignment]  # noqa

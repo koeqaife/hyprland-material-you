@@ -62,6 +62,16 @@ class AppearancePage(gtk.ScrolledWindow):
                 "Adds margins to the bar (conflicts with corners)",
                 "floating_bar",
             ),
+            SettingsDropdownRow(
+                "Bar background",
+                "Auto is transparent on empty workspaces",
+                "bar_background",
+                [
+                    DropdownItem("solid", "Solid"),
+                    DropdownItem("transparent", "Transparent"),
+                    DropdownItem("auto", "Auto"),
+                ]
+            ),
 
             Category("Formatting"),
             SettingsBoolRow(

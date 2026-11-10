@@ -7,6 +7,11 @@ window.bar {
     @include nLayerBackground($background, 1);
     border: none;
     box-shadow: none;
+    transition: background-color 200ms;
+
+    &.transparent {
+        background-color: transparent;
+    }
 
     &.floating {
         border-radius: $hyprlandRounding;
