@@ -5,7 +5,6 @@
 
 window.keybinds {
     @include nLayerBackground($background, 1);
-    min-width: 60rem;
     border-radius: $hyprlandRounding;
     border: 0.0625rem solid $layerBorderColor;
     padding: 0.5rem;
@@ -63,6 +62,27 @@ window.keybinds {
         color: $onSurface;
         font-size: 1rem;
         font-weight: 400;
+    }
+
+    .page-buttons {
+        margin-top: 0.5rem;
+        button {
+            @include nLayerBackground($surfaceContainer, 2);
+            min-width: 2rem;
+            min-height: 2rem;
+            border-radius: 1rem;
+            color: $onSurfaceVariant;
+            &:not(:last-child) {
+                margin-right: 0.25rem;
+            }
+            &:hover {
+                background-color: color.mix($surfaceContainer, $onSurface, 90%);
+            }
+            &.active {
+                background-color: $primary;
+                color: $onPrimary;
+            }
+        }
     }
 
     separator {
