@@ -77,6 +77,9 @@ class TextPopup(gtk.Revealer):
             window_counter.value[self.num] -= 1
 
     def destroy(self) -> None:
+        if self.timer_handler != -1:
+            glib.source_remove(self.timer_handler)
+            self.timer_handler = -1
         self.icon.destroy()
 
 
@@ -175,6 +178,9 @@ class Popup(gtk.Revealer):
             window_counter.value[self.num] -= 1
 
     def destroy(self) -> None:
+        if self.timer_handler != -1:
+            glib.source_remove(self.timer_handler)
+            self.timer_handler = -1
         self.icon.destroy()
 
 
@@ -250,6 +256,7 @@ class VolumePopup(Popup):
 
     def destroy(self) -> None:
         self.volume.unwatch(self.handler)
+        self.name_ref.unwatch(self.name_handler)
         super().destroy()
 
     def on_name_change(self, new_value: str) -> None:
@@ -282,7 +289,6 @@ class VolumePopup(Popup):
         if not self.revealed:
             return
         self.volume.value = self.scale.get_value()
-        self.name_ref.unwatch(self.name_handler)
         if self.show_if():
             self.reveal()
         super().scale_changed(*args)
@@ -421,6 +427,9 @@ class PopupsWindow(widget.LayerWindow):
         if getattr(self, "brightness"):
             self.brightness.destroy()
         self.volume.destroy()
+        self.mic_volume.destroy()
+        self.mic_is_using.destroy()
+        self.low_battery.destroy()
         recorders.unwatch(self.recorders_handler)
         get_upower().unwatch(self.upower_handler)
         is_locked.unwatch(self.lock_handler)
